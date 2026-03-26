@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Daland Montgomery
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! 15 quantum algorithms: Grover, QFT, QPE, VQE, QAOA, HHL, teleport,
 //! superdense, BB84, quantum walk, Simon, Bernstein-Vazirani.
 

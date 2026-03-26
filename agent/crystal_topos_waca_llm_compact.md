@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
 # Crystal Topos — Compact LLM Prompt
 # 136 observables. 96 quantum operators. 21 Haskell modules.
 

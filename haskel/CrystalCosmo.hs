@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Daland Montgomery
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 {- | Module: CrystalCosmo — Dark matter, Λ, neutrinos, η_B, m_ββ, halo slope -}
 module CrystalCosmo
   ( proveDMRatio, proveWardInvisibility, proveDMIdentity, proveDMCrossSection

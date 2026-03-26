@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """
 06 — Entanglement Analysis
 The crystal lives in ℂ² ⊗ ℂ³ — the UNIQUE dimension where PPT

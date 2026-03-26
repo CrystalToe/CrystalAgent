@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Daland Montgomery
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 {- | Module: CrystalCrossDomain — Cross-domain observables from A_F
      Blasius, Kleiber, von Kármán, Benford, Feigenbaum, Ω_Λ/Ω_m, τ_p
      

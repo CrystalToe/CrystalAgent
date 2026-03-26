@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """41 — Proton Mass from the Fermat Tower"""
 from crystal_topos import n_w, n_c, d_total, gauss
 v_mev = 246220.0  # Higgs VEV in MeV

@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
 # CrystalAxiom.hs — The One Law
 
 **774 lines · Foundation module · All other modules import this**

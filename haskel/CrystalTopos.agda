@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Daland Montgomery
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 {-
   CrystalTopos.agda — Agda Proof · v14 · March 2026
   THE ONE LAW: Phys = End(A_F) + Nat(End(A_F)). 650 endomorphisms.

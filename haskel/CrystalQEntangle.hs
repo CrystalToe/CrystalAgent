@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Daland Montgomery
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 {- |
 Module      : CrystalQEntangle
 Description : 12 entanglement analysis tools — PPT exact for ℂ²⊗ℂ³

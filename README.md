@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
 # Crystal Topos
 
 ### 136 Physical Constants from Two Primes. Zero Free Parameters.
