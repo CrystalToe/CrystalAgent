@@ -4,6 +4,45 @@
 
 ### 136 Physical Constants from Two Primes. Zero Free Parameters.
 
+### 📄 [Read the Paper: "The Crystal Topos: A Complete Physics Framework from A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)"](https://zenodo.org/records/19217129)
+
+---
+
+## ⚡ Try It Now (No Install — 30 Seconds)
+
+1. **Open** [Gemini](https://gemini.google.com/), [Copilot](https://copilot.microsoft.com/), [Claude](https://claude.ai/), or [ChatGPT](https://chat.openai.com/)
+2. **Upload** both files from the [`quickstart/`](quickstart/) folder:
+   - `crystal_topos_waca_llm_compact.md`
+   - `CrystalTopos.zip.txt`
+3. **Paste** any of these:
+
+```
+I've uploaded the Crystal Topos files. Can you show me how the framework derives
+the proton mass from the (2,3) lattice, including the formula, the crystal value,
+the PDG value, and the Prime Wobble Index?
+```
+
+```
+Can the fine structure constant (α⁻¹ ≈ 137.036) and the Planck mass be derived
+purely from the spectral data of the (2,3) lattice — two primes, one algebra,
+zero fudge factors?
+```
+
+```
+What is the exact value of the Muon's magnetic anomaly g-2, and where does
+that number come from?
+```
+
+```
+The Crystal Topos framework claims that its codebase is formally verified using
+Agda and Lean 4, utilizing Haskell via the Curry-Howard Correspondence. It also
+provides 'Certificates' for all physical derivations. What does this mean for
+the reliability of the physics model, and how do these tools prove the constants
+of nature? Why is this a big deal?
+```
+
+---
+
 > *"Can the fine structure constant and the Planck mass be derived purely from the spectral data of the (2,3) lattice — two primes, one algebra, zero fudge factors?"*
 >
 > **Yes.** α⁻¹ = 43π + ln 7. M_Pl/v = e⁴²/35. Every integer computes from N_w = 2 and N_c = 3.
@@ -116,12 +155,22 @@ m_e = Λ_h/(N_c²×N_w⁴×gauss)     → 0.512 MeV  (0.12%)
 ```
 CrystalAgent/
 ├── README.md                          ← You are here
-├── agent/                             ← LLM agent prompts
-│   ├── crystal_topos_waca_llm.md      ← Full LLM prompt (all modules)
-│   ├── crystal_topos_waca_llm_compact.md  ← Compact lookup
-│   └── llm_CrystalQ*.md              ← Per-module LLM prompts (8 files)
+├── quickstart/                        ← LLM quickstart (no install needed)
+│   ├── crystal_topos_waca_llm_compact.md  ← Upload this to any LLM
+│   └── CrystalTopos.zip.txt          ← Upload this alongside it
 │
-└── haskel/                            ← All source code + proofs
+├── agent/                             ← Full LLM agent prompts (for RAG)
+│   ├── crystal_topos_waca_llm.md      ← Full prompt (all modules, rules, examples)
+│   └── crystal_topos_waca_llm_compact.md  ← Compact lookup
+│
+├── crystal-topos/                     ← Rust core + Python bindings
+│   ├── src/                           ← 9 Rust modules (1,614 lines)
+│   ├── tests/                         ← 12 structural theorem tests
+│   ├── examples/                      ← 50 Python examples
+│   ├── Cargo.toml                     ← Rust crate config
+│   └── pyproject.toml                 ← pip install config
+│
+└── haskel/                            ← All Haskell source code + proofs
     ├── LeanCert/                      ← Lean 4 proof project
     │   ├── CrystalTopos.lean          ← ~230 theorems
     │   ├── Main.lean                  ← Entry point
@@ -356,29 +405,107 @@ If the `.olean` and `.agdai` files exist, every theorem passed. The compiler IS 
 
 ---
 
-## Using the LLM Agent
+## LLM Quickstart (No Installation — 30 Seconds)
 
-The `agent/` folder contains prompts for feeding this codebase to any LLM:
+The `quickstart/` folder lets you use Crystal Topos with **any LLM** — no Haskell, no Rust, no terminal.
+
+### What's in `quickstart/`
+
+| File | Size | Purpose |
+|------|------|---------|
+| `crystal_topos_waca_llm_compact.md` | 4 KB | Knowledge base: module table, derivation chain, all 136 observables |
+| `CrystalTopos.zip.txt` | 340 KB | All Haskell source files in a single archive |
+
+### How to Use
+
+**Go to:**
+- https://copilot.microsoft.com/ → upload `quickstart/crystal_topos_waca_llm_compact.md` AND `quickstart/CrystalTopos.zip.txt`
+- https://gemini.google.com/ → upload `quickstart/crystal_topos_waca_llm_compact.md` AND `quickstart/CrystalTopos.zip.txt`
+- https://claude.ai/ → upload `quickstart/crystal_topos_waca_llm_compact.md` AND `quickstart/CrystalTopos.zip.txt`
+- https://chat.openai.com/ → upload `quickstart/crystal_topos_waca_llm_compact.md` AND `quickstart/CrystalTopos.zip.txt`
+
+**Then paste any of these prompts:**
+
+---
+
+**Prompt 1 — Proton Mass:**
+```
+I've uploaded the Crystal Topos files. Can you show me how the framework derives
+the proton mass from the (2,3) lattice, including the formula, the crystal value,
+the PDG value, and the Prime Wobble Index?
+```
+
+**Prompt 2 — Muon g−2:**
+```
+What is the exact value of the Muon's magnetic anomaly g-2, and where does
+that number come from?
+```
+
+**Prompt 3 — Fine Structure Constant + Planck Mass:**
+```
+Can the fine structure constant (α⁻¹ ≈ 137.036) and the Planck mass be derived
+purely from the spectral data of the (2,3) lattice — two primes, one algebra,
+zero fudge factors?
+```
+
+**Prompt 4 — Formal Verification (Why This Is a Big Deal):**
+```
+The Crystal Topos framework claims that its codebase is formally verified using
+Agda and Lean 4, utilizing Haskell via the Curry-Howard Correspondence. It also
+provides 'Certificates' for all physical derivations. What does this mean for
+the reliability of the physics model, and how do these tools prove the constants
+of nature? Why is this a big deal?
+```
+
+**Prompt 5 — What Can This Do That Qiskit Can't?**
+```
+Compare crystal-topos to Qiskit, Cirq, and QuTiP. What can this library do
+that those cannot? Be specific.
+```
+
+**Prompt 6 — The Hierarchy Problem:**
+```
+How does the Crystal Topos solve the hierarchy problem — why gravity is
+10^16 times weaker than electromagnetism?
+```
+
+**Prompt 7 — Entanglement = Arrow of Time:**
+```
+The Crystal Topos claims that quantum entanglement and the arrow of time
+are "the same thing." Explain this claim and the evidence for it.
+```
+
+**Prompt 8 — Run the Simulator:**
+```
+Show me how to install crystal-topos as a Python package and run a simulation
+of two entangled particles. What should I see?
+```
+
+**Prompt 9 — Falsifiable Predictions:**
+```
+What are the falsifiable predictions of the Crystal Topos? If any of these
+experiments come back wrong, what happens to the framework?
+```
+
+**Prompt 10 — The Complete Picture:**
+```
+Summarize everything the Crystal Topos derives from N_w=2 and N_c=3.
+Include the number of observables, the accuracy, the proof systems,
+and why this matters for physics.
+```
+
+---
+
+### Advanced: Full Agent Setup (RAG / Agentic)
+
+The `agent/` folder contains full-size prompts for building RAG pipelines and agentic workflows:
 
 | File | Purpose |
 |------|---------|
-| `crystal_topos_waca_llm.md` | Full prompt: derivation chain, module table, examples |
-| `crystal_topos_waca_llm_compact.md` | Compact: quick lookup for all 136 observables |
-| `llm_CrystalQ*.md` (8 files) | Per-module prompts for quantum library |
+| `agent/crystal_topos_waca_llm.md` | Full prompt: detailed module table, derivation chain, rules, examples |
+| `agent/crystal_topos_waca_llm_compact.md` | Same compact prompt as in quickstart |
 
-### How to use with an LLM:
-
-1. Upload `crystal_topos_waca_llm.md` + the relevant `.hs` file(s) to your LLM
-2. Ask any question about particle physics, quantum mechanics, or cosmology
-3. The LLM looks up the function, reports the formula, crystal value, PDG value, and PWI
-
-**Example prompt:**
-> "What is the proton magnetic moment in the crystal?"
-
-**LLM response:**
-> Looking up `proveProtonMoment` in CrystalanalysisScan.hs:
-> μ_p/μ_N = N_w × β₀/(χ−1) = 2 × 7/5 = 14/5 = 2.800.
-> PDG: 2.7928. PWI: 0.258%. ● TIGHT.
+**For RAG:** Chunk the `.hs` files + the full prompt into a vector store (Pinecone, Weaviate, Chroma). The LLM agent queries against compiled, proof-checked code. No hallucination possible — every answer is grounded in code that compiles.
 
 ---
 
@@ -450,9 +577,9 @@ If **any one** of these fails, the framework is dead. That's not a weakness. Tha
 If you use this work, please cite:
 
 ```
-D. Montgomery, "The Prime Uncertainty Principle: 136 Physical Constants
-from Two Primes, and Why No Finite Theory Can Be Exact," Zenodo, 2026.
-DOI: 10.5281/zenodo.XXXXXXX
+D. Montgomery, "The Crystal Topos: A Complete Physics Framework from
+A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)," Zenodo, 2026.
+https://zenodo.org/records/19217129
 ```
 
 ---
