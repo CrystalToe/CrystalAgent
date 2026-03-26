@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Daland Montgomery
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 -- analysisScanTest.hs — Standalone test driver for CrystalanalysisScan
 -- Compile: ghc -O2 analysisScanTest.hs CrystalanalysisScan.hs -o waca_scan
 -- Run:     ./waca_scan

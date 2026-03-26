@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
 # CrystalQCD.hs — QCD & The Hadron Spectrum
 
 **1,140 lines · Largest module · Proton, quarks, full hadron spectrum**

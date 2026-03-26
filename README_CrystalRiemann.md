@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
 # CrystalRiemann.hs — The Riemann Connection
 
 **351 lines · Trace formula, ARIMA, Weil positivity, Beurling-Nyman**

@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
 # CrystalCosmo.hs — Cosmology
 
 **479 lines · Dark energy, dark matter, spectral index, neutrinos**

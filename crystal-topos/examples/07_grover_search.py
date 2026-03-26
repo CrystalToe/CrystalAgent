@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """
 07 — Grover Search
 Search over χ^n = 6^n states using crystal sector oracle.

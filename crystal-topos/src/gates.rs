@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Daland Montgomery
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! 27 quantum gates: 12 single-particle + 15 multi-particle.
 //! All generalised from ℂ² to ℂ^χ = ℂ⁶.
 

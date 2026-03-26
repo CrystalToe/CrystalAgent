@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Daland Montgomery
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! 10 quantum channels: depolarising, damping, flip, thermal, Kraus, Lindblad.
 
 use crate::base::*;

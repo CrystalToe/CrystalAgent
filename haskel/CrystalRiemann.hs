@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Daland Montgomery
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 {- CrystalRiemann.hs — Connes trace formula from crystal spectral data
    Encodes results from "An Admissible Test Function for the Connes Trace
    Formula from the Spectral Data of A_F" (DOI: 10.5281/zenodo.18916081)

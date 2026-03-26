@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Daland Montgomery
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 {- |
 Module      : CrystalQAlgorithms
 Description : 15 quantum algorithms in crystal sector basis

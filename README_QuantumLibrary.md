@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
 # Crystal Quantum Library — 96 Operators
 
 **8 modules · 1,561 lines · Every operator from Qiskit/Cirq/QuTiP/PennyLane**

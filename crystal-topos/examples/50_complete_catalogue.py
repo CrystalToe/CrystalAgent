@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """50 — The Complete Catalogue: 136 Observables from 2 and 3"""
 from crystal_topos import (n_w, n_c, chi, beta0, gauss, sigma_d,
                            sigma_d2, d_total, crystal_kappa, crystal_max_entropy)

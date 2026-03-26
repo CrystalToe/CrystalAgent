@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Daland Montgomery
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 {- | Module: CrystalAudit — Naturality, solver, kill tests, frontiers, boundary ledger -}
 module CrystalAudit
   ( NatConstraint(..), allNaturality, naturalityUnique

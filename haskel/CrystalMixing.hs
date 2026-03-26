@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Daland Montgomery
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 {- | Module: CrystalMixing — CKM + PMNS mixing matrices -}
 module CrystalMixing
   ( proveVus, proveWolfA, proveWolfA_Z, proveVcb

@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Daland Montgomery
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 {- | Module: CrystalGravity — Information-gravity equivalence, Jacobson chain,
      Kepler, SR/GR, Immirzi, BH -}
 module CrystalGravity where

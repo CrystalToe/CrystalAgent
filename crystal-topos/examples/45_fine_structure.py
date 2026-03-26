@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """45 — The Fine Structure Constant: α = 1/(43π + ln7)"""
 from crystal_topos import d_total, beta0
 import math

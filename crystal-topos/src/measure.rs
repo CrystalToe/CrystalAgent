@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Daland Montgomery
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! 8 measurement operators: projective, POVM, weak, parity, Bell,
 //! homodyne, heterodyne, state tomography.
 

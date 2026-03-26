@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Daland Montgomery
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 {- |
 Module      : CrystalQGates
 Description : Quantum gates from End(A_F) — 12 single + 15 multi-particle

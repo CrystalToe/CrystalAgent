@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
 # Crystal Topos — LLM Agent Prompt
 # 21 Haskell modules. 136 observables. 96 quantum operators.
 # Feed this file + the .hs files to any LLM.

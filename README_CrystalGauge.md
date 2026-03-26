@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
 # CrystalGauge.hs — Couplings & Leptons
 
 **275 lines · Derives α, sin²θ_W, α_s, VEV, Higgs, electron, muon, Koide**

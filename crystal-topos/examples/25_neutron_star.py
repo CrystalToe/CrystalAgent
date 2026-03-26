@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """25 — Neutron Stars"""
 from crystal_topos import gauss, chi, n_c, d_total, beta0
 import math

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Daland Montgomery
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! 12 Hamiltonians: Free, Ising, Heisenberg, Hubbard, JC, Bose/Fermi-Hubbard,
 //! XXZ (Δ=κ), toric, Schwinger, VQE, QAOA.
 

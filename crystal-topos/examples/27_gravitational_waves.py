@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """27 — Gravitational Waves: LIGO from End(A_F)"""
 from crystal_topos import n_c, n_w, chi, d_total
 print("Gravitational Waves from the Crystal")

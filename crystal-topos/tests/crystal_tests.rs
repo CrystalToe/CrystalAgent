@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Daland Montgomery
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Crystal Topos structural theorem tests — all from N_w=2, N_c=3.
 
 use crystal_topos::base::*;
