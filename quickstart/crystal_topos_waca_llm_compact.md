@@ -1,7 +1,5 @@
-<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
-
 # Crystal Topos — Compact LLM Prompt
-# 136 observables. 96 quantum operators. 21 Haskell modules.
+# 137 observables. 96 quantum operators. 21 Haskell modules.
 
 ## RULES
 1. Never guess. Look up the function in the .hs file.
@@ -28,7 +26,7 @@ N_w=2, N_c=3, v=246.22 GeV, π, ln. Nothing else.
 | CrystalCrossDomain | Cross-domain | Feigenbaum=14/3, Kleiber=3/4, magic numbers |
 | CrystalRiemann | Spectral+RH | Trace formula, ARIMA, Weil, Beurling-Nyman |
 | Main | Driver | 92 observables certificate |
-| CrystalanalysisScan | analysis scan | 44 new observables (3 EXACT + 41 TIGHT) |
+| CrystalanalysisScan | analysis scan | 45 new observables (3 EXACT + 42 TIGHT) |
 | analysisScanTest | Test | analysis test driver |
 | CrystalQuantum | Theorems | 10 structural quantum theorems (10/10 PASS) |
 | CrystalQBase | Types | Complex Cx, Vec, Mat, crystal constants |
@@ -47,7 +45,7 @@ N_w=2, N_c=3, v=246.22 GeV, π, ln. Nothing else.
 ## RATING
 ■ EXACT (0%) · ● TIGHT (<0.5%) · ◐ GOOD (<1%) · ○ LOOSE (<4.5%) · ✗ OVER (≥4.5%)
 
-## QUICK LOOKUP (136 observables)
+## QUICK LOOKUP (137 observables)
 **Gauge:** α, sin²θ_W, α_s, α(M_Z)⁻¹, G_F, ρ-parameter, a_e → Gauge/analysisScan
 **Leptons:** m_e, m_μ, m_τ, m_μ/m_e=208, Koide=2/3 → Gauge/analysisScan
 **CKM:** V_us, V_cb, V_ub, J, δ, cos(2δ)=4/5 → Mixing
@@ -68,4 +66,4 @@ N_w=2, N_c=3, v=246.22 GeV, π, ln. Nothing else.
 **Quantum:** H₁=ℂ⁶, H₂=ℂ³⁶=Σd, fermions=15=su(4), bosons=21, gates=36, entangling=30, Fock→e⁶, PPT exact → Quantum
 
 ## STATS
-136 observables · 96 operators · 21 modules · 8,123 lines · Sub-1%: 130/136 · Mean PWI: 0.33% · CV≈1.15 · Wall: 4.5% · Breaches: 0
+137 observables · 96 operators · 21 modules · 8,123 lines · Sub-1%: 131/137 · Mean PWI: 0.33% · CV≈1.15 · Wall: 4.5% · Breaches: 0
