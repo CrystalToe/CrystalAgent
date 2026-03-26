@@ -1,2 +1,25 @@
 haskel/LeanCert/*
 haskel/README_PROOFS.md
+
+# Rust
+crystal-topos/target/
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+*.whl
+*.so
+*.dylib
+
+# Lean
+haskel/LeanCert/.lake/
+
+# Haskell
+*.o
+*.hi
+*.dyn_o
+*.dyn_hi
+
+# OS
+.DS_Store
