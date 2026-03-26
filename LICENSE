@@ -1,0 +1,13 @@
+curl -o LICENSE https://www.gnu.org/licenses/agpl-3.0.txt
+```
+
+Then in every source file header, add:
+```
+# SPDX-License-Identifier: AGPL-3.0-or-later
+```
+
+And update your README to say:
+```
+## License
+
+AGPL-3.0 — See [LICENSE](LICENSE)
