@@ -459,7 +459,7 @@ DOI: 10.5281/zenodo.XXXXXXX
 
 ## License
 
-MIT
+AGPL-3.0 — See [LICENSE](LICENSE)
 
 ---
 
