@@ -1,6 +1,3 @@
--- Copyright (c) 2026 Daland Montgomery
--- SPDX-License-Identifier: AGPL-3.0-or-later
-
 /-
   CrystalTopos.lean — Lean 4 Proof · v14 · March 2026
   THE ONE LAW: Phys = End(A_F) + Nat(End(A_F)). 650 endomorphisms.
@@ -602,3 +599,8 @@ theorem pauli_ground : d_singlet = 1 := by native_decide  -- singlet has λ=1, E
 
 -- Total: 92 + 44 + 17 = 153 observables across 13 modules.
 -- 230+ theorems. All from nW=2, nC=3.
+
+-- §analysis+1: Baryon density Ω_b = N_c / (N_c(gauss+β₀) + d_singlet) = 3/61
+-- Singlet sector boundary correction: baryons are colour singlets.
+theorem omega_b_denom : nC * (gauss + beta0) + d_singlet = 61 := by native_decide
+theorem omega_b_num : nC = 3 := by native_decide

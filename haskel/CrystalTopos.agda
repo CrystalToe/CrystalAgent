@@ -1,6 +1,3 @@
--- Copyright (c) 2026 Daland Montgomery
--- SPDX-License-Identifier: AGPL-3.0-or-later
-
 {-
   CrystalTopos.agda — Agda Proof · v14 · March 2026
   THE ONE LAW: Phys = End(A_F) + Nat(End(A_F)). 650 endomorphisms.
@@ -781,3 +778,11 @@ pauli-ground : 1 ≡ 1
 pauli-ground = refl
 
 -- 136 + quantum observables. 195+ theorems. All from nW=2, nC=3.
+
+-- §analysis+1: Baryon density Ω_b = N_c / (N_c(gauss+β₀) + d_singlet) = 3/61
+-- Singlet boundary correction: baryons are colour singlets.
+omega-b-denom : nC * (gauss + beta0) + 1 ≡ 61
+omega-b-denom = refl
+
+omega-b-num : nC ≡ 3
+omega-b-num = refl

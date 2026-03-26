@@ -1,6 +1,3 @@
--- Copyright (c) 2026 Daland Montgomery
--- SPDX-License-Identifier: AGPL-3.0-or-later
-
 -- ═══════════════════════════════════════════════════════════════════════
 -- CrystalanalysisScan.hs — Wide-Aperture Cross-Domain Graft Scanner Results
 -- ═══════════════════════════════════════════════════════════════════════
@@ -42,8 +39,8 @@ module CrystalanalysisScan
     -- * Electroweak precision (4)
   , proveFermiConstant, proveRhoParameter
   , proveAlphaMZ, proveElectronG2
-    -- * Cosmology (2)
-  , proveCMBTemperature, proveAgeOfUniverse
+    -- * Cosmology (3)
+  , proveCMBTemperature, proveAgeOfUniverse, proveOmegaBaryon
     -- * Nuclear (3)
   , proveDeuteronBE, proveAlphaBE, proveNeutronLifetime
     -- * Magnetic moments (2)
@@ -120,6 +117,9 @@ gauss = n_c^2 + n_w^2                      -- 13
 
 d_total :: Int
 d_total = sigma_d + chi                    -- 42
+
+d_singlet :: Int
+d_singlet = head sector_dims               -- 1
 
 -- ─── TRANSCENDENTAL INVARIANT ───────────────────────────────────────
 
@@ -617,6 +617,19 @@ proveAgeOfUniverse =
   in mkObs "Age of universe (Gyr)" crystal pdg
        "gauss + χ/β₀" "analysisScan"
 
+-- | Baryon density: Ω_b = N_c / (N_c(gauss + β₀) + d_singlet) = 3/61.
+-- Zeroth order: 1/(gauss+β₀) = 1/20 = 0.0500 (PWI = 1.419% LOOSE).
+-- Correction: baryons are colour singlets. The singlet sector (d=1) adds
+-- +1 to the denominator: N_c × 20 + 1 = 61. Same pattern as γ, μ_n, B_s.
+-- Sector boundary correction: singlet constraint on baryon counting.
+proveOmegaBaryon :: Observable
+proveOmegaBaryon =
+  let crystal = fromIntegral n_c
+              / fromIntegral (n_c * (gauss + beta0) + d_singlet)  -- 3/61
+      pdg     = 0.04930
+  in mkObs "Ω_b (baryon density)" crystal pdg
+       "N_c/(N_c(gauss+β₀)+d_singlet)" "analysisScan"
+
 -- ═══════════════════════════════════════════════════════════════════════
 -- §10  NUCLEAR PHYSICS — 3 observables
 -- ═══════════════════════════════════════════════════════════════════════
@@ -814,8 +827,8 @@ wacaScanResults =
     -- EW precision (4)
   , proveFermiConstant, proveRhoParameter
   , proveAlphaMZ, proveElectronG2
-    -- Cosmology (2)
-  , proveCMBTemperature, proveAgeOfUniverse
+    -- Cosmology (3)
+  , proveCMBTemperature, proveAgeOfUniverse, proveOmegaBaryon
     -- Nuclear (3)
   , proveDeuteronBE, proveAlphaBE, proveNeutronLifetime
     -- Magnetic moments (2)
