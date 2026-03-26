@@ -1,0 +1,23 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "crystal-topos"
+version = "0.1.0"
+description = "136 physical constants from two primes. Quantum simulation library."
+readme = "README.md"
+license = {text = "MIT"}
+authors = [{name = "Daland Montgomery"}]
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+keywords = ["quantum", "physics", "simulation", "entanglement", "crystal-topos"]
+
+[tool.maturin]
+features = ["python"]

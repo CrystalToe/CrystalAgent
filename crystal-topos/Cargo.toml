@@ -1,0 +1,27 @@
+[package]
+name = "crystal-topos"
+version = "0.1.0"
+edition = "2021"
+authors = ["Daland Montgomery"]
+description = "136 physical constants from two primes. Zero free parameters. Quantum simulation library."
+license = "MIT"
+repository = "https://github.com/dalandmontgomery/crystal-topos"
+keywords = ["quantum", "physics", "simulation", "entanglement", "crystal-topos"]
+categories = ["science", "simulation", "mathematics"]
+
+[lib]
+name = "crystal_topos"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+pyo3 = { version = "0.22", features = ["extension-module"], optional = true }
+num-complex = "0.4"
+rand = "0.8"
+
+[features]
+default = []
+python = ["pyo3"]
+
+[profile.release]
+opt-level = 3
+lto = true
