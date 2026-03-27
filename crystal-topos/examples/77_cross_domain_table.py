@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """77 — The Cross-Domain Unification Table"""
 from crystal_topos import (n_w, n_c, chi, beta0, gauss, d_total,
                            sigma_d, sigma_d2, crystal_max_entropy)

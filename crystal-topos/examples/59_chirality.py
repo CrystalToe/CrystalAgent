@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """59 — Biological Chirality: Why Life is Left-Handed"""
 from crystal_topos import n_w, n_c, chi
 print("Chirality from the Crystal")

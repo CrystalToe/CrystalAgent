@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """65 — DNA as a (64,21,3) Error-Correcting Code"""
 from crystal_topos import n_w, n_c, beta0, gauss, chi
 import math

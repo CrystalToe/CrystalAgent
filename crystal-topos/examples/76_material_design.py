@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """76 — Material Design: Custom Lattice Structures"""
 from crystal_topos import n_w, n_c, chi, gauss, beta0, d_total, sigma_d
 print("Material Design from Sector Geometry")

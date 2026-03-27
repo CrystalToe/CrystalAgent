@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Daland Montgomery
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Crystal Topos base types: complex numbers, vectors, matrices, and all constants.
 //! Everything derived from N_w=2, N_c=3.
 

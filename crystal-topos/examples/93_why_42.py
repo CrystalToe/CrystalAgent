@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """93 — Why 42 IS the Answer to Everything"""
 from crystal_topos import d_total, sigma_d, chi, n_w, n_c, gauss, beta0
 import math

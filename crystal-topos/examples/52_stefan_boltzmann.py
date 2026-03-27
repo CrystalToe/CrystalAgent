@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """52 — Stefan-Boltzmann: Blackbody Radiation Counted by Sectors"""
 from crystal_topos import n_w, n_c, gauss, beta0
 print("Stefan-Boltzmann Law from the Crystal")

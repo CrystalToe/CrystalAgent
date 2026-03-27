@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """54 — Kolmogorov −5/3: Turbulence from Non-Commutativity"""
 from crystal_topos import n_w, n_c, d_total, gauss
 import math

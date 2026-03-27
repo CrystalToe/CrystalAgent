@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """53 — Fourier's Law: Thermal Conductivity = 5"""
 from crystal_topos import chi, sigma_d
 print("Fourier's Law of Heat Conduction")

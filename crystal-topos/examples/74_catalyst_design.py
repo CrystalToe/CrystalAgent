@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """74 — Catalyst Design: Finding Geometric Holes"""
 from crystal_topos import n_w, n_c, chi, d_total, gauss, beta0
 print("Catalyst Design via Lattice Geometry")

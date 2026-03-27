@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """72 — Room-Temperature Superconductors via Lattice Lock"""
 from crystal_topos import chi, sigma_d, n_w, n_c, sigma_d2
 import math

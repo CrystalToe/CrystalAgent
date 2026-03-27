@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """51 — Carnot Efficiency: The Second Law IS a Geometric Constraint"""
 from crystal_topos import chi, n_w, n_c
 print("The Second Law of Thermodynamics")

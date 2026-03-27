@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """55 — Prandtl Number: Momentum vs Thermal Diffusivity"""
 from crystal_topos import beta0, gauss, n_w, n_c
 print("Prandtl Number (Air)")

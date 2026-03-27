@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """85 — The IO Monad IS the Arrow of Time"""
 from crystal_topos import chi, crystal_max_entropy
 import math

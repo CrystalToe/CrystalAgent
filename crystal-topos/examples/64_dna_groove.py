@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """64 — DNA Major/Minor Groove: 11/χ"""
 from crystal_topos import n_c, chi, beta0
 print("DNA Groove Geometry from the Crystal")

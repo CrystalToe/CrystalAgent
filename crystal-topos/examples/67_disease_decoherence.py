@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """67 — Disease as Lattice Decoherence"""
 from crystal_topos import d_total, sigma_d, chi, gauss, beta0
 print("Cancer, Viruses, and the D=42 Ground State")

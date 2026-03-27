@@ -1,16 +1,19 @@
-"""50 — The Complete Catalogue: 172 Observables from 2 and 3"""
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+"""50 — The Complete Catalogue: 178 Observables from 2 and 3"""
 from crystal_topos import (n_w, n_c, chi, beta0, gauss, sigma_d,
                            sigma_d2, d_total, crystal_kappa, crystal_max_entropy)
 print("╔════════════════════════════════════════════════════════╗")
 print("║  THE COMPLETE CRYSTAL TOPOS CATALOGUE                 ║")
-print("║  172 observables · 0 free parameters · (2,3) only     ║")
+print("║  178 observables · 0 free parameters · (2,3) only     ║")
 print("╚════════════════════════════════════════════════════════╝")
 print(f"\n  N_w = {n_w()}, N_c = {n_c()}")
 print(f"  χ = {chi()}, β₀ = {beta0()}, D = {d_total()}, Σd = {sigma_d()}")
 print(f"  Σd² = {sigma_d2()}, gauss = {gauss()}, κ = {crystal_kappa():.6f}")
 print(f"\n  ORIGINAL CRYSTAL: 92 observables")
-print(f"  analysis SCAN: 60 new (29 EXACT + 49 TIGHT + 2 LOOSE)")
-print(f"  TOTAL: 172 observables, 100% sub-1%, mean PWI 0.205%")
+print(f"  analysis SCAN: 60 new (33 EXACT + 52 TIGHT + 1 LOOSE)")
+print(f"  TOTAL: 178 observables, 100% sub-1%, mean PWI 0.205%")
 print(f"\n  analysis CATEGORIES:")
 print(f"    Mesons:              10    Thermodynamics:       3")
 print(f"    Baryons:              7    Fluid dynamics:       5")
