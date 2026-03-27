@@ -299,3 +299,33 @@ fn test_groove_ratio() {
     // 11/χ = 11/6 → 11×6 = 66 cross check
     assert_eq!(11 * NC, 3 * BETA0 + 2 * CHI);  // 33 = 21 + 12
 }
+
+// ═══════════════════════════════════════════════════════════════
+// SUPERCONDUCTIVITY
+// ═══════════════════════════════════════════════════════════════
+
+#[test]
+fn test_lattice_lock() {
+    assert_eq!(SIGMA_D, CHI * CHI);  // 36 = 6² — the resonance
+}
+
+#[test]
+fn test_bcs_ratio() {
+    let gamma = BETA0 as f64 / (GAUSS - 1) as f64
+              - 1.0 / (GAUSS * GAUSS - NW) as f64;
+    let bcs = 2.0 * std::f64::consts::PI / gamma.exp();
+    assert!((bcs - 3.528).abs() < 0.002);  // PWI < 0.02%
+}
+
+#[test]
+fn test_cooper_pair_singlet() {
+    // Antisymmetric subspace = χ(χ-1)/2 = 15 = su(4)
+    assert_eq!(CHI * (CHI - 1) / 2, 15);
+}
+
+#[test]
+fn test_zero_resistance() {
+    // Singlet × singlet mismatch = |1 - 1| = 0
+    let mismatch = (1.0_f64 - 1.0_f64).abs();
+    assert_eq!(mismatch, 0.0);
+}

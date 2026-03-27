@@ -669,3 +669,10 @@ theorem at_bonds : nW = 2 := by native_decide
 theorem gc_bonds : nC = 3 := by native_decide
 -- Groove ratio: 11/χ = 11/6, and 11 is from β₀ = (11N_c - 2χ)/3
 theorem groove_eleven : 3 * beta0 + 2 * chi = 11 * nC := by native_decide
+
+-- §SUPERCONDUCTIVITY: Type-safe electron flow
+-- Lattice lock: Σd/χ² = 36/36 = 1
+theorem lattice_lock : sigmaD = chi * chi := by native_decide
+-- BCS uses Euler-Mascheroni: already proved above
+-- Cooper pair singlet: antisymmetric dim = χ(χ-1)/2 = 15
+theorem cooper_pair_dim : chi * (chi - 1) / 2 = 15 := by native_decide
