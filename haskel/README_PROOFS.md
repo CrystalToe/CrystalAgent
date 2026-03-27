@@ -19,3 +19,33 @@ lake build
 cp .lake/build/lib/lean/CrystalTopos.olean ..
 cd ..
 rm -rf LeanCert/
+
+
+mkdir LeanCert && cd LeanCert
+lake init CrystalTopos .
+cp ../CrystalNoether.lean .
+cp ../Main.lean .
+lake build
+cp .lake/build/lib/lean/Main.olean ../CrystalNoether.olean
+cd ..
+rm -rf LeanCert/
+
+mkdir LeanCert && cd LeanCert
+lake init CrystalTopos .
+cp ../CrystalDiscoveries.lean .
+cp ../Main.lean .
+lake build
+cp .lake/build/lib/lean/Main.olean ../CrystalDiscoveries.olean
+cd ..
+rm -rf LeanCert/
+
+
+
+
+
+
+
+
+
+
+
