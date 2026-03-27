@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
 # Crystal Topos — RAG Knowledge Base (Part 2 of 2)
 # 178 observables · 22 domains · 0 free parameters
 # Upload BOTH parts for 100% coverage. Each part works standalone for basic queries.
