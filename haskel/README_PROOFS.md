@@ -1,10 +1,8 @@
 <!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
 
-ghc -O2 -c CrystalanalysisScan.hs
 
 cd haskel
 ghc -O2 Main.hs -o crystal && ./crystal > GHC_Certificate.txt
-ghc -O2 analysisScanTest.hs CrystalanalysisScan.hs -o waca_scan && ./waca_scan >> GHC_Certificate.txt
 rm -f *.o *.hi crystal waca_scan
 
 # crystal

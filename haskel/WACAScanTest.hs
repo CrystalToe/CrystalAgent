@@ -1,13 +1,10 @@
 -- Copyright (c) 2026 Daland Montgomery
 -- SPDX-License-Identifier: AGPL-3.0-or-later
 
--- analysisScanTest.hs — Standalone test driver for CrystalanalysisScan
--- Compile: ghc -O2 analysisScanTest.hs CrystalanalysisScan.hs -o waca_scan
 -- Run:     ./waca_scan
 
 module Main where
 
-import CrystalanalysisScan
 import Data.List (sortBy)
 import Data.Ord (comparing)
 import Text.Printf
@@ -16,7 +13,6 @@ main :: IO ()
 main = do
   putStrLn ""
   putStrLn "╔═══════════════════════════════════════════════════════════════╗"
-  putStrLn "║   CRYSTAL TOPOS — analysis v3.1 WIDE-APERTURE SCAN RESULTS     ║"
   putStrLn "║   44 New Observables · All Under Prime Wall · (2,3) Only    ║"
   putStrLn "╚═══════════════════════════════════════════════════════════════╝"
   putStrLn ""
@@ -73,7 +69,6 @@ main = do
   
   putStrLn ""
   putStrLn "  ╔═══════════════════════════════════════════════╗"
-  putStrLn "  ║         analysis SCAN SUMMARY STATISTICS          ║"
   putStrLn "  ╠═══════════════════════════════════════════════╣"
   putStrLn $ "  ║  Total new observables:  " ++ printf_pad 4 (show nTotal) ++ "                ║"
   putStrLn $ "  ║  ■ EXACT (PWI = 0):      " ++ printf_pad 4 (show nExact) ++ "                ║"
@@ -95,7 +90,6 @@ main = do
   putStrLn "  ║       COMBINED CRYSTAL TOPOS CATALOGUE        ║"
   putStrLn "  ╠═══════════════════════════════════════════════╣"
   putStrLn "  ║  Original observables:     92                 ║"
-  putStrLn $ "  ║  analysis scan additions:      " ++ printf_pad 4 (show nTotal) ++ "                ║"
   putStrLn $ "  ║  TOTAL CATALOGUE:          " ++ printf_pad 4 (show (92 + nTotal)) ++ "                ║"
   putStrLn "  ║                                               ║"
   putStrLn "  ║  All under the prime wall.                    ║"
@@ -104,7 +98,6 @@ main = do
   putStrLn ""
   
   -- Key discoveries
-  putStrLn "  KEY DISCOVERIES FROM analysis v3.1 SCAN:"
   putStrLn "  ─────────────────────────────────────"
   putStrLn "   1. η' = Λ_h = v/257 (Fermat prime F₃)     PWI = 0.04%"
   putStrLn "   2. η  = Λ_h × 4/β₀                        PWI = 0.07%"

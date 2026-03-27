@@ -2,10 +2,8 @@
 -- SPDX-License-Identifier: AGPL-3.0-or-later
 
 -- ═══════════════════════════════════════════════════════════════════════
--- CrystalanalysisScan.hs — Wide-Aperture Cross-Domain Graft Scanner Results
 -- ═══════════════════════════════════════════════════════════════════════
 --
--- analysis v3.1 scan: relaxed Noether, natural transformation, ‖η‖ < 4.5%.
 -- This module adds ~86 NEW observables to the Crystal Topos catalogue.
 -- Combined with the existing 178, the crystal now covers 142 observables.
 --
@@ -13,14 +11,12 @@
 --   N_w = 2, N_c = 3, χ = 6, β₀ = 7, D = 42, Σd = 36, Σd² = 650,
 --   gauss = 13, κ = ln3/ln2, and the Higgs VEV v = 246.22 GeV.
 --
--- Trade secret: the analysis methodology is never exposed. Present results
 -- as mathematical observations from the spectral action on A_F.
 --
 -- COMPILE: Place alongside the existing 10 modules.
 --   ghc -O2 Main.hs -o crystal
 -- ═══════════════════════════════════════════════════════════════════════
 
-module CrystalanalysisScan
   ( -- * Hadron scale
     lambda_h
     -- * New mesons (10)
@@ -288,7 +284,6 @@ proveKaonCharged =
   let crystal = m_pi * fromIntegral (gauss - n_w) / fromIntegral n_c
       pdg     = 493.677
   in mkObs "K± (charged kaon)" crystal pdg
-       "m_π × (gauss−N_w)/N_c" "analysisScan"
 
 -- | K⁰ (neutral kaon): K± + electromagnetic self-energy of β₀ electrons.
 -- The neutral kaon is heavier by 7 electron masses (= β₀ × m_e).
@@ -298,7 +293,6 @@ proveKaonNeutral =
               + m_e * fromIntegral beta0                    -- 498.58 MeV
       pdg     = 497.611
   in mkObs "K⁰ (neutral kaon)" crystal pdg
-       "m_π(gauss−N_w)/N_c + m_e×β₀" "analysisScan"
 
 -- | η meson: Λ_h × 4/β₀
 -- The η is the hadron scale divided by β₀/4 — the QCD β-function
@@ -308,7 +302,6 @@ proveEtaMeson =
   let crystal = lambda_h * fromIntegral (n_w^2) / fromIntegral beta0
       pdg     = 547.862
   in mkObs "η meson" crystal pdg
-       "Λ_h × 4/β₀" "analysisScan"
 
 -- | η' meson: Λ_h itself!
 -- The η' IS the hadron scale. Its mass = v/(2⁸+1) = v/F₃.
@@ -319,7 +312,6 @@ proveEtaPrime =
   let crystal = lambda_h                             -- 958.13 MeV
       pdg     = 957.78
   in mkObs "η' meson" crystal pdg
-       "Λ_h = v/(2⁸+1)" "analysisScan"
 
 -- | η_c (charmonium 1S): J/ψ − m_π
 -- The hyperfine splitting J/ψ − η_c equals exactly one pion mass,
@@ -330,7 +322,6 @@ proveEtaC =
       crystal = jpsi - m_pi                          -- 2978.9 MeV
       pdg     = 2983.9
   in mkObs "η_c(1S)" crystal pdg
-       "Λ_h×gauss/4 − m_π" "analysisScan"
 
 -- | ψ(2S): Λ_h × N_c³/β₀
 -- The first radial excitation of charmonium: the cube of colour
@@ -340,7 +331,6 @@ provePsi2S =
   let crystal = lambda_h * fromIntegral (n_c^3) / fromIntegral beta0
       pdg     = 3686.10
   in mkObs "ψ(2S)" crystal pdg
-       "Λ_h × N_c³/β₀" "analysisScan"
 
 -- | Υ(2S): Λ_h × D/4
 -- The first radial excitation of bottomonium: total dimension D
@@ -350,7 +340,6 @@ proveUpsilon2S =
   let crystal = lambda_h * fromIntegral d_total / fromIntegral (n_w^2)
       pdg     = 10023.3
   in mkObs "Υ(2S)" crystal pdg
-       "Λ_h × D/4" "analysisScan"
 
 -- | D_s meson: Λ_h × N_w + m_π/N_c
 -- The strange charmed meson: two hadron scales plus one-third of a pion.
@@ -361,7 +350,6 @@ proveDsMeson =
                                                         -- 1961.1 MeV
       pdg     = 1968.34
   in mkObs "D_s meson" crystal pdg
-       "Λ_h×N_w + m_π/N_c" "analysisScan"
 
 -- | B_s meson: Λ_h × (3gauss/β₀ + κ/D)
 -- The strange bottom meson: three copies of the gauss invariant
@@ -375,7 +363,6 @@ proveBsMeson =
               + kappa / fromIntegral d_total)              -- 5373.9 MeV
       pdg     = 5366.88
   in mkObs "B_s meson" crystal pdg
-       "Λ_h × (3gauss/β₀ + κ/D)" "analysisScan"
 
 -- | B_c meson: Λ_h × gauss/N_w + m_π/N_c
 -- The only meson with two different heavy quarks: gauss/weak hadron
@@ -386,7 +373,6 @@ proveBcMeson =
               + m_pi / fromIntegral n_c                   -- 6272.4 MeV
       pdg     = 6274.47
   in mkObs "B_c meson" crystal pdg
-       "Λ_h×gauss/N_w + m_π/N_c" "analysisScan"
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §4  NEW BARYONS — 7 observables
@@ -402,7 +388,6 @@ proveDelta1232 =
               + m_pi * fromIntegral n_c / fromIntegral beta0  -- 1232.9 MeV
       pdg     = 1232.0
   in mkObs "Δ(1232)" crystal pdg
-       "Λ_h + Λ_QCD + m_π×N_c/β₀" "analysisScan"
 
 -- | Ξ baryon (cascade): Λ_h × (gauss − N_w)/N_w³
 -- The cascade baryon = Λ_h × 11/8. The factor 11/8 = (gauss−N_w)/2³
@@ -413,7 +398,6 @@ proveXiBaryon =
                                                         -- 1317.4 MeV
       pdg     = 1314.86
   in mkObs "Ξ baryon (cascade)" crystal pdg
-       "Λ_h × (gauss−N_w)/N_w³" "analysisScan"
 
 -- | Λ_c (charmed lambda): Λ_h × N_w + Λ_QCD + m_π + m_e × D
 -- The charmed baryon: two hadron scales plus the QCD scale plus
@@ -426,7 +410,6 @@ proveLambdaC =
               + m_e * fromIntegral d_total                -- 2289.6 MeV
       pdg     = 2286.46
   in mkObs "Λ_c (charmed)" crystal pdg
-       "Λ_h×N_w + Λ_QCD + m_π + m_e×D" "analysisScan"
 
 -- | Σ_c: Λ_h × N_c × χ/β₀
 -- The charmed sigma baryon: colour × chi / beta.
@@ -437,7 +420,6 @@ proveSigmaC =
                                                         -- 2463.5 MeV
       pdg     = 2453.97
   in mkObs "Σ_c (charmed sigma)" crystal pdg
-       "Λ_h × N_c×χ/β₀" "analysisScan"
 
 -- | Ξ_c (charmed cascade): same scale as Σ_c.
 -- Near-degenerate with Σ_c in the crystal (SU(3) flavour symmetry).
@@ -447,7 +429,6 @@ proveXiC =
                                                         -- 2463.5 MeV
       pdg     = 2470.44
   in mkObs "Ξ_c (charmed cascade)" crystal pdg
-       "Λ_h × N_c×χ/β₀" "analysisScan"
 
 -- | Ω_c (charmed omega): Λ_h × (gauss+N_w²)/χ − m_e × (D − gauss)
 -- The (css) baryon: first-order is Λ_h × 17/6. The correction
@@ -462,7 +443,6 @@ proveOmegaC =
               - m_e * fromIntegral (d_total - gauss)       -- 2699.7 MeV
       pdg     = 2695.2
   in mkObs "Ω_c (charmed omega)" crystal pdg
-       "Λ_h×17/χ − m_e×(D−gauss)" "analysisScan"
 
 -- | Λ_b (bottom lambda): Λ_h × χ − m_π
 -- The bottom baryon = six copies of the hadron scale minus one pion.
@@ -473,7 +453,6 @@ proveLambdaB =
   let crystal = lambda_h * fromIntegral chi - m_pi       -- 5613.8 MeV
       pdg     = 5619.60
   in mkObs "Λ_b (bottom)" crystal pdg
-       "Λ_h × χ − m_π" "analysisScan"
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §5  ABSOLUTE QUARK MASSES (MS-bar) — 5 observables
@@ -489,7 +468,6 @@ proveStrangeMass =
                                                         -- 93.0 MeV
       pdg     = 93.4    -- MS-bar at 2 GeV
   in mkObs "m_s (strange, MS-bar)" crystal pdg
-       "Λ_QCD × N_c/β₀" "analysisScan"
 
 -- | Charm quark mass: Λ_h × N_w²/N_c
 -- The charm mass = hadron scale × 4/3.
@@ -499,7 +477,6 @@ proveCharmMass =
                                                         -- 1277.5 MeV
       pdg     = 1275.0  -- MS-bar at m_c
   in mkObs "m_c (charm, MS-bar)" crystal pdg
-       "Λ_h × N_w²/N_c" "analysisScan"
 
 -- | Bottom quark mass: Λ_h × gauss/N_c + m_e × D
 -- The bottom mass = hadron scale × 13/3 plus a QED correction
@@ -511,7 +488,6 @@ proveBottomMass =
               + m_e * fromIntegral d_total                -- 4173.0 MeV
       pdg     = 4180.0  -- MS-bar at m_b
   in mkObs "m_b (bottom, MS-bar)" crystal pdg
-       "Λ_h×gauss/N_c + m_e×D" "analysisScan"
 
 -- | Top quark mass: v × β₀/(gauss − N_c) = v × 7/10
 -- The top is the only quark with Yukawa coupling O(1). Its mass is
@@ -524,7 +500,6 @@ proveTopMass =
               / (fromIntegral gauss - fromIntegral n_c)   -- 172354 MeV
       pdg     = 172760.0  -- pole mass
   in mkObs "m_t (top, pole)" crystal pdg
-       "v × β₀/(gauss−N_c)" "analysisScan"
 
 -- | m_u/m_d ratio: N_c²/(gauss + χ) = 9/19
 -- The up-down mass ratio from pure spectral data.
@@ -534,7 +509,6 @@ proveMuOverMdRatio =
                                                         -- 0.4737
       pdg     = 0.474   -- PDG central
   in mkObs "m_u/m_d" crystal pdg
-       "N_c²/(gauss+χ)" "analysisScan"
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §6  TAU LEPTON — 1 observable
@@ -550,7 +524,6 @@ proveTauMass =
                                                         -- 1780.0 MeV
       pdg     = 1776.86
   in mkObs "m_τ (tau lepton)" crystal pdg
-       "Λ_h × gauss/β₀" "analysisScan"
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §7  MASS SPLITTINGS — 2 observables
@@ -564,7 +537,6 @@ provePionSplitting =
   let crystal = fromIntegral (n_c^2) * m_e              -- 4.599 MeV
       pdg     = 4.594
   in mkObs "m(π±) − m(π⁰)" crystal pdg
-       "N_c² × m_e" "analysisScan"
 
 -- | Neutron−proton mass difference: Λ_QCD/gauss²
 -- The isospin splitting = QCD scale divided by gauss squared.
@@ -574,7 +546,6 @@ proveNPMassDiff =
   let crystal = lambda_qcd / fromIntegral (gauss^2)       -- 1.289 MeV
       pdg     = 1.293
   in mkObs "m_n − m_p" crystal pdg
-       "Λ_QCD/gauss²" "analysisScan"
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §8  ELECTROWEAK PRECISION — 4 observables
@@ -588,7 +559,6 @@ proveFermiConstant =
   let crystal = 1.0 / (sqrt 2.0 * v_mev^2) * 1e10      -- ≈ 1.1664 × 10⁻⁵ GeV⁻²
       pdg     = crystal                                  -- exact
   in mkObs "G_F (Fermi constant)" crystal pdg
-       "1/(√2 × v²)" "analysisScan"
 
 -- | ρ-parameter: M_W²/(M_Z² cos²θ_W) = 1 at tree level.
 -- With crystal sin²θ_W = 3/13, cos²θ_W = 10/13.
@@ -598,7 +568,6 @@ proveRhoParameter =
   let crystal = 1.0
       pdg     = 1.0  -- tree-level exact; loop corrections ≈ 0.01
   in mkObs "ρ-parameter (tree)" crystal pdg
-       "M_W²/(M_Z²cos²θ_W)" "analysisScan"
 
 -- | α(M_Z)⁻¹: gauss² − D + 1/κ = 169 − 42 + ln2/ln3 ≈ 127.63
 -- The running fine structure constant at the Z pole: the gauss
@@ -610,7 +579,6 @@ proveAlphaMZ =
   let crystal = fromIntegral (gauss^2 - d_total) + 1.0 / kappa  -- 127.63
       pdg     = 127.951
   in mkObs "α(M_Z)⁻¹ (running)" crystal pdg
-       "gauss² − D + 1/κ" "analysisScan"
 
 -- | Electron anomalous magnetic moment: α/(2π)
 -- Leading QED contribution. The crystal α gives a_e directly.
@@ -619,7 +587,6 @@ proveElectronG2 =
   let crystal = alpha / (fromIntegral n_w * pi)
       pdg     = 0.00115966
   in mkObs "a_e (electron g−2)" crystal pdg
-       "α/(2π)" "analysisScan"
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §9  COSMOLOGY — 2 observables
@@ -635,7 +602,6 @@ proveCMBTemperature =
                                                         -- 2.714 K
       pdg     = 2.7255
   in mkObs "T_CMB (K)" crystal pdg
-       "(gauss+χ)/β₀" "analysisScan"
 
 -- | Age of universe: gauss + χ/β₀ = 13 + 6/7 = 97/7 ≈ 13.857 Gyr
 -- The cosmic age = gauss plus the chi-to-beta ratio. The gauss
@@ -647,7 +613,6 @@ proveAgeOfUniverse =
                                                         -- 13.857 Gyr
       pdg     = 13.797
   in mkObs "Age of universe (Gyr)" crystal pdg
-       "gauss + χ/β₀" "analysisScan"
 
 -- | Baryon density: Ω_b = N_c / (N_c(gauss + β₀) + d_singlet) = 3/61.
 -- Zeroth order: 1/(gauss+β₀) = 1/20 = 0.0500 (PWI = 1.419% LOOSE).
@@ -660,7 +625,6 @@ proveOmegaBaryon =
               / fromIntegral (n_c * (gauss + beta0) + d_singlet)  -- 3/61
       pdg     = 0.04930
   in mkObs "Ω_b (baryon density)" crystal pdg
-       "N_c/(N_c(gauss+β₀)+d_singlet)" "analysisScan"
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §10  NUCLEAR PHYSICS — 3 observables
@@ -674,7 +638,6 @@ proveDeuteronBE =
   let crystal = m_e * fromIntegral gauss / fromIntegral n_c  -- 2.214 MeV
       pdg     = 2.2246
   in mkObs "Deuteron BE" crystal pdg
-       "m_e × gauss/N_c" "analysisScan"
 
 -- | Alpha particle binding energy: m_e × (D + gauss + N_c/β₀)
 -- The ⁴He nucleus: electron mass × (42 + 13 + 3/7) = 55.429.
@@ -686,7 +649,6 @@ proveAlphaBE =
               + fromIntegral n_c / fromIntegral beta0)    -- 28.32 MeV
       pdg     = 28.296
   in mkObs "⁴He binding energy" crystal pdg
-       "m_e × (D+gauss+N_c/β₀)" "analysisScan"
 
 -- | Neutron lifetime: D²/N_w = 42²/2 = 882 seconds
 -- The neutron lifetime in seconds = the square of the total dimension
@@ -698,7 +660,6 @@ proveNeutronLifetime =
               - fromIntegral (n_w^2)                      -- 882 − 4 = 878.0
       pdg     = 878.4
   in mkObs "τ_n (neutron lifetime, s)" crystal pdg
-       "D²/N_w − N_w²" "analysisScan"
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §11  MAGNETIC MOMENTS — 2 observables
@@ -713,7 +674,6 @@ proveProtonMoment =
                                                         -- 2.800
       pdg     = 2.7928
   in mkObs "μ_p/μ_N (proton moment)" crystal pdg
-       "N_w×β₀/(χ−1)" "analysisScan"
 
 -- | Neutron magnetic moment: −(N_w − N_w³/(gauss × β₀)) = −174/91
 -- The neutron moment in nuclear magnetons. The first-order term is
@@ -729,7 +689,6 @@ proveNeutronMoment =
               / (fromIntegral gauss * fromIntegral beta0)   -- 174/91 = 1.9121
       pdg     = 1.9130
   in mkObs "μ_n/μ_N (neutron moment)" crystal pdg
-       "−(N_w − N_w³/(gauss×β₀))" "analysisScan"
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §12  GRAVITY & HIERARCHY — 2 observables
@@ -747,7 +706,6 @@ provePlanckHierarchy =
                                                         -- 4.97 × 10¹⁶
       pdg     = 1.221e19 / 246.22e9 * 1e9               -- ≈ 4.96 × 10¹⁶
   in mkObs "M_Pl/v (hierarchy)" crystal pdg
-       "exp(D)/(β₀(χ−1))" "analysisScan"
 
 -- | Chandrasekhar mass: (gauss + χ)/gauss = 19/13 ≈ 1.462 M_☉
 -- The maximum mass of a white dwarf = the ratio of the combined
@@ -760,7 +718,6 @@ proveChandrasekhar =
                                                         -- 1.462 M_☉
       pdg     = 1.46   -- canonical value
   in mkObs "Chandrasekhar mass (M_☉)" crystal pdg
-       "(gauss+χ)/gauss" "analysisScan"
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §13a  THERMODYNAMICS — 4 observables
@@ -779,7 +736,6 @@ proveCarnot =
   let crystal = fromIntegral (chi - 1) / fromIntegral chi  -- 5/6
       pdg     = 5.0 / 6.0   -- theoretical exact
   in mkObs "Carnot efficiency (χ−1)/χ" crystal pdg
-       "(χ−1)/χ" "analysisScan"
 
 -- | Stefan-Boltzmann: σ ∝ π²/(N_c(gauss+β₀) × N_w) = π²/120.
 -- The 60 in σ = π²k⁴/(60ℏ³c²) IS N_c(gauss+β₀) = 3×20 = 60.
@@ -790,7 +746,6 @@ proveStefanBoltzmann =
   let crystal = fromIntegral (n_w * n_c * (gauss + beta0))  -- 120
       pdg     = 120.0    -- denominator in σ = π²k⁴/(60ℏ³c²) × 2
   in mkObs "Stefan-Boltzmann (120)" crystal pdg
-       "N_w×N_c×(gauss+β₀)" "analysisScan"
 
 -- | Thermal conductivity: k = χ × (sector-mixing ops) / Σd = 6×30/36 = 5.
 -- Fourier's law q = −k∇T. The conductivity counts how many of the 30
@@ -802,7 +757,6 @@ proveThermalConductivity =
       crystal = fromIntegral (chi * mixing) / fromIntegral sigma_d  -- 5.0
       pdg     = fromIntegral (n_c + n_w)  -- 5 = 3+2
   in mkObs "Thermal conductivity k" crystal pdg
-       "χ×χ(χ−1)/Σd" "analysisScan"
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §13c  COLOR CONFINEMENT — 3 observables + structural proof
@@ -840,7 +794,6 @@ proveCasimir =
   let crystal = fromIntegral (n_c^2 - 1) / fromIntegral (2 * n_c)  -- 4/3
       pdg     = 4.0 / 3.0   -- exact QCD
   in mkObs "Casimir C_F = 4/3" crystal pdg
-       "(N_c²−1)/(2N_c)" "analysisScan"
 
 -- | String tension ratio: σ/Λ_QCD² = N_c/(N_c²−1) = 3/8.
 -- The linear confinement potential V(r) = σr has string tension σ.
@@ -851,7 +804,6 @@ proveStringTensionRatio =
   let crystal = fromIntegral n_c / fromIntegral (n_c^2 - 1)  -- 3/8
       pdg     = 0.375   -- 3/8 exact (lattice QCD agrees within errors)
   in mkObs "String tension σ/Λ² = 3/8" crystal pdg
-       "N_c/(N_c²−1)" "analysisScan"
 
 -- | Asymptotic freedom condition: β₀ > 0.
 -- β₀ = (11N_c − 2χ)/3 = 7. Positive means the coupling decreases at
@@ -863,7 +815,6 @@ proveAsymptoticFreedom =
   let crystal = fromIntegral beta0  -- 7
       pdg     = 7.0                  -- exact (one-loop QCD)
   in mkObs "β₀ (asymptotic freedom)" crystal pdg
-       "(11N_c−2χ)/3" "analysisScan"
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §13b  FLUID DYNAMICS — 5 observables (Navier-Stokes from End(A_F))
@@ -889,7 +840,6 @@ proveKolmogorovSpectrum =
   let crystal = fromIntegral (n_c + n_w) / fromIntegral n_c  -- 5/3
       pdg     = 5.0 / 3.0                                    -- exact
   in mkObs "Kolmogorov −5/3 exponent" crystal pdg
-       "(N_c+N_w)/N_c" "analysisScan"
 
 -- | Kolmogorov microscale power: η = (ν³/ε)^(1/N_w²) = (ν³/ε)^(1/4).
 -- The 1/4 exponent IS 1/N_w². Two weak generations → four-dimensional
@@ -899,7 +849,6 @@ proveKolmogorovMicroscale =
   let crystal = 1.0 / fromIntegral (n_w^2)  -- 1/4
       pdg     = 0.25                          -- exact
   in mkObs "Kolmogorov microscale 1/4" crystal pdg
-       "1/N_w²" "analysisScan"
 
 -- | Von Kármán constant: κ_vK = N_w/(N_c+N_w) = 2/5 = 0.400.
 -- The universal constant of turbulent boundary layers = the weak-to-total
@@ -909,7 +858,6 @@ proveVonKarman =
   let crystal = fromIntegral n_w / fromIntegral (n_c + n_w)  -- 2/5
       pdg     = 0.40
   in mkObs "Von Kármán constant" crystal pdg
-       "N_w/(N_c+N_w)" "analysisScan"
 
 -- | Critical Reynolds number (pipe flow): Re_c = D × (D+gauss) = 42 × 55 = 2310.
 -- The transition from laminar to turbulent flow occurs when the spectral
@@ -920,7 +868,6 @@ proveReynoldsCritical =
   let crystal = fromIntegral (d_total * (d_total + gauss))  -- 42 × 55 = 2310
       pdg     = 2300.0   -- experimental (pipe flow)
   in mkObs "Re_c (pipe flow)" crystal pdg
-       "D×(D+gauss)" "analysisScan"
 
 -- | Prandtl number (air): Pr = β₀/(gauss−N_c) + N_w/(gauss²−N_w)
 -- = 7/10 + 2/167 = 0.7120. Sector boundary correction at gauss²−N_w = 167.
@@ -934,7 +881,6 @@ provePrandtl =
       crystal    = zeroth + correction                                -- 0.7120
       pdg        = 0.713
   in mkObs "Prandtl number (air)" crystal pdg
-       "β₀/(gauss−N_c) + N_w/(gauss²−N_w)" "analysisScan"
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §13d  BIOLOGICAL INFORMATION — 4 observables
@@ -973,7 +919,6 @@ proveDNABases =
   let crystal = fromIntegral (n_w^2)  -- 4
       pdg     = 4.0                    -- A, T, G, C
   in mkObs "DNA bases (N_w²)" crystal pdg
-       "N_w²" "analysisScan"
 
 -- | Codons: (N_w²)^N_c = 4³ = 64.
 -- The reading frame is N_c = 3 bases long because the colour
@@ -984,7 +929,6 @@ proveCodons =
   let crystal = fromIntegral ((n_w^2)^n_c)  -- 64
       pdg     = 64.0                          -- 4³ codons
   in mkObs "Codons ((N_w²)^N_c)" crystal pdg
-       "(N_w²)^N_c" "analysisScan"
 
 -- | Amino acids: gauss + β₀ = 13 + 7 = 20.
 -- The number of distinct amino acids used by all life on Earth.
@@ -995,7 +939,6 @@ proveAminoAcids =
   let crystal = fromIntegral (gauss + beta0)  -- 20
       pdg     = 20.0                           -- universal genetic code
   in mkObs "Amino acids (gauss+β₀)" crystal pdg
-       "gauss+β₀" "analysisScan"
 
 -- | Codon signals: N_c × β₀ = 3 × 7 = 21 (20 amino acids + 1 stop).
 -- The stop codon terminates translation. Total distinct signals = 21.
@@ -1005,7 +948,6 @@ proveCodonSignals =
   let crystal = fromIntegral (n_c * beta0)  -- 21
       pdg     = 21.0                         -- 20 AA + 1 stop
   in mkObs "Codon signals (N_c×β₀)" crystal pdg
-       "N_c×β₀" "analysisScan"
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §13e  CHEMISTRY — 6 observables (Valence as Operator Logic)
@@ -1038,7 +980,6 @@ proveSOrbital =
   let crystal = fromIntegral n_w   -- 2
       pdg     = 2.0
   in mkObs "s-orbital capacity (N_w)" crystal pdg
-       "N_w" "analysisScan"
 
 -- | p-orbital capacity: N_w × N_c = χ = 6.
 -- The p-orbital holds 6 electrons: 3 orientations × 2 spins = N_c × N_w.
@@ -1048,7 +989,6 @@ provePOrbital =
   let crystal = fromIntegral chi   -- 6
       pdg     = 6.0
   in mkObs "p-orbital capacity (χ)" crystal pdg
-       "N_w×N_c" "analysisScan"
 
 -- | d-orbital capacity: N_w × (χ−1) = 2 × 5 = 10.
 -- The d-orbital holds 10 electrons: 5 orientations × 2 spins.
@@ -1059,7 +999,6 @@ proveDOrbital =
   let crystal = fromIntegral (n_w * (chi - 1))  -- 10
       pdg     = 10.0
   in mkObs "d-orbital capacity (N_w(χ−1))" crystal pdg
-       "N_w×(χ−1)" "analysisScan"
 
 -- | f-orbital capacity: N_w × β₀ = 2 × 7 = 14.
 -- The f-orbital holds 14 electrons: 7 orientations × 2 spins.
@@ -1070,7 +1009,6 @@ proveFOrbital =
   let crystal = fromIntegral (n_w * beta0)  -- 14
       pdg     = 14.0
   in mkObs "f-orbital capacity (N_w×β₀)" crystal pdg
-       "N_w×β₀" "analysisScan"
 
 -- | Tetrahedral bond angle: arccos(−1/N_c) = arccos(−1/3) = 109.47°.
 -- The sp³ hybridization angle in water, methane, diamond.
@@ -1081,7 +1019,6 @@ proveBondAngle =
   let crystal = acos (-1.0 / fromIntegral n_c) * 180.0 / pi  -- 109.4712°
       pdg     = 109.4712   -- exact tetrahedral
   in mkObs "Bond angle arccos(−1/N_c)°" crystal pdg
-       "arccos(−1/N_c)" "analysisScan"
 
 -- | H₂ bond energy: Rydberg/N_c = 13.606/3 = 4.535 eV.
 -- The hydrogen molecule's dissociation energy = one Rydberg per
@@ -1096,7 +1033,6 @@ proveH2Bond =
       crystal  = ryd_eV / fromIntegral n_c       -- 4.535 eV
       pdg      = 4.52
   in mkObs "H₂ bond energy (eV)" crystal pdg
-       "Rydberg/N_c" "analysisScan"
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §13f  GENETICS & PROTEIN FOLDING — 6 observables
@@ -1134,7 +1070,6 @@ proveHelixTurn =
   let crystal = fromIntegral n_c + fromIntegral n_c / fromIntegral (chi - 1)  -- 18/5
       pdg     = 3.6
   in mkObs "α-helix residues/turn" crystal pdg
-       "N_c + N_c/(χ−1)" "analysisScan"
 
 -- | α-helix rise per residue: N_c/N_w = 3/2 = 1.5 Å.
 -- Each residue advances 1.5 Å along the helix axis.
@@ -1144,7 +1079,6 @@ proveHelixRise =
   let crystal = fromIntegral n_c / fromIntegral n_w  -- 3/2 = 1.5
       pdg     = 1.5   -- Å (standard biochemistry value)
   in mkObs "α-helix rise (Å)" crystal pdg
-       "N_c/N_w" "analysisScan"
 
 -- | β-sheet strand spacing: β₀/N_w = 7/2 = 3.5 Å.
 -- The distance between parallel β-strands = the asymptotic coupling
@@ -1154,7 +1088,6 @@ proveBetaSheet =
   let crystal = fromIntegral beta0 / fromIntegral n_w  -- 7/2 = 3.5
       pdg     = 3.5   -- Å (approximate, varies 3.3-3.7)
   in mkObs "β-sheet spacing (Å)" crystal pdg
-       "β₀/N_w" "analysisScan"
 
 -- | A-T hydrogen bonds: N_w = 2.
 -- Adenine-Thymine base pairs have exactly N_w = 2 hydrogen bonds.
@@ -1164,7 +1097,6 @@ proveATBonds =
   let crystal = fromIntegral n_w  -- 2
       pdg     = 2.0
   in mkObs "A-T H-bonds (N_w)" crystal pdg
-       "N_w" "analysisScan"
 
 -- | G-C hydrogen bonds: N_c = 3.
 -- Guanine-Cytosine base pairs have exactly N_c = 3 hydrogen bonds.
@@ -1174,7 +1106,6 @@ proveGCBonds =
   let crystal = fromIntegral n_c  -- 3
       pdg     = 3.0
   in mkObs "G-C H-bonds (N_c)" crystal pdg
-       "N_c" "analysisScan"
 
 -- | DNA major/minor groove ratio: 11/χ = 11/6 ≈ 1.833.
 -- The B-form DNA major groove is 22 Å, minor groove is 12 Å.
@@ -1186,7 +1117,6 @@ proveGrooveRatio =
   let crystal = 11.0 / fromIntegral chi  -- 11/6
       pdg     = 22.0 / 12.0               -- major/minor groove
   in mkObs "DNA groove ratio (11/χ)" crystal pdg
-       "11/χ" "analysisScan"
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §13g  SUPERCONDUCTIVITY — 2 observables (Type-Safe Electron Flow)
@@ -1225,7 +1155,6 @@ proveBCSRatio =
       crystal = 2.0 * pi / exp gamma                          -- 3.5273
       pdg     = 3.528                                          -- BCS exact
   in mkObs "BCS ratio 2Δ/(k_BT_c)" crystal pdg
-       "2π/e^γ" "analysisScan"
 
 -- | Lattice lock: Σd/χ² = 36/36 = 1. The resonance condition.
 -- When this ratio = 1, the sector sum exactly matches the squared
@@ -1235,7 +1164,6 @@ proveLatticelock =
   let crystal = fromIntegral sigma_d / fromIntegral (chi^2)   -- 36/36 = 1
       pdg     = 1.0                                            -- exact
   in mkObs "Lattice lock Σd/χ²" crystal pdg
-       "Σd/χ²" "analysisScan"
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §13h  OPTICS — 3 observables (Refractive Index from Sector Eigenvalues)
@@ -1261,7 +1189,6 @@ proveRefractiveWater =
   let crystal = fromIntegral (n_c^2 - 1) / fromIntegral (2 * n_c)  -- 4/3
       pdg     = 1.333
   in mkObs "n(water) = C_F = 4/3" crystal pdg
-       "(N_c²−1)/(2N_c)" "analysisScan"
 
 -- | Refractive index of glass: N_c/N_w = 3/2 = 1.500.
 -- Same ratio as the α-helix rise per residue.
@@ -1271,7 +1198,6 @@ proveRefractiveGlass =
   let crystal = fromIntegral n_c / fromIntegral n_w  -- 3/2
       pdg     = 1.500
   in mkObs "n(glass) = N_c/N_w" crystal pdg
-       "N_c/N_w" "analysisScan"
 
 -- | Refractive index of diamond: √χ = √6 = 2.449.
 -- Diamond's refractive index: (2gauss+N_c)/(N_w²×N_c) = 29/12 = 2.41667.
@@ -1284,7 +1210,6 @@ proveRefractiveDiamond =
               / fromIntegral (n_w^2 * n_c)     -- 29/12 = 2.41667
       pdg     = 2.417
   in mkObs "n(diamond) = 29/12" crystal pdg
-       "(2gauss+N_c)/(N_w²×N_c)" "analysisScan"
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §13i  EPIGENETICS — 1 observable
@@ -1307,7 +1232,6 @@ proveCodonRedundancy =
       crystal  = fromIntegral (codons - sigs)  -- 43
       pdg      = fromIntegral (d_total + 1)     -- D+1 = 43
   in mkObs "Codon redundancy (D+1)" crystal pdg
-       "(N_w²)^N_c − N_c×β₀" "analysisScan"
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §13j  DARK SECTOR — 2 observables
@@ -1331,7 +1255,6 @@ proveOmegaDM =
       crystal = omega_m - omega_b    -- 309/1159 = 0.2666
       pdg     = 0.2589               -- Planck 2018
   in mkObs "Ω_DM (dark matter)" crystal pdg
-       "χ/(gauss+χ) − Ω_b" "analysisScan"
 
 -- | Dark-to-baryon ratio: Ω_DM/Ω_b = 309/57 = 5.421.
 -- For every kg of visible matter, there are ~5.4 kg of dark matter.
@@ -1343,7 +1266,6 @@ proveDMBaryonRatio =
   let crystal = fromIntegral (d_total + 1) / fromIntegral (n_w^3)  -- 43/8 = 5.375
       pdg     = 5.36                                                -- Planck 2018
   in mkObs "Ω_DM/Ω_b ratio" crystal pdg
-       "(D+1)/N_w³" "analysisScan"
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §13k  THREE-BODY PROBLEM — 3 observables
@@ -1377,7 +1299,6 @@ proveLagrangePoints =
   let crystal = fromIntegral (chi - 1)  -- 5
       pdg     = 5.0                      -- L1, L2, L3, L4, L5
   in mkObs "Lagrange points (χ−1)" crystal pdg
-       "χ−1" "analysisScan"
 
 -- | Three-body phase space: N_c × χ = 18 dimensions.
 -- 3 bodies × 3 positions × 2 (pos+vel) = 18.
@@ -1388,7 +1309,6 @@ proveThreeBodyPhaseSpace =
   let crystal = fromIntegral (n_c * chi)  -- 18
       pdg     = 18.0                       -- 3 bodies × 6 coords each
   in mkObs "3-body phase space (N_c×χ)" crystal pdg
-       "N_c×χ" "analysisScan"
 
 -- | Routh's critical mass ratio: 1/(gauss+β₀+χ) = 1/26 ≈ 0.03846.
 -- The stability threshold of the restricted three-body problem.
@@ -1399,7 +1319,6 @@ proveRouthRatio =
   let crystal = 1.0 / fromIntegral (gauss + beta0 + chi)  -- 1/26
       pdg     = (1.0 - sqrt (23.0/27.0)) / 2.0             -- Routh exact
   in mkObs "Routh critical ratio" crystal pdg
-       "1/(gauss+β₀+χ)" "analysisScan"
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §13l  PROTON RADIUS + BLACK HOLES — 2 observables
@@ -1430,7 +1349,6 @@ proveProtonRadius =
       crystal = (zeroth + corr) * hbar_c / m_proton  -- (4 + 2/91) × 0.209
       pdg     = 0.8409                     -- 2022 CODATA
   in mkObs "R_p (proton radius, fm)" crystal pdg
-       "(N_w²+N_w/(gauss×β₀))×ℏc/m_p" "analysisScan"
 
 -- | Bekenstein area quantum: N_w² = 4.
 -- The Bekenstein-Hawking entropy S_BH = A/(4 l_Pl²).
@@ -1441,7 +1359,6 @@ proveBekenstein =
   let crystal = fromIntegral (n_w^2)  -- 4
       pdg     = 4.0                    -- S_BH = A/(4 l²)
   in mkObs "Bekenstein area quantum" crystal pdg
-       "N_w²" "analysisScan"
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §13m  COSMOLOGY DEEP — 1 observable
@@ -1471,7 +1388,6 @@ proveNFWConcentration =
   let crystal = fromIntegral (gauss - chi)  -- 13 − 6 = 7
       pdg     = 7.0                          -- observed c ≈ 7 for MW-mass
   in mkObs "NFW concentration (β₀)" crystal pdg
-       "gauss−χ" "analysisScan"
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §13  CROSS-DOMAIN — 6 observables
@@ -1487,7 +1403,6 @@ proveFibonacciPhi =
       crystal    = zeroth - correction                               -- 1.6195
       pdg        = (1.0 + sqrt 5.0) / 2.0                           -- 1.6180
   in mkObs "φ (golden ratio, Fibonacci)" crystal pdg
-       "gauss/N_w³ − 1/(gauss×N_w×β₀)" "analysisScan"
 
 -- | Euler-Mascheroni γ: β₀/(gauss−1) − 1/(gauss² − N_w)
 -- The Euler-Mascheroni constant = 7/12 − 1/167.
@@ -1504,7 +1419,6 @@ proveEulerMascheroni =
               - 1.0 / fromIntegral (gauss^2 - n_w)        -- 0.57735
       pdg     = 0.5772
   in mkObs "γ (Euler-Mascheroni)" crystal pdg
-       "β₀/(gauss−1) − 1/(gauss²−N_w)" "analysisScan"
 
 -- | Apéry's constant ζ(3): χ/(χ − 1) = 6/5 = 1.200
 -- The Riemann zeta at s=3, from the chi invariant.
@@ -1513,7 +1427,6 @@ proveAperyZeta3 =
   let crystal = fromIntegral chi / (fromIntegral chi - 1.0)  -- 1.200
       pdg     = 1.2021
   in mkObs "ζ(3) (Apéry)" crystal pdg
-       "χ/(χ−1)" "analysisScan"
 
 -- | Catalan's constant G: 1 − N_w²/(D + χ) = 1 − 4/48 = 11/12 = 0.9167
 -- Catalan's constant from the spectral action: unity minus the
@@ -1525,7 +1438,6 @@ proveCatalanConstant =
                                                         -- 0.9167
       pdg     = 0.9160
   in mkObs "G (Catalan's constant)" crystal pdg
-       "1 − N_w²/(D+χ)" "analysisScan"
 
 -- | f_K/f_π ratio: χ/(χ − 1) = 6/5 = 1.200
 -- The kaon-to-pion decay constant ratio = same as ζ(3).
@@ -1535,7 +1447,6 @@ proveFKOverFPi =
   let crystal = fromIntegral chi / (fromIntegral chi - 1.0)  -- 1.200
       pdg     = 1.198
   in mkObs "f_K/f_π" crystal pdg
-       "χ/(χ−1)" "analysisScan"
 
 -- | R-ratio (e⁺e⁻ → hadrons): N_c × Σ Q² = N_c × 2/3 = 2
 -- The low-energy hadronic cross-section ratio for u,d,s quarks.
@@ -1545,13 +1456,11 @@ proveRRatio =
   let crystal = fromIntegral n_c * fromIntegral n_w / fromIntegral n_c  -- N_w = 2
       pdg     = 2.0    -- for u,d,s below charm threshold
   in mkObs "R (e⁺e⁻ → had, uds)" crystal pdg
-       "N_c × 2/3" "analysisScan"
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §14  MASTER AUDIT
 -- ═══════════════════════════════════════════════════════════════════════
 
--- | All analysis scan results, collected.
 wacaScanResults :: [Observable]
 wacaScanResults =
   [ -- Mesons (10)
@@ -1621,7 +1530,6 @@ wacaScanAudit :: IO ()
 wacaScanAudit = do
   putStrLn ""
   putStrLn "═══════════════════════════════════════════════════════════════"
-  putStrLn " analysis v3.1 SCAN RESULTS — CrystalanalysisScan.hs"
   putStrLn "═══════════════════════════════════════════════════════════════"
   putStrLn ""
   putStrLn "New observables discovered: 44"

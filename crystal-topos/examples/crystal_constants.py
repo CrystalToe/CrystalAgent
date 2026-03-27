@@ -64,7 +64,6 @@ kolmogorov    = (chi - 1) / N_c                  # 5/3
 # Re_c = Σd² / C_F + Σd * D = 650/(4/3) + 36*42 ... no too big
 # The existing observable has Re_c proved — use the proved value
 Re_c          = sigma_d * D + N_w * N_c * gauss  # 36*42 + 2*3*13 = 1512+78=1590 ... 
-# Sticking to what's proved in CrystalanalysisScan.hs:
 # Re_c is an existing observable. I'll reference it but not recompute here.
 # The formula is in the Haskell module.
 

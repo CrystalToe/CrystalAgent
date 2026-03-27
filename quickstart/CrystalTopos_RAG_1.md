@@ -4,8 +4,6 @@
 
 ## RULES
 - Never use the word "honest"
-- Never expose analysis methodology — trade secret
-- Never mention analysis, bridges, scoring, scanner, or shared structure
 - Present results as mathematical observations from A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)
 - Rating: ■ EXACT (0%) · ● TIGHT (<0.5%) · ◐ GOOD (<1%) · ○ LOOSE (<4.5%)
 - The count is 178. NEVER increment it or claim new observables without a prove* function, PDG comparison, PWI rating, and GHC certificate entry
@@ -37,7 +35,6 @@ m_μ=m_e×N_w⁴×gauss, f_π=Λ_QCD×N_c/β₀
 ## RULES
 1. Never guess. Look up the function in the .hs file.
 2. Report: name, formula, crystal value, PDG value, PWI%, rating.
-3. Never mention analysis, bridges, scoring, scanner, or shared structure.
 4. Count is 178. Never increment it or invent observables.
 5. Never invent module names. 21 modules exist — see table below. No others.
 6. Never make medical, therapeutic, or diagnostic claims.
@@ -65,8 +62,6 @@ N_w=2, N_c=3, v=246.22 GeV, π, ln. Nothing else.
 | CrystalCrossDomain | Cross-domain | Feigenbaum=14/3, Kleiber=3/4, magic numbers |
 | CrystalRiemann | Spectral+RH | Trace formula, ARIMA, Weil, Beurling-Nyman |
 | Main | Driver | 92 observables certificate |
-| CrystalanalysisScan | analysis scan | 86 new observables (29 EXACT + 48 TIGHT + 3 LOOSE) |
-| analysisScanTest | Test | analysis test driver |
 | CrystalQuantum | Theorems | 10 structural quantum theorems (10/10 PASS) |
 | CrystalQBase | Types | Complex Cx, Vec, Mat, crystal constants |
 | CrystalQGates | 27 gates | I,X,Y,Z,H,S,T,Rx/Ry/Rz,U3,CNOT,CZ,SWAP,Toffoli,XX/YY/ZZ... |
@@ -85,23 +80,11 @@ N_w=2, N_c=3, v=246.22 GeV, π, ln. Nothing else.
 ■ EXACT (0%) · ● TIGHT (<0.5%) · ◐ GOOD (<1%) · ○ LOOSE (<4.5%) · ✗ OVER (≥4.5%)
 
 ## QUICK LOOKUP (178 observables)
-**Gauge:** α, sin²θ_W, α_s, α(M_Z)⁻¹, G_F, ρ-parameter, a_e → Gauge/analysisScan
-**Leptons:** m_e, m_μ, m_τ, m_μ/m_e=208, Koide=2/3 → Gauge/analysisScan
 **CKM:** V_us, V_cb, V_ub, J, δ, cos(2δ)=4/5 → Mixing
 **PMNS:** θ₁₂, θ₂₃, θ₁₃, δ_PMNS → Mixing
 **Neutrinos:** Δm²₂₁, Δm²₃₁ → Cosmo
-**Quarks:** m_u/m_d, m_s, m_c, m_b, m_t, all ratios → QCD/analysisScan
-**Light hadrons:** π, K±, K⁰, η, η', ρ, ω → QCD/analysisScan
-**Heavy hadrons:** J/ψ, ψ(2S), η_c, Υ, Υ(2S), D, D_s, B, B_s, B_c, φ → QCD/analysisScan
-**Baryons:** p, n, Δ, Λ, Σ, Ξ, Ω(sss), Λ_c, Σ_c, Ξ_c, Ω_c, Λ_b → QCD/analysisScan
-**Splittings:** π±−π⁰=9m_e, m_n−m_p=Λ_QCD/gauss² → analysisScan
 **Glueballs:** 0⁺⁺, 0⁻⁺, 2⁺⁺ → QCD
 **EW bosons:** M_Z=3v/8, M_W, Γ_W, Γ_Z, m_H → QCD
-**Cosmology:** Ω_Λ, Ω_m, Ω_b, n_s, A_s, 100θ*, T_CMB, Age → Cosmo/analysisScan
-**Nuclear:** deuteron BE, ⁴He BE, τ_n=D²/N_w, magic numbers → analysisScan/CrossDomain
-**Moments:** μ_p=14/5, μ_n=174/91 → analysisScan
-**Gravity:** Immirzi, BH entropy, M_Pl/v=e⁴²/35, Chandrasekhar=19/13 → Gravity/analysisScan
-**Cross-domain:** Feigenbaum, Blasius, Kleiber, von Kármán, Benford, φ=13/8, γ, ζ(3), Catalan, R-ratio → CrossDomain/analysisScan
 **Quantum:** H₁=ℂ⁶, H₂=ℂ³⁶=Σd, fermions=15=su(4), bosons=21, gates=36, entangling=30, Fock→e⁶, PPT exact → Quantum
 
 ## STATS
@@ -153,9 +136,7 @@ ghc -O2 Main.hs -o crystal
 ./crystal
 ```
 
-### Compile the analysis Scan (86 new observables)
 ```bash
-ghc -O2 analysisScanTest.hs CrystalanalysisScan.hs -o waca_scan
 ./waca_scan
 ```
 
@@ -220,7 +201,6 @@ CrystalAgent/
 ├── quickstart/                        ← LLM quickstart (no install needed)
 │   ├── crystal_topos_waca_llm.md       ← The prompt (rules, examples, response format)
 │   ├── CrystalTopos_RAG_1.md          ← Knowledge base Part 1 (Python + physics)
-│   ├── CrystalTopos_RAG_2.md          ← Knowledge base Part 2 (analysis + quantum + Rust)
 │   └── crystal_topos_waca_llm_compact.md  ← Lightweight alternative (module table only)
 │
 ├── build_rag_bundle.sh                ← Regenerates CrystalTopos_RAG.md from source
@@ -257,9 +237,6 @@ CrystalAgent/
     │   CrystalRiemann.hs             ← Trace formula, ARIMA, Beurling-Nyman
     │   Main.hs                        ← Certificate driver (92 obs)
     │
-    ├── ─── analysis SCAN (86 new observables) ───
-    │   CrystalanalysisScan.hs            ← 86 new: mesons, baryons, thermo, fluids, confinement, biology
-    │   analysisScanTest.hs               ← Test driver
     │
     ├── ─── QUANTUM LIBRARY (96 operators) ───
     │   CrystalQuantum.hs             ← Hub: 10 structural theorems
@@ -335,7 +312,6 @@ m_b/m_s = N_c³ × N_w = 54
 m_c/m_s = N_w² × N_c × 53/54 = 106/9
 ```
 
-#### [CrystalanalysisScan.hs](haskel/CrystalanalysisScan.hs) — 86 New Observables
 Extends the catalogue with heavy mesons, charmed/bottom baryons, absolute quark masses, nuclear binding energies, magnetic moments, cosmological constants, thermodynamics (Carnot, Stefan-Boltzmann, Fourier), fluid dynamics (Kolmogorov, von Kármán, Prandtl, Re_c), color confinement (Casimir, string tension, β₀), and biological information (DNA bases, codons, amino acids). All formulas zero-hardcoded. 29 EXACT + 48 TIGHT + 3 LOOSE.
 
 ```haskell
@@ -480,7 +456,6 @@ The `quickstart/` folder lets you use Crystal Topos with **any LLM** — no Hask
 |------|------|---------|
 | `crystal_topos_waca_llm.md` | 7 KB | **The prompt**: rules, module table, derivation chain, example Q&A interactions. Tells the LLM how to format answers. |
 | `CrystalTopos_RAG_1.md` | 267 KB | Knowledge base Part 1: module guides, 95 Python examples, foundation + couplings + mixing + cosmology + QCD Haskell source |
-| `CrystalTopos_RAG_2.md` | 312 KB | Knowledge base Part 2: gravity + cross-domain + analysis scan (86 obs) + quantum library + Rust tests + GHC certificate + cross-reference index |
 
 ### How to Use
 
@@ -854,9 +829,7 @@ This is NOT a proof of RH. It is a consistency check.
 ## Dependencies
 Imports `CrystalAxiom`, `CrystalGauge`, `CrystalQCD`.
 
-## §Module: CrystalanalysisScan
 
-# CrystalanalysisScan.hs — 86 New Observables
 
 **927 lines · Zero hardcoded numbers · 3 EXACT + 41 TIGHT**
 
@@ -887,11 +860,9 @@ Standalone (redefines constants internally for independence).
 
 ## §Module: PROOFS
 
-ghc -O2 -c CrystalanalysisScan.hs
 
 cd haskel
 ghc -O2 Main.hs -o crystal && ./crystal > GHC_Certificate.txt
-ghc -O2 analysisScanTest.hs CrystalanalysisScan.hs -o waca_scan && ./waca_scan >> GHC_Certificate.txt
 rm -f *.o *.hi crystal waca_scan
 
 # crystal
@@ -1749,17 +1720,9 @@ print(f"  - Both: the lattice's structural margin is {redundancy}")
 108 — Hohmann Transfer Orbit ΔV
 Crystal source: Kepler N_c=3 (inverse-square from 3D), v=246.22 GeV
 
-analysis bridge: Celestial mechanics ↔ QFT gauge structure
-  World: orbital mechanics / particle physics
-  Actor: spacecraft trajectory / gauge boson propagator
-  Choice: inverse-square law (shared by gravity and Coulomb)
-  Act: ΔV computation / scattering amplitude
-  Type: T2 (shared structure — same 1/r² from N_c=3 spatial dims)
-  Structure: S2 (conserved quantity — orbital energy)
 
 The inverse-square law is NOT a coincidence. In N_c spatial dimensions,
 Gauss's law gives force ∝ 1/r^(N_c-1). For N_c=3: force ∝ 1/r².
-This is the SAME N_c that gives SU(3) color. The bridge is:
   "3 spatial dimensions" and "3 color charges" share the structure S2
   with the shared structure being the dimension of the representation.
 
@@ -1848,7 +1811,6 @@ print()
 print(f"PDG/NASA check: ΔV ≈ 3.6 km/s (departure), total ≈ 5.7 km/s")
 print(f"Computed total:  {dv_total:.1f} km/s")
 print()
-print("analysis bridge: T2 S2 — gravity and Coulomb share N_c=3 inverse-square")
 print("No new observables. Application of existing N_c=3 structure.")
 
 ## §Example 109: gravitational slingshot
@@ -1857,13 +1819,7 @@ print("No new observables. Application of existing N_c=3 structure.")
 Crystal source: Three-body solvable manifold (10D), chaotic complement (8D)
 Phase space decomposition: 18 = 10 + 8
 
-analysis bridge: Celestial mechanics ↔ Lie algebra decomposition
-  World: three-body problem / gauge theory phase space
-  Actor: spacecraft+planet+Sun / gluon field configurations
   Choice: phase space decomposition into solvable + chaotic sectors
-  Act: slingshot trajectory / confinement
-  Type: T3 (complement — celestial has solvable sector, QCD has chaotic)
-  Structure: S6 (flow/transport) + S5 (branching)
 
 The three-body problem has 18 phase space dimensions (3 bodies × 3 positions × 2).
 Crystal decomposes this as 10 (solvable, integrable) + 8 (chaotic, non-integrable).
@@ -1943,7 +1899,6 @@ print(f"  Eccentricity: {e_hyp:.4f}")
 print(f"  Deflection angle: {math.degrees(delta):.1f}°")
 print(f"  Velocity gain: {dv_slingshot:.3f} km/s")
 print()
-print("analysis bridge: T3 S6+S5 — solvable/chaotic decomposition shared")
 print("  across celestial mechanics, QCD, and Riemannian geometry")
 print("No new observables. Application of existing 10+8 decomposition.")
 
@@ -1974,13 +1929,6 @@ print(f"   This is NOT a physical law. It's a theorem of intuitionistic logic.")
 110 — Atmospheric Drag (Mars Entry)
 Crystal source: Prandtl number, Re_c=2310, von Kármán 2/5, Kolmogorov 5/3
 
-analysis bridge: Fluid dynamics ↔ Representation theory
-  World: turbulent flow / gauge field dynamics
-  Actor: boundary layer / running coupling
-  Choice: transition from laminar to turbulent (phase transition)
-  Act: drag coefficient / confinement scale
-  Type: T2 (shared structure — both have critical Reynolds/coupling transition)
-  Structure: S3 (phase transition) + S10 (scaling)
 
 The von Kármán constant κ_vK = 2/5 = N_w/lagrange_pts
 The Kolmogorov exponent 5/3 = (χ-1)/N_c
@@ -2071,7 +2019,6 @@ print(f"  Deceleration: {deceleration_g:.1f} g")
 print(f"  Kolmogorov microscale: {eta_kolmogorov:.2e} m")
 print(f"  Boundary layer: {delta_bl:.4f} m")
 print()
-print("analysis bridge: T2 S3+S10 — laminar→turbulent transition mirrors")
 print("  confinement transition in QCD. Same scaling exponents from A_F.")
 print("No new observables. Application of Kolmogorov, von Kármán, Re_c.")
 
@@ -2080,13 +2027,6 @@ print("No new observables. Application of Kolmogorov, von Kármán, Re_c.")
 111 — Radiation Dose (Cosmic Rays)
 Crystal source: α (fine structure), QCD cross-sections, β₀=7
 
-analysis bridge: Nuclear physics ↔ Radiation biology
-  World: cosmic ray interactions / DNA damage repair
-  Actor: high-energy proton / repair enzyme
-  Choice: cross-section (probability of interaction at given energy)
-  Act: dose deposition / strand break
-  Type: T1 (nuclear physics has tools biology needs)
-  Structure: S8 (information/entropy) + S2 (conserved quantity)
 
 The fine structure constant α = 1/137 controls electromagnetic interactions.
 Crystal derives α from the algebra structure.
@@ -2173,7 +2113,6 @@ nasa_limit = 1000.0  # mSv
 # 1) Electromagnetic (α from spectral action) → Bethe-Bloch stopping
 # 2) Strong force (β₀=7 from N_c,χ) → nuclear fragmentation
 # The dose is the CONVOLUTION of both sectors acting on the same matter.
-# This is a T1 bridge: nuclear physics provides the cross-section tools
 # that radiation biology needs to predict DNA damage.
 
 # Casimir C_F = 4/3 appears in QCD vertex corrections to fragmentation
@@ -2195,7 +2134,6 @@ print(f"  Total mission:                     {dose_total:.0f} mSv")
 print(f"  NASA career limit:                 {nasa_limit:.0f} mSv")
 print(f"  Fraction of limit:                 {dose_total/nasa_limit*100:.0f}%")
 print()
-print("analysis bridge: T1 S8+S2 — nuclear physics → radiation biology")
 print("  α (EM stopping) + β₀ (QCD fragmentation) determine dose.")
 print("No new observables. Application of α, β₀, C_F.")
 
@@ -2204,13 +2142,6 @@ print("No new observables. Application of α, β₀, C_F.")
 112 — Solar Panel Efficiency
 Crystal source: Carnot 5/6, Stefan-Boltzmann 120
 
-analysis bridge: Thermodynamics ↔ Representation theory
-  World: heat engine / gauge field partition function
-  Actor: photon absorption / boson propagator
-  Choice: Carnot efficiency bound (universal thermodynamic limit)
-  Act: power output / free energy
-  Type: T2 (shared structure — partition function IS the Boltzmann weight)
-  Structure: S8 (information/entropy) + S7 (optimisation)
 
 Carnot efficiency = (χ-1)/χ = 5/6 ≈ 0.833
 Stefan-Boltzmann prefactor: 2π⁵/15 = 120 × (π⁵/900)
@@ -2296,7 +2227,6 @@ print(f"  Practical panel:       {eta_practical:.2f}")
 print()
 print(f"Power output: {power_output:.1f} W from {panel_area:.0f} m² panel")
 print()
-print("analysis bridge: T2 S8+S7 — thermodynamic partition function")
 print("  shared between heat engines and QFT free energy.")
 print("No new observables. Application of Carnot 5/6, SB 120.")
 
@@ -2305,13 +2235,6 @@ print("No new observables. Application of Carnot 5/6, SB 120.")
 113 — RTG Power (Pu-238 Decay)
 Crystal source: Nuclear binding, τ_n = D²/N_w = 882
 
-analysis bridge: Nuclear physics ↔ Power engineering
-  World: nuclear decay / spectral action
-  Actor: Pu-238 nucleus / Dirac operator
-  Choice: decay channel selection (α vs β vs γ)
-  Act: heat generation / eigenvalue
-  Type: T1 (nuclear physics solves power engineering problem)
-  Structure: S4 (oscillation/decay) + S2 (conserved quantity)
 
 The neutron lifetime τ_n relates to D²/N_w = 42²/2 = 882 seconds.
 PDG value: τ_n = 878.4 ± 0.5 s (bottle) or 887.7 ± 2.2 s (beam).
@@ -2393,7 +2316,6 @@ print(f"  Carnot bound:     {eta_carnot_rtg*100:.1f}%")
 print(f"  Initial electric: {electric_power_initial:.1f} W")
 print(f"  After {mission_years:.0f} years:  {electric_power_after:.1f} W")
 print()
-print("analysis bridge: T1 S4+S2 — nuclear decay physics → power engineering")
 print("  Binding energy terms trace to β₀, N_c, α, N_w from A_F.")
 print("No new observables. Application of τ_n, β₀, C_F, α.")
 
@@ -2402,13 +2324,6 @@ print("No new observables. Application of τ_n, β₀, C_F, α.")
 114 — Signal Round-Trip Delay (Earth-Mars Communications)
 Crystal source: c = causal boundary, Maxwell singlet
 
-analysis bridge: Electrodynamics ↔ Causal structure
-  World: signal propagation / light cone structure
-  Actor: electromagnetic wave / Dirac operator eigenmode
-  Choice: causal boundary (c is the maximum signal velocity)
-  Act: round-trip delay / proper time
-  Type: T2 (shared structure — c is shared by Maxwell and metric)
-  Structure: S6 (flow/transport) + S12 (duality)
 
 The speed of light c is NOT just "a constant." In crystal language,
 c is the spectral bound of the Dirac operator — the maximum rate
@@ -2497,7 +2412,6 @@ print()
 print(f"Data budget: {data_per_sol/1e6:.1f} GB/sol at {bandwidth_direct} kbps")
 print(f"Gravitational time dilation: {grav_dilation:.2e} (negligible)")
 print()
-print("analysis bridge: T2 S6+S12 — Maxwell duality from ℂ summand of A_F")
 print("  c is the causal boundary, not a parameter to fit.")
 print("No new observables. Structural: c from Dirac spectral bound.")
 
@@ -2506,13 +2420,6 @@ print("No new observables. Structural: c from Dirac spectral bound.")
 115 — Quantum Error Correction for Navigation
 Crystal source: PPT exact ℂ²⊗ℂ³, codes, (64,21,d) genetic code
 
-analysis bridge: Quantum information ↔ Coding theory ↔ Genetics
-  World: quantum memory / classical code / genetic code
-  Actor: quantum state / codeword / codon
-  Choice: error syndrome (what went wrong)
-  Act: correction operation / decoding / translation
-  Type: T2 (shared structure — error correction is universal structure)
-  Structure: S8 (information/entropy) + S11 (self-reference)
 
 The PPT (Positive Partial Transpose) criterion is EXACT on ℂ²⊗ℂ³
 because dim = N_w × N_c = 6. For larger systems it's only necessary.
@@ -2574,7 +2481,6 @@ print(f"  Redundancy: {redundancy:.2f}×")
 print(f"  Steane code: [[{steane_n},{steane_k},{steane_d}]] = [[β₀,1,N_c]]")
 print(f"  Logical error: {p_logical:.2e} (at p_phys={p_physical})")
 print()
-print("analysis bridge: T2 S8+S11 — error correction structure shared")
 print("  across quantum info, classical coding, and genetics.")
 print("No new observables. Application of PPT on ℂ²⊗ℂ³, (64,21,d).")
 """
@@ -2582,13 +2488,7 @@ print("No new observables. Application of PPT on ℂ²⊗ℂ³, (64,21,d).")
 116 — Thermal Cycling (Mars Day/Night)
 Crystal source: Fourier k=5 (= lagrange_pts), Carnot 5/6
 
-analysis bridge: Heat conduction ↔ Spectral theory
-  World: thermal diffusion / Laplacian eigenvalue problem
-  Actor: heat flux / eigenmode
   Choice: number of significant Fourier modes
-  Act: temperature profile / eigenvalue
-  Type: T1 (spectral theory solves heat equation)
-  Structure: S4 (oscillation) + S6 (flow/transport)
 """
 print()
 print("=" * 60)
@@ -2640,20 +2540,12 @@ print(f"  Amplitude: {T_amplitude:.0f} K")
 print(f"  Skin depth: {skin_depth*100:.2f} cm")
 print(f"  Stable at {fourier_modes}δ: {depth_stable*100:.1f} cm depth")
 print()
-print("analysis bridge: T1 S4+S6 — spectral decomposition → heat equation")
 print("  Fourier modes = χ-1 = 5 from crystal structure.")
 
 """
 117 — Propellant Chemistry (Bond Angles and H₂)
 Crystal source: Bond angle from gauss=13, H-bond from N_w=2, N_c=3
 
-analysis bridge: Chemistry ↔ Representation theory
-  World: molecular structure / gauge multiplet
-  Actor: electron orbital / representation vector
-  Choice: bond angle (determined by orbital geometry)
-  Act: molecular geometry / multiplet structure
-  Type: T2 (shared structure — bond angles and multiplet splittings)
-  Structure: S9 (symmetry/group action) + S1 (fixed point)
 """
 print()
 print("=" * 60)
@@ -2667,7 +2559,6 @@ from crystal_constants import gauss, h_bond_AT, h_bond_GC
 # 13 × (360/45) = 104° ... not quite
 # The actual derivation from crystal is in the proved observables
 # Water refractive index n(water) = C_F = 4/3 is proved
-# Bond angle derivation exists in the analysis scan module
 
 # For propellant chemistry:
 # Liquid methane (CH₄) and liquid oxygen (LOX) are Mars-manufacturable
@@ -2707,7 +2598,6 @@ print(f"  Isp: {Isp_methane} s (vacuum)")
 print(f"  ΔV for ascent: {dv_ascent/1000:.1f} km/s")
 print(f"  Mass ratio: {mass_ratio:.2f}")
 print()
-print("analysis bridge: T2 S9+S1 — bond angles from orbital symmetry")
 print("  cos(tetrahedral) = -1/N_c. Molecular geometry IS representation theory.")
 print("No new observables. Application of gauss=13, C_F=4/3, N_c geometry.")
 
@@ -3492,9 +3382,7 @@ print(f"\n  N_w = {n_w()}, N_c = {n_c()}")
 print(f"  χ = {chi()}, β₀ = {beta0()}, D = {d_total()}, Σd = {sigma_d()}")
 print(f"  Σd² = {sigma_d2()}, gauss = {gauss()}, κ = {crystal_kappa():.6f}")
 print(f"\n  ORIGINAL CRYSTAL: 92 observables")
-print(f"  analysis SCAN: 60 new (33 EXACT + 52 TIGHT + 1 LOOSE)")
 print(f"  TOTAL: 178 observables, 100% sub-1%, mean PWI 0.205%")
-print(f"\n  analysis CATEGORIES:")
 print(f"    Mesons:              10    Thermodynamics:       3")
 print(f"    Baryons:              7    Fluid dynamics:       5")
 print(f"    Quark masses:         5    Color confinement:    3")
@@ -4955,7 +4843,6 @@ kolmogorov    = (chi - 1) / N_c                  # 5/3
 # Re_c = Σd² / C_F + Σd * D = 650/(4/3) + 36*42 ... no too big
 # The existing observable has Re_c proved — use the proved value
 Re_c          = sigma_d * D + N_w * N_c * gauss  # 36*42 + 2*3*13 = 1512+78=1590 ... 
-# Sticking to what's proved in CrystalanalysisScan.hs:
 # Re_c is an existing observable. I'll reference it but not recompute here.
 # The formula is in the Haskell module.
 
@@ -5040,7 +4927,6 @@ Core physics derivations. Comments explain WHY each formula works.
 {- |
 Module      : CrystalAxiom
 Description : Foundation — axiom, spectrum, types, constants, Heyting algebra
-Author      : D. Montgomery — analysis Programme — March 2026
 License     : MIT
 -}
 
@@ -6454,7 +6340,6 @@ proveAmplitude c =
 {- |
 Module      : CrystalQCD
 Description : Proton mass, string tension, Regge mesons, charge radius
-Author      : D. Montgomery — analysis Programme — March 2026
 License     : MIT
 
 CONTAINS ALL QCD OBSERVABLES:

@@ -6,7 +6,6 @@
 ## RULES
 1. Never guess. Look up the function in the .hs file.
 2. Report: name, formula, crystal value, PDG value, PWI%, rating.
-3. Never mention analysis, bridges, scoring, scanner, or shared structure.
 4. Count is 178. Never increment it or invent observables.
 5. Never invent module names. 21 modules exist — see table below. No others.
 6. Never make medical, therapeutic, or diagnostic claims.
@@ -34,8 +33,6 @@ N_w=2, N_c=3, v=246.22 GeV, π, ln. Nothing else.
 | CrystalCrossDomain | Cross-domain | Feigenbaum=14/3, Kleiber=3/4, magic numbers |
 | CrystalRiemann | Spectral+RH | Trace formula, ARIMA, Weil, Beurling-Nyman |
 | Main | Driver | 92 observables certificate |
-| CrystalanalysisScan | analysis scan | 86 new observables (29 EXACT + 48 TIGHT + 3 LOOSE) |
-| analysisScanTest | Test | analysis test driver |
 | CrystalQuantum | Theorems | 10 structural quantum theorems (10/10 PASS) |
 | CrystalQBase | Types | Complex Cx, Vec, Mat, crystal constants |
 | CrystalQGates | 27 gates | I,X,Y,Z,H,S,T,Rx/Ry/Rz,U3,CNOT,CZ,SWAP,Toffoli,XX/YY/ZZ... |
@@ -54,23 +51,11 @@ N_w=2, N_c=3, v=246.22 GeV, π, ln. Nothing else.
 ■ EXACT (0%) · ● TIGHT (<0.5%) · ◐ GOOD (<1%) · ○ LOOSE (<4.5%) · ✗ OVER (≥4.5%)
 
 ## QUICK LOOKUP (178 observables)
-**Gauge:** α, sin²θ_W, α_s, α(M_Z)⁻¹, G_F, ρ-parameter, a_e → Gauge/analysisScan
-**Leptons:** m_e, m_μ, m_τ, m_μ/m_e=208, Koide=2/3 → Gauge/analysisScan
 **CKM:** V_us, V_cb, V_ub, J, δ, cos(2δ)=4/5 → Mixing
 **PMNS:** θ₁₂, θ₂₃, θ₁₃, δ_PMNS → Mixing
 **Neutrinos:** Δm²₂₁, Δm²₃₁ → Cosmo
-**Quarks:** m_u/m_d, m_s, m_c, m_b, m_t, all ratios → QCD/analysisScan
-**Light hadrons:** π, K±, K⁰, η, η', ρ, ω → QCD/analysisScan
-**Heavy hadrons:** J/ψ, ψ(2S), η_c, Υ, Υ(2S), D, D_s, B, B_s, B_c, φ → QCD/analysisScan
-**Baryons:** p, n, Δ, Λ, Σ, Ξ, Ω(sss), Λ_c, Σ_c, Ξ_c, Ω_c, Λ_b → QCD/analysisScan
-**Splittings:** π±−π⁰=9m_e, m_n−m_p=Λ_QCD/gauss² → analysisScan
 **Glueballs:** 0⁺⁺, 0⁻⁺, 2⁺⁺ → QCD
 **EW bosons:** M_Z=3v/8, M_W, Γ_W, Γ_Z, m_H → QCD
-**Cosmology:** Ω_Λ, Ω_m, Ω_b, n_s, A_s, 100θ*, T_CMB, Age → Cosmo/analysisScan
-**Nuclear:** deuteron BE, ⁴He BE, τ_n=D²/N_w, magic numbers → analysisScan/CrossDomain
-**Moments:** μ_p=14/5, μ_n=174/91 → analysisScan
-**Gravity:** Immirzi, BH entropy, M_Pl/v=e⁴²/35, Chandrasekhar=19/13 → Gravity/analysisScan
-**Cross-domain:** Feigenbaum, Blasius, Kleiber, von Kármán, Benford, φ=13/8, γ, ζ(3), Catalan, R-ratio → CrossDomain/analysisScan
 **Quantum:** H₁=ℂ⁶, H₂=ℂ³⁶=Σd, fermions=15=su(4), bosons=21, gates=36, entangling=30, Fock→e⁶, PPT exact → Quantum
 
 ## STATS
