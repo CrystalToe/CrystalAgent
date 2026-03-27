@@ -2,7 +2,7 @@
 
 # Crystal Topos
 
-### 166 Physical Constants from Two Primes. Zero Free Parameters.
+### 172 Physical Constants from Two Primes. Zero Free Parameters.
 
 ### 📄 [Read the Paper: "The Crystal Topos: A Complete Physics Framework from A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)"](https://zenodo.org/records/19217129)
 
@@ -67,10 +67,10 @@ The deviations between crystal predictions and experiment follow an **exponentia
 
 | Metric | Value |
 |--------|-------|
-| Total observables | **166** |
-| Sub-1% accuracy | **166 / 166** (100%) |
-| Mean deviation (PWI) | **0.21%** |
-| Maximum deviation | **0.44%** |
+| Total observables | **172** |
+| Sub-1% accuracy | **170 / 172** (99%) (100%) |
+| Mean deviation (PWI) | **0.25%** |
+| Maximum deviation | **2.98%** |
 | CV (should be 1.0) | **1.15** (inside 95% CI) |
 | Free parameters | **0** |
 | Hardcoded numbers | **0** in crystal formulas |
@@ -91,7 +91,7 @@ ghc -O2 Main.hs -o crystal
 ./crystal
 ```
 
-### Compile the analysis Scan (74 new observables)
+### Compile the analysis Scan (80 new observables)
 ```bash
 ghc -O2 analysisScanTest.hs CrystalanalysisScan.hs -o waca_scan
 ./waca_scan
@@ -143,7 +143,7 @@ m_π = m_p/β₀                     → 135 MeV    (0.34%)
 Λ_QCD = m_p × N_c/gauss          → 218 MeV
 m_e = Λ_h/(N_c²×N_w⁴×gauss)     → 0.512 MeV  (0.12%)
          ↓
-... all 166 observables
+... all 172 observables
 ```
 
 **Zero hardcoded numbers.** Every 53, 54, 257, 1872 computes from (2, 3).
@@ -192,8 +192,8 @@ CrystalAgent/
     │   CrystalRiemann.hs             ← Trace formula, ARIMA, Beurling-Nyman
     │   Main.hs                        ← Certificate driver (92 obs)
     │
-    ├── ─── analysis SCAN (74 new observables) ───
-    │   CrystalanalysisScan.hs            ← 74 new: mesons, baryons, thermo, fluids, confinement, biology
+    ├── ─── analysis SCAN (80 new observables) ───
+    │   CrystalanalysisScan.hs            ← 80 new: mesons, baryons, thermo, fluids, confinement, biology
     │   analysisScanTest.hs               ← Test driver
     │
     ├── ─── QUANTUM LIBRARY (96 operators) ───
@@ -270,8 +270,8 @@ m_b/m_s = N_c³ × N_w = 54
 m_c/m_s = N_w² × N_c × 53/54 = 106/9
 ```
 
-#### [CrystalanalysisScan.hs](haskel/CrystalanalysisScan.hs) — 74 New Observables
-Extends the catalogue with heavy mesons, charmed/bottom baryons, absolute quark masses, nuclear binding energies, magnetic moments, cosmological constants, thermodynamics (Carnot, Stefan-Boltzmann, Fourier), fluid dynamics (Kolmogorov, von Kármán, Prandtl, Re_c), color confinement (Casimir, string tension, β₀), and biological information (DNA bases, codons, amino acids). All formulas zero-hardcoded. 27 EXACT + 47 TIGHT.
+#### [CrystalanalysisScan.hs](haskel/CrystalanalysisScan.hs) — 80 New Observables
+Extends the catalogue with heavy mesons, charmed/bottom baryons, absolute quark masses, nuclear binding energies, magnetic moments, cosmological constants, thermodynamics (Carnot, Stefan-Boltzmann, Fourier), fluid dynamics (Kolmogorov, von Kármán, Prandtl, Re_c), color confinement (Casimir, string tension, β₀), and biological information (DNA bases, codons, amino acids). All formulas zero-hardcoded. 29 EXACT + 49 TIGHT + 2 LOOSE.
 
 ```haskell
 -- The hadron scale = v / Fermat prime
@@ -413,7 +413,7 @@ The `quickstart/` folder lets you use Crystal Topos with **any LLM** — no Hask
 
 | File | Size | Purpose |
 |------|------|---------|
-| `crystal_topos_waca_llm_compact.md` | 4 KB | Knowledge base: module table, derivation chain, all 166 observables |
+| `crystal_topos_waca_llm_compact.md` | 4 KB | Knowledge base: module table, derivation chain, all 172 observables |
 | `CrystalTopos.zip.txt` | 340 KB | All Haskell source files in a single archive |
 
 ### How to Use
