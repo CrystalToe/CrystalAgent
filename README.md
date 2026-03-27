@@ -11,9 +11,10 @@
 ## ⚡ Try It Now (No Install — 30 Seconds)
 
 1. **Open** [Gemini](https://gemini.google.com/), [Copilot](https://copilot.microsoft.com/), [Claude](https://claude.ai/), or [ChatGPT](https://chat.openai.com/)
-2. **Upload** both files from the [`quickstart/`](quickstart/) folder:
-   - `crystal_topos_waca_llm_compact.md`
-   - `CrystalTopos.zip.txt`
+2. **Upload** three files from the [`quickstart/`](quickstart/) folder:
+   - `crystal_topos_waca_llm.md` (the prompt — tells the LLM how to behave)
+   - `CrystalTopos_RAG_1.md` (267 KB — Python examples + physics Haskell)
+   - `CrystalTopos_RAG_2.md` (312 KB — analysis scan + quantum library + Rust + GHC cert)
 3. **Paste** any of these:
 
 ```
@@ -156,17 +157,20 @@ m_e = Λ_h/(N_c²×N_w⁴×gauss)     → 0.512 MeV  (0.12%)
 CrystalAgent/
 ├── README.md                          ← You are here
 ├── quickstart/                        ← LLM quickstart (no install needed)
-│   ├── crystal_topos_waca_llm_compact.md  ← Upload this to any LLM
-│   └── CrystalTopos.zip.txt          ← Upload this alongside it
+│   ├── crystal_topos_waca_llm.md       ← The prompt (rules, examples, response format)
+│   ├── CrystalTopos_RAG_1.md          ← Knowledge base Part 1 (Python + physics)
+│   ├── CrystalTopos_RAG_2.md          ← Knowledge base Part 2 (analysis + quantum + Rust)
+│   └── crystal_topos_waca_llm_compact.md  ← Lightweight alternative (module table only)
 │
-├── agent/                             ← Full LLM agent prompts (for RAG)
+├── build_rag_bundle.sh                ← Regenerates CrystalTopos_RAG.md from source
+├── agent/                             ← LLM agent prompts
 │   ├── crystal_topos_waca_llm.md      ← Full prompt (all modules, rules, examples)
 │   └── crystal_topos_waca_llm_compact.md  ← Compact lookup
 │
 ├── crystal-topos/                     ← Rust core + Python bindings
-│   ├── src/                           ← 9 Rust modules (1,614 lines)
-│   ├── tests/                         ← 12 structural theorem tests
-│   ├── examples/                      ← 50 Python examples
+│   ├── src/                           ← 10 Rust modules (2,179 lines)
+│   ├── tests/                         ← 67 Rust tests
+│   ├── examples/                      ← 95 Python examples
 │   ├── Cargo.toml                     ← Rust crate config
 │   └── pyproject.toml                 ← pip install config
 │
@@ -413,16 +417,17 @@ The `quickstart/` folder lets you use Crystal Topos with **any LLM** — no Hask
 
 | File | Size | Purpose |
 |------|------|---------|
-| `crystal_topos_waca_llm_compact.md` | 4 KB | Knowledge base: module table, derivation chain, all 178 observables |
-| `CrystalTopos.zip.txt` | 340 KB | All Haskell source files in a single archive |
+| `crystal_topos_waca_llm.md` | 7 KB | **The prompt**: rules, module table, derivation chain, example Q&A interactions. Tells the LLM how to format answers. |
+| `CrystalTopos_RAG_1.md` | 267 KB | Knowledge base Part 1: module guides, 95 Python examples, foundation + couplings + mixing + cosmology + QCD Haskell source |
+| `CrystalTopos_RAG_2.md` | 312 KB | Knowledge base Part 2: gravity + cross-domain + analysis scan (86 obs) + quantum library + Rust tests + GHC certificate + cross-reference index |
 
 ### How to Use
 
-**Go to:**
-- https://copilot.microsoft.com/ → upload `quickstart/crystal_topos_waca_llm_compact.md` AND `quickstart/CrystalTopos.zip.txt`
-- https://gemini.google.com/ → upload `quickstart/crystal_topos_waca_llm_compact.md` AND `quickstart/CrystalTopos.zip.txt`
-- https://claude.ai/ → upload `quickstart/crystal_topos_waca_llm_compact.md` AND `quickstart/CrystalTopos.zip.txt`
-- https://chat.openai.com/ → upload `quickstart/crystal_topos_waca_llm_compact.md` AND `quickstart/CrystalTopos.zip.txt`
+**Upload three files** to any LLM:
+- https://claude.ai/ → upload all three files from `quickstart/`
+- https://chat.openai.com/ → upload all three files from `quickstart/`
+- https://gemini.google.com/ → upload all three files from `quickstart/`
+- https://copilot.microsoft.com/ → upload all three files from `quickstart/`
 
 **Then paste any of these prompts:**
 
@@ -498,14 +503,16 @@ and why this matters for physics.
 
 ### Advanced: Full Agent Setup (RAG / Agentic)
 
-The `agent/` folder contains full-size prompts for building RAG pipelines and agentic workflows:
+The `agent/` folder contains prompts for building RAG pipelines and agentic workflows:
 
 | File | Purpose |
 |------|---------|
 | `agent/crystal_topos_waca_llm.md` | Full prompt: detailed module table, derivation chain, rules, examples |
 | `agent/crystal_topos_waca_llm_compact.md` | Same compact prompt as in quickstart |
 
-**For RAG:** Chunk the `.hs` files + the full prompt into a vector store (Pinecone, Weaviate, Chroma). The LLM agent queries against compiled, proof-checked code. No hallucination possible — every answer is grounded in code that compiles.
+**For RAG:** Use `quickstart/CrystalTopos_RAG_1.md` and `CrystalTopos_RAG_2.md` directly — together they contain all 21 Haskell modules, 95 Python examples, Rust tests, and the GHC certificate in chunked markdown. Feed both into any vector store (Pinecone, Weaviate, Chroma). Every answer is grounded in code that compiles.
+
+**To regenerate:** Run `bash build_rag_bundle.sh` from the repo root. It rebuilds both RAG files from current source. Add new examples or modules, re-run, done.
 
 ---
 

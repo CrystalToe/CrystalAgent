@@ -24,3 +24,5 @@ haskel/LeanCert/.lake/
 
 # OS
 .DS_Store
+
+.lake
