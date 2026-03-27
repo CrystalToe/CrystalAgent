@@ -1,6 +1,6 @@
 <!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
 
-# CrystalanalysisScan.hs — 44 New Observables
+# CrystalanalysisScan.hs — 86 New Observables
 
 **927 lines · Zero hardcoded numbers · 3 EXACT + 41 TIGHT**
 
@@ -24,7 +24,7 @@
 | γ (Euler-Masch) | β₀/(gauss−1)−1/(gauss²−N_w) | 0.025% |
 
 ## Derivation Chain
-21 steps from (2, 3, v, π, ln) → all 44 observables. Zero bare numbers in executable code.
+21 steps from (2, 3, v, π, ln) → all 86 observables. Zero bare numbers in executable code.
 
 ## Dependencies
 Standalone (redefines constants internally for independence).
