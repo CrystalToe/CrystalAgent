@@ -833,3 +833,13 @@ amino-acids = refl
 
 codon-signals : nC * beta0 ≡ 21
 codon-signals = refl
+
+-- §CORRECTIONS: τ_n and φ sector boundary corrections
+tau-n-corrected : towerD * towerD ≡ 1764
+tau-n-corrected = refl
+
+tau-n-weak-self : nW * nW ≡ 4
+tau-n-weak-self = refl
+
+phi-boundary : gauss * nW * beta0 ≡ 182
+phi-boundary = refl

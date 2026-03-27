@@ -10,3 +10,4 @@ cp ../CrystalTopos.lean .
 cp ../Main.lean .
 lake build
 cp .lake/build/lib/lean/CrystalTopos.olean ..
+cd ..
