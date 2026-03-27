@@ -4,7 +4,6 @@
 {- |
 Module      : CrystalQCD
 Description : Proton mass, string tension, Regge mesons, charge radius
-Author      : D. Montgomery — analysis Programme — March 2026
 License     : MIT
 
 CONTAINS ALL QCD OBSERVABLES:

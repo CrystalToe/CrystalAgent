@@ -6,13 +6,7 @@
 Crystal source: Three-body solvable manifold (10D), chaotic complement (8D)
 Phase space decomposition: 18 = 10 + 8
 
-analysis bridge: Celestial mechanics ↔ Lie algebra decomposition
-  World: three-body problem / gauge theory phase space
-  Actor: spacecraft+planet+Sun / gluon field configurations
   Choice: phase space decomposition into solvable + chaotic sectors
-  Act: slingshot trajectory / confinement
-  Type: T3 (complement — celestial has solvable sector, QCD has chaotic)
-  Structure: S6 (flow/transport) + S5 (branching)
 
 The three-body problem has 18 phase space dimensions (3 bodies × 3 positions × 2).
 Crystal decomposes this as 10 (solvable, integrable) + 8 (chaotic, non-integrable).
@@ -93,6 +87,5 @@ print(f"  Eccentricity: {e_hyp:.4f}")
 print(f"  Deflection angle: {math.degrees(delta):.1f}°")
 print(f"  Velocity gain: {dv_slingshot:.3f} km/s")
 print()
-print("analysis bridge: T3 S6+S5 — solvable/chaotic decomposition shared")
 print("  across celestial mechanics, QCD, and Riemannian geometry")
 print("No new observables. Application of existing 10+8 decomposition.")

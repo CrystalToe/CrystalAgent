@@ -14,7 +14,6 @@
 2. **Upload** three files from the [`quickstart/`](quickstart/) folder:
    - `crystal_topos_waca_llm.md` (the prompt — tells the LLM how to behave)
    - `CrystalTopos_RAG_1.md` (267 KB — Python examples + physics Haskell)
-   - `CrystalTopos_RAG_2.md` (312 KB — analysis scan + quantum library + Rust + GHC cert)
 3. **Paste** any of these:
 
 ```
@@ -92,9 +91,7 @@ ghc -O2 Main.hs -o crystal
 ./crystal
 ```
 
-### Compile the analysis Scan (86 new observables)
 ```bash
-ghc -O2 analysisScanTest.hs CrystalanalysisScan.hs -o waca_scan
 ./waca_scan
 ```
 
@@ -159,7 +156,6 @@ CrystalAgent/
 ├── quickstart/                        ← LLM quickstart (no install needed)
 │   ├── crystal_topos_waca_llm.md       ← The prompt (rules, examples, response format)
 │   ├── CrystalTopos_RAG_1.md          ← Knowledge base Part 1 (Python + physics)
-│   ├── CrystalTopos_RAG_2.md          ← Knowledge base Part 2 (analysis + quantum + Rust)
 │   └── crystal_topos_waca_llm_compact.md  ← Lightweight alternative (module table only)
 │
 ├── build_rag_bundle.sh                ← Regenerates CrystalTopos_RAG.md from source
@@ -196,9 +192,6 @@ CrystalAgent/
     │   CrystalRiemann.hs             ← Trace formula, ARIMA, Beurling-Nyman
     │   Main.hs                        ← Certificate driver (92 obs)
     │
-    ├── ─── analysis SCAN (86 new observables) ───
-    │   CrystalanalysisScan.hs            ← 86 new: mesons, baryons, thermo, fluids, confinement, biology
-    │   analysisScanTest.hs               ← Test driver
     │
     ├── ─── QUANTUM LIBRARY (96 operators) ───
     │   CrystalQuantum.hs             ← Hub: 10 structural theorems
@@ -274,7 +267,6 @@ m_b/m_s = N_c³ × N_w = 54
 m_c/m_s = N_w² × N_c × 53/54 = 106/9
 ```
 
-#### [CrystalanalysisScan.hs](haskel/CrystalanalysisScan.hs) — 86 New Observables
 Extends the catalogue with heavy mesons, charmed/bottom baryons, absolute quark masses, nuclear binding energies, magnetic moments, cosmological constants, thermodynamics (Carnot, Stefan-Boltzmann, Fourier), fluid dynamics (Kolmogorov, von Kármán, Prandtl, Re_c), color confinement (Casimir, string tension, β₀), and biological information (DNA bases, codons, amino acids). All formulas zero-hardcoded. 29 EXACT + 48 TIGHT + 3 LOOSE.
 
 ```haskell
@@ -419,7 +411,6 @@ The `quickstart/` folder lets you use Crystal Topos with **any LLM** — no Hask
 |------|------|---------|
 | `crystal_topos_waca_llm.md` | 7 KB | **The prompt**: rules, module table, derivation chain, example Q&A interactions. Tells the LLM how to format answers. |
 | `CrystalTopos_RAG_1.md` | 267 KB | Knowledge base Part 1: module guides, 95 Python examples, foundation + couplings + mixing + cosmology + QCD Haskell source |
-| `CrystalTopos_RAG_2.md` | 312 KB | Knowledge base Part 2: gravity + cross-domain + analysis scan (86 obs) + quantum library + Rust tests + GHC certificate + cross-reference index |
 
 ### How to Use
 

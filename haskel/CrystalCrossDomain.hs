@@ -209,7 +209,6 @@ proveDiracNeutrinos _ =
 --
 --  Physical: the muon mass is LOCKED to the QCD scale by the colour
 --  eigenvalue squared. This ratio controls the HVP integral.
---  The Kondo bridge (analysis Score 9) says: HVP is a universal function
 --  of this ratio. Wilson solved the analogous Kondo problem (1975)
 --  by coarse-graining the bath into MERA shells.
 -- ═══════════════════════════════════════════════════════════════════
@@ -232,7 +231,6 @@ proveMuonQCDRatio c =
 --  The crystal captures 99.6% of the full anomalous magnetic moment
 --  in FOUR TERMS — one per sector — without Feynman diagrams.
 --
---  analysis bridges (Score 7-9):
 --   Kondo effect: Wilson NRG = MERA shells. Same structure.
 --   DFT Jacob's ladder: 4 rungs = 4 sectors. Same convergence.
 --   She-Leveque turbulence: uses 2/3 and 1/9 literally.

@@ -5,13 +5,6 @@
 115 — Quantum Error Correction for Navigation
 Crystal source: PPT exact ℂ²⊗ℂ³, codes, (64,21,d) genetic code
 
-analysis bridge: Quantum information ↔ Coding theory ↔ Genetics
-  World: quantum memory / classical code / genetic code
-  Actor: quantum state / codeword / codon
-  Choice: error syndrome (what went wrong)
-  Act: correction operation / decoding / translation
-  Type: T2 (shared structure — error correction is universal structure)
-  Structure: S8 (information/entropy) + S11 (self-reference)
 
 The PPT (Positive Partial Transpose) criterion is EXACT on ℂ²⊗ℂ³
 because dim = N_w × N_c = 6. For larger systems it's only necessary.
@@ -74,7 +67,6 @@ print(f"  Redundancy: {redundancy:.2f}×")
 print(f"  Steane code: [[{steane_n},{steane_k},{steane_d}]] = [[β₀,1,N_c]]")
 print(f"  Logical error: {p_logical:.2e} (at p_phys={p_physical})")
 print()
-print("analysis bridge: T2 S8+S11 — error correction structure shared")
 print("  across quantum info, classical coding, and genetics.")
 print("No new observables. Application of PPT on ℂ²⊗ℂ³, (64,21,d).")
 """
@@ -82,13 +74,7 @@ print("No new observables. Application of PPT on ℂ²⊗ℂ³, (64,21,d).")
 116 — Thermal Cycling (Mars Day/Night)
 Crystal source: Fourier k=5 (= lagrange_pts), Carnot 5/6
 
-analysis bridge: Heat conduction ↔ Spectral theory
-  World: thermal diffusion / Laplacian eigenvalue problem
-  Actor: heat flux / eigenmode
   Choice: number of significant Fourier modes
-  Act: temperature profile / eigenvalue
-  Type: T1 (spectral theory solves heat equation)
-  Structure: S4 (oscillation) + S6 (flow/transport)
 """
 print()
 print("=" * 60)
@@ -140,20 +126,12 @@ print(f"  Amplitude: {T_amplitude:.0f} K")
 print(f"  Skin depth: {skin_depth*100:.2f} cm")
 print(f"  Stable at {fourier_modes}δ: {depth_stable*100:.1f} cm depth")
 print()
-print("analysis bridge: T1 S4+S6 — spectral decomposition → heat equation")
 print("  Fourier modes = χ-1 = 5 from crystal structure.")
 
 """
 117 — Propellant Chemistry (Bond Angles and H₂)
 Crystal source: Bond angle from gauss=13, H-bond from N_w=2, N_c=3
 
-analysis bridge: Chemistry ↔ Representation theory
-  World: molecular structure / gauge multiplet
-  Actor: electron orbital / representation vector
-  Choice: bond angle (determined by orbital geometry)
-  Act: molecular geometry / multiplet structure
-  Type: T2 (shared structure — bond angles and multiplet splittings)
-  Structure: S9 (symmetry/group action) + S1 (fixed point)
 """
 print()
 print("=" * 60)
@@ -167,7 +145,6 @@ from crystal_constants import gauss, h_bond_AT, h_bond_GC
 # 13 × (360/45) = 104° ... not quite
 # The actual derivation from crystal is in the proved observables
 # Water refractive index n(water) = C_F = 4/3 is proved
-# Bond angle derivation exists in the analysis scan module
 
 # For propellant chemistry:
 # Liquid methane (CH₄) and liquid oxygen (LOX) are Mars-manufacturable
@@ -207,6 +184,5 @@ print(f"  Isp: {Isp_methane} s (vacuum)")
 print(f"  ΔV for ascent: {dv_ascent/1000:.1f} km/s")
 print(f"  Mass ratio: {mass_ratio:.2f}")
 print()
-print("analysis bridge: T2 S9+S1 — bond angles from orbital symmetry")
 print("  cos(tetrahedral) = -1/N_c. Molecular geometry IS representation theory.")
 print("No new observables. Application of gauss=13, C_F=4/3, N_c geometry.")

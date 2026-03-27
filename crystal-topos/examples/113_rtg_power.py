@@ -5,13 +5,6 @@
 113 — RTG Power (Pu-238 Decay)
 Crystal source: Nuclear binding, τ_n = D²/N_w = 882
 
-analysis bridge: Nuclear physics ↔ Power engineering
-  World: nuclear decay / spectral action
-  Actor: Pu-238 nucleus / Dirac operator
-  Choice: decay channel selection (α vs β vs γ)
-  Act: heat generation / eigenvalue
-  Type: T1 (nuclear physics solves power engineering problem)
-  Structure: S4 (oscillation/decay) + S2 (conserved quantity)
 
 The neutron lifetime τ_n relates to D²/N_w = 42²/2 = 882 seconds.
 PDG value: τ_n = 878.4 ± 0.5 s (bottle) or 887.7 ± 2.2 s (beam).
@@ -94,6 +87,5 @@ print(f"  Carnot bound:     {eta_carnot_rtg*100:.1f}%")
 print(f"  Initial electric: {electric_power_initial:.1f} W")
 print(f"  After {mission_years:.0f} years:  {electric_power_after:.1f} W")
 print()
-print("analysis bridge: T1 S4+S2 — nuclear decay physics → power engineering")
 print("  Binding energy terms trace to β₀, N_c, α, N_w from A_F.")
 print("No new observables. Application of τ_n, β₀, C_F, α.")

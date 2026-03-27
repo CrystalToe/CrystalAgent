@@ -467,7 +467,6 @@ main = do
   printf "  Dirac neutrinos: %s. %s\n" (show dirac) diracReason
   putStrLn ""
 
-  -- ── Muon g-2 analysis bridges ──
   -- ── Heavy hadrons (PWI extension) ──
   putStrLn "══ §9c HEAVY HADRONS (PWI extension — every particle gets a score) ══"
   putStrLn "  PWI Rating: ■ EXACT  ● <0.5%  ◐ <1.0%  ○ <4.5%"
@@ -482,10 +481,8 @@ main = do
   putStrLn $ showDerived (proveOmegaSSS c r)
   putStrLn ""
 
-  putStrLn "══ §9d MUON g-2 (analysis cross-domain) ══"
   putStrLn $ showDerived (proveMuonQCDRatio c)
   putStrLn $ showDerived (proveSpectralGm2 c)
-  putStrLn "  analysis bridges: Kondo(9), DFT(8), She-Leveque(8), Bootstrap(8)"
   putStrLn ""
 
   putStrLn "══ §10 NATURALITY ══"

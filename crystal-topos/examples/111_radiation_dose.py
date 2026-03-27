@@ -5,13 +5,6 @@
 111 — Radiation Dose (Cosmic Rays)
 Crystal source: α (fine structure), QCD cross-sections, β₀=7
 
-analysis bridge: Nuclear physics ↔ Radiation biology
-  World: cosmic ray interactions / DNA damage repair
-  Actor: high-energy proton / repair enzyme
-  Choice: cross-section (probability of interaction at given energy)
-  Act: dose deposition / strand break
-  Type: T1 (nuclear physics has tools biology needs)
-  Structure: S8 (information/entropy) + S2 (conserved quantity)
 
 The fine structure constant α = 1/137 controls electromagnetic interactions.
 Crystal derives α from the algebra structure.
@@ -99,7 +92,6 @@ nasa_limit = 1000.0  # mSv
 # 1) Electromagnetic (α from spectral action) → Bethe-Bloch stopping
 # 2) Strong force (β₀=7 from N_c,χ) → nuclear fragmentation
 # The dose is the CONVOLUTION of both sectors acting on the same matter.
-# This is a T1 bridge: nuclear physics provides the cross-section tools
 # that radiation biology needs to predict DNA damage.
 
 # Casimir C_F = 4/3 appears in QCD vertex corrections to fragmentation
@@ -121,6 +113,5 @@ print(f"  Total mission:                     {dose_total:.0f} mSv")
 print(f"  NASA career limit:                 {nasa_limit:.0f} mSv")
 print(f"  Fraction of limit:                 {dose_total/nasa_limit*100:.0f}%")
 print()
-print("analysis bridge: T1 S8+S2 — nuclear physics → radiation biology")
 print("  α (EM stopping) + β₀ (QCD fragmentation) determine dose.")
 print("No new observables. Application of α, β₀, C_F.")

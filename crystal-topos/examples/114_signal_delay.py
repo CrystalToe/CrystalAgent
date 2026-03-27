@@ -5,13 +5,6 @@
 114 — Signal Round-Trip Delay (Earth-Mars Communications)
 Crystal source: c = causal boundary, Maxwell singlet
 
-analysis bridge: Electrodynamics ↔ Causal structure
-  World: signal propagation / light cone structure
-  Actor: electromagnetic wave / Dirac operator eigenmode
-  Choice: causal boundary (c is the maximum signal velocity)
-  Act: round-trip delay / proper time
-  Type: T2 (shared structure — c is shared by Maxwell and metric)
-  Structure: S6 (flow/transport) + S12 (duality)
 
 The speed of light c is NOT just "a constant." In crystal language,
 c is the spectral bound of the Dirac operator — the maximum rate
@@ -101,6 +94,5 @@ print()
 print(f"Data budget: {data_per_sol/1e6:.1f} GB/sol at {bandwidth_direct} kbps")
 print(f"Gravitational time dilation: {grav_dilation:.2e} (negligible)")
 print()
-print("analysis bridge: T2 S6+S12 — Maxwell duality from ℂ summand of A_F")
 print("  c is the causal boundary, not a parameter to fit.")
 print("No new observables. Structural: c from Dirac spectral bound.")

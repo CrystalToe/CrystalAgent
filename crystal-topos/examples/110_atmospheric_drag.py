@@ -5,13 +5,6 @@
 110 — Atmospheric Drag (Mars Entry)
 Crystal source: Prandtl number, Re_c=2310, von Kármán 2/5, Kolmogorov 5/3
 
-analysis bridge: Fluid dynamics ↔ Representation theory
-  World: turbulent flow / gauge field dynamics
-  Actor: boundary layer / running coupling
-  Choice: transition from laminar to turbulent (phase transition)
-  Act: drag coefficient / confinement scale
-  Type: T2 (shared structure — both have critical Reynolds/coupling transition)
-  Structure: S3 (phase transition) + S10 (scaling)
 
 The von Kármán constant κ_vK = 2/5 = N_w/lagrange_pts
 The Kolmogorov exponent 5/3 = (χ-1)/N_c
@@ -103,6 +96,5 @@ print(f"  Deceleration: {deceleration_g:.1f} g")
 print(f"  Kolmogorov microscale: {eta_kolmogorov:.2e} m")
 print(f"  Boundary layer: {delta_bl:.4f} m")
 print()
-print("analysis bridge: T2 S3+S10 — laminar→turbulent transition mirrors")
 print("  confinement transition in QCD. Same scaling exponents from A_F.")
 print("No new observables. Application of Kolmogorov, von Kármán, Re_c.")

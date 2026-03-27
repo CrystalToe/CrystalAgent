@@ -5,17 +5,9 @@
 108 — Hohmann Transfer Orbit ΔV
 Crystal source: Kepler N_c=3 (inverse-square from 3D), v=246.22 GeV
 
-analysis bridge: Celestial mechanics ↔ QFT gauge structure
-  World: orbital mechanics / particle physics
-  Actor: spacecraft trajectory / gauge boson propagator
-  Choice: inverse-square law (shared by gravity and Coulomb)
-  Act: ΔV computation / scattering amplitude
-  Type: T2 (shared structure — same 1/r² from N_c=3 spatial dims)
-  Structure: S2 (conserved quantity — orbital energy)
 
 The inverse-square law is NOT a coincidence. In N_c spatial dimensions,
 Gauss's law gives force ∝ 1/r^(N_c-1). For N_c=3: force ∝ 1/r².
-This is the SAME N_c that gives SU(3) color. The bridge is:
   "3 spatial dimensions" and "3 color charges" share the structure S2
   with the shared structure being the dimension of the representation.
 
@@ -105,5 +97,4 @@ print()
 print(f"PDG/NASA check: ΔV ≈ 3.6 km/s (departure), total ≈ 5.7 km/s")
 print(f"Computed total:  {dv_total:.1f} km/s")
 print()
-print("analysis bridge: T2 S2 — gravity and Coulomb share N_c=3 inverse-square")
 print("No new observables. Application of existing N_c=3 structure.")

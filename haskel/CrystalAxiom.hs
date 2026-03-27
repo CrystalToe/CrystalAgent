@@ -4,7 +4,6 @@
 {- |
 Module      : CrystalAxiom
 Description : Foundation — axiom, spectrum, types, constants, Heyting algebra
-Author      : D. Montgomery — analysis Programme — March 2026
 License     : MIT
 -}
 

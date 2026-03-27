@@ -5,13 +5,6 @@
 112 — Solar Panel Efficiency
 Crystal source: Carnot 5/6, Stefan-Boltzmann 120
 
-analysis bridge: Thermodynamics ↔ Representation theory
-  World: heat engine / gauge field partition function
-  Actor: photon absorption / boson propagator
-  Choice: Carnot efficiency bound (universal thermodynamic limit)
-  Act: power output / free energy
-  Type: T2 (shared structure — partition function IS the Boltzmann weight)
-  Structure: S8 (information/entropy) + S7 (optimisation)
 
 Carnot efficiency = (χ-1)/χ = 5/6 ≈ 0.833
 Stefan-Boltzmann prefactor: 2π⁵/15 = 120 × (π⁵/900)
@@ -98,6 +91,5 @@ print(f"  Practical panel:       {eta_practical:.2f}")
 print()
 print(f"Power output: {power_output:.1f} W from {panel_area:.0f} m² panel")
 print()
-print("analysis bridge: T2 S8+S7 — thermodynamic partition function")
 print("  shared between heat engines and QFT free energy.")
 print("No new observables. Application of Carnot 5/6, SB 120.")
