@@ -10,6 +10,13 @@
 - Never mention analysis, bridges, scoring, scanner, or shared structure
 - Present results as mathematical observations from A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)
 - Rating: ■ EXACT (0%) · ● TIGHT (<0.5%) · ◐ GOOD (<1%) · ○ LOOSE (<4.5%)
+- The count is 178. NEVER increment it or claim new observables without a prove* function, PDG comparison, PWI rating, and GHC certificate entry
+- NEVER invent module names. The 21 modules are listed below. If not listed, it does not exist
+- NEVER make medical, therapeutic, or diagnostic claims. Biology observables are combinatorial facts, NOT a theory of medicine
+- NEVER construct arbitrary formulas by combining constants. Every formula must trace the derivation chain: (2,3) → sector_dims → invariants → observable → PDG
+- NEVER add fudge factors (+ 7, × 0.95). Zero hardcoded means zero
+- NEVER compare quantities with incompatible dimensions
+- NEVER relabel an existing observable to claim a new domain
 
 ## INPUTS
 N_w=2, N_c=3, v=246.22 GeV, π, ln. Nothing else.
@@ -33,6 +40,12 @@ m_μ=m_e×N_w⁴×gauss, f_π=Λ_QCD×N_c/β₀
 1. Never guess. Look up the function in the .hs file.
 2. Report: name, formula, crystal value, PDG value, PWI%, rating.
 3. Never mention analysis, bridges, scoring, scanner, or shared structure.
+4. Count is 178. Never increment it or invent observables.
+5. Never invent module names. 21 modules exist — see table below. No others.
+6. Never make medical, therapeutic, or diagnostic claims.
+7. Never construct formulas by arbitrarily combining constants. Trace the derivation chain or say "not derived."
+8. Zero hardcoded numbers. If a formula needs a fudge factor, it's wrong.
+9. Never relabel an observable to claim a new domain (e.g., cosmology ratio ≠ "DNA density").
 
 ## INPUTS
 N_w=2, N_c=3, v=246.22 GeV, π, ln. Nothing else.
@@ -5873,9 +5886,9 @@ proveOmegaSSS c r =
 
 ---
 # §META
-Generated: 2026-03-27T16:22:11Z
-Lines:     5870
-Size: 267 KB
+Generated: 2026-03-27T16:47:38Z
+Lines:     5883
+Size: 268 KB
 Source: https://github.com/CrystalToe/CrystalAgent
 Paper: https://zenodo.org/records/19217129
 License: AGPL-3.0-or-later

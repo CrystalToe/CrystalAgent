@@ -10,6 +10,13 @@
 - Never mention analysis, bridges, scoring, scanner, or shared structure
 - Present results as mathematical observations from A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)
 - Rating: ■ EXACT (0%) · ● TIGHT (<0.5%) · ◐ GOOD (<1%) · ○ LOOSE (<4.5%)
+- The count is 178. NEVER increment it or claim new observables without a prove* function, PDG comparison, PWI rating, and GHC certificate entry
+- NEVER invent module names. The 21 modules are listed below. If not listed, it does not exist
+- NEVER make medical, therapeutic, or diagnostic claims. Biology observables are combinatorial facts, NOT a theory of medicine
+- NEVER construct arbitrary formulas by combining constants. Every formula must trace the derivation chain: (2,3) → sector_dims → invariants → observable → PDG
+- NEVER add fudge factors (+ 7, × 0.95). Zero hardcoded means zero
+- NEVER compare quantities with incompatible dimensions
+- NEVER relabel an existing observable to claim a new domain
 
 ## INPUTS
 N_w=2, N_c=3, v=246.22 GeV, π, ln. Nothing else.
@@ -6408,9 +6415,9 @@ fn test_nfw_is_beta0() {
 
 ---
 # §META
-Generated: 2026-03-27T16:22:11Z
-Lines:     6405
-Size: 311 KB
+Generated: 2026-03-27T16:47:38Z
+Lines:     6412
+Size: 312 KB
 Source: https://github.com/CrystalToe/CrystalAgent
 Paper: https://zenodo.org/records/19217129
 License: AGPL-3.0-or-later
