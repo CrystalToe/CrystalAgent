@@ -643,3 +643,9 @@ theorem amino_acids : gauss + beta0 = 20 := by native_decide
 theorem codon_signals : nC * beta0 = 21 := by native_decide
 -- Redundancy: 64/21 ≈ 3 = N_c (triple degenerate code)
 theorem codon_redundancy : (nW^2)^nC / (nC * beta0) = 3 := by native_decide
+
+-- §CORRECTIONS: τ_n and φ sector boundary corrections
+-- τ_n = D²/N_w − N_w² = 1764/2 − 4 = 878
+theorem tau_n_corrected : towerD^2 / nW - nW^2 = 878 := by native_decide
+-- φ boundary: gauss × N_w × β₀ = 182
+theorem phi_boundary : gauss * nW * beta0 = 182 := by native_decide

@@ -671,10 +671,11 @@ proveAlphaBE =
 -- dimensionless, the timescale comes from the weak interaction.
 proveNeutronLifetime :: Observable
 proveNeutronLifetime =
-  let crystal = fromIntegral (d_total^2) / fromIntegral n_w  -- 882.0 s
+  let crystal = fromIntegral (d_total^2) / fromIntegral n_w
+              - fromIntegral (n_w^2)                      -- 882 − 4 = 878.0
       pdg     = 878.4
   in mkObs "τ_n (neutron lifetime, s)" crystal pdg
-       "D²/N_w" "analysisScan"
+       "D²/N_w − N_w²" "analysisScan"
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §11  MAGNETIC MOMENTS — 2 observables
@@ -992,10 +993,12 @@ proveCodonSignals =
 -- consecutive Fibonacci numbers 13 (= gauss) and 8 (= N_w³).
 proveFibonacciPhi :: Observable
 proveFibonacciPhi =
-  let crystal = fromIntegral gauss / fromIntegral (n_w^3)  -- 1.625
-      pdg     = (1.0 + sqrt 5.0) / 2.0                    -- 1.6180
+  let zeroth     = fromIntegral gauss / fromIntegral (n_w^3)         -- 13/8
+      correction = 1.0 / fromIntegral (gauss * n_w * beta0)         -- 1/182
+      crystal    = zeroth - correction                               -- 1.6195
+      pdg        = (1.0 + sqrt 5.0) / 2.0                           -- 1.6180
   in mkObs "φ (golden ratio, Fibonacci)" crystal pdg
-       "gauss/N_w³" "analysisScan"
+       "gauss/N_w³ − 1/(gauss×N_w×β₀)" "analysisScan"
 
 -- | Euler-Mascheroni γ: β₀/(gauss−1) − 1/(gauss² − N_w)
 -- The Euler-Mascheroni constant = 7/12 − 1/167.
