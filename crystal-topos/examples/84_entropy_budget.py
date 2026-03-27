@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """84 — The Entropy Budget: D = 42 Complexity Dimensions"""
 from crystal_topos import d_total, sigma_d, chi, crystal_max_entropy
 import math

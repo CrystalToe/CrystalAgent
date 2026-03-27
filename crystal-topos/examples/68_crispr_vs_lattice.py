@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """68 — CRISPR vs Lattice Tuning"""
 from crystal_topos import n_w, n_c, chi, beta0, gauss
 print("CRISPR vs Crystal Lattice Tuning")

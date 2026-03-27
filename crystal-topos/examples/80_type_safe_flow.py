@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """80 — Why Electrons Can't Hit Atoms in a Superconductor"""
 from crystal_topos import n_w, n_c, chi, sigma_d
 print("Type-Safe Electron Flow")

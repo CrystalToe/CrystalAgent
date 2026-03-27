@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """90 — Hardcode Audit: Verify Nothing Is Fudged"""
 from crystal_topos import (n_w, n_c, chi, beta0, gauss, sigma_d,
                            sigma_d2, d_total, crystal_kappa)

@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """69 — The Periodic Table IS the Crystal"""
 from crystal_topos import n_w, n_c, chi, beta0, gauss, sigma_d
 print("The Periodic Table from Two Primes")

@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """66 — The Protein Folding Space"""
 from crystal_topos import n_w, n_c, gauss, beta0, chi, sigma_d, d_total
 import math

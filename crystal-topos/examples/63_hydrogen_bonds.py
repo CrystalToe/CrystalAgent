@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """63 — DNA Hydrogen Bonds ARE the Two Primes"""
 from crystal_topos import n_w, n_c
 print("The Two Primes ARE the Two Bond Strengths")

@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Daland Montgomery
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 {-
   CrystalTopos.agda — Agda Proof · v14 · March 2026
   THE ONE LAW: Phys = End(A_F) + Nat(End(A_F)). 650 endomorphisms.
@@ -911,3 +914,40 @@ audit-D = refl
 audit-fermat3 : 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 + 1 ≡ 257
 audit-fermat3 = refl
 -- Zero hardcoded numbers. Every integer from (2,3). QED.
+
+-- §THREE-BODY: The three-body problem IS the crystal
+lagrange-points : chi - 1 ≡ 5
+lagrange-points = refl
+
+three-body-phase : nC * chi ≡ 18
+three-body-phase = refl
+
+three-body-symmetry : nW * (chi - 1) ≡ 10
+three-body-symmetry = refl
+
+three-body-unsolved : nW * nW * nW ≡ 8
+three-body-unsolved = refl
+
+routh-denom : gauss + beta0 + chi ≡ 26
+routh-denom = refl
+
+-- §PROTON RADIUS + BLACK HOLES
+bekenstein-area : nW * nW ≡ 4
+bekenstein-area = refl
+
+hawking-eight : nW * nW * nW ≡ 8
+hawking-eight = refl
+
+-- §CORRECTIONS: R_p and Ω_DM/Ω_b
+rp-boundary : gauss * beta0 ≡ 91
+rp-boundary = refl
+
+dm-ratio-num : towerD + 1 ≡ 43
+dm-ratio-num = refl
+
+dm-ratio-denom : nW * nW * nW ≡ 8
+dm-ratio-denom = refl
+
+-- §COSMOLOGY DEEP: NFW concentration
+nfw-concentration : gauss - chi ≡ beta0
+nfw-concentration = refl

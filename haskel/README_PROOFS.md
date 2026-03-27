@@ -11,3 +11,4 @@ cp ../Main.lean .
 lake build
 cp .lake/build/lib/lean/CrystalTopos.olean ..
 cd ..
+rm -rf LeanCert/

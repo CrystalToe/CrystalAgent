@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """56 — Color Confinement: Quarks Can't Escape"""
 from crystal_topos import n_c, n_w, chi, beta0
 print("Color Confinement from the Heyting Algebra")

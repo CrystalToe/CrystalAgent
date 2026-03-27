@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Daland Montgomery
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Crystal Topos structural theorem tests — all from N_w=2, N_c=3.
 
 use crystal_topos::base::*;
@@ -398,4 +401,105 @@ fn audit_no_magic_numbers() {
     // 54 = sum of sector products + 1
     // 1872 = NC² × NW⁴ × GAUSS = 9 × 16 × 13
     assert_eq!(NC*NC * NW*NW*NW*NW * GAUSS, 1872);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// THREE-BODY PROBLEM
+// ═══════════════════════════════════════════════════════════════
+
+#[test]
+fn test_lagrange_points() {
+    assert_eq!(CHI - 1, 5);  // L1-L5
+}
+
+#[test]
+fn test_three_body_phase_space() {
+    assert_eq!(NC * CHI, 18);  // 3 bodies × 6 coords
+}
+
+#[test]
+fn test_three_body_decomposition() {
+    let phase = NC * CHI;           // 18
+    let symmetry = NW * (CHI - 1);  // 10
+    let unsolved = NW * NW * NW;    // 8
+    assert_eq!(phase - symmetry, unsolved);  // 18 - 10 = 8
+}
+
+#[test]
+fn test_routh_ratio() {
+    assert_eq!(GAUSS + BETA0 + CHI, 26);
+    let mu = 1.0 / (GAUSS + BETA0 + CHI) as f64;
+    let mu_exact = (1.0 - (23.0_f64 / 27.0).sqrt()) / 2.0;
+    assert!((mu - mu_exact).abs() < 0.0001);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PROTON RADIUS + BLACK HOLES
+// ═══════════════════════════════════════════════════════════════
+
+#[test]
+fn test_bekenstein_area_quantum() {
+    assert_eq!(NW * NW, 4);  // S_BH = A/(4 l²)
+}
+
+#[test]
+fn test_proton_radius() {
+    // R_p = N_w² × ℏc/m_p
+    let hbar_c = 197.327_f64;  // MeV·fm
+    let m_p = 246220.0 / 256.0 * 53.0 / 54.0;
+    let r_p = (NW * NW) as f64 * hbar_c / m_p;
+    assert!((r_p - 0.8409).abs() < 0.005);  // GOOD: < 1%
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CORRECTED: R_p and Ω_DM/Ω_b
+// ═══════════════════════════════════════════════════════════════
+
+#[test]
+fn test_rp_boundary() {
+    assert_eq!(GAUSS * BETA0, 91);  // same boundary as μ_p
+}
+
+#[test]
+fn test_proton_radius_corrected() {
+    let hbar_c = 197.327_f64;
+    let m_p = 246220.0 / 256.0 * 53.0 / 54.0;
+    let r_p = (NW * NW) as f64 * hbar_c / m_p
+            + (NW as f64 / (GAUSS * BETA0) as f64) * hbar_c / m_p;
+    assert!((r_p - 0.8409).abs() < 0.001);  // PWI < 0.02%
+}
+
+#[test]
+fn test_dm_baryon_ratio_corrected() {
+    // Ω_DM/Ω_b = (D+1)/N_w³ = 43/8 = 5.375
+    let ratio = (D_TOTAL + 1) as f64 / (NW * NW * NW) as f64;
+    assert!((ratio - 5.36).abs() < 0.02);  // PWI < 0.28%
+}
+
+#[test]
+fn test_dm_is_codons_over_colour() {
+    // codon_redundancy / colour_DOF = dark/baryon ratio
+    let codons = (NW * NW).pow(NC as u32);
+    let signals = NC * BETA0;
+    let redundancy = codons - signals;  // 43
+    let colour_dof = NW * NW * NW;     // 8
+    assert_eq!(redundancy, D_TOTAL + 1);
+    assert_eq!(colour_dof, 8);
+    // 43/8 = 5.375 ≈ Ω_DM/Ω_b
+}
+
+// ═══════════════════════════════════════════════════════════════
+// COSMOLOGY DEEP
+// ═══════════════════════════════════════════════════════════════
+
+#[test]
+fn test_nfw_concentration() {
+    assert_eq!(GAUSS - CHI, BETA0);  // 13 - 6 = 7
+}
+
+#[test]
+fn test_nfw_is_beta0() {
+    // The number that confines quarks shapes dark matter halos
+    assert_eq!(GAUSS - CHI, 7);
+    assert_eq!(BETA0, 7);
 }

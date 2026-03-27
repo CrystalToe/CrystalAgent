@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """60 — Full Life Simulation: From Quarks to DNA in 60 Lines"""
 from crystal_topos import (
     QuantumState, n_w, n_c, chi, beta0, gauss, d_total,

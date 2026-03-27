@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """87 — Dark Matter Lives in the Colour and Mixed Sectors"""
 from crystal_topos import n_w, n_c, chi, gauss, beta0, sigma_d
 print("Where Is the Dark Matter?")

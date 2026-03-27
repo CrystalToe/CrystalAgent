@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """83 — KMS Thermal Equilibrium at β = 2π"""
 from crystal_topos import chi, sigma_d, crystal_energies
 import math

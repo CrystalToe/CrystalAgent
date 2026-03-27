@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """57 — The Genetic Code IS the (2,3) Lattice"""
 from crystal_topos import n_w, n_c, gauss, beta0, chi
 print("THE GENETIC CODE FROM TWO PRIMES")

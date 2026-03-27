@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """61 — α-Helix: Protein Folding from Two Primes"""
 from crystal_topos import n_w, n_c, chi, beta0
 print("α-Helix: The Most Common Protein Fold")

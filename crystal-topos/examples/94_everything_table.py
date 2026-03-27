@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """94 — Everything from Two Primes: The Complete Table"""
 from crystal_topos import n_w, n_c, chi, beta0, gauss, sigma_d, d_total
 import math

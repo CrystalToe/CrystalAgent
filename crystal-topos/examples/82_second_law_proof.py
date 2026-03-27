@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """82 — The Second Law of Thermodynamics: A Geometric Proof"""
 from crystal_topos import chi, n_w, n_c, beta0, gauss, sigma_d
 import math
