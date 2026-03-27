@@ -1,5 +1,5 @@
 # Crystal Topos — LLM Agent Prompt
-# 21 Haskell modules. 152 observables. 96 quantum operators.
+# 21 Haskell modules. 164 observables. 96 quantum operators.
 # Feed this file + the .hs files to any LLM.
 
 ## RULES
@@ -52,11 +52,11 @@ f_π = Λ_QCD × N_c/β₀           m_ρ = m_π × (D−β₀)/χ
 | Main | Certificate output, all 92 observables | Main driver |
 | analysisScanTest | analysis scan test driver, derivation audit | Test driver |
 
-### analysis Scan (1 module, 60 new observables)
+### analysis Scan (1 module, 72 new observables)
 
 | Module | Key Functions | Domain |
 |--------|--------------|--------|
-| CrystalanalysisScan | 60 new: mesons, baryons, quark masses, τ, EW, nuclear, moments | analysis scan |
+| CrystalanalysisScan | 72 new: mesons, baryons, quark masses, τ, EW, nuclear, moments | analysis scan |
 
 ### Quantum Library (9 modules, 96 operators + 10 theorems)
 
@@ -85,8 +85,8 @@ f_π = Λ_QCD × N_c/β₀           m_ρ = m_π × (D−β₀)/χ
 - ✗ OVER (PWI ≥ 4.5%): Wall breach
 
 ## SUMMARY STATS
-- Total observables: 152 (92 + 60)
-- Sub-1%: 152/152
+- Total observables: 164 (92 + 72)
+- Sub-1%: 164/164
 - Mean PWI: 0.33%
 - CV ≈ 1.15 (Shannon optimal, inside 95% CI)
 - Prime wall: 4.5%
