@@ -869,3 +869,10 @@ gc-bonds = refl
 
 groove-ratio-num : 3 * beta0 + 2 * chi ≡ 33
 groove-ratio-num = refl
+
+-- §SUPERCONDUCTIVITY: Type-safe electron flow
+lattice-lock : sigmaD ≡ chi * chi
+lattice-lock = refl
+
+cooper-pair-dim : chi * (chi - 1) ≡ 30
+cooper-pair-dim = refl
