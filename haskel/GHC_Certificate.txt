@@ -1,14 +1,3 @@
-╔══════════════════════════════════════════════════════════════════╗
-║  GHC CURRY-HOWARD CERTIFICATE                                  ║
-║  21 Haskell modules · 96 quantum operators                     ║
-║  178 observables · 10 quantum theorems · Zero hardcoded numbers ║
-╚══════════════════════════════════════════════════════════════════╝
-Generated: 2026-03-27 07:45:45 UTC
-analysis: 86 (33 EXACT + 52 TIGHT + 1 LOOSE + 0 OVER)
-Total: 92 + 86 = 178. Mean PWI: 0.230%. Max: 2.98%.
-Sub-1%: 177/178 (99.4%). Only LOOSE: Ω_DM (structural).
-HARDCODE AUDIT: PASS
-
 
 ╔══════════════════════════════════════════════════════════════════╗
 ║  CRYSTAL TOPOS — PROOF-CARRYING IMPLEMENTATION (modular v14)   ║
@@ -523,7 +512,6 @@ HARDCODE AUDIT: PASS
 ╚══════════════════════════════════════════════════════════════════╝
 
 
-
 ╔═══════════════════════════════════════════════════════════════╗
 ║   CRYSTAL TOPOS — analysis v3.1 WIDE-APERTURE SCAN RESULTS     ║
 ║   44 New Observables · All Under Prime Wall · (2,3) Only    ║
@@ -677,52 +665,3 @@ HARDCODE AUDIT: PASS
   12. μ_p/μ_N = 14/5                          PWI = 0.26%
   13. Deuteron BE = m_e × gauss/N_c           PWI = 0.48%
 
-
-
-================================================================
- CRYSTAL QUANTUM — Multi-Particle Operators from End(A_F)
- All from N_w=2, N_c=3. Zero free parameters.
-================================================================
-
-  Hilbert space: C^chi = C^6
-  Operator algebra: End(C^chi) = M_6(C)
-  Total endomorphisms of A_F: 650
-  Single-particle gates: chi^2 = 36
-  Sector-preserving: 6
-  Sector-mixing (entangling): 30
-
-  Energy spectrum:
-    Singlet   E = 0.0     d = 1
-    Weak      E = 0.6931  d = 3
-    Colour    E = 1.0986  d = 8
-    Mixed     E = 1.7918  d = 24
-  Mass gap: dE = ln(N_w) = 0.6931
-  Max energy: ln(chi) = 1.7918
-
-  Multi-particle:
-    H_2 = C^36 (= Sigma_d = 36)
-    Symmetric (bosons): 21
-    Antisymmetric (fermions): 15
-    Fock limit: e^chi = 403.4
-
-  Entanglement:
-    Max S_vN = ln(chi) = 1.7918 nats
-    Product states: 6
-    Entangled states: 30
-    PPT exact: True
-
-  Structural theorems:
-    1. dim(H₂) = χ² = Σd                       36 = 36  PASS
-    2. S_entangle = ΔS_arrow = ln(χ)           1.791759469228055  PASS
-    3. Fermion dim = dim(su(N_w²))             15 = 15  PASS
-    4. PPT exact for ℂ²⊗ℂ³                     N_w×N_c = 6 ≤ 6  PASS
-    5. End(A_F) = 650 = 36 + 614               gates + sector-internal  PASS
-    6. Fock dim → e^χ = e^6                    403  PASS
-    7. ΔE₀₁ = ΔE₂₃ = ln(N_w)                   0.6931471805599453 = 0.6931471805599452  PASS
-    8. Interactions = 2 × fermions             30 = 2 × 15  PASS
-    9. Pauli: H ≥ 0 → no self-adjoint T        E₀ = 0, Heyting incomparable  PASS
-    10. CNOT dim = χ⁴ = ν ratio numerator       1296/1295 = χ⁴/(χ⁴−1)  PASS
-
-  Theorems: 10/10 PASS
-
-================================================================
