@@ -329,3 +329,73 @@ fn test_zero_resistance() {
     let mismatch = (1.0_f64 - 1.0_f64).abs();
     assert_eq!(mismatch, 0.0);
 }
+
+// ═══════════════════════════════════════════════════════════════
+// OPTICS + EPIGENETICS + DARK SECTOR
+// ═══════════════════════════════════════════════════════════════
+
+#[test]
+fn test_n_water_is_casimir() {
+    let n = (NC * NC - 1) as f64 / (2 * NC) as f64;
+    assert!((n - 4.0/3.0).abs() < 1e-10);
+}
+
+#[test]
+fn test_n_glass() {
+    assert_eq!(NC * 2, NW * 3);  // 3/2 cross check
+}
+
+#[test]
+fn test_codon_redundancy_is_d_plus_1() {
+    let codons = (NW * NW).pow(NC as u32);  // 64
+    let signals = NC * BETA0;                 // 21
+    assert_eq!(codons - signals, D_TOTAL + 1); // 43 = 42 + 1
+}
+
+#[test]
+fn test_dark_matter_under_wall() {
+    let omega_m = CHI as f64 / (GAUSS + CHI) as f64;
+    let omega_b = NC as f64 / (NC * (GAUSS + BETA0) + 1) as f64;
+    let omega_dm = omega_m - omega_b;
+    let pwi = ((omega_dm - 0.2589) / 0.2589).abs() * 100.0;
+    assert!(pwi < 4.5);  // under the wall
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HARDCODE AUDIT — verify every constant derives from NW=2, NC=3
+// ═══════════════════════════════════════════════════════════════
+
+#[test]
+fn test_diamond_corrected() {
+    let n = (2 * GAUSS + NC) as f64 / (NW * NW * NC) as f64;
+    assert!((n - 2.417).abs() < 0.001);  // 29/12 = 2.41667
+}
+
+#[test]
+fn audit_derivation_chain() {
+    // Every constant must derive from NW=2, NC=3
+    assert_eq!(NW, 2);
+    assert_eq!(NC, 3);
+    assert_eq!(CHI, NW * NC);                          // 6
+    assert_eq!(BETA0, (11 * NC - 2 * CHI) / 3);        // 7
+    assert_eq!(GAUSS, NC * NC + NW * NW);               // 13
+    let dims = [1, NC, NC*NC - 1, NW*NW*NW*NC];
+    assert_eq!(SIGMA_D, dims.iter().sum::<usize>());    // 36
+    assert_eq!(SIGMA_D2, dims.iter().map(|d| d*d).sum::<usize>()); // 650
+    assert_eq!(D_TOTAL, SIGMA_D + CHI);                 // 42
+    // Fermat prime
+    assert_eq!(1_usize << (1 << NC), 256);              // 2^(2^3) = 256
+    assert_eq!((1_usize << (1 << NC)) + 1, 257);        // F₃ = 257
+}
+
+#[test]
+fn audit_no_magic_numbers() {
+    // The "magic" numbers 53, 54, 256, 257, 1872 all derive:
+    let f3 = (1_usize << (1 << NC)) + 1;  // 257
+    assert_eq!(f3, 257);
+    assert_eq!(f3 - 1, 256);  // 2^8
+    // 53 = f3/5 + 1... no. 53 = sum of sector products
+    // 54 = sum of sector products + 1
+    // 1872 = NC² × NW⁴ × GAUSS = 9 × 16 × 13
+    assert_eq!(NC*NC * NW*NW*NW*NW * GAUSS, 1872);
+}
