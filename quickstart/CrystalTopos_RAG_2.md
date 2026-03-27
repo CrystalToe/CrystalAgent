@@ -1,5 +1,3 @@
-<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
-
 # Crystal Topos — RAG Knowledge Base (Part 2 of 2)
 # 178 observables · 22 domains · 0 free parameters
 # Upload BOTH parts for 100% coverage. Each part works standalone for basic queries.
@@ -6722,7 +6720,7 @@ fn test_engineering_genetic_ecc() {
 
 ---
 # §META
-Generated: 2026-03-27T17:45:05Z
+Generated: 2026-03-27T22:09:25Z
 Lines:     6719
 Size: 323 KB
 Source: https://github.com/CrystalToe/CrystalAgent
