@@ -1,6 +1,9 @@
 haskel/LeanCert/*
 haskel/README_PROOFS.md
 todo/*
+INTERNAL_README.md
+HANDOFF.md
+sync_check.sh
 
 # Rust
 crystal-topos/target/
