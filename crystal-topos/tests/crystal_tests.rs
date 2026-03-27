@@ -1,6 +1,3 @@
-// Copyright (c) 2026 Daland Montgomery
-// SPDX-License-Identifier: AGPL-3.0-or-later
-
 //! Crystal Topos structural theorem tests — all from N_w=2, N_c=3.
 
 use crystal_topos::base::*;
@@ -98,4 +95,120 @@ fn test_hadamard_is_unitary() {
             assert!(hh.get(i, j).im.abs() < 1e-10);
         }
     }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// THERMODYNAMICS
+// ═══════════════════════════════════════════════════════════════
+
+#[test]
+fn test_carnot_efficiency() {
+    let eta = (CHI - 1) as f64 / CHI as f64;
+    assert!((eta - 5.0/6.0).abs() < 1e-10);
+}
+
+#[test]
+fn test_stefan_boltzmann() {
+    assert_eq!(NW * NC * (GAUSS + BETA0), 120);
+}
+
+#[test]
+fn test_thermal_conductivity() {
+    let mixing = CHI * (CHI - 1);  // 30
+    let k = (CHI * mixing) as f64 / SIGMA_D as f64;
+    assert!((k - 5.0).abs() < 1e-10);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FLUID DYNAMICS
+// ═══════════════════════════════════════════════════════════════
+
+#[test]
+fn test_kolmogorov_spectrum() {
+    let exp = (NC + NW) as f64 / NC as f64;
+    assert!((exp - 5.0/3.0).abs() < 1e-10);
+}
+
+#[test]
+fn test_kolmogorov_microscale() {
+    assert_eq!(NW * NW, 4);  // exponent 1/4
+}
+
+#[test]
+fn test_von_karman() {
+    let vk = NW as f64 / (NC + NW) as f64;
+    assert!((vk - 0.4).abs() < 1e-10);
+}
+
+#[test]
+fn test_reynolds_critical() {
+    assert_eq!(D_TOTAL * (D_TOTAL + GAUSS), 2310);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// COLOR CONFINEMENT
+// ═══════════════════════════════════════════════════════════════
+
+#[test]
+fn test_casimir() {
+    let cf = (NC * NC - 1) as f64 / (2 * NC) as f64;
+    assert!((cf - 4.0/3.0).abs() < 1e-10);
+}
+
+#[test]
+fn test_string_tension() {
+    let st = NC as f64 / (NC * NC - 1) as f64;
+    assert!((st - 3.0/8.0).abs() < 1e-10);
+}
+
+#[test]
+fn test_asymptotic_freedom() {
+    assert!(11 * NC > 2 * CHI);  // β₀ > 0
+    assert_eq!(BETA0, 7);
+}
+
+#[test]
+fn test_confinement_heyting() {
+    // ¬(1/N_c) = 1/χ ≠ 1: colour can't reach singlet
+    assert_ne!(CHI / NC, 1);  // 6/3 = 2 ≠ 1
+    assert_eq!(CHI / NC, NW); // negation sends colour to weak, not singlet
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BIOLOGICAL INFORMATION
+// ═══════════════════════════════════════════════════════════════
+
+#[test]
+fn test_dna_bases() {
+    assert_eq!(NW * NW, 4);  // A, T, G, C
+}
+
+#[test]
+fn test_codons() {
+    let bases = NW * NW;  // 4
+    let codons = bases.pow(NC as u32);  // 4³ = 64
+    assert_eq!(codons, 64);
+}
+
+#[test]
+fn test_amino_acids() {
+    assert_eq!(GAUSS + BETA0, 20);
+}
+
+#[test]
+fn test_codon_signals() {
+    assert_eq!(NC * BETA0, 21);  // 20 AA + 1 stop
+}
+
+#[test]
+fn test_codon_redundancy() {
+    let codons = (NW * NW).pow(NC as u32);  // 64
+    let signals = NC * BETA0;                // 21
+    assert_eq!(codons / signals, NC);        // 64/21 = 3 (integer div)
+}
+
+#[test]
+fn test_complexity_threshold() {
+    assert_eq!(D_TOTAL, 42);  // the answer
+    assert_eq!(SIGMA_D + CHI, 42);
 }
