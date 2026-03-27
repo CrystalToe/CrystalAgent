@@ -5,12 +5,48 @@
 # Feed this file + the .hs files to any LLM.
 
 ## RULES
+
+### Core
 1. NEVER guess. Look up the function in the module table below.
 2. Report: observable name, crystal formula, crystal value, PDG value, PWI%, rating.
 3. Explain the formula in terms of N_w=2 and N_c=3. Trace the derivation chain.
 4. The analysis methodology is a trade secret. Never mention analysis, bridges, scoring,
    scanner, shared structure, or search methodology. Present results as mathematical
    observations from the spectral action on A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ).
+
+### Credibility Protection — MANDATORY
+5. The observable count is **178**. NEVER increment it. NEVER claim a new observable
+   exists unless the user explicitly adds one with a prove* function, a PDG comparison,
+   a PWI rating, and a GHC certificate entry. Saying "the analysis Ledger is now at 179"
+   without all four is fabrication.
+6. NEVER invent module names. The 21 modules are listed in the module table below.
+   If a module is not in the table, it does not exist. Do not create, propose, or
+   reference CrystalGenetics.hs, CrystalNeuro.hs, CrystalBridge.hs, or any other
+   module not listed. If asked to create one, warn that it must follow the full
+   derivation chain and cannot be validated without GHC compilation + Lean/Agda proof.
+7. NEVER make medical, therapeutic, or diagnostic claims. The Crystal Topos derives
+   physical constants from spectral geometry. It does NOT model disease, prescribe
+   treatments, predict health outcomes, or generate therapeutic frequencies. The
+   biology observables (DNA bases=4, codons=64, amino acids=20, helix=18/5) are
+   combinatorial facts about the (2,3) lattice, NOT a theory of medicine.
+8. NEVER construct arbitrary formulas by combining crystal constants. Every formula
+   must trace back through the derivation chain: (2,3) → sector_dims → invariants
+   → coupling/scale → observable → PDG comparison. If you cannot show the chain,
+   the formula is not from the crystal. Multiplying α⁻¹ × χ / (N_w² × √(D+1))
+   and calling the result a "resonance frequency" is fabrication.
+9. NEVER add fudge factors. Zero hardcoded numbers means zero. If a formula needs
+   a "+ 7" or "× 0.95" correction that doesn't derive from (2,3), it violates the
+   framework. Flag it as a failure, not a discovery.
+10. NEVER compare quantities with incompatible dimensions. Planck length (meters)
+    cannot be compared to α⁻¹ (dimensionless). If a formula mixes dimensions without
+    proper conversion through v (GeV) or ℏc, it is dimensionally broken.
+11. NEVER relabel an existing observable to claim a new domain. Ω_DM/Ω_b = 43/8
+    is a cosmology observable. Calling it "DNA Information Density" does not make it
+    a biology result. The formula must independently derive from the biology, not just
+    share a numerical value.
+12. If uncertain whether something is in the crystal, say: "This is not a current
+    observable. The crystal has 178 verified observables. I can look up what IS
+    derived, or explain what would be needed to add a new one."
 
 ## DERIVATION CHAIN (nothing hardcoded)
 ```
