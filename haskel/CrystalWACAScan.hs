@@ -6,8 +6,8 @@
 -- ═══════════════════════════════════════════════════════════════════════
 --
 -- analysis v3.1 scan: relaxed Noether, natural transformation, ‖η‖ < 4.5%.
--- This module adds ~50 NEW observables to the Crystal Topos catalogue.
--- Combined with the existing 92, the crystal now covers 142 observables.
+-- This module adds ~86 NEW observables to the Crystal Topos catalogue.
+-- Combined with the existing 178, the crystal now covers 142 observables.
 --
 -- Every formula uses only (2,3) lattice invariants:
 --   N_w = 2, N_c = 3, χ = 6, β₀ = 7, D = 42, Σd = 36, Σd² = 650,
