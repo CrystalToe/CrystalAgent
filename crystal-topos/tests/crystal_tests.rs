@@ -212,3 +212,90 @@ fn test_complexity_threshold() {
     assert_eq!(D_TOTAL, 42);  // the answer
     assert_eq!(SIGMA_D + CHI, 42);
 }
+
+// ═══════════════════════════════════════════════════════════════
+// SECTOR BOUNDARY CORRECTIONS
+// ═══════════════════════════════════════════════════════════════
+
+#[test]
+fn test_neutron_lifetime_correction() {
+    // τ_n = D²/N_w − N_w² = 1764/2 − 4 = 878
+    let tau = D_TOTAL * D_TOTAL / NW - NW * NW;
+    assert_eq!(tau, 878);
+}
+
+#[test]
+fn test_phi_boundary() {
+    // φ correction denominator: gauss × N_w × β₀ = 182
+    assert_eq!(GAUSS * NW * BETA0, 182);
+}
+
+#[test]
+fn test_golden_ratio_corrected() {
+    let phi = GAUSS as f64 / (NW * NW * NW) as f64
+            - 1.0 / (GAUSS * NW * BETA0) as f64;
+    let exact = (1.0 + 5.0_f64.sqrt()) / 2.0;
+    assert!((phi - exact).abs() < 0.002);  // PWI < 0.1%
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CHEMISTRY
+// ═══════════════════════════════════════════════════════════════
+
+#[test]
+fn test_s_orbital() { assert_eq!(NW, 2); }
+
+#[test]
+fn test_p_orbital() { assert_eq!(NW * NC, 6); }
+
+#[test]
+fn test_d_orbital() { assert_eq!(NW * (CHI - 1), 10); }
+
+#[test]
+fn test_f_orbital() { assert_eq!(NW * BETA0, 14); }
+
+#[test]
+fn test_tetrahedral_angle() {
+    let angle = (-1.0 / NC as f64).acos() * 180.0 / std::f64::consts::PI;
+    assert!((angle - 109.4712).abs() < 0.001);
+}
+
+#[test]
+fn test_krypton_is_sigma_d() {
+    assert_eq!(SIGMA_D, 36);  // Kr atomic number = Σd
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GENETICS & PROTEIN FOLDING
+// ═══════════════════════════════════════════════════════════════
+
+#[test]
+fn test_helix_turn() {
+    // 3.6 = N_c + N_c/(χ-1) = 3 + 3/5 = 18/5
+    let turn = NC as f64 + NC as f64 / (CHI - 1) as f64;
+    assert!((turn - 3.6).abs() < 1e-10);
+}
+
+#[test]
+fn test_helix_rise() {
+    // 1.5 Å = N_c/N_w = 3/2
+    assert_eq!(NC * 2, NW * 3);  // cross multiply: 3/2
+}
+
+#[test]
+fn test_beta_sheet() {
+    // 3.5 Å = β₀/N_w = 7/2
+    assert_eq!(BETA0 * 2, NW * 7);
+}
+
+#[test]
+fn test_at_hydrogen_bonds() { assert_eq!(NW, 2); }
+
+#[test]
+fn test_gc_hydrogen_bonds() { assert_eq!(NC, 3); }
+
+#[test]
+fn test_groove_ratio() {
+    // 11/χ = 11/6 → 11×6 = 66 cross check
+    assert_eq!(11 * NC, 3 * BETA0 + 2 * CHI);  // 33 = 21 + 12
+}

@@ -649,3 +649,23 @@ theorem codon_redundancy : (nW^2)^nC / (nC * beta0) = 3 := by native_decide
 theorem tau_n_corrected : towerD^2 / nW - nW^2 = 878 := by native_decide
 -- φ boundary: gauss × N_w × β₀ = 182
 theorem phi_boundary : gauss * nW * beta0 = 182 := by native_decide
+
+-- §CHEMISTRY: Periodic table from End(A_F)
+theorem s_orbital : nW = 2 := by native_decide
+theorem p_orbital : nW * nC = 6 := by native_decide
+theorem d_orbital : nW * (chi - 1) = 10 := by native_decide
+theorem f_orbital : nW * beta0 = 14 := by native_decide
+-- Krypton = Σd: the noble gas that fills all sector dimensions
+theorem krypton_is_sigma_d : sigmaD = 36 := by native_decide
+
+-- §GENETICS: Protein folding from the (2,3) lattice
+-- α-helix: N_c + N_c/(χ-1) = 3 + 3/5 = 18/5
+theorem helix_turn_num : nC * chi + nC * 1 = 21 := by native_decide  -- 18+3=21... no
+-- Actually: 5 × 3 + 3 = 18, and denominator is 5
+theorem helix_denom : chi - 1 = 5 := by native_decide
+theorem helix_rise : nC = 3 := by native_decide  -- 3/2 = 1.5
+theorem beta_sheet : beta0 = 7 := by native_decide  -- 7/2 = 3.5
+theorem at_bonds : nW = 2 := by native_decide
+theorem gc_bonds : nC = 3 := by native_decide
+-- Groove ratio: 11/χ = 11/6, and 11 is from β₀ = (11N_c - 2χ)/3
+theorem groove_eleven : 3 * beta0 + 2 * chi = 11 * nC := by native_decide

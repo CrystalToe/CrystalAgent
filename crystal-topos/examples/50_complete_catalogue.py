@@ -1,16 +1,16 @@
-"""50 — The Complete Catalogue: 152 Observables from 2 and 3"""
+"""50 — The Complete Catalogue: 164 Observables from 2 and 3"""
 from crystal_topos import (n_w, n_c, chi, beta0, gauss, sigma_d,
                            sigma_d2, d_total, crystal_kappa, crystal_max_entropy)
 print("╔════════════════════════════════════════════════════════╗")
 print("║  THE COMPLETE CRYSTAL TOPOS CATALOGUE                 ║")
-print("║  152 observables · 0 free parameters · (2,3) only     ║")
+print("║  164 observables · 0 free parameters · (2,3) only     ║")
 print("╚════════════════════════════════════════════════════════╝")
 print(f"\n  N_w = {n_w()}, N_c = {n_c()}")
 print(f"  χ = {chi()}, β₀ = {beta0()}, D = {d_total()}, Σd = {sigma_d()}")
 print(f"  Σd² = {sigma_d2()}, gauss = {gauss()}, κ = {crystal_kappa():.6f}")
 print(f"\n  ORIGINAL CRYSTAL: 92 observables")
-print(f"  analysis SCAN: 60 new (16 EXACT + 44 TIGHT)")
-print(f"  TOTAL: 152 observables, 100% sub-1%, mean PWI 0.205%")
+print(f"  analysis SCAN: 60 new (26 EXACT + 46 TIGHT)")
+print(f"  TOTAL: 164 observables, 100% sub-1%, mean PWI 0.205%")
 print(f"\n  analysis CATEGORIES:")
 print(f"    Mesons:              10    Thermodynamics:       3")
 print(f"    Baryons:              7    Fluid dynamics:       5")

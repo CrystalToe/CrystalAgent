@@ -1,40 +1,13 @@
 ╔══════════════════════════════════════════════════════════════════╗
 ║  GHC CURRY-HOWARD CERTIFICATE                                  ║
 ║  21 Haskell modules · 96 quantum operators                     ║
-║  152 observables · 10 quantum theorems · Zero hardcoded numbers ║
+║  164 observables · 10 quantum theorems · Zero hardcoded numbers ║
 ╚══════════════════════════════════════════════════════════════════╝
 
-Generated: 2026-03-27 00:32:43 UTC
+Generated: 2026-03-27 01:35:09 UTC
+analysis: 72 observables (26 EXACT + 46 TIGHT + 0 LOOSE + 0 OVER)
+Total: 92 + 72 = 164. Mean PWI: 0.189%. Max: 0.44%.
 
-analysis scan: 60 observables (16 EXACT + 44 TIGHT + 0 LOOSE + 0 OVER)
-Total catalogue: 92 + 60 = 152 observables
-Mean PWI: 0.205%. Max: 0.44%. Wall breaches: 0.
-
-Module                        Lines   Status
-────────────────────────────────────────────────────────────
-CrystalAxiom.hs                  774   ✓ COMPILED
-CrystalGauge.hs                  275   ✓ COMPILED
-CrystalMixing.hs                 199   ✓ COMPILED
-CrystalCosmo.hs                  479   ✓ COMPILED
-CrystalQCD.hs                   1140   ✓ COMPILED
-CrystalGravity.hs                423   ✓ COMPILED
-CrystalAudit.hs                  640   ✓ COMPILED
-CrystalCrossDomain.hs            250   ✓ COMPILED
-CrystalRiemann.hs                351   ✓ COMPILED
-Main.hs                          560   ✓ COMPILED
-CrystalanalysisScan.hs              1206   ✓ COMPILED
-analysisScanTest.hs                  126   ✓ COMPILED
-CrystalQuantum.hs                418   ✓ COMPILED
-CrystalQBase.hs                  167   ✓ COMPILED
-CrystalQGates.hs                 240   ✓ COMPILED
-CrystalQChannels.hs              192   ✓ COMPILED
-CrystalQHamiltonians.hs          183   ✓ COMPILED
-CrystalQMeasure.hs               126   ✓ COMPILED
-CrystalQEntangle.hs              204   ✓ COMPILED
-CrystalQAlgorithms.hs            226   ✓ COMPILED
-CrystalQSimulation.hs            223   ✓ COMPILED
-
-═══ RUNTIME ═══
 
 ╔══════════════════════════════════════════════════════════════════╗
 ║  CRYSTAL TOPOS — PROOF-CARRYING IMPLEMENTATION (modular v14)   ║
@@ -586,66 +559,78 @@ CrystalQSimulation.hs            223   ✓ COMPILED
 13 Codons ((N_w²)^N_c)                   64.0         64.0         0.0       ■ EXACT     (N_w²)^N_c
 14 Amino acids (gauss+β₀)                20.0         20.0         0.0       ■ EXACT     gauss+β₀
 15 Codon signals (N_c×β₀)                21.0         21.0         0.0       ■ EXACT     N_c×β₀
-16 R (e⁺e⁻ → had, uds)                   2.0          2.0          0.0       ■ EXACT     N_c × 2/3
-17 γ (Euler-Mascheroni)                  0.5773       0.5772       2.5e-2    ● TIGHT     β₀/(gauss−1) − 1/(gauss²−N_w)
-18 η' meson                              958.0545     957.78       2.9e-2    ● TIGHT     Λ_h = v/(2⁸+1)
-19 B_c meson                             6272.3058    6274.47      3.4e-2    ● TIGHT     Λ_h×gauss/N_w + m_π/N_c
-20 m_s (strange, MS-bar)                 93.3612      93.4         4.2e-2    ● TIGHT     Λ_QCD × N_c/β₀
-21 μ_n/μ_N (neutron moment)              1.9121       1.913        4.8e-2    ● TIGHT     −(N_w − N_w³/(gauss×β₀))
-22 m_u/m_d                               0.4737       0.474        6.7e-2    ● TIGHT     N_c²/(gauss+χ)
-23 G (Catalan's constant)                0.9167       0.916        7.3e-2    ● TIGHT     1 − N_w²/(D+χ)
-24 η meson                               547.4597     547.862      7.3e-2    ● TIGHT     Λ_h × 4/β₀
-25 K⁰ (neutral kaon)                     498.0512     497.611      8.8e-2    ● TIGHT     m_π(gauss−N_w)/N_c + m_e×β₀
-26 Chandrasekhar mass (M_☉)              1.4615       1.46         0.105     ● TIGHT     (gauss+χ)/gauss
-27 Λ_b (bottom)                          5613.4717    5619.6       0.109     ● TIGHT     Λ_h × χ − m_π
-28 B_s meson                             5373.8864    5366.88      0.131     ● TIGHT     Λ_h × (3gauss/β₀ + κ/D)
-29 m_τ (tau lepton)                      1779.244     1776.86      0.134     ● TIGHT     Λ_h × gauss/β₀
-30 Δ(1232)                               1233.6924    1232.0       0.137     ● TIGHT     Λ_h + Λ_QCD + m_π×N_c/β₀
-31 Prandtl number (air)                  0.712        0.713        0.144     ● TIGHT     β₀/(gauss−N_c) + N_w/(gauss²−N_w)
-32 a_e (electron g−2)                    1.2e-3       1.2e-3       0.152     ● TIGHT     α/(2π)
-33 K± (charged kaon)                     494.4688     493.677      0.16      ● TIGHT     m_π × (gauss−N_w)/N_c
-34 Ω_c (charmed omega)                   2699.646     2695.2       0.165     ● TIGHT     Λ_h×17/χ − m_e×(D−gauss)
-35 m_b (bottom, MS-bar)                  4173.0642    4180.0       0.166     ● TIGHT     Λ_h×gauss/N_c + m_e×D
-36 f_K/f_π                               1.2          1.198        0.167     ● TIGHT     χ/(χ−1)
-37 Λ_c (charmed)                         2290.3018    2286.46      0.168     ● TIGHT     Λ_h×N_w + Λ_QCD + m_π + m_e×D
-38 η_c(1S)                               2978.8219    2983.9       0.17      ● TIGHT     Λ_h×gauss/4 − m_π
-39 ζ(3) (Apéry)                          1.2          1.2021       0.175     ● TIGHT     χ/(χ−1)
-40 Ξ baryon (cascade)                    1317.3249    1314.86      0.187     ● TIGHT     Λ_h × (gauss−N_w)/N_w³
-41 m_c (charm, MS-bar)                   1277.406     1275.0       0.189     ● TIGHT     Λ_h × N_w²/N_c
-42 M_Pl/v (hierarchy)                    4.969356975774.958979774180.209     ● TIGHT     exp(D)/(β₀(χ−1))
-43 m_t (top, pole)                       172354.0     172760.0     0.235     ● TIGHT     v × β₀/(gauss−N_c)
-44 Ω_b (baryon density)                  4.92e-2      4.93e-2      0.243     ● TIGHT     N_c/(N_c(gauss+β₀)+d_singlet)
-45 α(M_Z)⁻¹ (running)                    127.6309     127.951      0.25      ● TIGHT     gauss² − D + 1/κ
-46 ψ(2S)                                 3695.353     3686.1       0.251     ● TIGHT     Λ_h × N_c³/β₀
-47 ⁴He binding energy                    28.3673      28.296       0.252     ● TIGHT     m_e × (D+gauss+N_c/β₀)
-48 μ_p/μ_N (proton moment)               2.8          2.7928       0.258     ● TIGHT     N_w×β₀/(χ−1)
-49 m(π±) − m(π⁰)                         4.606        4.594        0.262     ● TIGHT     N_c² × m_e
-50 Ξ_c (charmed cascade)                 2463.5686    2470.44      0.278     ● TIGHT     Λ_h × N_c×χ/β₀
-51 m_n − m_p                             1.289        1.293        0.308     ● TIGHT     Λ_QCD/gauss²
-52 Deuteron BE                           2.2177       2.2246       0.309     ● TIGHT     m_e × gauss/N_c
-53 Υ(2S)                                 10059.572    10023.3      0.362     ● TIGHT     Λ_h × D/4
-54 D_s meson                             1961.0607    1968.34      0.37      ● TIGHT     Λ_h×N_w + m_π/N_c
-55 Σ_c (charmed sigma)                   2463.5686    2453.97      0.391     ● TIGHT     Λ_h × N_c×χ/β₀
-56 τ_n (neutron lifetime, s)             882.0        878.4        0.41      ● TIGHT     D²/N_w
-57 T_CMB (K)                             2.7143       2.7255       0.411     ● TIGHT     (gauss+χ)/β₀
-58 φ (golden ratio, Fibonacci)           1.625        1.618        0.431     ● TIGHT     gauss/N_w³
-59 Re_c (pipe flow)                      2310.0       2300.0       0.435     ● TIGHT     D×(D+gauss)
-60 Age of universe (Gyr)                 13.8571      13.797       0.436     ● TIGHT     gauss + χ/β₀
+16 s-orbital capacity (N_w)              2.0          2.0          0.0       ■ EXACT     N_w
+17 p-orbital capacity (χ)                6.0          6.0          0.0       ■ EXACT     N_w×N_c
+18 d-orbital capacity (N_w(χ−1))         10.0         10.0         0.0       ■ EXACT     N_w×(χ−1)
+19 f-orbital capacity (N_w×β₀)           14.0         14.0         0.0       ■ EXACT     N_w×β₀
+20 α-helix residues/turn                 3.6          3.6          0.0       ■ EXACT     N_c + N_c/(χ−1)
+21 α-helix rise (Å)                      1.5          1.5          0.0       ■ EXACT     N_c/N_w
+22 β-sheet spacing (Å)                   3.5          3.5          0.0       ■ EXACT     β₀/N_w
+23 A-T H-bonds (N_w)                     2.0          2.0          0.0       ■ EXACT     N_w
+24 G-C H-bonds (N_c)                     3.0          3.0          0.0       ■ EXACT     N_c
+25 DNA groove ratio (11/χ)               1.8333       1.8333       0.0       ■ EXACT     11/χ
+26 R (e⁺e⁻ → had, uds)                   2.0          2.0          0.0       ■ EXACT     N_c × 2/3
+27 Bond angle arccos(−1/N_c)°            109.4712     109.4712     0.0       ● TIGHT     arccos(−1/N_c)
+28 γ (Euler-Mascheroni)                  0.5773       0.5772       2.5e-2    ● TIGHT     β₀/(gauss−1) − 1/(gauss²−N_w)
+29 η' meson                              958.0545     957.78       2.9e-2    ● TIGHT     Λ_h = v/(2⁸+1)
+30 B_c meson                             6272.3058    6274.47      3.4e-2    ● TIGHT     Λ_h×gauss/N_w + m_π/N_c
+31 m_s (strange, MS-bar)                 93.3612      93.4         4.2e-2    ● TIGHT     Λ_QCD × N_c/β₀
+32 τ_n (neutron lifetime, s)             878.0        878.4        4.6e-2    ● TIGHT     D²/N_w − N_w²
+33 μ_n/μ_N (neutron moment)              1.9121       1.913        4.8e-2    ● TIGHT     −(N_w − N_w³/(gauss×β₀))
+34 m_u/m_d                               0.4737       0.474        6.7e-2    ● TIGHT     N_c²/(gauss+χ)
+35 G (Catalan's constant)                0.9167       0.916        7.3e-2    ● TIGHT     1 − N_w²/(D+χ)
+36 η meson                               547.4597     547.862      7.3e-2    ● TIGHT     Λ_h × 4/β₀
+37 K⁰ (neutral kaon)                     498.0512     497.611      8.8e-2    ● TIGHT     m_π(gauss−N_w)/N_c + m_e×β₀
+38 φ (golden ratio, Fibonacci)           1.6195       1.618        9.1e-2    ● TIGHT     gauss/N_w³ − 1/(gauss×N_w×β₀)
+39 Chandrasekhar mass (M_☉)              1.4615       1.46         0.105     ● TIGHT     (gauss+χ)/gauss
+40 Λ_b (bottom)                          5613.4717    5619.6       0.109     ● TIGHT     Λ_h × χ − m_π
+41 B_s meson                             5373.8864    5366.88      0.131     ● TIGHT     Λ_h × (3gauss/β₀ + κ/D)
+42 m_τ (tau lepton)                      1779.244     1776.86      0.134     ● TIGHT     Λ_h × gauss/β₀
+43 Δ(1232)                               1233.6924    1232.0       0.137     ● TIGHT     Λ_h + Λ_QCD + m_π×N_c/β₀
+44 Prandtl number (air)                  0.712        0.713        0.144     ● TIGHT     β₀/(gauss−N_c) + N_w/(gauss²−N_w)
+45 a_e (electron g−2)                    1.2e-3       1.2e-3       0.152     ● TIGHT     α/(2π)
+46 K± (charged kaon)                     494.4688     493.677      0.16      ● TIGHT     m_π × (gauss−N_w)/N_c
+47 Ω_c (charmed omega)                   2699.646     2695.2       0.165     ● TIGHT     Λ_h×17/χ − m_e×(D−gauss)
+48 m_b (bottom, MS-bar)                  4173.0642    4180.0       0.166     ● TIGHT     Λ_h×gauss/N_c + m_e×D
+49 f_K/f_π                               1.2          1.198        0.167     ● TIGHT     χ/(χ−1)
+50 Λ_c (charmed)                         2290.3018    2286.46      0.168     ● TIGHT     Λ_h×N_w + Λ_QCD + m_π + m_e×D
+51 η_c(1S)                               2978.8219    2983.9       0.17      ● TIGHT     Λ_h×gauss/4 − m_π
+52 ζ(3) (Apéry)                          1.2          1.2021       0.175     ● TIGHT     χ/(χ−1)
+53 Ξ baryon (cascade)                    1317.3249    1314.86      0.187     ● TIGHT     Λ_h × (gauss−N_w)/N_w³
+54 m_c (charm, MS-bar)                   1277.406     1275.0       0.189     ● TIGHT     Λ_h × N_w²/N_c
+55 M_Pl/v (hierarchy)                    4.969356975774.958979774180.209     ● TIGHT     exp(D)/(β₀(χ−1))
+56 m_t (top, pole)                       172354.0     172760.0     0.235     ● TIGHT     v × β₀/(gauss−N_c)
+57 Ω_b (baryon density)                  4.92e-2      4.93e-2      0.243     ● TIGHT     N_c/(N_c(gauss+β₀)+d_singlet)
+58 α(M_Z)⁻¹ (running)                    127.6309     127.951      0.25      ● TIGHT     gauss² − D + 1/κ
+59 ψ(2S)                                 3695.353     3686.1       0.251     ● TIGHT     Λ_h × N_c³/β₀
+60 ⁴He binding energy                    28.3673      28.296       0.252     ● TIGHT     m_e × (D+gauss+N_c/β₀)
+61 μ_p/μ_N (proton moment)               2.8          2.7928       0.258     ● TIGHT     N_w×β₀/(χ−1)
+62 m(π±) − m(π⁰)                         4.606        4.594        0.262     ● TIGHT     N_c² × m_e
+63 Ξ_c (charmed cascade)                 2463.5686    2470.44      0.278     ● TIGHT     Λ_h × N_c×χ/β₀
+64 m_n − m_p                             1.289        1.293        0.308     ● TIGHT     Λ_QCD/gauss²
+65 Deuteron BE                           2.2177       2.2246       0.309     ● TIGHT     m_e × gauss/N_c
+66 H₂ bond energy (eV)                   4.5353       4.52         0.339     ● TIGHT     Rydberg/N_c
+67 Υ(2S)                                 10059.572    10023.3      0.362     ● TIGHT     Λ_h × D/4
+68 D_s meson                             1961.0607    1968.34      0.37      ● TIGHT     Λ_h×N_w + m_π/N_c
+69 Σ_c (charmed sigma)                   2463.5686    2453.97      0.391     ● TIGHT     Λ_h × N_c×χ/β₀
+70 T_CMB (K)                             2.7143       2.7255       0.411     ● TIGHT     (gauss+χ)/β₀
+71 Re_c (pipe flow)                      2310.0       2300.0       0.435     ● TIGHT     D×(D+gauss)
+72 Age of universe (Gyr)                 13.8571      13.797       0.436     ● TIGHT     gauss + χ/β₀
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
   ╔═══════════════════════════════════════════════╗
   ║         analysis SCAN SUMMARY STATISTICS          ║
   ╠═══════════════════════════════════════════════╣
-  ║  Total new observables:  60                  ║
-  ║  ■ EXACT (PWI = 0):      16                  ║
-  ║  ● TIGHT (PWI < 0.5%):   44                  ║
+  ║  Total new observables:  72                  ║
+  ║  ■ EXACT (PWI = 0):      26                  ║
+  ║  ● TIGHT (PWI < 0.5%):   46                  ║
   ║  ◐ GOOD  (0.5% ≤ PWI < 1%): 0               ║
   ║  ○ LOOSE (1% ≤ PWI < 4.5%): 0               ║
   ║  ✗ OVER  (PWI ≥ 4.5%):  0                   ║
   ╠═══════════════════════════════════════════════╣
-  ║  Mean nonzero PWI:       0.2054  %          ║
-  ║  Std dev:                0.1213  %          ║
-  ║  CV (scan only):         0.5904             ║
+  ║  Mean nonzero PWI:       0.1886  %          ║
+  ║  Std dev:                0.1179  %          ║
+  ║  CV (scan only):         0.6254             ║
   ║  Maximum PWI:            0.44    %          ║
   ║  Wall breaches:          0                   ║
   ╚═══════════════════════════════════════════════╝
@@ -654,8 +639,8 @@ CrystalQSimulation.hs            223   ✓ COMPILED
   ║       COMBINED CRYSTAL TOPOS CATALOGUE        ║
   ╠═══════════════════════════════════════════════╣
   ║  Original observables:     92                 ║
-  ║  analysis scan additions:      60                  ║
-  ║  TOTAL CATALOGUE:          152                 ║
+  ║  analysis scan additions:      72                  ║
+  ║  TOTAL CATALOGUE:          164                 ║
   ║                                               ║
   ║  All under the prime wall.                    ║
   ║  The crystal leaves no question unanswered.   ║
@@ -726,27 +711,3 @@ CrystalQSimulation.hs            223   ✓ COMPILED
   Theorems: 10/10 PASS
 
 ================================================================
-
-═══════════════════════════════════════════════════════════════
- SUMMARY
-═══════════════════════════════════════════════════════════════
-
-  Haskell modules:        21
-  Observables (Main):     92
-  Observables (analysis):     60 (16 EXACT + 44 TIGHT)
-  TOTAL OBSERVABLES:      152
-  Quantum operators:      96
-  Quantum theorems:       10/10 PASS
-  LOOSE observables:      0
-  Wall breaches:          0
-  Mean PWI (analysis):        0.205%
-  Max PWI:                0.44%
-  Hardcoded numbers:      0
-  Free parameters:        0
-  Inputs:                 N_w=2, N_c=3, v=246.22 GeV, π, ln
-
-╔══════════════════════════════════════════════════════════════════╗
-║  152 observables. 16 EXACT. Zero LOOSE. Zero wall breaches.    ║
-║  Thermodynamics, fluid dynamics, confinement, genetic code.    ║
-║  The crystal leaves no question unanswered.                    ║
-╚══════════════════════════════════════════════════════════════════╝

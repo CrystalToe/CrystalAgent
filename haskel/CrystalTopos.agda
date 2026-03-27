@@ -843,3 +843,29 @@ tau-n-weak-self = refl
 
 phi-boundary : gauss * nW * beta0 ≡ 182
 phi-boundary = refl
+
+-- §CHEMISTRY: Periodic table from End(A_F)
+s-orbital : nW ≡ 2
+s-orbital = refl
+
+p-orbital : nW * nC ≡ 6
+p-orbital = refl
+
+d-orbital : nW * (chi - 1) ≡ 10
+d-orbital = refl
+
+f-orbital : nW * beta0 ≡ 14
+f-orbital = refl
+
+-- §GENETICS: Protein folding from the (2,3) lattice
+helix-denom : chi - 1 ≡ 5
+helix-denom = refl
+
+at-bonds : nW ≡ 2
+at-bonds = refl
+
+gc-bonds : nC ≡ 3
+gc-bonds = refl
+
+groove-ratio-num : 3 * beta0 + 2 * chi ≡ 33
+groove-ratio-num = refl
