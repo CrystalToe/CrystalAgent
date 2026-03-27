@@ -1,6 +1,3 @@
-// Copyright (c) 2026 Daland Montgomery
-// SPDX-License-Identifier: AGPL-3.0-or-later
-
 //! Crystal Topos base types: complex numbers, vectors, matrices, and all constants.
 //! Everything derived from N_w=2, N_c=3.
 
@@ -225,3 +222,33 @@ impl Mat {
               data: self.data.iter().map(|c| c.scale(s)).collect() }
     }
 }
+
+// ═══════════════════════════════════════════════════════════════
+// §4  NEW DERIVED CONSTANTS — thermodynamics, fluids, confinement, biology
+// ═══════════════════════════════════════════════════════════════
+
+pub const D_SINGLET: usize = 1;   // first sector dimension
+pub const D_COLOUR: usize = 8;    // N_c² - 1 = adjoint = gluon count
+pub const D_MIXED: usize = 24;    // N_w³ × N_c
+pub const MIXING_OPS: usize = CHI * (CHI - 1);  // 30 sector-mixing operators
+
+// Thermodynamics
+pub fn carnot_efficiency() -> f64 { (CHI - 1) as f64 / CHI as f64 }  // 5/6
+pub const STEFAN_BOLTZMANN_DENOM: usize = NW * NC * (NC*NC + NW*NW + (11*NC - 2*NW*NC)/3); // 120
+pub fn thermal_conductivity() -> f64 { (CHI * MIXING_OPS) as f64 / SIGMA_D as f64 } // 5.0
+
+// Fluid dynamics
+pub fn kolmogorov_exponent() -> f64 { (NC + NW) as f64 / NC as f64 }  // 5/3
+pub fn kolmogorov_microscale() -> f64 { 1.0 / (NW * NW) as f64 }      // 1/4
+pub fn von_karman() -> f64 { NW as f64 / (NC + NW) as f64 }           // 2/5
+pub fn reynolds_critical() -> f64 { (D_TOTAL * (D_TOTAL + GAUSS)) as f64 } // 2310
+
+// Color confinement
+pub fn casimir_fundamental() -> f64 { (NC*NC - 1) as f64 / (2 * NC) as f64 } // 4/3
+pub fn string_tension_ratio() -> f64 { NC as f64 / (NC*NC - 1) as f64 }       // 3/8
+
+// Biological information
+pub const DNA_BASES: usize = NW * NW;                    // 4
+pub const CODONS: usize = (NW*NW) * (NW*NW) * (NW*NW);  // 64
+pub const AMINO_ACIDS: usize = NC*NC + NW*NW + (11*NC - 2*NW*NC)/3; // 20
+pub const CODON_SIGNALS: usize = NC * ((11*NC - 2*NW*NC)/3);         // 21

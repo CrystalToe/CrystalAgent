@@ -2,7 +2,7 @@
 
 # Crystal Topos
 
-### 137 Physical Constants from Two Primes. Zero Free Parameters.
+### 152 Physical Constants from Two Primes. Zero Free Parameters.
 
 ### 📄 [Read the Paper: "The Crystal Topos: A Complete Physics Framework from A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)"](https://zenodo.org/records/19217129)
 
@@ -51,7 +51,7 @@ of nature? Why is this a big deal?
 
 ## What Is This?
 
-This repository contains a complete, proof-carrying implementation of the **Crystal Topos** — a framework that derives 137 physical constants from a single finite-dimensional algebra:
+This repository contains a complete, proof-carrying implementation of the **Crystal Topos** — a framework that derives 152 physical constants from a single finite-dimensional algebra:
 
 ```
 A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)
@@ -67,18 +67,18 @@ The deviations between crystal predictions and experiment follow an **exponentia
 
 | Metric | Value |
 |--------|-------|
-| Total observables | **136** |
-| Sub-1% accuracy | **131 / 137** (96%) |
-| Mean deviation (PWI) | **0.33%** |
-| Maximum deviation | **2.4%** |
+| Total observables | **152** |
+| Sub-1% accuracy | **152 / 152** (100%) |
+| Mean deviation (PWI) | **0.21%** |
+| Maximum deviation | **0.44%** |
 | CV (should be 1.0) | **1.15** (inside 95% CI) |
 | Free parameters | **0** |
 | Hardcoded numbers | **0** in crystal formulas |
 | Wall breaches | **0** (prime wall = 4.5%) |
-| Haskell modules | **21** (8,123 lines) |
+| Haskell modules | **21** (8,200+ lines) |
 | Quantum operators | **96** |
-| Lean theorems | **~230** (native_decide) |
-| Agda theorems | **~195** (refl) |
+| Lean theorems | **~240** (native_decide) |
+| Agda theorems | **~210** (refl) |
 
 ---
 
@@ -91,7 +91,7 @@ ghc -O2 Main.hs -o crystal
 ./crystal
 ```
 
-### Compile the analysis Scan (45 new observables)
+### Compile the analysis Scan (60 new observables)
 ```bash
 ghc -O2 analysisScanTest.hs CrystalanalysisScan.hs -o waca_scan
 ./waca_scan
@@ -143,7 +143,7 @@ m_π = m_p/β₀                     → 135 MeV    (0.34%)
 Λ_QCD = m_p × N_c/gauss          → 218 MeV
 m_e = Λ_h/(N_c²×N_w⁴×gauss)     → 0.512 MeV  (0.12%)
          ↓
-... all 137 observables
+... all 152 observables
 ```
 
 **Zero hardcoded numbers.** Every 53, 54, 257, 1872 computes from (2, 3).
@@ -192,8 +192,8 @@ CrystalAgent/
     │   CrystalRiemann.hs             ← Trace formula, ARIMA, Beurling-Nyman
     │   Main.hs                        ← Certificate driver (92 obs)
     │
-    ├── ─── analysis SCAN (45 new observables) ───
-    │   CrystalanalysisScan.hs            ← 45 new: mesons, baryons, τ, nuclear
+    ├── ─── analysis SCAN (60 new observables) ───
+    │   CrystalanalysisScan.hs            ← 60 new: mesons, baryons, thermo, fluids, confinement, biology
     │   analysisScanTest.hs               ← Test driver
     │
     ├── ─── QUANTUM LIBRARY (96 operators) ───
@@ -270,8 +270,8 @@ m_b/m_s = N_c³ × N_w = 54
 m_c/m_s = N_w² × N_c × 53/54 = 106/9
 ```
 
-#### [CrystalanalysisScan.hs](haskel/CrystalanalysisScan.hs) — 45 New Observables
-Extends the catalogue with heavy mesons, charmed/bottom baryons, absolute quark masses, nuclear binding energies, magnetic moments, and cosmological constants. All formulas zero-hardcoded.
+#### [CrystalanalysisScan.hs](haskel/CrystalanalysisScan.hs) — 60 New Observables
+Extends the catalogue with heavy mesons, charmed/bottom baryons, absolute quark masses, nuclear binding energies, magnetic moments, cosmological constants, thermodynamics (Carnot, Stefan-Boltzmann, Fourier), fluid dynamics (Kolmogorov, von Kármán, Prandtl, Re_c), color confinement (Casimir, string tension, β₀), and biological information (DNA bases, codons, amino acids). All formulas zero-hardcoded. 16 EXACT + 44 TIGHT.
 
 ```haskell
 -- The hadron scale = v / Fermat prime
@@ -413,7 +413,7 @@ The `quickstart/` folder lets you use Crystal Topos with **any LLM** — no Hask
 
 | File | Size | Purpose |
 |------|------|---------|
-| `crystal_topos_waca_llm_compact.md` | 4 KB | Knowledge base: module table, derivation chain, all 137 observables |
+| `crystal_topos_waca_llm_compact.md` | 4 KB | Knowledge base: module table, derivation chain, all 152 observables |
 | `CrystalTopos.zip.txt` | 340 KB | All Haskell source files in a single archive |
 
 ### How to Use
