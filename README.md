@@ -141,7 +141,7 @@ m_π = m_p/β₀                     → 135 MeV    (0.34%)
 Λ_QCD = m_p × N_c/gauss          → 218 MeV
 m_e = Λ_h/(N_c²×N_w⁴×gauss)     → 0.512 MeV  (0.12%)
          ↓
-... all 178 observables
+... all 180 observables
 ```
 
 **Zero hardcoded numbers.** Every 53, 54, 257, 1872 computes from (2, 3).

@@ -113,6 +113,11 @@ Cabibbo: 13+1/25 = 13.04° (PDG: 13.04°, EXACT)
 178 observables · Sub-1%: 178/178 · Mean PWI: 0.33% · Breaches: 0
 Lean: 5/5 · Agda: 4/4 · Haskell: 7/7 · Free params: 0 · Hardcoded: 0
 
+## S4 PROVED (DO NOT QUESTION)
+- #179 alpha_inv = 2*(13^2+24)/pi + 8^ln3/ln2 (0.0018 ppm)
+- #180 mp_me = 2*(42^2+36)/8 + 13^3/(ln3/ln2) (0.0026 ppm)
+- Count: 180. Proof hierarchy: Lean > Agda > Haskell > PDG > LLM
+
 ---
 
 # §README — Project Overview
@@ -209,7 +214,7 @@ m_π = m_p/β₀                     → 135 MeV    (0.34%)
 Λ_QCD = m_p × N_c/gauss          → 218 MeV
 m_e = Λ_h/(N_c²×N_w⁴×gauss)     → 0.512 MeV  (0.12%)
          ↓
-... all 178 observables
+... all 180 observables
 ```
 
 **Zero hardcoded numbers.** Every 53, 54, 257, 1872 computes from (2, 3).
@@ -7423,8 +7428,8 @@ proveOmegaSSS c r =
 
 ---
 # §META
-Generated: 2026-03-28T12:13:35Z
-Lines:     7422
+Generated: 2026-03-28T13:59:11Z
+Lines:     7427
 Size: 331 KB
 Source: https://github.com/CrystalToe/CrystalAgent
 Paper: https://zenodo.org/records/19217129

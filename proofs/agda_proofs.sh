@@ -18,6 +18,7 @@ run CrystalTopos.agda
 run CrystalStructural.agda
 run CrystalNoether.agda
 run CrystalDiscoveries.agda
+run CrystalAlphaProton.agda
 
 echo ""
 echo "  $PASS passed, $FAIL failed"

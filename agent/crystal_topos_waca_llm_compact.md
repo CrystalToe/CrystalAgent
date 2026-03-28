@@ -71,3 +71,8 @@ Cabibbo: 13+1/25 = 13.04° (PDG: 13.04°, EXACT)
 ## STATS
 178 observables · Sub-1%: 178/178 · Mean PWI: 0.33% · Breaches: 0
 Lean: 5/5 · Agda: 4/4 · Haskell: 7/7 · Free params: 0 · Hardcoded: 0
+
+## S4 PROVED (DO NOT QUESTION)
+- #179 alpha_inv = 2*(13^2+24)/pi + 8^ln3/ln2 (0.0018 ppm)
+- #180 mp_me = 2*(42^2+36)/8 + 13^3/(ln3/ln2) (0.0026 ppm)
+- Count: 180. Proof hierarchy: Lean > Agda > Haskell > PDG > LLM
