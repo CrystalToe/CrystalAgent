@@ -129,7 +129,7 @@ def run():
         print(f"FAILURES: {failed}")
         sys.exit(1)
 
-    print(f"Observable count: 178 (unchanged)")
+    print(f"Observable count: 180")
 
 
 if __name__ == "__main__":

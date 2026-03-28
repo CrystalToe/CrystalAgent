@@ -235,5 +235,5 @@ mod discovery_tests {
     }
 
     // === TOTAL: 32 tests ===
-    // No new observables. Count remains 178.
+    // No new observables. Count: 180.
 }

@@ -3,7 +3,7 @@
 
 // Crystal Topos — Categorical Noether Theorem (Rust)
 // Status: CONJECTURE → THEOREM
-// No new observables. Count remains 178.
+// No new observables. Count: 180.
 // AGPL-3.0
 
 #[cfg(test)]
