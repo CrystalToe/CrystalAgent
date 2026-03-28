@@ -3,7 +3,7 @@
 
 // Crystal Topos — Structural Principle Bridge Tests
 // Rust assert_eq tests proving cross-domain bridges
-// No new observables. Count remains 178.
+// No new observables. Count: 180.
 // AGPL-3.0
 
 #[cfg(test)]
@@ -238,5 +238,5 @@ mod structural_tests {
     }
 
     // === TOTAL: 35 tests ===
-    // No new observables. Count remains 178.
+    // No new observables. Count: 180.
 }

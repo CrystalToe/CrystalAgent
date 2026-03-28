@@ -34,8 +34,8 @@ except ImportError:
     _BACKEND = "python"
 
 from crystal_structural_proof import structural_checks
-from crystal_noether_proof import noether_checks, verify_deviation_bound
-from crystal_discoveries_proof import all_sections as discovery_sections
+from CrystalAgent.proofs.crystal_noether_proof import noether_checks, verify_deviation_bound
+from CrystalAgent.proofs.crystal_discoveries_proof import all_sections as discovery_sections
 
 
 def run_section(name, checks):
@@ -144,7 +144,7 @@ def main():
         print("  ║  Cosmological partition D = 29 + 11 + 2.       ║")
         print("  ║  CKM hierarchy from sector depth.              ║")
         print("  ║  13^(1/3) cross-domain bridge verified.        ║")
-        print("  ║  Observable count: 178 (unchanged).            ║")
+        print("  ║  Observable count: 180.                             ║")
         print("  ║  Free parameters: 0.                           ║")
         print("  ║  Hardcoded numbers: 0.                         ║")
         print("  ╚═════════════════════════════════════════════════╝")
