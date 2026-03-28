@@ -8,6 +8,7 @@ module Main where
 import Data.List (sortBy)
 import Data.Ord (comparing)
 import Text.Printf
+import CrystalWACAScan
 
 main :: IO ()
 main = do

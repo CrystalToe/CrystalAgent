@@ -17,6 +17,7 @@
 --   ghc -O2 Main.hs -o crystal
 -- ═══════════════════════════════════════════════════════════════════════
 
+module CrystalWACAScan
   ( -- * Hadron scale
     lambda_h
     -- * New mesons (10)
@@ -267,10 +268,10 @@ rating p
 -- | Full observable record: (name, crystal, pdg, pwi%, rating, formula, module)
 type Observable = (String, Double, Double, Double, String, String, String)
 
-mkObs :: String -> Double -> Double -> String -> String -> Observable
-mkObs name crystal pdg formula modul =
+mkObs :: String -> Double -> Double -> Observable
+mkObs name crystal pdg =
   let p = pwi crystal pdg
-  in (name, crystal, pdg, p, rating p, formula, modul)
+  in (name, crystal, pdg, p, rating p, "", "")
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §3  NEW MESONS — 10 observables
@@ -1448,14 +1449,14 @@ proveFKOverFPi =
       pdg     = 1.198
   in mkObs "f_K/f_π" crystal pdg
 
--- | R-ratio (e⁺e⁻ → hadrons): N_c × Σ Q² = N_c × 2/3 = 2
+-- | R-ratio (e+e- -> hadrons): N_c × Σ Q² = N_c × 2/3 = 2
 -- The low-energy hadronic cross-section ratio for u,d,s quarks.
 -- Exact from colour counting. N_c determines R.
 proveRRatio :: Observable
 proveRRatio =
   let crystal = fromIntegral n_c * fromIntegral n_w / fromIntegral n_c  -- N_w = 2
       pdg     = 2.0    -- for u,d,s below charm threshold
-  in mkObs "R (e⁺e⁻ → had, uds)" crystal pdg
+  in mkObs "R (e+e- -> had, uds)" crystal pdg
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §14  MASTER AUDIT
