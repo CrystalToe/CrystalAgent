@@ -58,7 +58,9 @@ This repository contains a complete, proof-carrying implementation of the **Crys
 A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)
 ```
 
-The algebra is built on two primes: **N_w = 2** (weak generations) and **N_c = 3** (colours). From these two numbers, plus one dimensionful scale (the Higgs VEV v = 246.22 GeV) and the transcendental functions π and ln, every formula in this codebase is derived. No fitting. No tuning. No free parameters.
+**This algebra is the axiom.** It is the same algebra used by Connes, Chamseddine, and Marcolli in the spectral action framework for the Standard Model (1996–2007). It encodes U(1) × SU(2) × SU(3) — the gauge structure of nature. The Crystal Topos does not invent a new algebra. It takes the established one and computes harder.
+
+The algebra is built on two primes: **N_w = 2** (weak generations, from M₂(ℂ)) and **N_c = 3** (colours, from M₃(ℂ)). From these two numbers, plus one dimensionful scale (the Higgs VEV v = 246.22 GeV) and the transcendental functions π and ln, every formula in this codebase is derived. No fitting. No tuning. No free parameters.
 
 The deviations between crystal predictions and experiment follow an **exponential distribution** with coefficient of variation CV ≈ 1 — the Shannon-optimal value. The wobble is not error. It is the structural cost of encoding continuous physics in the discrete (2,3) lattice.
 
