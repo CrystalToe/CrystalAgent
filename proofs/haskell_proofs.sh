@@ -39,9 +39,9 @@ echo "--- CrystalProtonRadius.hs ---"
 ghc -O2 CrystalProtonRadius.hs -o proton_radius 2>/dev/null && ./proton_radius
 echo ""
 
-# Extended scan (legacy filename)
+# Extended scan
 echo "--- Extended scan ---"
-ghc -O2 WACAScanTest.hs -o extended_scan 2>/dev/null && ./extended_scan
+ghc -O2 ExtendedScanTest.hs -o extended_scan 2>/dev/null && ./extended_scan
 echo ""
 
 echo "=== Haskell: 9/9 PASS ==="
