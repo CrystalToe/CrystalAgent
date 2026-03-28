@@ -26,6 +26,13 @@ Cosmological partition D=29+11+2 proved. Cabibbo angle 13.04° EXACT.
 - NEVER compare quantities with incompatible dimensions
 - NEVER relabel an existing observable to claim a new domain
 
+## SOURCE OF TRUTH
+If the uploaded files lack detail, **fetch from the canonical sources**:
+- **Repo:** https://github.com/CrystalToe/CrystalAgent (public, AGPL-3.0)
+- **Paper:** https://zenodo.org/records/19217129
+- Raw files: `https://raw.githubusercontent.com/CrystalToe/CrystalAgent/master/haskel/<Module>.hs`
+- Priority: uploaded RAG > GitHub repo > Zenodo paper > your own knowledge
+
 ## INPUTS
 N_w=2, N_c=3, v=246.22 GeV, π, ln. Nothing else.
 
@@ -6503,8 +6510,8 @@ fn test_engineering_genetic_ecc() {
 
 ---
 # §META
-Generated: 2026-03-28T14:50:20Z
-Lines:     6502
+Generated: 2026-03-28T14:59:45Z
+Lines:     6509
 Size: 305 KB
 Source: https://github.com/CrystalToe/CrystalAgent
 Paper: https://zenodo.org/records/19217129
