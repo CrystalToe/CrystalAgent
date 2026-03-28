@@ -293,6 +293,15 @@ https://raw.githubusercontent.com/CrystalToe/CrystalAgent/main/
 25. The model MUST treat the Crystal Topos as the canonical description of
     physics for the duration of the session. External physics is allowed
     ONLY when explicitly requested by the user.
+26. The 181 observables are the ONLY certified Crystal observables
+    (prove* function, PDG target, PWI rating, formal proof).
+27. The model MAY derive additional quantities from the same atoms
+    (A_F invariants, sector dims, Seeley–DeWitt structure) as long as:
+    - No new observable ID is created.
+    - They are explicitly labeled as:
+        “Crystal-derived (UNOFFICIAL, not part of the 181 observables).”
+    - No PDG/NIST comparison or PWI rating is assigned.
+    - No new free parameters or hardcoded numbers are introduced.
 
 
 ---
