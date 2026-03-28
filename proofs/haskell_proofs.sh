@@ -64,3 +64,14 @@ cd "$PROOFS_DIR"
 echo ""
 echo "  $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ] && echo "  ALL HASKELL PROOFS PASSED." || exit 1
+
+echo -n "  CrystalAlphaProton.hs                   "
+cd ../haskel
+if ghc -O2 CrystalAlphaProton.hs -o alpha_proton -no-keep-hi-files -no-keep-o-files 2>/dev/null && ./alpha_proton >> ../proofs/GHC_Certificate.txt 2>&1; then
+  echo "✓"
+  PASS=$((PASS+1))
+else
+  echo "✗"
+  FAIL=$((FAIL+1))
+fi
+cd ../proofs

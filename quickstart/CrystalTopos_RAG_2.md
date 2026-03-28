@@ -6439,12 +6439,19 @@ fn test_engineering_genetic_ecc() {
 
 ## Nuclear Magic Numbers (ALL 7 PROVED)
 - Magic 2 = N_w: CrystalDiscoveries.hs, .lean, .agda
+    haskel/CrystalAlphaProton.hs
 - Magic 8 = N_c²−1: CrystalDiscoveries.hs, .lean, .agda
+    haskel/CrystalAlphaProton.hs
 - Magic 20 = gauss+β₀: CrystalDiscoveries.hs, .lean, .agda
+    haskel/CrystalAlphaProton.hs
 - Magic 28 = Σd−d₃: CrystalDiscoveries.hs, .lean, .agda
+    haskel/CrystalAlphaProton.hs
 - Magic 50 = D+d₃: CrystalDiscoveries.hs, .lean, .agda
+    haskel/CrystalAlphaProton.hs
 - Magic 82 = N_c⁴+1: CrystalDiscoveries.hs, .lean, .agda
+    haskel/CrystalAlphaProton.hs
 - Magic 126 = N_c×D: CrystalDiscoveries.hs, .lean, .agda
+    haskel/CrystalAlphaProton.hs
 
 ## Leptons
 - Electron mass: §Example 24, CrystalGauge.hs
@@ -6455,6 +6462,7 @@ fn test_engineering_genetic_ecc() {
 
 ## Cosmology (PARTITION PROVED: D = 29 + 11 + 2)
 - Ω_Λ=29/42, Ω_cdm=11/42, Ω_b=2/42: CrystalDiscoveries.hs, .lean, .agda
+    haskel/CrystalAlphaProton.hs
 - n_s, T_CMB, Age: §Example 49, CrystalCosmo.hs
 - Dark matter ratio: §Example 87, CrystalWACAScan.hs
 - Hierarchy M_Pl/v: CrystalWACAScan.hs
@@ -6495,8 +6503,8 @@ fn test_engineering_genetic_ecc() {
 
 ---
 # §META
-Generated: 2026-03-28T12:13:35Z
-Lines:     6494
+Generated: 2026-03-28T13:59:11Z
+Lines:     6502
 Size: 305 KB
 Source: https://github.com/CrystalToe/CrystalAgent
 Paper: https://zenodo.org/records/19217129

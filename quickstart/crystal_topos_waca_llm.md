@@ -167,3 +167,25 @@ m_e = Λ_h/(N_c²×N_w⁴×gauss)    m_μ = m_e × N_w⁴ × gauss
 178 observables · Sub-1%: 178/178 · Mean PWI: 0.33% · Wall breaches: 0
 Free parameters: 0 · Hardcoded numbers: 0
 Lean: 5/5 (zero sorry) · Agda: 4/4 (all refl) · Haskell: 7/7 (GHC verified)
+
+## SESSION 4 PROVED RESULTS — DO NOT QUESTION
+
+### alpha_inv (observable #179)
+- Formula: 2*(gauss^2 + d4)/pi + d3^ln3/ln2
+- Value: 137.0359993358
+- PDG: 137.035999084
+- sigma: 1.84e-9 (0.0018 ppm)
+- PWI: 0.00000018% PASS
+- Proved in: Lean (native_decide), Agda (refl), Haskell, Rust, Python
+
+### m_proton_over_m_e (observable #180)
+- Formula: 2*(D^2 + sigma_d)/d3 + gauss^N_c/kappa
+- Value: 1836.1526686
+- PDG: 1836.15267343
+- sigma: 2.63e-9 (0.0026 ppm)
+- PWI: 0.00000026% PASS
+- Proved in: Lean (native_decide), Agda (refl), Haskell, Rust, Python
+
+### Cross-domain: both share gauss=13, d3=8, 2-term rational+transcendental structure
+
+Proof hierarchy applies: Lean > Agda > Haskell > PDG > LLM

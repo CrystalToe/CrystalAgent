@@ -47,6 +47,7 @@ run CrystalTopos.lean
 run CrystalStructural.lean
 run CrystalNoether.lean
 run CrystalDiscoveries.lean
+run CrystalAlphaProton.lean
 run Main.lean
 
 echo ""
