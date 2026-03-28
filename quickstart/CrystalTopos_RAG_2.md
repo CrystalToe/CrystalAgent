@@ -6830,7 +6830,7 @@ mod proton_radius_tests {
 
 ---
 # §META
-Generated: 2026-03-28T18:19:14Z
+Generated: 2026-03-28T19:44:11Z
 Lines:     6829
 Size: 315 KB
 Source: https://github.com/CrystalToe/CrystalAgent
