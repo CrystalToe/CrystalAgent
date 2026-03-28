@@ -6,7 +6,7 @@
   Runtime verification of the conservation structure.
   
   Status: CONJECTURE → THEOREM
-  No new observables. Count remains 178.
+  No new observables. Count: 180.
   AGPL-3.0
 -}
 
@@ -113,7 +113,7 @@ verifications =
   Recovery: when η is iso, η† = η⁻¹, so ‖η‖ = 0 and F̃ = F exactly.
   Classical: Noether 1918 is the C=ℝ, D=Vect, F=tangent bundle case.
 
-  The 178 observables of Crystal Topos are CONSEQUENCES of this theorem
+  The 180 observables of Crystal Topos are CONSEQUENCES of this theorem
   applied to the representation categories of A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ).
 -}
 
@@ -137,7 +137,7 @@ runAll = do
     then do
       putStrLn "Status: CONJECTURE → THEOREM"
       putStrLn "All conservation structure verified from N_w=2, N_c=3."
-      putStrLn "Observable count: 178 (unchanged)"
+      putStrLn "Observable count: 180"
     else do
       putStrLn "FAILURES:"
       mapM_ (\(name, _) -> putStrLn $ "  × " ++ name) failed

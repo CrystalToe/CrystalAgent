@@ -255,4 +255,63 @@ mod tests {
         // Ratio = d₄/N_w = 12
         assert_eq!(CHI * D4, 12 * (N_W * CHI));
     }
+
+    // ══════════════════════════════════════════════════
+    // sin²θ_W (a₄ correction, β₀ channel)
+    // Base: N_c/gauss = 3/13
+    // Correction: +β₀/(d₄·Σd²) = 7/15600
+    // β₀ = one-loop coefficient, d₄ = SU(3), Σd² = a₄
+    // ══════════════════════════════════════════════════
+
+    const PDG_SIN2TW: f64 = 0.23122;
+    const PDG_SIN2TW_UNC: f64 = 0.00003;
+    const SIN2_CORR_DENOM: u64 = D4 * SIGMA_D2;  // 15600
+
+    #[test]
+    fn test_sin2_corr_denom() {
+        assert_eq!(SIN2_CORR_DENOM, 15600);
+    }
+
+    #[test]
+    fn test_sin2tw_base() {
+        let val = N_C as f64 / GAUSS as f64;  // 3/13
+        assert!(pwi_pass(val, PDG_SIN2TW));
+    }
+
+    #[test]
+    fn test_sin2tw_corrected() {
+        // N_c/gauss + β₀/(d₄·Σd²) = 3/13 + 7/15600
+        let base = N_C as f64 / GAUSS as f64;
+        let corr = BETA0 as f64 / SIN2_CORR_DENOM as f64;
+        let val = base + corr;
+        let delta = (val - PDG_SIN2TW).abs();
+        let delta_unc = delta / PDG_SIN2TW_UNC;
+        println!("sin2tw_corrected = {:.15}", val);
+        println!("  Δ = {:.4e}, Δ/unc = {:.4}", delta, delta_unc);
+        assert!(pwi_pass(val, PDG_SIN2TW));
+        assert!(delta_unc < 1.0, "Δ/unc = {:.4} > 1.0", delta_unc);
+    }
+
+    // ══════════════════════════════════════════════════
+    // ALL THREE share Σd² = 650 (a₄ Seeley-DeWitt)
+    // ══════════════════════════════════════════════════
+
+    #[test]
+    fn test_all_three_share_a4() {
+        // α⁻¹ correction denom has Σd²
+        assert_eq!(ALPHA_CORR_DENOM % SIGMA_D2, 0);
+        // m_p/m_e correction denom has Σd²
+        assert_eq!(MP_CORR_DENOM % SIGMA_D2, 0);
+        // sin²θ_W correction denom has Σd²
+        assert_eq!(SIN2_CORR_DENOM % SIGMA_D2, 0);
+    }
+
+    #[test]
+    fn test_gauge_sector_split() {
+        // Couplings (α⁻¹, sin²θ_W) get rational corrections
+        // Mass ratios (m_p/m_e) get transcendental corrections (κ)
+        // Both coupling corrections use d₄ = 24 (SU(3) sector)
+        assert_eq!(ALPHA_CORR_DENOM / SIGMA_D2, CHI * D4 * TOWER_D);
+        assert_eq!(SIN2_CORR_DENOM / SIGMA_D2, D4);
+    }
 }
