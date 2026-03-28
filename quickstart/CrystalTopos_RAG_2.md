@@ -4958,7 +4958,7 @@ Run:          ./crystal
 -}
 ```
 
-## §Haskell: WACAScanTest (     123 lines)
+## §Haskell: WACAScanTest (     124 lines)
 ```haskell
 
 -- Run:     ./waca_scan
@@ -6832,7 +6832,7 @@ mod proton_radius_tests {
 
 ---
 # §META
-Generated: 2026-03-28T19:44:11Z
+Generated: 2026-03-28T23:15:54Z
 Lines:     6829
 Size: 315 KB
 Source: https://github.com/CrystalToe/CrystalAgent
