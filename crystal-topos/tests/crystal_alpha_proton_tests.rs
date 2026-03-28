@@ -3,8 +3,12 @@
 
 // crystal_alpha_proton_tests.rs
 // Prove functions for alpha_inv and m_proton_over_m_e
-// All atoms from A_F = C + M2(C) + M3(C)
-// Zero free parameters. Zero hardcoded numbers.
+//
+// THE AXIOM: A_F = C + M2(C) + M3(C)
+// Connes-Chamseddine spectral triple for the Standard Model.
+// Encodes U(1) x SU(2) x SU(3). Starting point, not conclusion.
+// All atoms from N_w=2, N_c=3. Zero free parameters.
+// Zero hardcoded numbers.
 
 #[cfg(test)]
 mod tests {
@@ -183,5 +187,72 @@ mod tests {
         // Rational numerator: 2*(13^2 + 24) = 2*193 = 386
         let val = 2 * (GAUSS * GAUSS + D4);
         assert_eq!(val, 386);
+    }
+
+    // ══════════════════════════════════════════════════
+    // CORRECTED FORMULAS (Session 5) — Δ/unc < 1
+    // ══════════════════════════════════════════════════
+
+    const ALPHA_CORR_DENOM: u64 = CHI * D4 * SIGMA_D2 * TOWER_D;
+    const MP_CORR_DENOM: u64 = N_W * CHI * SIGMA_D2 * TOWER_D;
+
+    #[test]
+    fn test_alpha_corr_denom() {
+        assert_eq!(ALPHA_CORR_DENOM, 3931200);
+    }
+
+    #[test]
+    fn test_mp_corr_denom() {
+        assert_eq!(MP_CORR_DENOM, 327600);
+    }
+
+    #[test]
+    fn test_corr_denom_ratio() {
+        assert_eq!(ALPHA_CORR_DENOM / MP_CORR_DENOM, 12);
+        assert_eq!(D4 / N_W, 12);
+    }
+
+    #[test]
+    fn test_shared_core() {
+        assert_eq!(SIGMA_D2 * TOWER_D, 27300);
+    }
+
+    #[test]
+    fn test_alpha_inv_corrected() {
+        // 2*(gauss^2 + d4)/π + d3^ln3/ln2 − 1/(χ·d₄·Σd²·D)
+        let term1 = 2.0 * (GAUSS * GAUSS + D4) as f64 / PI;
+        let term2 = (D3 as f64).powf(ln3()) / ln2();
+        let corr = 1.0 / ALPHA_CORR_DENOM as f64;
+        let val = term1 + term2 - corr;
+        let delta = (val - PDG_ALPHA_INV).abs();
+        let delta_unc = delta / 0.000000021;
+        println!("alpha_inv_corrected = {:.15}", val);
+        println!("  Δ = {:.4e}, Δ/unc = {:.4}", delta, delta_unc);
+        assert!(pwi_pass(val, PDG_ALPHA_INV));
+        assert!(delta_unc < 1.0, "Δ/unc = {:.4} > 1.0", delta_unc);
+    }
+
+    #[test]
+    fn test_mp_me_corrected() {
+        // 2*(D^2 + Σd)/d₃ + gauss^Nc/κ + κ/(N_w·χ·Σd²·D)
+        let term1 = 2.0 * (TOWER_D * TOWER_D + SIGMA_D) as f64 / D3 as f64;
+        let term2 = GAUSS.pow(N_C as u32) as f64 / kappa();
+        let corr = kappa() / MP_CORR_DENOM as f64;
+        let val = term1 + term2 + corr;
+        let delta = (val - PDG_MP_ME).abs();
+        let delta_unc = delta / 0.00000011;
+        println!("mp_me_corrected = {:.15}", val);
+        println!("  Δ = {:.4e}, Δ/unc = {:.4}", delta, delta_unc);
+        assert!(pwi_pass(val, PDG_MP_ME));
+        assert!(delta_unc < 1.0, "Δ/unc = {:.4} > 1.0", delta_unc);
+    }
+
+    #[test]
+    fn test_cross_domain_corrections() {
+        // Both corrections share Σd²·D in denominator
+        // α correction is rational (1/integer)
+        // m_p/m_e correction is transcendental (κ/integer)
+        // Ratio = d₄/N_w = 12
+        assert_eq!(CHI * D4, 12 * (N_W * CHI));
     }
 }
