@@ -1,47 +1,96 @@
+#!/bin/bash
 # Copyright (c) 2026 Daland Montgomery
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-#!/bin/bash
-# Haskell proof runner — Session 6 update
-# Run from haskel/ directory
+# Haskell proof runner — Session 6
 set -e
 
+# Find repo root (works from proofs/, haskel/, or repo root)
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+if [ -d "$SCRIPT_DIR/../haskel" ]; then
+  REPO="$SCRIPT_DIR/.."
+elif [ -d "$SCRIPT_DIR/haskel" ]; then
+  REPO="$SCRIPT_DIR"
+else
+  echo "ERROR: Cannot find haskel/ directory." && exit 1
+fi
+
+HASKEL="$REPO/haskel"
+PROOFS="$REPO/proofs"
+cd "$HASKEL"
+
+# Clean up build artifacts on exit (always, even on failure)
+cleanup() {
+  cd "$HASKEL"
+  rm -f *.o *.hi
+  rm -f crystal structural noether discoveries alpha_proton proton_radius extended_scan
+}
+trap cleanup EXIT
+
 echo "=== Haskell Proof Runner (Session 6) ==="
+echo "    Running from: $(pwd)"
+echo "    Certificate:  $PROOFS/GHC_Certificate.txt"
 echo ""
 
-# Original 92 observables
+PASS=0
+FAIL=0
+
+run_main() {
+  local label="$1" src="$2" out="$3"
+  echo "--- $label ---"
+  if ghc -O2 "$src" -o "$out" 2>&1; then
+    ./"$out" && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
+  else
+    echo "  COMPILE FAILED"; FAIL=$((FAIL+1))
+  fi
+  echo ""
+}
+
+run_exe() {
+  local label="$1" src="$2" mod="$3" out="$4"
+  echo "--- $label ---"
+  if ghc -O2 -main-is "$mod" "$src" -o "$out" 2>&1; then
+    ./"$out" && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
+  else
+    echo "  COMPILE FAILED"; FAIL=$((FAIL+1))
+  fi
+  echo ""
+}
+
+typecheck() {
+  local label="$1" src="$2"
+  echo "--- $label (type-check = proof) ---"
+  if ghc -fno-code "$src" 2>&1; then
+    echo "  Type-checks ✓ (Curry-Howard: compilation = proof)"
+    PASS=$((PASS+1))
+  else
+    echo "  TYPE-CHECK FAILED"; FAIL=$((FAIL+1))
+  fi
+  echo ""
+}
+
+# 1. Original 92 observables (module Main) → GHC_Certificate.txt
 echo "--- Main.hs (92 observables) ---"
-ghc -O2 Main.hs -o crystal 2>/dev/null && ./crystal
+if ghc -O2 Main.hs -o crystal 2>&1; then
+  ./crystal | tee "$PROOFS/GHC_Certificate.txt" && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
+else
+  echo "  COMPILE FAILED"; FAIL=$((FAIL+1))
+fi
 echo ""
 
-# Structural proofs
-echo "--- CrystalStructural.hs ---"
-ghc -O2 CrystalStructural.hs -o structural 2>/dev/null && ./structural
-echo ""
+# 2-4. Library proof modules (no main — type-check IS the proof)
+typecheck "CrystalStructural.hs"  "CrystalStructural.hs"
+typecheck "CrystalNoether.hs"     "CrystalNoether.hs"
+typecheck "CrystalDiscoveries.hs" "CrystalDiscoveries.hs"
 
-# Noether proofs
-echo "--- CrystalNoether.hs ---"
-ghc -O2 CrystalNoether.hs -o noether 2>/dev/null && ./noether
-echo ""
+# 5-6. Standalone proof modules (have main, need -main-is)
+run_exe "CrystalAlphaProton.hs (S4+S5)"  "CrystalAlphaProton.hs"  "CrystalAlphaProton"  "alpha_proton"
+run_exe "CrystalProtonRadius.hs (S6)"    "CrystalProtonRadius.hs" "CrystalProtonRadius" "proton_radius"
 
-# Discoveries (magic_82)
-echo "--- CrystalDiscoveries.hs ---"
-ghc -O2 CrystalDiscoveries.hs -o discoveries 2>/dev/null && ./discoveries
-echo ""
+# 7. Extended scan (module Main)
+run_main "Extended scan" "WACAScanTest.hs" "extended_scan"
 
-# Alpha/Proton/sin2tw (S4+S5)
-echo "--- CrystalAlphaProton.hs ---"
-ghc -O2 CrystalAlphaProton.hs -o alpha_proton 2>/dev/null && ./alpha_proton
-echo ""
-
-# Proton radius (S6) — NEW
-echo "--- CrystalProtonRadius.hs ---"
-ghc -O2 CrystalProtonRadius.hs -o proton_radius 2>/dev/null && ./proton_radius
-echo ""
-
-# Extended scan
-echo "--- Extended scan ---"
-ghc -O2 ExtendedScanTest.hs -o extended_scan 2>/dev/null && ./extended_scan
-echo ""
-
-echo "=== Haskell: 9/9 PASS ==="
+# Tally (cleanup runs automatically via trap)
+TOTAL=$((PASS+FAIL))
+echo "=== Haskell: $PASS/$TOTAL PASS ==="
+[ "$FAIL" -eq 0 ] || exit 1
