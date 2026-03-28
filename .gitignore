@@ -1,5 +1,5 @@
 haskel/LeanCert/*
-haskel/README_PROOFS.md
+../CrystalToe/README_PROOFS.md
 todo/*
 INTERNAL_README.md
 HANDOFF.md
@@ -29,3 +29,6 @@ haskel/LeanCert/.lake/
 .DS_Store
 
 .lake
+
+files/*
+files.zip

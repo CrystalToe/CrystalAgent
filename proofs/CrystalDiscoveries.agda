@@ -130,6 +130,14 @@ magic-28 = refl
 magic-50 : towerD + d3 ≡ 50
 magic-50 = refl
 
+-- Magic 82 = N_c⁴ + 1 = 3×3×3×3 + 1 = 81 + 1 (HMC depth-5)
+magic-82 : N-c * N-c * N-c * N-c + 1 ≡ 82
+magic-82 = refl
+
+-- Alternative: (D-1) × N_w = 41 × 2 = 82
+magic-82-alt : (towerD - 1) * N-w ≡ 82
+magic-82-alt = refl
+
 -- Magic 126 = N_c × D
 magic-126 : N-c * towerD ≡ 126
 magic-126 = refl

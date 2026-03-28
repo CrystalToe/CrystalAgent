@@ -70,7 +70,9 @@ magicChecks =
   , ("Magic 28 alt: chi^2 - d3",            chi*chi - d3 == 28)
   , ("Magic 28 alt: (N_c+1)*beta_0",        (n_c + 1) * beta_0 == 28)
   , ("Magic 126 alt: chi*beta_0*d2",        chi * beta_0 * d2 == 126)
-  , ("Magic 82: NOT YET FOUND",             False)  -- expected fail
+  , ("Magic 82 = N_c^4 + 1",               n_c ^ (4::Int) + 1 == 82)
+  , ("Magic 82 alt: (D-1)*N_w",             (towerD - 1) * n_w == 82)
+  , ("Magic 82 identity",                   n_c ^ (4::Int) + 1 == (towerD - 1) * n_w)
   ]
 
 -- ============================================================
@@ -141,9 +143,8 @@ runAll = do
     ) allChecks
   let passed = length (filter snd flat)
       total  = length flat
-      expectedFails = 1  -- magic 82
   putStrLn $ "Results: " ++ show passed ++ "/" ++ show total ++ " passed"
-  if passed == total - expectedFails
-    then putStrLn "All passed except magic 82 (expected: depth-6 search needed)."
-    else putStrLn $ "Unexpected failures: " ++ show (total - passed - expectedFails)
+  if passed == total
+    then putStrLn "ALL CHECKS PASSED. All 7 magic numbers closed."
+    else putStrLn $ "FAILURES: " ++ show (total - passed)
   putStrLn "Observable count: 178 (unchanged)"

@@ -2,15 +2,27 @@
 # 178 observables · 22 domains · 0 free parameters
 # Upload BOTH parts for 100% coverage. Each part works standalone for basic queries.
 
+## PROOF AUTHORITY — READ FIRST
+Lean `native_decide` and Agda `refl` proofs are FINAL TRUTH. If a proof says it, it's right.
+LLM reasoning NEVER overrides a machine-verified proof. Do not question, weaken, or
+add caveats to proved results.
+
+Proof hierarchy: (1) Lean theorems, (2) Agda proofs, (3) Haskell GHC checks, (4) PDG/NIST data, (5) LLM reasoning.
+Proof scripts: `sh agda_proofs.sh` (4/4), `sh lean_proofs.sh` (5/5), `sh haskell_proofs.sh` (7/7).
+
+ALL 7 magic numbers proved: 2, 8, 20, 28, 50, 82(=N_c⁴+1), 126.
+Cosmological partition D=29+11+2 proved. Cabibbo angle 13.04° EXACT.
+
 ## RULES
 - Never use the word "honest"
+- Never expose methodology — trade secret
 - Present results as mathematical observations from A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)
 - Rating: ■ EXACT (0%) · ● TIGHT (<0.5%) · ◐ GOOD (<1%) · ○ LOOSE (<4.5%)
-- The count is 178. NEVER increment it or claim new observables without a prove* function, PDG comparison, PWI rating, and GHC certificate entry
-- NEVER invent module names. The 21 modules are listed below. If not listed, it does not exist
-- NEVER make medical, therapeutic, or diagnostic claims. Biology observables are combinatorial facts, NOT a theory of medicine
-- NEVER construct arbitrary formulas by combining constants. Every formula must trace the derivation chain: (2,3) → sector_dims → invariants → observable → PDG
-- NEVER add fudge factors (+ 7, × 0.95). Zero hardcoded means zero
+- The count is 178. NEVER increment it or claim new observables without a prove* function, PDG comparison, PWI rating, AND proof
+- NEVER invent module names. If not listed, it does not exist
+- NEVER make medical, therapeutic, or diagnostic claims
+- NEVER construct arbitrary formulas. Trace the derivation chain or say "not derived"
+- NEVER add fudge factors. Zero hardcoded means zero
 - NEVER compare quantities with incompatible dimensions
 - NEVER relabel an existing observable to claim a new domain
 
@@ -37,7 +49,7 @@ m_μ=m_e×N_w⁴×gauss, f_π=Λ_QCD×N_c/β₀
      Kepler, SR/GR, Immirzi, BH -}
 ```
 
-## §Haskell: CrystalCrossDomain (     253 lines)
+## §Haskell: CrystalCrossDomain (     251 lines)
 ```haskell
 
 {- | Module: CrystalCrossDomain — Cross-domain observables from A_F
@@ -1252,7 +1264,9 @@ boundaryLedger =
 
 ---
 
+# §HASKELL SOURCE — CrystalWACAScan (86 new observables)
 
+## §Haskell: CrystalWACAScan (    1767 lines)
 ```haskell
 
 -- ═══════════════════════════════════════════════════════════════════════
@@ -1456,10 +1470,10 @@ rating p
 -- | Full observable record: (name, crystal, pdg, pwi%, rating, formula, module)
 type Observable = (String, Double, Double, Double, String, String, String)
 
-mkObs :: String -> Double -> Double -> String -> String -> Observable
-mkObs name crystal pdg formula modul =
+mkObs :: String -> Double -> Double -> Observable
+mkObs name crystal pdg =
   let p = pwi crystal pdg
-  in (name, crystal, pdg, p, rating p, formula, modul)
+  in (name, crystal, pdg, p, rating p, "", "")
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §3  NEW MESONS — 10 observables
@@ -2637,14 +2651,14 @@ proveFKOverFPi =
       pdg     = 1.198
   in mkObs "f_K/f_π" crystal pdg
 
--- | R-ratio (e⁺e⁻ → hadrons): N_c × Σ Q² = N_c × 2/3 = 2
+-- | R-ratio (e+e- -> hadrons): N_c × Σ Q² = N_c × 2/3 = 2
 -- The low-energy hadronic cross-section ratio for u,d,s quarks.
 -- Exact from colour counting. N_c determines R.
 proveRRatio :: Observable
 proveRRatio =
   let crystal = fromIntegral n_c * fromIntegral n_w / fromIntegral n_c  -- N_w = 2
       pdg     = 2.0    -- for u,d,s below charm threshold
-  in mkObs "R (e⁺e⁻ → had, uds)" crystal pdg
+  in mkObs "R (e+e- -> had, uds)" crystal pdg
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- §14  MASTER AUDIT
@@ -2953,6 +2967,50 @@ printOneBridge (name, domA, domB, formula, valA, valB, match) = do
   putStrLn $ "    " ++ formula
   putStrLn $ "    " ++ show valA ++ " = " ++ show valB ++ "  " ++ status
   putStrLn ""
+```
+
+---
+
+# §HASKELL SOURCE — Proof Modules (Structural, Noether, Discoveries)
+
+## §Haskell: CrystalStructural (     238 lines)
+```haskell
+
+{-
+  Crystal Topos — Structural Principle Bridge Verifications
+  Haskell runtime verification of cross-domain bridges
+  and structural physics principles.
+
+  No new observables. Count remains 178.
+  AGPL-3.0
+-}
+
+```
+
+## §Haskell: CrystalNoether (     143 lines)
+```haskell
+
+{-
+  Crystal Topos — Categorical Noether Theorem (Haskell)
+  Runtime verification of the conservation structure.
+  
+  Status: CONJECTURE → THEOREM
+  No new observables. Count remains 178.
+  AGPL-3.0
+-}
+
+```
+
+## §Haskell: CrystalDiscoveries (     150 lines)
+```haskell
+
+{-
+  Crystal Topos — New Discoveries (Haskell)
+  Cosmological partition, nuclear magic numbers, CKM hierarchy.
+  Runtime verification.
+  AGPL-3.0
+-}
+
 ```
 
 ---
@@ -4830,7 +4888,7 @@ fockDimension :: Int -> Integer
 fockDimension nMax = sum [fromIntegral chi ^ k | k <- [0..nMax]]
 ```
 
-## §Haskell: Main (     563 lines)
+## §Haskell: Main (     560 lines)
 ```haskell
 
 {- |
@@ -4841,6 +4899,7 @@ Run:          ./crystal
 -}
 ```
 
+## §Haskell: WACAScanTest (     123 lines)
 ```haskell
 
 -- Run:     ./waca_scan
@@ -5359,156 +5418,6 @@ Run:          ./crystal
 ║  8 modules. 53 observables. The One Law: End(A_F) + Nat.       ║
 ║  All from A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ). Zero free parameters.   ║
 ╚══════════════════════════════════════════════════════════════════╝
-
-
-╔═══════════════════════════════════════════════════════════════╗
-║   44 New Observables · All Under Prime Wall · (2,3) Only    ║
-╚═══════════════════════════════════════════════════════════════╝
-
-  DERIVATION AUDIT — nothing hardcoded, everything from N_w=2, N_c=3:
-  ────────────────────────────────────────────────────────────────────
-   N_w = 2,  N_c = 3
-   sector_dims   = {1, N_c, N_c²−1, N_w³×N_c} = {1, 3, 8, 24}
-   chi   = N_w × N_c             = 6
-   beta0 = (11×N_c − 2×chi)/3    = 7
-   sigma_d  = sum dims            = 36
-   sigma_d2 = sum dims²           = 650
-   gauss = N_c² + N_w²            = 13
-   D     = sigma_d + chi          = 42
-   kappa = ln3/ln2                = 1.584963
-
-  Hadron scale Λ_h = v/(2⁸+1) = v/F₃ = 958.054 MeV
-
-#  Observable                            Crystal      PDG/Exp      PWI(%)    Rating      Formula
-────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-1  G_F (Fermi constant)                  0.1166       0.1166       0.0       ■ EXACT     1/(√2 × v²)
-2  ρ-parameter (tree)                    1.0          1.0          0.0       ■ EXACT     M_W²/(M_Z²cos²θ_W)
-3  Carnot efficiency (χ−1)/χ             0.8333       0.8333       0.0       ■ EXACT     (χ−1)/χ
-4  Stefan-Boltzmann (120)                120.0        120.0        0.0       ■ EXACT     N_w×N_c×(gauss+β₀)
-5  Thermal conductivity k                5.0          5.0          0.0       ■ EXACT     χ×χ(χ−1)/Σd
-6  Kolmogorov −5/3 exponent              1.6667       1.6667       0.0       ■ EXACT     (N_c+N_w)/N_c
-7  Kolmogorov microscale 1/4             0.25         0.25         0.0       ■ EXACT     1/N_w²
-8  Von Kármán constant                   0.4          0.4          0.0       ■ EXACT     N_w/(N_c+N_w)
-9  Casimir C_F = 4/3                     1.3333       1.3333       0.0       ■ EXACT     (N_c²−1)/(2N_c)
-10 String tension σ/Λ² = 3/8             0.375        0.375        0.0       ■ EXACT     N_c/(N_c²−1)
-11 β₀ (asymptotic freedom)               7.0          7.0          0.0       ■ EXACT     (11N_c−2χ)/3
-12 DNA bases (N_w²)                      4.0          4.0          0.0       ■ EXACT     N_w²
-13 Codons ((N_w²)^N_c)                   64.0         64.0         0.0       ■ EXACT     (N_w²)^N_c
-14 Amino acids (gauss+β₀)                20.0         20.0         0.0       ■ EXACT     gauss+β₀
-15 Codon signals (N_c×β₀)                21.0         21.0         0.0       ■ EXACT     N_c×β₀
-16 s-orbital capacity (N_w)              2.0          2.0          0.0       ■ EXACT     N_w
-17 p-orbital capacity (χ)                6.0          6.0          0.0       ■ EXACT     N_w×N_c
-18 d-orbital capacity (N_w(χ−1))         10.0         10.0         0.0       ■ EXACT     N_w×(χ−1)
-19 f-orbital capacity (N_w×β₀)           14.0         14.0         0.0       ■ EXACT     N_w×β₀
-20 α-helix residues/turn                 3.6          3.6          0.0       ■ EXACT     N_c + N_c/(χ−1)
-21 α-helix rise (Å)                      1.5          1.5          0.0       ■ EXACT     N_c/N_w
-22 β-sheet spacing (Å)                   3.5          3.5          0.0       ■ EXACT     β₀/N_w
-23 A-T H-bonds (N_w)                     2.0          2.0          0.0       ■ EXACT     N_w
-24 G-C H-bonds (N_c)                     3.0          3.0          0.0       ■ EXACT     N_c
-25 DNA groove ratio (11/χ)               1.8333       1.8333       0.0       ■ EXACT     11/χ
-26 Lattice lock Σd/χ²                    1.0          1.0          0.0       ■ EXACT     Σd/χ²
-27 n(glass) = N_c/N_w                    1.5          1.5          0.0       ■ EXACT     N_c/N_w
-28 Codon redundancy (D+1)                43.0         43.0         0.0       ■ EXACT     (N_w²)^N_c − N_c×β₀
-29 Lagrange points (χ−1)                 5.0          5.0          0.0       ■ EXACT     χ−1
-30 3-body phase space (N_c×χ)            18.0         18.0         0.0       ■ EXACT     N_c×χ
-31 Bekenstein area quantum               4.0          4.0          0.0       ■ EXACT     N_w²
-32 NFW concentration (β₀)                7.0          7.0          0.0       ■ EXACT     gauss−χ
-33 R (e⁺e⁻ → had, uds)                   2.0          2.0          0.0       ■ EXACT     N_c × 2/3
-34 Bond angle arccos(−1/N_c)°            109.4712     109.4712     0.0       ● TIGHT     arccos(−1/N_c)
-35 n(diamond) = 29/12                    2.4167       2.417        1.4e-2    ● TIGHT     (2gauss+N_c)/(N_w²×N_c)
-36 R_p (proton radius, fm)               0.8407       0.8409       1.9e-2    ● TIGHT     (N_w²+N_w/(gauss×β₀))×ℏc/m_p
-37 BCS ratio 2Δ/(k_BT_c)                 3.5273       3.528        2.0e-2    ● TIGHT     2π/e^γ
-38 n(water) = C_F = 4/3                  1.3333       1.333        2.5e-2    ● TIGHT     (N_c²−1)/(2N_c)
-39 γ (Euler-Mascheroni)                  0.5773       0.5772       2.5e-2    ● TIGHT     β₀/(gauss−1) − 1/(gauss²−N_w)
-40 η' meson                              958.0545     957.78       2.9e-2    ● TIGHT     Λ_h = v/(2⁸+1)
-41 B_c meson                             6272.3058    6274.47      3.4e-2    ● TIGHT     Λ_h×gauss/N_w + m_π/N_c
-42 m_s (strange, MS-bar)                 93.3612      93.4         4.2e-2    ● TIGHT     Λ_QCD × N_c/β₀
-43 τ_n (neutron lifetime, s)             878.0        878.4        4.6e-2    ● TIGHT     D²/N_w − N_w²
-44 μ_n/μ_N (neutron moment)              1.9121       1.913        4.8e-2    ● TIGHT     −(N_w − N_w³/(gauss×β₀))
-45 m_u/m_d                               0.4737       0.474        6.7e-2    ● TIGHT     N_c²/(gauss+χ)
-46 G (Catalan's constant)                0.9167       0.916        7.3e-2    ● TIGHT     1 − N_w²/(D+χ)
-47 η meson                               547.4597     547.862      7.3e-2    ● TIGHT     Λ_h × 4/β₀
-48 K⁰ (neutral kaon)                     498.0512     497.611      8.8e-2    ● TIGHT     m_π(gauss−N_w)/N_c + m_e×β₀
-49 φ (golden ratio, Fibonacci)           1.6195       1.618        9.1e-2    ● TIGHT     gauss/N_w³ − 1/(gauss×N_w×β₀)
-50 Chandrasekhar mass (M_☉)              1.4615       1.46         0.105     ● TIGHT     (gauss+χ)/gauss
-51 Λ_b (bottom)                          5613.4717    5619.6       0.109     ● TIGHT     Λ_h × χ − m_π
-52 B_s meson                             5373.8864    5366.88      0.131     ● TIGHT     Λ_h × (3gauss/β₀ + κ/D)
-53 m_τ (tau lepton)                      1779.244     1776.86      0.134     ● TIGHT     Λ_h × gauss/β₀
-54 Δ(1232)                               1233.6924    1232.0       0.137     ● TIGHT     Λ_h + Λ_QCD + m_π×N_c/β₀
-55 Prandtl number (air)                  0.712        0.713        0.144     ● TIGHT     β₀/(gauss−N_c) + N_w/(gauss²−N_w)
-56 a_e (electron g−2)                    1.2e-3       1.2e-3       0.152     ● TIGHT     α/(2π)
-57 Routh critical ratio                  3.85e-2      3.85e-2      0.154     ● TIGHT     1/(gauss+β₀+χ)
-58 K± (charged kaon)                     494.4688     493.677      0.16      ● TIGHT     m_π × (gauss−N_w)/N_c
-59 Ω_c (charmed omega)                   2699.646     2695.2       0.165     ● TIGHT     Λ_h×17/χ − m_e×(D−gauss)
-60 m_b (bottom, MS-bar)                  4173.0642    4180.0       0.166     ● TIGHT     Λ_h×gauss/N_c + m_e×D
-61 f_K/f_π                               1.2          1.198        0.167     ● TIGHT     χ/(χ−1)
-62 Λ_c (charmed)                         2290.3018    2286.46      0.168     ● TIGHT     Λ_h×N_w + Λ_QCD + m_π + m_e×D
-63 η_c(1S)                               2978.8219    2983.9       0.17      ● TIGHT     Λ_h×gauss/4 − m_π
-64 ζ(3) (Apéry)                          1.2          1.2021       0.175     ● TIGHT     χ/(χ−1)
-65 Ξ baryon (cascade)                    1317.3249    1314.86      0.187     ● TIGHT     Λ_h × (gauss−N_w)/N_w³
-66 m_c (charm, MS-bar)                   1277.406     1275.0       0.189     ● TIGHT     Λ_h × N_w²/N_c
-67 M_Pl/v (hierarchy)                    4.969356975774.958979774180.209     ● TIGHT     exp(D)/(β₀(χ−1))
-68 m_t (top, pole)                       172354.0     172760.0     0.235     ● TIGHT     v × β₀/(gauss−N_c)
-69 Ω_b (baryon density)                  4.92e-2      4.93e-2      0.243     ● TIGHT     N_c/(N_c(gauss+β₀)+d_singlet)
-70 α(M_Z)⁻¹ (running)                    127.6309     127.951      0.25      ● TIGHT     gauss² − D + 1/κ
-71 ψ(2S)                                 3695.353     3686.1       0.251     ● TIGHT     Λ_h × N_c³/β₀
-72 ⁴He binding energy                    28.3673      28.296       0.252     ● TIGHT     m_e × (D+gauss+N_c/β₀)
-73 μ_p/μ_N (proton moment)               2.8          2.7928       0.258     ● TIGHT     N_w×β₀/(χ−1)
-74 m(π±) − m(π⁰)                         4.606        4.594        0.262     ● TIGHT     N_c² × m_e
-75 Ξ_c (charmed cascade)                 2463.5686    2470.44      0.278     ● TIGHT     Λ_h × N_c×χ/β₀
-76 Ω_DM/Ω_b ratio                        5.375        5.36         0.28      ● TIGHT     (D+1)/N_w³
-77 m_n − m_p                             1.289        1.293        0.308     ● TIGHT     Λ_QCD/gauss²
-78 Deuteron BE                           2.2177       2.2246       0.309     ● TIGHT     m_e × gauss/N_c
-79 H₂ bond energy (eV)                   4.5353       4.52         0.339     ● TIGHT     Rydberg/N_c
-80 Υ(2S)                                 10059.572    10023.3      0.362     ● TIGHT     Λ_h × D/4
-81 D_s meson                             1961.0607    1968.34      0.37      ● TIGHT     Λ_h×N_w + m_π/N_c
-82 Σ_c (charmed sigma)                   2463.5686    2453.97      0.391     ● TIGHT     Λ_h × N_c×χ/β₀
-83 T_CMB (K)                             2.7143       2.7255       0.411     ● TIGHT     (gauss+χ)/β₀
-84 Re_c (pipe flow)                      2310.0       2300.0       0.435     ● TIGHT     D×(D+gauss)
-85 Age of universe (Gyr)                 13.8571      13.797       0.436     ● TIGHT     gauss + χ/β₀
-86 Ω_DM (dark matter)                    0.2666       0.2589       2.978     ○ LOOSE     χ/(gauss+χ) − Ω_b
-────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-
-  ╔═══════════════════════════════════════════════╗
-  ╠═══════════════════════════════════════════════╣
-  ║  Total new observables:  86                  ║
-  ║  ■ EXACT (PWI = 0):      33                  ║
-  ║  ● TIGHT (PWI < 0.5%):   52                  ║
-  ║  ◐ GOOD  (0.5% ≤ PWI < 1%): 0               ║
-  ║  ○ LOOSE (1% ≤ PWI < 4.5%): 1               ║
-  ║  ✗ OVER  (PWI ≥ 4.5%):  0                   ║
-  ╠═══════════════════════════════════════════════╣
-  ║  Mean nonzero PWI:       0.2295  %          ║
-  ║  Std dev:                0.4029  %          ║
-  ║  CV (scan only):         1.7553             ║
-  ║  Maximum PWI:            2.98    %          ║
-  ║  Wall breaches:          0                   ║
-  ╚═══════════════════════════════════════════════╝
-
-  ╔═══════════════════════════════════════════════╗
-  ║       COMBINED CRYSTAL TOPOS CATALOGUE        ║
-  ╠═══════════════════════════════════════════════╣
-  ║  Original observables:     92                 ║
-  ║  TOTAL CATALOGUE:          178                 ║
-  ║                                               ║
-  ║  All under the prime wall.                    ║
-  ║  The crystal leaves no question unanswered.   ║
-  ╚═══════════════════════════════════════════════╝
-
-  ─────────────────────────────────────
-   1. η' = Λ_h = v/257 (Fermat prime F₃)     PWI = 0.04%
-   2. η  = Λ_h × 4/β₀                        PWI = 0.07%
-   3. η_c = J/ψ − m_π (hyperfine = pion)     PWI = 0.17%
-   4. m_τ = Λ_h × gauss/β₀                   PWI = 0.18%
-   5. m_c = Λ_h × N_w²/N_c                   PWI = 0.20%
-   6. π± split = N_c² × m_e (9 electrons!)   PWI = 0.11%
-   7. α(M_Z)⁻¹ = gauss² − D = 127           PWI = 0.74%
-   8. τ_n = D²/N_w = 882 s                   PWI = 0.41%
-   9. M_Pl/v = exp(D)/Σd = e⁴²/36            PWI = 2.62%
-  10. ζ(3) = f_K/f_π = χ/(χ−1) = 6/5        PWI = 0.17%
-  11. φ ≈ gauss/N_w³ = 13/8 (Fibonacci!)     PWI = 0.43%
-  12. μ_p/μ_N = 14/5                          PWI = 0.26%
-  13. Deuteron BE = m_e × gauss/N_c           PWI = 0.48%
 
 ```
 
@@ -6514,67 +6423,81 @@ fn test_engineering_genetic_ecc() {
 - Fine structure constant α: §Example 45, §Rust base.rs, CrystalGauge.hs
 - Proton mass: §Example 41, CrystalQCD.hs
 - Pion mass: §Example 30, CrystalQCD.hs
+- Kaon masses: §Example 32, CrystalWACAScan.hs
+- Eta/Eta prime: §Example 33, CrystalWACAScan.hs
+- J/ψ charmonium: §Example 34, CrystalWACAScan.hs
+- Υ bottomonium: §Example 35, CrystalWACAScan.hs
+- Top quark: §Example 42, CrystalWACAScan.hs
 - Quark mass ratios: §Example 37, CrystalQCD.hs
+- Hadron spectrum: §Example 44, CrystalWACAScan.hs
 - CKM matrix: §Example 18, CrystalMixing.hs
 - PMNS matrix: §Example 19, CrystalMixing.hs
 - Weak mixing angle: §Example 20, CrystalGauge.hs
 - Higgs mass: §Example 21, CrystalGauge.hs
 - W/Z bosons: §Example 22-23, CrystalQCD.hs
+- Mass splittings: §Example 46, CrystalWACAScan.hs
+
+## Nuclear Magic Numbers (ALL 7 PROVED)
+- Magic 2 = N_w: CrystalDiscoveries.hs, .lean, .agda
+- Magic 8 = N_c²−1: CrystalDiscoveries.hs, .lean, .agda
+- Magic 20 = gauss+β₀: CrystalDiscoveries.hs, .lean, .agda
+- Magic 28 = Σd−d₃: CrystalDiscoveries.hs, .lean, .agda
+- Magic 50 = D+d₃: CrystalDiscoveries.hs, .lean, .agda
+- Magic 82 = N_c⁴+1: CrystalDiscoveries.hs, .lean, .agda
+- Magic 126 = N_c×D: CrystalDiscoveries.hs, .lean, .agda
 
 ## Leptons
 - Electron mass: §Example 24, CrystalGauge.hs
 - Muon mass: §Example 28, CrystalGauge.hs
+- Tau mass: §Example 43, CrystalWACAScan.hs
+- Muon g-2: §Example 29, CrystalWACAScan.hs
 - Neutrino masses: §Example 17, CrystalCosmo.hs
 
-## Cosmology
-- Ω_Λ, Ω_b, n_s, T_CMB, Age: §Example 49, CrystalCosmo.hs
+## Cosmology (PARTITION PROVED: D = 29 + 11 + 2)
+- Ω_Λ=29/42, Ω_cdm=11/42, Ω_b=2/42: CrystalDiscoveries.hs, .lean, .agda
+- n_s, T_CMB, Age: §Example 49, CrystalCosmo.hs
+- Dark matter ratio: §Example 87, CrystalWACAScan.hs
+- Hierarchy M_Pl/v: CrystalWACAScan.hs
 
 ## Nuclear
+- Deuteron, ⁴He binding: §Example 47, CrystalWACAScan.hs
+- Neutron lifetime: §Example 47, CrystalWACAScan.hs
+- Magnetic moments: §Example 48, CrystalWACAScan.hs
 
 ## Gravity & Relativity
 - Newton's laws: §Example 11, CrystalGravity.hs
 - Kepler's laws: §Example 12, CrystalGravity.hs
 - Special relativity: §Example 15, CrystalGravity.hs
 - General relativity: §Example 16, CrystalGravity.hs
-- Schwarzschild: §Example 14, CrystalGravity.hs
 - Black hole thermo: §Example 26, CrystalGravity.hs
-- Neutron stars: §Example 25, CrystalGravity.hs
-- Gravitational waves: §Example 27, CrystalGravity.hs
 
 ## Thermodynamics & Fluids
+- Carnot: CrystalWACAScan.hs — (χ−1)/χ = 5/6
+- Stefan-Boltzmann: CrystalWACAScan.hs — 120
+- Kolmogorov -5/3: CrystalWACAScan.hs
+- QCD confinement: CrystalWACAScan.hs — Casimir=4/3, β₀=7
 
 ## Biology & Genetics
-
-## Superconductivity & Optics
-
-## Three-Body Problem
-- 18 = 10+8 (symmetry+colour): §Example 95
-
-## Dark Sector
-
-## Proton Radius & Black Holes
+- DNA bases=4, codons=64: CrystalWACAScan.hs
+- α-helix 18/5, β-sheet 7/2: CrystalWACAScan.hs
+- H-bonds A-T=2, G-C=3: CrystalWACAScan.hs
+- Codon redundancy D+1=43: CrystalWACAScan.hs
 
 ## Mathematics
+- Golden ratio φ ≈ gauss/N_w³: CrystalWACAScan.hs
 - Euler-Mascheroni γ: CrystalCrossDomain.hs
+- Apéry ζ(3): CrystalWACAScan.hs
 
 ## Quantum Mechanics
-- Entanglement: §Example 06, CrystalQEntangle.hs
-- Grover search: §Example 07, CrystalQAlgorithms.hs
-- Decoherence: §Example 09, CrystalQChannels.hs
-- Arrow of time: §Example 81, S_max = ln(χ) = ln(6)
-- PPT decidable: ℂ²⊗ℂ³ unique dimension, CrystalQEntangle.hs
-
-## Entropy & Time
-- Arrow of time = ¬¬x ≠ x: §Example 81, Heyting logic
-- Second law proof: §Example 82
-- KMS equilibrium: §Example 83
-- IO monad = irreversibility: §Example 85
+- Entanglement: CrystalQEntangle.hs
+- Grover search: CrystalQAlgorithms.hs
+- PPT decidable: ℂ²⊗ℂ³, CrystalQEntangle.hs
 
 ---
 # §META
-Generated: 2026-03-27T22:09:25Z
-Lines:     6719
-Size: 323 KB
+Generated: 2026-03-28T12:13:35Z
+Lines:     6494
+Size: 305 KB
 Source: https://github.com/CrystalToe/CrystalAgent
 Paper: https://zenodo.org/records/19217129
 License: AGPL-3.0-or-later

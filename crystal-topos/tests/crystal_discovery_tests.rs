@@ -98,6 +98,24 @@ mod discovery_tests {
     }
 
     #[test]
+    fn magic_82() {
+        // N_c^4 + 1 = 81 + 1 = 82 (HMC depth-5)
+        assert_eq!(N_C.pow(4) + 1, 82);
+    }
+
+    #[test]
+    fn magic_82_alt() {
+        // (D - 1) * N_w = 41 * 2 = 82
+        assert_eq!((TOWER_D - 1) * N_W, 82);
+    }
+
+    #[test]
+    fn magic_82_identity() {
+        // N_c^4 + 1 = (D - 1) * N_w
+        assert_eq!(N_C.pow(4) + 1, (TOWER_D - 1) * N_W);
+    }
+
+    #[test]
     fn magic_50_alt() {
         // sigma_d2 / gauss = 650 / 13 = 50
         assert_eq!(SIGMA_D2, 650);

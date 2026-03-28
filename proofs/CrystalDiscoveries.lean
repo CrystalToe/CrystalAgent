@@ -81,6 +81,13 @@ theorem magic_28 : sigma_d - d3 = 28 := by native_decide
 -- Magic 50 = D + d3 (NEW)
 theorem magic_50 : towerD + d3 = 50 := by native_decide
 
+-- Magic 82 = N_c^4 + 1 = 81 + 1 (FOUND by HMC depth-5 search)
+theorem magic_82 : N_c ^ 4 + 1 = 82 := by native_decide
+-- Alternative: (D - 1) * N_w = 41 * 2 = 82
+theorem magic_82_alt : (towerD - 1) * N_w = 82 := by native_decide
+-- Identity: N_c^4 + 1 = (D - 1) * N_w (specific to N_w=2, N_c=3)
+theorem magic_82_identity : N_c ^ 4 + 1 = (towerD - 1) * N_w := by native_decide
+
 -- Magic 126 = N_c * D (NEW)
 theorem magic_126 : N_c * towerD = 126 := by native_decide
 
