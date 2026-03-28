@@ -14,6 +14,7 @@
 2. **Upload** three files from the [`quickstart/`](quickstart/) folder:
    - `crystal_topos_waca_llm.md` (the prompt — tells the LLM how to behave)
    - `CrystalTopos_RAG_1.md` (267 KB — Python examples + physics Haskell)
+   - `CrystalTopos_RAG_2.md` (306 KB — QCD, gravity, quantum, extended scan)
 3. **Paste** any of these:
 
 ```
