@@ -6,7 +6,7 @@
   Haskell runtime verification of cross-domain bridges
   and structural physics principles.
 
-  No new observables. Count remains 178.
+  No new observables. Count: 180.
   AGPL-3.0
 -}
 

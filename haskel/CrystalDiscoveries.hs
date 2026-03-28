@@ -147,4 +147,4 @@ runAll = do
   if passed == total
     then putStrLn "ALL CHECKS PASSED. All 7 magic numbers closed."
     else putStrLn $ "FAILURES: " ++ show (total - passed)
-  putStrLn "Observable count: 178 (unchanged)"
+  putStrLn "Observable count: 180"

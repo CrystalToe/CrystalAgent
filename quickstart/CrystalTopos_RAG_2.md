@@ -1288,7 +1288,7 @@ boundaryLedger =
 -- ═══════════════════════════════════════════════════════════════════════
 --
 -- This module adds ~86 NEW observables to the Crystal Topos catalogue.
--- Combined with the existing 178, the crystal now covers 142 observables.
+-- Combined with the original 92, the crystal now covers 180 observables.
 --
 -- Every formula uses only (2,3) lattice invariants:
 --   N_w = 2, N_c = 3, χ = 6, β₀ = 7, D = 42, Σd = 36, Σd² = 650,
@@ -2996,7 +2996,7 @@ printOneBridge (name, domA, domB, formula, valA, valB, match) = do
   Haskell runtime verification of cross-domain bridges
   and structural physics principles.
 
-  No new observables. Count remains 178.
+  No new observables. Count: 180.
   AGPL-3.0
 -}
 
@@ -3010,7 +3010,7 @@ printOneBridge (name, domA, domB, formula, valA, valB, match) = do
   Runtime verification of the conservation structure.
   
   Status: CONJECTURE → THEOREM
-  No new observables. Count remains 178.
+  No new observables. Count: 180.
   AGPL-3.0
 -}
 
@@ -6518,7 +6518,7 @@ fn test_engineering_genetic_ecc() {
 
 ---
 # §META
-Generated: 2026-03-28T15:41:38Z
+Generated: 2026-03-28T16:22:13Z
 Lines:     6517
 Size: 306 KB
 Source: https://github.com/CrystalToe/CrystalAgent

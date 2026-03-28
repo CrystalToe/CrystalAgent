@@ -193,3 +193,25 @@ magic-82 = refl
 
 magic-82-alt : (towerD ∸ 1) * N-w ≡ 82
 magic-82-alt = refl
+
+-- ══════════════════════════════════════════════════
+-- sin²θ_W CORRECTION (a₄ level, β₀ channel)
+-- +β₀/(d₄·Σd²) = 7/15600
+-- ══════════════════════════════════════════════════
+
+beta0-val : ℕ
+beta0-val = 7
+
+-- (11·N_c − 2·χ) = 21 = 3·β₀
+beta0-numerator : 11 * N-c ∸ 2 * chi ≡ 21
+beta0-numerator = refl
+
+sin2-corr-denom : d4 * sigma-d2 ≡ 15600
+sin2-corr-denom = refl
+
+beta0-eq : beta0-val ≡ 7
+beta0-eq = refl
+
+-- All three corrections share a₄ invariant
+all-share-a4 : sigma-d2 ≡ 650
+all-share-a4 = refl

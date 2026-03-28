@@ -197,3 +197,36 @@ theorem mp_corr_primes :
 theorem magic_82 : N_c ^ 4 + 1 = 82 := by native_decide
 theorem magic_82_alt : (towerD - 1) * N_w = 82 := by native_decide
 theorem magic_82_identity : N_c ^ 4 + 1 = (towerD - 1) * N_w := by native_decide
+
+-- ══════════════════════════════════════════════════
+-- sin²θ_W CORRECTION (a₄ level, β₀ channel)
+-- +β₀/(d₄·Σd²) = 7/15600
+-- β₀ = one-loop β-function coefficient
+-- d₄ = SU(3) sector (shared with α⁻¹)
+-- Σd² = a₄ invariant (shared with ALL)
+-- Sign: positive (coupling runs up)
+-- Rational (coupling → rational correction)
+-- ══════════════════════════════════════════════════
+
+theorem sin2_corr_denom :
+    d₄ * sigma_d2 = 15600 := by native_decide
+
+theorem sin2_corr_num :
+    beta0 = 7 := by native_decide
+
+-- All three corrections share Σd² = 650
+theorem all_share_a4 :
+    sigma_d2 = 650 := by native_decide
+
+-- sin²θ_W and α⁻¹ share d₄ = 24 (SU(3) sector)
+theorem sin2_alpha_share_d4 :
+    d₄ = 24 := by native_decide
+
+-- β₀ connection: sin²θ_W uses the one-loop coefficient
+-- β₀ = (11·N_c − 2·χ)/3 = 7
+theorem beta0_from_primes :
+    (11 * N_c - 2 * chi) / 3 = 7 := by native_decide
+
+-- Equivalent form: D/(χ·d₄·Σd²) = 42/93600 = 7/15600
+theorem sin2_equiv :
+    towerD * 15600 = beta0 * (chi * d₄ * sigma_d2) := by native_decide

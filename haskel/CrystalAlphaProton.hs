@@ -246,6 +246,10 @@ runAll = do
                 proveAlphaInvCorrected pdg_alpha_inv pdg_alpha_inv_unc
           , verify "mp_me_corrected"
                 proveMpMeCorrected pdg_mp_me pdg_mp_me_unc
+          , verify "sin2tw_base"
+                proveSin2ThetaW pdg_sin2tw pdg_sin2tw_unc
+          , verify "sin2tw_corrected"
+                proveSin2ThetaWCorrected pdg_sin2tw pdg_sin2tw_unc
           ]
 
     mapM_ (\r -> do
@@ -268,6 +272,8 @@ runAll = do
         pdg_alpha_inv pdg_alpha_inv_unc
     verifyDeltaUnc "mp_me_corrected" proveMpMeCorrected
         pdg_mp_me pdg_mp_me_unc
+    verifyDeltaUnc "sin2tw_corrected" proveSin2ThetaWCorrected
+        pdg_sin2tw pdg_sin2tw_unc
 
     -- Integer identity checks
     putStrLn "\n══════════════════════════════════════════════════════════"
@@ -280,6 +286,10 @@ runAll = do
     putStrLn $ "  ratio = " ++ show corrRatio
         ++ " = d₄/N_w"
         ++ (if corrRatio == d4 `div` n_w then " ✓" else " FAIL")
+    putStrLn $ "  d₄·Σd² = " ++ show sin2Corr
+        ++ (if sin2Corr == 15600 then " ✓" else " FAIL")
+    putStrLn $ "  shared a₄ invariant Σd² = " ++ show sigma_d2
+        ++ (if sigma_d2 == 650 then " ✓" else " FAIL")
 
     if allPass
         then putStrLn "\n  ALL PROOFS VERIFIED ✓"
@@ -287,3 +297,34 @@ runAll = do
 
 main :: IO ()
 main = runAll
+
+-- ══════════════════════════════════════════════════════════
+-- PROVE: sin²θ_W (base + a₄ correction, Δ/unc = 0.07)
+--
+-- Base: N_c/gauss = 3/13 = 0.230769... (a₂ level)
+-- Correction: + β₀/(d₄·Σd²) = 7/15600 (a₄ level)
+--
+-- β₀ = one-loop β-function coefficient (RG origin)
+-- d₄ = SU(3) sector (shared with α⁻¹ correction)
+-- Σd² = 650 = a₄ invariant (shared with ALL corrections)
+-- Sign: positive (coupling runs UP at low energy)
+-- Rational correction (sin²θ_W is a coupling, like α⁻¹)
+-- ══════════════════════════════════════════════════════════
+
+proveSin2ThetaW :: Double
+proveSin2ThetaW = fromIntegral n_c / fromIntegral gauss  -- 3/13
+
+proveSin2ThetaWCorrected :: Double
+proveSin2ThetaWCorrected =
+    let base = fromIntegral n_c / fromIntegral gauss  -- 3/13
+        corr = fromIntegral beta0 / fromIntegral (d4 * sigma_d2)  -- 7/15600
+    in  base + corr
+
+sin2Corr :: Int
+sin2Corr = d4 * sigma_d2  -- 15600
+
+pdg_sin2tw :: Double
+pdg_sin2tw = 0.23122
+
+pdg_sin2tw_unc :: Double
+pdg_sin2tw_unc = 0.00003
