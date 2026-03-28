@@ -2,7 +2,7 @@
 
 # Crystal Topos
 
-### 181 Physical Constants from Two Primes. Zero Free Parameters.
+### 180 Physical Constants from Two Primes. Zero Free Parameters.
 
 ### 📄 [Read the Paper: "The Crystal Topos: A Complete Physics Framework from A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)"](https://zenodo.org/records/19217129)
 
@@ -52,7 +52,7 @@ of nature? Why is this a big deal?
 
 ## What Is This?
 
-This repository contains a complete, proof-carrying implementation of the **Crystal Topos** — a framework that derives 181 physical constants from a single finite-dimensional algebra:
+This repository contains a complete, proof-carrying implementation of the **Crystal Topos** — a framework that derives 180 physical constants from a single finite-dimensional algebra:
 
 ```
 A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)
@@ -70,34 +70,18 @@ The deviations between crystal predictions and experiment follow an **exponentia
 
 | Metric | Value |
 |--------|-------|
-| Total observables | **181** |
+| Total observables | **180** |
 | Sub-1% accuracy | **169 / 172** (98%) (100%) |
-| Mean deviation (PWI) | **0.28%** |
+| Mean deviation (PWI) | **0.25%** |
 | Maximum deviation | **2.98%** |
-| CV (should be 1.0) | **1.15** (inside 95% CI) |
+| CV (should be 1.0) | **1.33** (inside 95% CI) |
 | Free parameters | **0** |
 | Hardcoded numbers | **0** in crystal formulas |
 | Wall breaches | **0** (prime wall = 4.5%) |
-| Haskell modules | **26** |
+| Haskell modules | **25** (9,700+ lines) |
 | Quantum operators | **96** |
-| Lean theorems | **578+** (native_decide, zero sorry) |
-| Agda theorems | **424+** (refl, zero sorry) |
-| Constants inside CODATA | **4** |
-
----
-
-## Four Constants Inside CODATA
-
-Four fundamental constants are derived from the algebra with zero free parameters, all inside CODATA experimental uncertainty:
-
-| Constant | PDG/CODATA Value | Crystal Value | Δ/unc |
-|----------|-----------------|---------------|-------|
-| α⁻¹ (fine structure) | 137.035999084(21) | 137.035999081 | **0.12** |
-| m_p/m_e (proton-electron mass ratio) | 1836.15267343(11) | 1836.15267345 | **0.04** |
-| sin²θ_W (weak mixing angle) | 0.23122(4) | 0.23122 | **0.07** |
-| r_p (proton charge radius) | 0.84087(39) fm | 0.84087 fm | **0.0013** |
-
-All four formulas use only the derived invariants of A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ). No fitting. No tuning.
+| Lean theorems | **537** (native_decide) |
+| Agda theorems | **391** (refl) |
 
 ---
 
@@ -161,7 +145,7 @@ m_π = m_p/β₀                     → 135 MeV    (0.34%)
 Λ_QCD = m_p × N_c/gauss          → 218 MeV
 m_e = Λ_h/(N_c²×N_w⁴×gauss)     → 0.512 MeV  (0.12%)
          ↓
-... all 181 observables
+... all 180 observables
 ```
 
 **Zero hardcoded numbers.** Every 53, 54, 257, 1872 computes from (2, 3).
@@ -185,34 +169,32 @@ CrystalAgent/
 │
 ├── crystal-topos/                     ← Rust core + Python bindings
 │   ├── src/                           ← 10 Rust modules (1,674 lines)
-│   ├── tests/                         ← 6 test files (235 tests)
+│   ├── tests/                         ← 5 test files (193 tests)
 │   ├── examples/                      ← 116 Python/HTML/JSX examples
 │   ├── Cargo.toml                     ← Rust crate config
 │   └── pyproject.toml                 ← pip install config
 │
 ├── proofs/                            ← Formal proofs + runner scripts
-│   ├── agda_proofs.sh                 ← 6/6 PASS
-│   ├── lean_proofs.sh                 ← 7/7 PASS (produces .olean)
-│   ├── haskell_proofs.sh              ← 9/9 PASS
+│   ├── agda_proofs.sh                 ← 5/5 PASS
+│   ├── lean_proofs.sh                 ← 6/6 PASS (produces .olean)
+│   ├── haskell_proofs.sh              ← 8/8 PASS
 │   ├── CrystalTopos.lean              ← 353 theorems
 │   ├── CrystalStructural.lean         ← 51 theorems
 │   ├── CrystalNoether.lean            ← 18 theorems
 │   ├── CrystalDiscoveries.lean        ← 35 theorems
-│   ├── CrystalAlphaProton.lean        ← 42 theorems
-│   ├── CrystalProtonRadius.lean       ← 25 theorems
+│   ├── CrystalAlphaProton.lean        ← 20 theorems
 │   ├── Main.lean                      ← 60 theorems
 │   ├── CrystalTopos.agda              ← 272 proofs by refl
 │   ├── CrystalStructural.agda         ← 49 proofs by refl
 │   ├── CrystalNoether.agda            ← 17 proofs by refl
 │   ├── CrystalDiscoveries.agda        ← 38 proofs by refl
-│   ├── CrystalAlphaProton.agda        ← 28 proofs by refl
-│   ├── CrystalProtonRadius.agda       ← 24 proofs by refl
+│   ├── CrystalAlphaProton.agda        ← 15 proofs by refl
 │   ├── *.olean                        ← Compiled Lean certificates
 │   ├── *.agdai                        ← Compiled Agda certificates
 │   ├── GHC_Certificate.txt            ← Runtime output
-│   └── crystal_*_proof.py             ← 6 Python proof modules
+│   └── crystal_*_proof.py             ← 5 Python proof modules (121/121)
 │
-└── haskel/                            ← All Haskell source code (26 modules)
+└── haskel/                            ← All Haskell source code (25 modules, 9,700+ lines)
     │
     ├── ─── ORIGINAL CRYSTAL (92 observables) ───
     │   CrystalAxiom.hs               ← Foundation: one law, spectrum, types
@@ -234,8 +216,7 @@ CrystalAgent/
     │   CrystalStructural.hs          ← Structural proof module
     │   CrystalNoether.hs             ← Noether proof module
     │   CrystalDiscoveries.hs         ← Discoveries proof module (magic_82)
-    │   CrystalAlphaProton.hs         ← α⁻¹ + m_p/m_e + sin²θ_W (18 prove functions)
-    │   CrystalProtonRadius.hs        ← Proton charge radius (11 prove functions)
+    │   CrystalAlphaProton.hs         ← α⁻¹ + m_p/m_e (5 prove functions)
     │
     ├── ─── QUANTUM LIBRARY (96 operators) ───
     │   CrystalQuantum.hs             ← Hub: 10 structural theorems
