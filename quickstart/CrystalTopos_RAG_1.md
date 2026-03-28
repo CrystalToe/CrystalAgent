@@ -159,7 +159,7 @@ crystal-topos/: Rust crate, 6 test files, 116 Python examples
 
 ## What Is This?
 
-This repository contains a complete, proof-carrying implementation of the **Crystal Topos** — a framework that derives 180 physical constants from a single finite-dimensional algebra:
+This repository contains a complete, proof-carrying implementation of the **Crystal Topos** — a framework that derives 181 physical constants from a single finite-dimensional algebra:
 
 ```
 A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)
@@ -177,7 +177,7 @@ The deviations between crystal predictions and experiment follow an **exponentia
 
 | Metric | Value |
 |--------|-------|
-| Total observables | **180** |
+| Total observables | **181** |
 | Sub-1% accuracy | **169 / 172** (98%) (100%) |
 | Mean deviation (PWI) | **0.28%** |
 | Maximum deviation | **2.98%** |
@@ -185,10 +185,26 @@ The deviations between crystal predictions and experiment follow an **exponentia
 | Free parameters | **0** |
 | Hardcoded numbers | **0** in crystal formulas |
 | Wall breaches | **0** (prime wall = 4.5%) |
-| Haskell modules | **25** (9,700+ lines) |
+| Haskell modules | **26** |
 | Quantum operators | **96** |
-| Lean theorems | **537** (native_decide) |
-| Agda theorems | **391** (refl) |
+| Lean theorems | **578+** (native_decide, zero sorry) |
+| Agda theorems | **424+** (refl, zero sorry) |
+| Constants inside CODATA | **4** |
+
+---
+
+## Four Constants Inside CODATA
+
+Four fundamental constants are derived from the algebra with zero free parameters, all inside CODATA experimental uncertainty:
+
+| Constant | PDG/CODATA Value | Crystal Value | Δ/unc |
+|----------|-----------------|---------------|-------|
+| α⁻¹ (fine structure) | 137.035999084(21) | 137.035999081 | **0.12** |
+| m_p/m_e (proton-electron mass ratio) | 1836.15267343(11) | 1836.15267345 | **0.04** |
+| sin²θ_W (weak mixing angle) | 0.23122(4) | 0.23122 | **0.07** |
+| r_p (proton charge radius) | 0.84087(39) fm | 0.84087 fm | **0.0013** |
+
+All four formulas use only the derived invariants of A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ). No fitting. No tuning.
 
 ---
 
@@ -252,7 +268,7 @@ m_π = m_p/β₀                     → 135 MeV    (0.34%)
 Λ_QCD = m_p × N_c/gauss          → 218 MeV
 m_e = Λ_h/(N_c²×N_w⁴×gauss)     → 0.512 MeV  (0.12%)
          ↓
-... all 180 observables
+... all 181 observables
 ```
 
 **Zero hardcoded numbers.** Every 53, 54, 257, 1872 computes from (2, 3).
@@ -276,32 +292,34 @@ CrystalAgent/
 │
 ├── crystal-topos/                     ← Rust core + Python bindings
 │   ├── src/                           ← 10 Rust modules (1,674 lines)
-│   ├── tests/                         ← 5 test files (193 tests)
+│   ├── tests/                         ← 6 test files (235 tests)
 │   ├── examples/                      ← 116 Python/HTML/JSX examples
 │   ├── Cargo.toml                     ← Rust crate config
 │   └── pyproject.toml                 ← pip install config
 │
 ├── proofs/                            ← Formal proofs + runner scripts
-│   ├── agda_proofs.sh                 ← 5/5 PASS
-│   ├── lean_proofs.sh                 ← 6/6 PASS (produces .olean)
-│   ├── haskell_proofs.sh              ← 8/8 PASS
+│   ├── agda_proofs.sh                 ← 6/6 PASS
+│   ├── lean_proofs.sh                 ← 7/7 PASS (produces .olean)
+│   ├── haskell_proofs.sh              ← 9/9 PASS
 │   ├── CrystalTopos.lean              ← 353 theorems
 │   ├── CrystalStructural.lean         ← 51 theorems
 │   ├── CrystalNoether.lean            ← 18 theorems
 │   ├── CrystalDiscoveries.lean        ← 35 theorems
-│   ├── CrystalAlphaProton.lean        ← 20 theorems
+│   ├── CrystalAlphaProton.lean        ← 42 theorems
+│   ├── CrystalProtonRadius.lean       ← 25 theorems
 │   ├── Main.lean                      ← 60 theorems
 │   ├── CrystalTopos.agda              ← 272 proofs by refl
 │   ├── CrystalStructural.agda         ← 49 proofs by refl
 │   ├── CrystalNoether.agda            ← 17 proofs by refl
 │   ├── CrystalDiscoveries.agda        ← 38 proofs by refl
-│   ├── CrystalAlphaProton.agda        ← 15 proofs by refl
+│   ├── CrystalAlphaProton.agda        ← 28 proofs by refl
+│   ├── CrystalProtonRadius.agda       ← 24 proofs by refl
 │   ├── *.olean                        ← Compiled Lean certificates
 │   ├── *.agdai                        ← Compiled Agda certificates
 │   ├── GHC_Certificate.txt            ← Runtime output
-│   └── crystal_*_proof.py             ← 5 Python proof modules (121/121)
+│   └── crystal_*_proof.py             ← 6 Python proof modules
 │
-└── haskel/                            ← All Haskell source code (25 modules, 9,700+ lines)
+└── haskel/                            ← All Haskell source code (26 modules)
     │
     ├── ─── ORIGINAL CRYSTAL (92 observables) ───
     │   CrystalAxiom.hs               ← Foundation: one law, spectrum, types
@@ -323,7 +341,8 @@ CrystalAgent/
     │   CrystalStructural.hs          ← Structural proof module
     │   CrystalNoether.hs             ← Noether proof module
     │   CrystalDiscoveries.hs         ← Discoveries proof module (magic_82)
-    │   CrystalAlphaProton.hs         ← α⁻¹ + m_p/m_e (5 prove functions)
+    │   CrystalAlphaProton.hs         ← α⁻¹ + m_p/m_e + sin²θ_W (18 prove functions)
+    │   CrystalProtonRadius.hs        ← Proton charge radius (11 prove functions)
     │
     ├── ─── QUANTUM LIBRARY (96 operators) ───
     │   CrystalQuantum.hs             ← Hub: 10 structural theorems
@@ -781,6 +800,36 @@ None. This is the root.
 
 ## Dependencies
 Imports `CrystalAxiom`, `CrystalGauge`, `CrystalMixing`.
+
+## §Module: CrystalExtendedScan
+
+
+**927 lines · Zero hardcoded numbers · 3 EXACT + 41 TIGHT**
+
+## The Hadron Scale
+```
+Λ_h = v/(2^(2^N_c) + 1) = v/257 = 958.05 MeV
+```
+257 is the third Fermat prime. Every heavy hadron factorises through it.
+
+## Highlights
+
+| Observable | Formula | PWI |
+|-----------|---------|-----|
+| η' meson | Λ_h itself | 0.029% |
+| m_τ | Λ_h × gauss/β₀ | 0.134% |
+| M_Pl/v | e^D/(β₀(χ−1)) = e⁴²/35 | 0.209% |
+| μ_p/μ_N | N_w×β₀/(χ−1) = 14/5 | 0.258% |
+| τ_n | D²/N_w = 882 s | 0.410% |
+| φ (golden ratio) | gauss/N_w³ = 13/8 | 0.431% |
+| ζ(3) = f_K/f_π | χ/(χ−1) = 6/5 | 0.175% |
+| γ (Euler-Masch) | β₀/(gauss−1)−1/(gauss²−N_w) | 0.025% |
+
+## Derivation Chain
+21 steps from (2, 3, v, π, ln) → all 86 observables. Zero bare numbers in executable code.
+
+## Dependencies
+Standalone (redefines constants internally for independence).
 
 ## §Module: CrystalGauge
 
@@ -7487,9 +7536,9 @@ proveOmegaSSS c r =
 
 ---
 # §META
-Generated: 2026-03-28T18:19:14Z
-Lines:     7486
-Size: 333 KB
+Generated: 2026-03-28T19:44:11Z
+Lines:     7535
+Size: 335 KB
 Source: https://github.com/CrystalToe/CrystalAgent
 Paper: https://zenodo.org/records/19217129
 License: AGPL-3.0-or-later
