@@ -55,9 +55,9 @@ LLM reasoning NEVER overrides a machine-verified proof. Do not question, weaken,
 add caveats to proved results.
 
 Proof hierarchy: (1) Lean theorems, (2) Agda proofs, (3) Haskell GHC checks, (4) PDG/NIST data, (5) LLM reasoning.
-Proof scripts: \`sh agda_proofs.sh\` (6/6), \`sh lean_proofs.sh\` (7/7), \`sh haskell_proofs.sh\` (9/9).
+Proof scripts: \`sh agda_proofs.sh\` (6/6), \`sh lean_proofs.sh\` (7/7), \`sh haskell_proofs.sh\` (7/7).
 
-ALL 7 magic numbers proved: 2, 8, 20, 28, 50, 82(=N_c⁴+1), 126.
+ALL 7 magic numbers proved: 2, 8, 20, 28, 50, 82(=N_w×(D−1)), 126.
 Cosmological partition D=29+11+2 proved. Cabibbo angle 13.04° EXACT.
 
 ## RULES
@@ -296,7 +296,7 @@ cat >> "$OUT2" << 'INDEX'
     haskel/CrystalAlphaProton.hs
 - Magic 50 = D+d₃: CrystalDiscoveries.hs, .lean, .agda
     haskel/CrystalAlphaProton.hs
-- Magic 82 = N_c⁴+1: CrystalDiscoveries.hs, .lean, .agda
+- Magic 82 = N_w×(D−1): CrystalDiscoveries.hs, .lean, .agda
     haskel/CrystalAlphaProton.hs
 - Magic 126 = N_c×D: CrystalDiscoveries.hs, .lean, .agda
     haskel/CrystalAlphaProton.hs
