@@ -1299,7 +1299,7 @@ boundaryLedger =
 -- ═══════════════════════════════════════════════════════════════════════
 --
 -- This module adds ~86 NEW observables to the Crystal Topos catalogue.
--- Combined with the original 92, the crystal now covers 180 observables.
+-- Combined with the original 92, the crystal now covers 181 observables.
 --
 -- Every formula uses only (2,3) lattice invariants:
 --   N_w = 2, N_c = 3, χ = 6, β₀ = 7, D = 42, Σd = 36, Σd² = 650,
@@ -1333,7 +1333,7 @@ boundaryLedger =
 --        → m_e = Λ_h/(N_c²×N_w⁴×gauss)  (electron)
 --        → m_μ = m_e × N_w⁴ × gauss   (muon)
 --        → f_π = Λ_QCD × N_c/β₀       (pion decay constant)
---        → all 44 observables
+--        → all 86 observables
 -- ═══════════════════════════════════════════════════════════════════════
 
 -- | The two primes that build the world.
@@ -2761,8 +2761,8 @@ wacaScanAudit = do
   putStrLn "═══════════════════════════════════════════════════════════════"
   putStrLn "═══════════════════════════════════════════════════════════════"
   putStrLn ""
-  putStrLn "New observables discovered: 44"
-  putStrLn "Combined catalogue: 92 + 44 = 136 (+ exactified R-ratio = 137)"
+  putStrLn "New observables discovered: 86"
+  putStrLn "Combined catalogue: 92 + 86 + 3 = 181"
   putStrLn ""
   putStrLn $ padR 40 "Observable" ++ padR 12 "Crystal" ++ padR 12 "PDG"
           ++ padR 10 "PWI(%)" ++ "Rating"
@@ -2849,8 +2849,8 @@ wacaScanAudit = do
 --     kaon/pion decay ratio, and a number-theoretic constant are
 --     ALL the same crystal fraction.
 --
--- TOTAL NEW:  44 observables, 0 wall breaches.
--- TOTAL CATALOGUE: 92 + 44 = 136 observables.
+-- TOTAL NEW:  86 observables, 0 wall breaches.
+-- TOTAL CATALOGUE: 92 + 86 + 3 = 181 observables.
 -- Still exponential. Still CV ≈ 1. Still under the wall.
 -- ═══════════════════════════════════════════════════════════════════════
 
@@ -4970,12 +4970,12 @@ Run:          ./crystal
 
 ╔══════════════════════════════════════════════════════════════════╗
 ║  CRYSTAL TOPOS — PROOF-CARRYING IMPLEMENTATION (modular v14)   ║
-║  8 modules. 53 observables. Full QCD hadron spectrum.          ║
+║  8 modules. 92 observables. Full QCD hadron spectrum.          ║
 ╚══════════════════════════════════════════════════════════════════╝
 
 ══ §0 THE ONE LAW ══
   Phys = End(A_F) + Nat(End(A_F)). 650 endomorphisms. Nothing else.
-  Endomorphisms of A_F: 650. This codebase: 53 observables from them.
+  Endomorphisms of A_F: 650. This codebase: 92 observables from them.
 
 ══ §1 AXIOM ══
   N_w = 2   N_c = 3   χ = 6   β₀ = 7   D = 42   Σd = 36   Σd² = 650
@@ -5474,7 +5474,7 @@ Run:          ./crystal
 
 ╔══════════════════════════════════════════════════════════════════╗
 ║  CURRY–HOWARD CERTIFICATE (modular v14)                        ║
-║  8 modules. 53 observables. The One Law: End(A_F) + Nat.       ║
+║  8 modules. 92 observables. The One Law: End(A_F) + Nat.       ║
 ║  All from A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ). Zero free parameters.   ║
 ╚══════════════════════════════════════════════════════════════════╝
 
@@ -6832,7 +6832,7 @@ mod proton_radius_tests {
 
 ---
 # §META
-Generated: 2026-03-28T23:43:01Z
+Generated: 2026-03-29T11:45:45Z
 Lines:     6829
 Size: 315 KB
 Source: https://github.com/CrystalToe/CrystalAgent

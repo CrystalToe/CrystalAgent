@@ -3441,18 +3441,18 @@ dm_b = (d_total()+1) / n_w()**3
 print(f"\n  Ω_DM/Ω_b = (D+1)/N_w³ = {d_total()+1}/{n_w()**3} = {dm_b:.4f}")
 print(f"  Planck: 5.36, PWI: {abs(dm_b-5.36)/5.36*100:.2f}%")
 
-## §Example 50: 50 — The Complete Catalogue: 180 Observables from 2 and 3
-"""50 — The Complete Catalogue: 180 Observables from 2 and 3"""
+## §Example 50: 50 — The Complete Catalogue: 181 Observables from 2 and 3
+"""50 — The Complete Catalogue: 181 Observables from 2 and 3"""
                            sigma_d2, d_total, crystal_kappa, crystal_max_entropy)
 print("╔════════════════════════════════════════════════════════╗")
 print("║  THE COMPLETE CRYSTAL TOPOS CATALOGUE                 ║")
-print("║  180 observables · 0 free parameters · (2,3) only     ║")
+print("║  181 observables · 0 free parameters · (2,3) only     ║")
 print("╚════════════════════════════════════════════════════════╝")
 print(f"\n  N_w = {n_w()}, N_c = {n_c()}")
 print(f"  χ = {chi()}, β₀ = {beta0()}, D = {d_total()}, Σd = {sigma_d()}")
 print(f"  Σd² = {sigma_d2()}, gauss = {gauss()}, κ = {crystal_kappa():.6f}")
 print(f"\n  ORIGINAL CRYSTAL: 92 observables")
-print(f"  TOTAL: 180 observables, 100% sub-1%, mean PWI 0.205%")
+print(f"  TOTAL: 181 observables, 100% sub-1%, mean PWI 0.205%")
 print(f"    Mesons:              10    Thermodynamics:       3")
 print(f"    Baryons:              7    Fluid dynamics:       5")
 print(f"    Quark masses:         5    Color confinement:    3")
@@ -4997,7 +4997,7 @@ Core physics derivations. Comments explain WHY each formula works.
 {- |
 Module      : CrystalAxiom
 Description : Foundation — axiom, spectrum, types, constants, Heyting algebra
-License     : MIT
+License     : AGPL-3.0-or-later
 -}
 
 {-# LANGUAGE GADTs                 #-}
@@ -5099,7 +5099,7 @@ License     : MIT
 --  The crystal doesn't change. Your projection does.
 --
 -- THE HASKELL CODE IS THE PROOF:
---  This codebase computes 53 observables from End(A_F).
+--  This codebase computes 92 observables from End(A_F).
 --  48/53 are sub-1%. 5 are EXACT rationals.
 --  Zero free parameters. Zero imported physics.
 --  Every function traces to nW = 2, nC = 3.
@@ -7519,7 +7519,7 @@ proveOmegaSSS c r =
 
 ---
 # §META
-Generated: 2026-03-28T23:43:01Z
+Generated: 2026-03-29T11:45:45Z
 Lines:     7516
 Size: 334 KB
 Source: https://github.com/CrystalToe/CrystalAgent
