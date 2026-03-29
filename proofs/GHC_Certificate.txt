@@ -1,12 +1,12 @@
 
 ╔══════════════════════════════════════════════════════════════════╗
 ║  CRYSTAL TOPOS — PROOF-CARRYING IMPLEMENTATION (modular v14)   ║
-║  8 modules. 53 observables. Full QCD hadron spectrum.          ║
+║  8 modules. 92 observables. Full QCD hadron spectrum.          ║
 ╚══════════════════════════════════════════════════════════════════╝
 
 ══ §0 THE ONE LAW ══
   Phys = End(A_F) + Nat(End(A_F)). 650 endomorphisms. Nothing else.
-  Endomorphisms of A_F: 650. This codebase: 53 observables from them.
+  Endomorphisms of A_F: 650. This codebase: 92 observables from them.
 
 ══ §1 AXIOM ══
   N_w = 2   N_c = 3   χ = 6   β₀ = 7   D = 42   Σd = 36   Σd² = 650
@@ -505,7 +505,7 @@
 
 ╔══════════════════════════════════════════════════════════════════╗
 ║  CURRY–HOWARD CERTIFICATE (modular v14)                        ║
-║  8 modules. 53 observables. The One Law: End(A_F) + Nat.       ║
+║  8 modules. 92 observables. The One Law: End(A_F) + Nat.       ║
 ║  All from A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ). Zero free parameters.   ║
 ╚══════════════════════════════════════════════════════════════════╝
 
