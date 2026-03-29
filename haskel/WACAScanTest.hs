@@ -14,7 +14,7 @@ main :: IO ()
 main = do
   putStrLn ""
   putStrLn "╔═══════════════════════════════════════════════════════════════╗"
-  putStrLn "║   44 New Observables · All Under Prime Wall · (2,3) Only    ║"
+  putStrLn "║   86 New Observables · All Under Prime Wall · (2,3) Only    ║"
   putStrLn "╚═══════════════════════════════════════════════════════════════╝"
   putStrLn ""
   

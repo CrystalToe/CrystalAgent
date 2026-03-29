@@ -34,7 +34,7 @@ main = do
   putStrLn ""
   putStrLn "╔══════════════════════════════════════════════════════════════════╗"
   putStrLn "║  CRYSTAL TOPOS — PROOF-CARRYING IMPLEMENTATION (modular v14)   ║"
-  putStrLn "║  8 modules. 53 observables. Full QCD hadron spectrum.          ║"
+  putStrLn "║  8 modules. 92 observables. Full QCD hadron spectrum.          ║"
   putStrLn "╚══════════════════════════════════════════════════════════════════╝"
   putStrLn ""
 
@@ -42,7 +42,7 @@ main = do
   putStrLn "══ §0 THE ONE LAW ══"
   let (endos, statement) = theOneLaw c
   printf "  %s\n" statement
-  printf "  Endomorphisms of A_F: %d. This codebase: 53 observables from them.\n" endos
+  printf "  Endomorphisms of A_F: %d. This codebase: 92 observables from them.\n" endos
   putStrLn ""
 
   -- ── Axiom ──
@@ -554,7 +554,7 @@ main = do
   -- ── Certificate ──
   putStrLn "╔══════════════════════════════════════════════════════════════════╗"
   putStrLn "║  CURRY–HOWARD CERTIFICATE (modular v14)                        ║"
-  putStrLn "║  8 modules. 53 observables. The One Law: End(A_F) + Nat.       ║"
+  putStrLn "║  8 modules. 92 observables. The One Law: End(A_F) + Nat.       ║"
   putStrLn "║  All from A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ). Zero free parameters.   ║"
   putStrLn "╚══════════════════════════════════════════════════════════════════╝"
   putStrLn ""

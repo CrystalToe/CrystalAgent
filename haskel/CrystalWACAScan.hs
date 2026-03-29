@@ -5,7 +5,7 @@
 -- ═══════════════════════════════════════════════════════════════════════
 --
 -- This module adds ~86 NEW observables to the Crystal Topos catalogue.
--- Combined with the original 92, the crystal now covers 180 observables.
+-- Combined with the original 92, the crystal now covers 181 observables.
 --
 -- Every formula uses only (2,3) lattice invariants:
 --   N_w = 2, N_c = 3, χ = 6, β₀ = 7, D = 42, Σd = 36, Σd² = 650,
@@ -105,7 +105,7 @@ module CrystalWACAScan
 --        → m_e = Λ_h/(N_c²×N_w⁴×gauss)  (electron)
 --        → m_μ = m_e × N_w⁴ × gauss   (muon)
 --        → f_π = Λ_QCD × N_c/β₀       (pion decay constant)
---        → all 44 observables
+--        → all 86 observables
 -- ═══════════════════════════════════════════════════════════════════════
 
 -- | The two primes that build the world.
@@ -1533,8 +1533,8 @@ wacaScanAudit = do
   putStrLn "═══════════════════════════════════════════════════════════════"
   putStrLn "═══════════════════════════════════════════════════════════════"
   putStrLn ""
-  putStrLn "New observables discovered: 44"
-  putStrLn "Combined catalogue: 92 + 44 = 136 (+ exactified R-ratio = 137)"
+  putStrLn "New observables discovered: 86"
+  putStrLn "Combined catalogue: 92 + 86 + 3 = 181"
   putStrLn ""
   putStrLn $ padR 40 "Observable" ++ padR 12 "Crystal" ++ padR 12 "PDG"
           ++ padR 10 "PWI(%)" ++ "Rating"
@@ -1621,8 +1621,8 @@ wacaScanAudit = do
 --     kaon/pion decay ratio, and a number-theoretic constant are
 --     ALL the same crystal fraction.
 --
--- TOTAL NEW:  44 observables, 0 wall breaches.
--- TOTAL CATALOGUE: 92 + 44 = 136 observables.
+-- TOTAL NEW:  86 observables, 0 wall breaches.
+-- TOTAL CATALOGUE: 92 + 86 + 3 = 181 observables.
 -- Still exponential. Still CV ≈ 1. Still under the wall.
 -- ═══════════════════════════════════════════════════════════════════════
 
