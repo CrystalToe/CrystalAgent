@@ -4,7 +4,7 @@
 {- |
 Module      : CrystalAxiom
 Description : Foundation — axiom, spectrum, types, constants, Heyting algebra
-License     : MIT
+License     : AGPL-3.0-or-later
 -}
 
 {-# LANGUAGE GADTs                 #-}
@@ -141,7 +141,7 @@ import Data.Ratio (Rational, (%), numerator, denominator)
 --  The crystal doesn't change. Your projection does.
 --
 -- THE HASKELL CODE IS THE PROOF:
---  This codebase computes 53 observables from End(A_F).
+--  This codebase computes 92 observables from End(A_F).
 --  48/53 are sub-1%. 5 are EXACT rationals.
 --  Zero free parameters. Zero imported physics.
 --  Every function traces to nW = 2, nC = 3.

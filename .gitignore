@@ -19,11 +19,7 @@ __pycache__/
 # Lean
 haskel/LeanCert/.lake/
 
-# Haskell
-*.o
-*.hi
-*.dyn_o
-*.dyn_hi
+
 
 # OS
 .DS_Store
@@ -35,3 +31,17 @@ files.zip
 INTERNAL_README.md
 CHANGELOG.md
 branch_gate.sh
+
+
+# Haskell build artifacts
+*.o
+*.hi
+*.dyn_o
+*.dyn_hi
+
+# Compiled binaries (haskel/)
+haskel/crystal
+haskel/alpha_proton
+haskel/proton_radius
+haskel/extended_scan
+haskel/full_test

@@ -113,7 +113,7 @@ verifications =
   Recovery: when η is iso, η† = η⁻¹, so ‖η‖ = 0 and F̃ = F exactly.
   Classical: Noether 1918 is the C=ℝ, D=Vect, F=tangent bundle case.
 
-  The 180 observables of Crystal Topos are CONSEQUENCES of this theorem
+  The 181 observables of Crystal Topos are CONSEQUENCES of this theorem
   applied to the representation categories of A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ).
 -}
 
