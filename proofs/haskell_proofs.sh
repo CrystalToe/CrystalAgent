@@ -23,7 +23,7 @@ cd "$HASKEL"
 cleanup() {
   cd "$HASKEL"
   rm -f *.o *.hi
-  rm -f crystal structural noether discoveries alpha_proton proton_radius extended_scan hierarchy_test full_test
+  rm -f crystal structural noether discoveries alpha_proton proton_radius extended_scan hierarchy_test full_test crystal_layer
 }
 trap cleanup EXIT
 
@@ -95,6 +95,9 @@ run_exe "CrystalHierarchy.hs (S8)"  "CrystalHierarchy.hs"  "CrystalHierarchy"  "
 
 # 9. Full 181-observable regression test (S7+S8)
 run_exe "CrystalFullTest.hs (181 obs)"  "CrystalFullTest.hs"  "CrystalFullTest"  "full_test"
+
+# 10. Spectral tower layer provenance (S11)
+run_exe "CrystalLayer.hs (S11 tower)"  "CrystalLayer.hs"  "CrystalLayer"  "crystal_layer"
 
 # Tally (cleanup runs automatically via trap)
 TOTAL=$((PASS+FAIL))

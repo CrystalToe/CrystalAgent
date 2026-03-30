@@ -16,6 +16,7 @@ FILES=(
   CrystalDiscoveries.lean
   CrystalAlphaProton.lean
   CrystalProtonRadius.lean
+  CrystalLayer.lean
   Main.lean
 )
 

@@ -16,6 +16,7 @@ FILES=(
   CrystalDiscoveries.agda
   CrystalAlphaProton.agda
   CrystalProtonRadius.agda
+  CrystalLayer.agda
 )
 
 PASS=0
