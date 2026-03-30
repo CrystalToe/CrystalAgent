@@ -31,6 +31,7 @@ fi
 PROOFS="$REPO/proofs"
 HASKEL="$REPO/haskel"
 RUST="$REPO/crystal-topos"
+EXAMPLES="$REPO/crystal-topos/examples"
 BASELINE="$PROOFS/proof_manifest.baseline"
 CANDIDATE="/tmp/proof_manifest.candidate.$$"
 
@@ -46,9 +47,14 @@ generate_manifest() {
   echo "# LEAN THEOREMS" >> "$out"
   for f in CrystalTopos.lean CrystalStructural.lean CrystalNoether.lean \
            CrystalDiscoveries.lean CrystalAlphaProton.lean \
-           CrystalProtonRadius.lean CrystalLayer.lean Main.lean; do
+           CrystalProtonRadius.lean CrystalLayer.lean Main.lean \
+           CrystalGravityDyn.lean; do
     if [ -f "$PROOFS/$f" ]; then
       grep "^theorem " "$PROOFS/$f" | sed "s/theorem \([^ :]*\).*/LEAN $f \1/" >> "$out"
+    fi
+    # Also check haskel/LeanCert/ for Lean files
+    if [ -f "$HASKEL/LeanCert/$f" ]; then
+      grep "^theorem " "$HASKEL/LeanCert/$f" | sed "s/theorem \([^ :]*\).*/LEAN $f \1/" >> "$out"
     fi
   done
 
@@ -56,8 +62,10 @@ generate_manifest() {
   local lean_files=0
   for f in CrystalTopos.lean CrystalStructural.lean CrystalNoether.lean \
            CrystalDiscoveries.lean CrystalAlphaProton.lean \
-           CrystalProtonRadius.lean CrystalLayer.lean Main.lean; do
+           CrystalProtonRadius.lean CrystalLayer.lean Main.lean \
+           CrystalGravityDyn.lean; do
     [ -f "$PROOFS/$f" ] && lean_files=$((lean_files + 1))
+    [ -f "$HASKEL/LeanCert/$f" ] && lean_files=$((lean_files + 1))
   done
   echo "LEAN_FILES $lean_files" >> "$out"
 
@@ -65,9 +73,19 @@ generate_manifest() {
   echo "# AGDA PROOFS" >> "$out"
   for f in CrystalTopos.agda CrystalStructural.agda CrystalNoether.agda \
            CrystalDiscoveries.agda CrystalAlphaProton.agda \
-           CrystalProtonRadius.agda CrystalLayer.agda; do
+           CrystalProtonRadius.agda CrystalLayer.agda \
+           CrystalGravityDyn.agda; do
+    # Check proofs/ dir
     if [ -f "$PROOFS/$f" ]; then
       grep -B1 "= refl" "$PROOFS/$f" | grep -v "= refl" | grep -v "^--" | \
+        sed 's/^ *//' | sed "s/ .*//" | grep -v "^$" | \
+        while read -r name; do
+          echo "AGDA $f $name"
+        done >> "$out"
+    fi
+    # Check haskel/ dir (where agda files also live)
+    if [ -f "$HASKEL/$f" ]; then
+      grep -B1 "= refl" "$HASKEL/$f" | grep -v "= refl" | grep -v "^--" | \
         sed 's/^ *//' | sed "s/ .*//" | grep -v "^$" | \
         while read -r name; do
           echo "AGDA $f $name"
@@ -79,8 +97,10 @@ generate_manifest() {
   local agda_files=0
   for f in CrystalTopos.agda CrystalStructural.agda CrystalNoether.agda \
            CrystalDiscoveries.agda CrystalAlphaProton.agda \
-           CrystalProtonRadius.agda CrystalLayer.agda; do
+           CrystalProtonRadius.agda CrystalLayer.agda \
+           CrystalGravityDyn.agda; do
     [ -f "$PROOFS/$f" ] && agda_files=$((agda_files + 1))
+    [ -f "$HASKEL/$f" ] && agda_files=$((agda_files + 1))
   done
   echo "AGDA_FILES $agda_files" >> "$out"
 
@@ -89,7 +109,16 @@ generate_manifest() {
   for f in Main.hs CrystalStructural.hs CrystalNoether.hs \
            CrystalDiscoveries.hs CrystalAlphaProton.hs \
            CrystalProtonRadius.hs WACAScanTest.hs \
-           CrystalHierarchy.hs CrystalLayer.hs; do
+           CrystalHierarchy.hs CrystalLayer.hs \
+           CrystalAxiom.hs CrystalGauge.hs CrystalMixing.hs \
+           CrystalCosmo.hs CrystalQCD.hs CrystalGravity.hs \
+           CrystalAudit.hs CrystalCrossDomain.hs CrystalRiemann.hs \
+           CrystalWACAScan.hs CrystalQuantum.hs \
+           CrystalQBase.hs CrystalQGates.hs CrystalQChannels.hs \
+           CrystalQHamiltonians.hs CrystalQMeasure.hs \
+           CrystalQEntangle.hs CrystalQAlgorithms.hs \
+           CrystalQSimulation.hs \
+           CrystalGravityDyn.hs GravityDynTest.hs; do
     [ -f "$HASKEL/$f" ] && echo "HASKELL $f" >> "$out"
   done
 
@@ -102,6 +131,15 @@ generate_manifest() {
   echo "# RUST TESTS" >> "$out"
   if [ -d "$RUST/tests" ]; then
     for f in "$RUST"/tests/*.rs; do
+      [ -f "$f" ] || continue
+      local fname=$(basename "$f")
+      grep -A1 "#\[test\]" "$f" 2>/dev/null | grep "fn " | \
+        sed "s/.*fn \([^ (]*\).*/RUST $fname \1/" >> "$out"
+    done
+  fi
+  if [ -d "$RUST/src" ]; then
+    for f in "$RUST"/src/*.rs; do
+      [ -f "$f" ] || continue
       local fname=$(basename "$f")
       grep -A1 "#\[test\]" "$f" 2>/dev/null | grep "fn " | \
         sed "s/.*fn \([^ (]*\).*/RUST $fname \1/" >> "$out"
@@ -111,9 +149,20 @@ generate_manifest() {
   # ── Rust test count per file ──
   if [ -d "$RUST/tests" ]; then
     for f in "$RUST"/tests/*.rs; do
+      [ -f "$f" ] || continue
       local fname=$(basename "$f")
-      local count=$(grep -c "#\[test\]" "$f" 2>/dev/null || echo 0)
+      local count
+      count=$(grep -c "#\[test\]" "$f" 2>/dev/null) || count=0
       echo "RUST_COUNT $fname $count" >> "$out"
+    done
+  fi
+  if [ -d "$RUST/src" ]; then
+    for f in "$RUST"/src/*.rs; do
+      [ -f "$f" ] || continue
+      local fname=$(basename "$f")
+      local count
+      count=$(grep -c "#\[test\]" "$f" 2>/dev/null) || count=0
+      [ "$count" -gt 0 ] && echo "RUST_COUNT $fname $count" >> "$out"
     done
   fi
 
@@ -123,6 +172,12 @@ generate_manifest() {
     if [ -f "$f" ]; then
       local fname=$(basename "$f")
       echo "PYTHON $fname" >> "$out"
+    fi
+  done
+  # Session 12: gravity computation files in examples/
+  for f in mera_gravity_closed.py mera_linearized_gravity.py spectral_tower.py qubo_folder.py; do
+    if [ -f "$EXAMPLES/$f" ]; then
+      echo "PYTHON $f" >> "$out"
     fi
   done
 
@@ -219,8 +274,8 @@ echo "  Checking proof counts..."
 
 check_count() {
   local label="$1"
-  local base=$(grep "^$label " "$BASELINE" | awk '{print $2}')
-  local cand=$(grep "^$label " "$CANDIDATE" | awk '{print $2}')
+  local base=$(grep "^$label " "$BASELINE" | head -1 | awk '{print $2}')
+  local cand=$(grep "^$label " "$CANDIDATE" | head -1 | awk '{print $2}')
   base=${base:-0}
   cand=${cand:-0}
 
@@ -249,7 +304,7 @@ grep "^RUST_COUNT " "$BASELINE" > "$TMPCHECK" 2>/dev/null || true
 while IFS= read -r line; do
   fname=$(echo "$line" | awk '{print $2}')
   base_count=$(echo "$line" | awk '{print $3}')
-  cand_count=$(grep "^RUST_COUNT $fname" "$CANDIDATE" | awk '{print $3}')
+  cand_count=$(grep "^RUST_COUNT $fname " "$CANDIDATE" | head -1 | awk '{print $3}')
   cand_count=${cand_count:-0}
   if [ "$cand_count" -lt "$base_count" ]; then
     echo "    FAIL: Rust $fname decreased from $base_count to $cand_count"
@@ -276,10 +331,10 @@ fi
 
 # ── Verdict ──
 echo ""
-echo "  ══════════════════════════════════════════"
+echo "  ============================================="
 if [ "$FAIL" -gt 0 ]; then
-  echo "  RESULT: FAIL — $FAIL proof(s) lost or count(s) decreased"
-  echo "  ══════════════════════════════════════════"
+  echo "  RESULT: FAIL -- $FAIL proof(s) lost or count(s) decreased"
+  echo "  ============================================="
   exit 1
 else
   echo "  RESULT: PASS"
@@ -289,6 +344,6 @@ else
   else
     echo "    No changes from baseline"
   fi
-  echo "  ══════════════════════════════════════════"
+  echo "  ============================================="
   exit 0
 fi
