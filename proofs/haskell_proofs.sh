@@ -2,7 +2,7 @@
 # Copyright (c) 2026 Daland Montgomery
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# Haskell proof runner — Session 6
+# Haskell proof runner — Session 8
 set -e
 
 # Find repo root (works from proofs/, haskel/, or repo root)
@@ -23,11 +23,11 @@ cd "$HASKEL"
 cleanup() {
   cd "$HASKEL"
   rm -f *.o *.hi
-  rm -f crystal structural noether discoveries alpha_proton proton_radius extended_scan
+  rm -f crystal structural noether discoveries alpha_proton proton_radius extended_scan hierarchy_test full_test
 }
 trap cleanup EXIT
 
-echo "=== Haskell Proof Runner (Session 6) ==="
+echo "=== Haskell Proof Runner (Session 8) ==="
 echo "    Running from: $(pwd)"
 echo "    Certificate:  $PROOFS/GHC_Certificate.txt"
 echo ""
@@ -89,6 +89,12 @@ run_exe "CrystalProtonRadius.hs (S6)"    "CrystalProtonRadius.hs" "CrystalProton
 
 # 7. Extended scan (module Main)
 run_main "Extended scan" "WACAScanTest.hs" "extended_scan"
+
+# 8. Hierarchical implosion (S8)
+run_exe "CrystalHierarchy.hs (S8)"  "CrystalHierarchy.hs"  "CrystalHierarchy"  "hierarchy_test"
+
+# 9. Full 181-observable regression test (S7+S8)
+run_exe "CrystalFullTest.hs (181 obs)"  "CrystalFullTest.hs"  "CrystalFullTest"  "full_test"
 
 # Tally (cleanup runs automatically via trap)
 TOTAL=$((PASS+FAIL))

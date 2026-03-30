@@ -215,3 +215,77 @@ beta0-eq = refl
 -- All three corrections share a₄ invariant
 all-share-a4 : sigma-d2 ≡ 650
 all-share-a4 = refl
+
+-- ══════════════════════════════════════════════════
+-- SESSION 8: HIERARCHICAL IMPLOSION — 5 DUAL ROUTES
+-- ══════════════════════════════════════════════════
+
+-- m_Υ: N_c³/(χ·Σd) = N_c²/(N_w·Σd) = 1/8
+-- Cross-multiply: N_c³·N_w·Σd = N_c²·χ·Σd
+-- Simplifies to: N_c·N_w = χ (which is the definition)
+upsilon-dual : N-c ^ 3 * (N-w * sigma-d) ≡ N-c ^ 2 * (chi * sigma-d)
+upsilon-dual = refl
+
+upsilon-corr : N-c ^ 3 * 8 ≡ chi * sigma-d
+upsilon-corr = refl
+
+-- m_D: D/(d₄·Σd) = 7/144
+-- Cross-multiply: D·144 = 7·d₄·Σd
+dmeson-dual : towerD * 144 ≡ 7 * (d4 * sigma-d)
+dmeson-dual = refl
+
+-- D = Σd + χ (the split identity)
+dmeson-split : towerD ≡ sigma-d + chi
+dmeson-split = refl
+
+-- m_ρ: T_F/χ = N_c/Σd = 1/12
+-- Cross-multiply: Σd = 2·χ·N_c (since T_F = 1/2)
+rho-dual : sigma-d ≡ 2 * chi * N-c
+rho-dual = refl
+
+-- m_φ: N_w/(N_c·Σd) = (d₄−d₃)/(d₄·Σd) = 1/54
+-- Cross-multiply: N_w·d₄·Σd = (d₄−d₃)·N_c·Σd
+phi-dual : N-w * (d4 * sigma-d) ≡ (d4 ∸ d3) * (N-c * sigma-d)
+phi-dual = refl
+
+-- Supporting: d₄ − d₃ = N_w·d₃ = 16
+phi-d4-minus-d3 : d4 ∸ d3 ≡ N-w * d3
+phi-d4-minus-d3 = refl
+
+-- Supporting: d₃·N_c = d₄
+phi-d3-nc : d3 * N-c ≡ d4
+phi-d3-nc = refl
+
+-- Ω_DM: gauss·(gauss−N_c) = N_w·(χ−1)·gauss = 130
+omega-dm-dual : gauss * (gauss ∸ N-c) ≡ N-w * (chi ∸ 1) * gauss
+omega-dm-dual = refl
+
+omega-dm-val : gauss * (gauss ∸ N-c) ≡ 130
+omega-dm-val = refl
+
+-- gauss − N_c = N_w·(χ−1) = 10
+omega-dm-identity : gauss ∸ N-c ≡ N-w * (chi ∸ 1)
+omega-dm-identity = refl
+
+-- r_p (session 6): 2·d₃·Σd = d₄²
+rp-dual : 2 * d3 * sigma-d ≡ d4 ^ 2
+rp-dual = refl
+
+-- sin²θ₁₃: (D+d_w)·N_w²·(χ−1)² = Σd·(χ−1)³ = 4500
+d-w : ℕ
+d-w = N-w ^ 2 ∸ 1  -- 3
+
+sin13-dual : (towerD + d-w) * (N-w ^ 2) * ((chi ∸ 1) ^ 2) ≡ sigma-d * ((chi ∸ 1) ^ 3)
+sin13-dual = refl
+
+sin13-corr : (towerD + d-w) * (N-w ^ 2) * ((chi ∸ 1) ^ 2) ≡ 4500
+sin13-corr = refl
+
+sin13-identity : (towerD + d-w) * (N-w ^ 2) ≡ sigma-d * (chi ∸ 1)
+sin13-identity = refl
+
+sin13-num : 2 * chi ∸ 1 ≡ 11
+sin13-num = refl
+
+sin13-denom : N-w ^ 2 * ((chi ∸ 1) ^ 3) ≡ 500
+sin13-denom = refl

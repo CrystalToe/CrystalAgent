@@ -477,6 +477,24 @@ LEAN CrystalAlphaProton.lean all_share_a4
 LEAN CrystalAlphaProton.lean sin2_alpha_share_d4
 LEAN CrystalAlphaProton.lean beta0_from_primes
 LEAN CrystalAlphaProton.lean sin2_equiv
+LEAN CrystalAlphaProton.lean upsilon_dual_route
+LEAN CrystalAlphaProton.lean upsilon_corr_val
+LEAN CrystalAlphaProton.lean dmeson_dual_route
+LEAN CrystalAlphaProton.lean dmeson_split
+LEAN CrystalAlphaProton.lean rho_dual_route
+LEAN CrystalAlphaProton.lean rho_identity
+LEAN CrystalAlphaProton.lean phi_dual_route
+LEAN CrystalAlphaProton.lean phi_identity_d4_minus_d3
+LEAN CrystalAlphaProton.lean phi_identity_d3_nc
+LEAN CrystalAlphaProton.lean omega_dm_dual_route
+LEAN CrystalAlphaProton.lean omega_dm_identity
+LEAN CrystalAlphaProton.lean omega_dm_corr_val
+LEAN CrystalAlphaProton.lean rp_dual_route
+LEAN CrystalAlphaProton.lean sin13_dual_route
+LEAN CrystalAlphaProton.lean sin13_corr_val
+LEAN CrystalAlphaProton.lean sin13_identity
+LEAN CrystalAlphaProton.lean sin13_numerator
+LEAN CrystalAlphaProton.lean sin13_denominator
 LEAN CrystalProtonRadius.lean dual_route_d4_sq
 LEAN CrystalProtonRadius.lean d4_sq_eq_576
 LEAN CrystalProtonRadius.lean two_d3_sigma_d_eq_576
@@ -971,6 +989,23 @@ AGDA CrystalAlphaProton.agda beta0-numerator
 AGDA CrystalAlphaProton.agda sin2-corr-denom
 AGDA CrystalAlphaProton.agda beta0-eq
 AGDA CrystalAlphaProton.agda all-share-a4
+AGDA CrystalAlphaProton.agda upsilon-dual
+AGDA CrystalAlphaProton.agda upsilon-corr
+AGDA CrystalAlphaProton.agda dmeson-dual
+AGDA CrystalAlphaProton.agda dmeson-split
+AGDA CrystalAlphaProton.agda rho-dual
+AGDA CrystalAlphaProton.agda phi-dual
+AGDA CrystalAlphaProton.agda phi-d4-minus-d3
+AGDA CrystalAlphaProton.agda phi-d3-nc
+AGDA CrystalAlphaProton.agda omega-dm-dual
+AGDA CrystalAlphaProton.agda omega-dm-val
+AGDA CrystalAlphaProton.agda omega-dm-identity
+AGDA CrystalAlphaProton.agda rp-dual
+AGDA CrystalAlphaProton.agda sin13-dual
+AGDA CrystalAlphaProton.agda sin13-corr
+AGDA CrystalAlphaProton.agda sin13-identity
+AGDA CrystalAlphaProton.agda sin13-num
+AGDA CrystalAlphaProton.agda sin13-denom
 AGDA CrystalProtonRadius.agda dual-route
 AGDA CrystalProtonRadius.agda d4-sq-576
 AGDA CrystalProtonRadius.agda two-d3-sigma-d
@@ -1068,6 +1103,47 @@ RUST crystal_discovery_tests.rs nuclear_saturation
 RUST crystal_discovery_tests.rs gauss_decomposition
 RUST crystal_discovery_tests.rs sigma_d_eq_chi_sq
 RUST crystal_discovery_tests.rs tower_decomposition
+RUST crystal_hierarchy_tests.rs test_shared_core
+RUST crystal_hierarchy_tests.rs test_level_a0
+RUST crystal_hierarchy_tests.rs test_level_a4
+RUST crystal_hierarchy_tests.rs test_level_ratio_numerator
+RUST crystal_hierarchy_tests.rs test_upsilon_dual_route
+RUST crystal_hierarchy_tests.rs test_upsilon_corr_value
+RUST crystal_hierarchy_tests.rs test_upsilon_corr_is_eighth
+RUST crystal_hierarchy_tests.rs test_dmeson_dual_route
+RUST crystal_hierarchy_tests.rs test_dmeson_split
+RUST crystal_hierarchy_tests.rs test_dmeson_dual_route_b
+RUST crystal_hierarchy_tests.rs test_rho_dual_route
+RUST crystal_hierarchy_tests.rs test_rho_corr_value
+RUST crystal_hierarchy_tests.rs test_phi_dual_route
+RUST crystal_hierarchy_tests.rs test_phi_d4_minus_d3
+RUST crystal_hierarchy_tests.rs test_phi_d3_nc_eq_d4
+RUST crystal_hierarchy_tests.rs test_phi_corr_value
+RUST crystal_hierarchy_tests.rs test_omega_dm_dual_route
+RUST crystal_hierarchy_tests.rs test_omega_dm_identity
+RUST crystal_hierarchy_tests.rs test_omega_dm_corr_value
+RUST crystal_hierarchy_tests.rs test_rp_dual_route
+RUST crystal_hierarchy_tests.rs test_rp_corr_value
+RUST crystal_hierarchy_tests.rs test_chi_is_nw_nc
+RUST crystal_hierarchy_tests.rs test_all_corrections_negative
+RUST crystal_hierarchy_tests.rs test_all_corrections_perturbative
+RUST crystal_hierarchy_tests.rs test_upsilon_corrected
+RUST crystal_hierarchy_tests.rs test_dmeson_corrected
+RUST crystal_hierarchy_tests.rs test_rho_corrected
+RUST crystal_hierarchy_tests.rs test_phi_corrected
+RUST crystal_hierarchy_tests.rs test_omega_dm_corrected
+RUST crystal_hierarchy_tests.rs test_upsilon_multiplier
+RUST crystal_hierarchy_tests.rs test_dmeson_multiplier
+RUST crystal_hierarchy_tests.rs test_rho_multiplier
+RUST crystal_hierarchy_tests.rs test_phi_multiplier
+RUST crystal_hierarchy_tests.rs test_all_denoms_factor_from_af
+RUST crystal_hierarchy_tests.rs test_sin13_dual_route
+RUST crystal_hierarchy_tests.rs test_sin13_corr_value
+RUST crystal_hierarchy_tests.rs test_sin13_identity
+RUST crystal_hierarchy_tests.rs test_sin13_clean_form
+RUST crystal_hierarchy_tests.rs test_sin13_corrected
+RUST crystal_hierarchy_tests.rs test_sin13_multiplier
+RUST crystal_hierarchy_tests.rs test_sin13_shares_2chi_minus_1
 RUST crystal_noether_tests.rs noether_u1_generators
 RUST crystal_noether_tests.rs noether_su2_generators
 RUST crystal_noether_tests.rs noether_su3_generators
@@ -1244,6 +1320,7 @@ RUST crystal_tests.rs test_engineering_refractive_indices
 RUST crystal_tests.rs test_engineering_genetic_ecc
 RUST_COUNT crystal_alpha_proton_tests.rs 28
 RUST_COUNT crystal_discovery_tests.rs 33
+RUST_COUNT crystal_hierarchy_tests.rs 41
 RUST_COUNT crystal_noether_tests.rs 21
 RUST_COUNT crystal_proton_radius_tests.rs 30
 RUST_COUNT crystal_structural_tests.rs 36
@@ -1252,12 +1329,13 @@ RUST_COUNT crystal_tests.rs 87
 PYTHON crystal_alpha_proton_proof.py
 PYTHON crystal_certificate_proof.py
 PYTHON crystal_discoveries_proof.py
+PYTHON crystal_hierarchy_proof.py
 PYTHON crystal_noether_proof.py
 PYTHON crystal_proton_radius_proof.py
 PYTHON crystal_structural_proof.py
 # SUMMARY COUNTS
-TOTAL_LEAN_THEOREMS      566
-TOTAL_AGDA_PROOFS      429
-TOTAL_RUST_TESTS      235
+TOTAL_LEAN_THEOREMS      584
+TOTAL_AGDA_PROOFS      446
+TOTAL_RUST_TESTS      276
 TOTAL_HASKELL_MODULES        8
-TOTAL_PYTHON_MODULES        6
+TOTAL_PYTHON_MODULES        7
