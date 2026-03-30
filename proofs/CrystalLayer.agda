@@ -156,20 +156,20 @@ layer10-proton-mass = mkLayer 940313 1000000
 -- ═══════════════════════════════════════════════════════════════
 
 layer18-bohr : Layer 18
-layer18-bohr = mkLayer 529170 1000000
+layer18-bohr = mkLayer 526306 1000000
 
 -- Covalent radii: <r>_2p from Slater Z_eff (pure screening integrals)
 layer18-rcov-C : Layer 18
-layer18-rcov-C = mkLayer 814108 1000000
+layer18-rcov-C = mkLayer 809702 1000000
 
 layer18-rcov-N : Layer 18
-layer18-rcov-N = mkLayer 678423 1000000
+layer18-rcov-N = mkLayer 674752 1000000
 
 layer18-rcov-O : Layer 18
-layer18-rcov-O = mkLayer 581505 1000000
+layer18-rcov-O = mkLayer 578359 1000000
 
 layer18-rcov-H : Layer 18
-layer18-rcov-H = mkLayer 529170 1000000
+layer18-rcov-H = mkLayer 526306 1000000
 
 -- ═══════════════════════════════════════════════════════════════
 -- §7  D=20: HYBRIDIZATION (derived: arccos(-1/N_c), 360/N_c)
@@ -186,26 +186,26 @@ layer20-sp2 = mkLayer 120000 1000
 -- ═══════════════════════════════════════════════════════════════
 
 layer25-strand-anti : Layer 25
-layer25-strand-anti = mkLayer 2634 1000
+layer25-strand-anti = mkLayer 2620 1000
 
 layer25-strand-par : Layer 25
-layer25-strand-par = mkLayer 3011 1000
+layer25-strand-par = mkLayer 2994 1000
 
 -- ═══════════════════════════════════════════════════════════════
 -- §9  D=27-28: PEPTIDE AND CA-CA (derived)
 -- ═══════════════════════════════════════════════════════════════
 
 layer27-cn-peptide : Layer 27
-layer27-cn-peptide = mkLayer 1278 1000
+layer27-cn-peptide = mkLayer 1271 1000
 
 layer27-ca-c : Layer 27
-layer27-ca-c = mkLayer 1628 1000
+layer27-ca-c = mkLayer 1619 1000
 
 layer27-n-ca : Layer 27
-layer27-n-ca = mkLayer 1493 1000
+layer27-n-ca = mkLayer 1484 1000
 
 layer28-ca-ca : Layer 28
-layer28-ca-ca = mkLayer 3462 1000
+layer28-ca-ca = mkLayer 3443 1000
 
 -- ═══════════════════════════════════════════════════════════════
 -- §10  D=32: HELIX (exact rational 18/5)

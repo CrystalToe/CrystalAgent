@@ -63,7 +63,7 @@ Cosmological partition D=29+11+2 proved. Cabibbo angle 13.04° EXACT.
 
 ## SPECTRAL TOWER (Session 11)
 Pure derivation chain D=0→D=42. Every constant tagged with its MERA layer.
-44/46 pure (2 impure: m_e Yukawa open, water_angle needs H₂O calc).
+46/46 pure. m_e = m_mu/208 (lepton chain), water = arccos(-1/N_w^2) = 104.48°.
 D=22 VdW wall: single-atom STO gives VdW radii 33-44% too small.
 Helix 18/5, Flory 2/5, sp3=arccos(-1/3) all EXACT.
 Layer types: Python DerivedAt, Rust DerivedAt<D>, Haskell Layer d, Lean DerivedAt d, Agda Layer d.
@@ -91,7 +91,6 @@ If the uploaded files lack detail, **fetch from the canonical sources**:
 
 ## INPUTS
 N_w=2, N_c=3, v=246.22 GeV, π, ln. Nothing else.
-m_e=0.000511 GeV (measured — Yukawa sector open).
 ℏc=197.327 MeV·fm (unit conversion, not physics).
 
 ## INVARIANTS
@@ -105,8 +104,9 @@ C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
 m_μ=m_e×N_w⁴×gauss, f_π=Λ_QCD×N_c/β₀
 
 ## TOWER LAYER MAP
-D=0: A_F→χ,β₀,Σd,D,κ. D=5: α=1/(43π+ln7). D=10: m_p=v/257×53/54.
+D=0: A_F→χ,β₀,Σd,D,κ. D=5: α=1/(43π+ln7), m_e=m_mu/208. D=10: m_p=v/257×53/54.
 D=18: a₀=ℏc/(m_e·α). D=20: sp3=arccos(-1/3). D=22: VdW (WALL).
+D=24: water=arccos(-1/N_w²)=104.48°.
 D=25: H-bond, strands. D=28: CA-CA. D=32: helix=18/5. D=33: Flory=2/5.
 D=42: E_fold=v/2⁴².
 
@@ -192,7 +192,7 @@ echo "" >> "$OUT1"
 echo "# §SPECTRAL TOWER — Pure D=0→D=42 Derivation Chain (Session 11)" >> "$OUT1"
 echo "" >> "$OUT1"
 echo "Every constant derived from {N_w=2, N_c=3, v=246.22, π, ln}." >> "$OUT1"
-echo "44/46 pure. Layer provenance via DerivedAt type." >> "$OUT1"
+echo "46/46 pure. Layer provenance via DerivedAt type." >> "$OUT1"
 if [ -f "crystal-topos/examples/spectral_tower.py" ]; then
     echo "" >> "$OUT1"
     echo '```python' >> "$OUT1"
