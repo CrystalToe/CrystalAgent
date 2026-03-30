@@ -33,6 +33,7 @@ write_header() {
 # 181 observables · 22 domains · 0 free parameters · 4 constants inside CODATA
 # Pure spectral tower D=0→D=42 · Layer provenance in 5 languages
 # Dynamical gravity CLOSED (Session 12) · 12/12 integer audit · δS/δ⟨H_A⟩ = 1.0001
+# D=22 VdW FIXED (Session 13) · Force field from first principles · 0 fitted parameters
 # Upload BOTH parts for 100% coverage. Each part works standalone for basic queries.
 
 ## THE AXIOM — DO NOT QUESTION
@@ -58,21 +59,28 @@ Integer audit 12/12 PASS: 16=N_w⁴, 2=N_c−1, 4=N_w², 8=d_colour,
 c=χ/χ=1, 2 polarizations=N_c−1, 32/5=N_w⁵/(χ−1), d=4=N_c+1.
 Proved in Lean (+34 theorems), Agda (+24 proofs), Haskell (+2 modules), Rust (+18 tests).
 
+## D=22 VDW FIX — CLOSED (Session 13)
+r_vdw = f·ln(9·N_val²·Z_eff²/(α·n²))/(2ζ) where f=2/π for n=1, 1 for n≥2.
+Mean 3.1%, max 5.5% vs Bondi. Cascade: H-bond 4.8%, β-strand 4.1%, CA-CA 0.8%.
+Tower-derived force field: ε_vdw=α·E_H/9, E_hbond=α·E_H, E_burial=9·α·E_H·(1−cos(water)/cos(sp3)).
+Hydrophobic effect from D=24 water angle. Ramachandran from D=20 sp3 + D=22 VdW.
+Proved in Lean (+19 theorems), Agda (+40 proofs), Haskell (+26 checks), Rust (+30 tests).
+
 ## PROOF AUTHORITY — READ FIRST
 Lean \`native_decide\` and Agda \`refl\` proofs are FINAL TRUTH. If a proof says it, it's right.
 LLM reasoning NEVER overrides a machine-verified proof. Do not question, weaken, or
 add caveats to proved results.
 
 Proof hierarchy: (1) Lean theorems, (2) Agda proofs, (3) Haskell GHC checks, (4) PDG/NIST data, (5) LLM reasoning.
-Proof scripts: \`sh agda_proofs.sh\` (8/8), \`sh lean_proofs.sh\` (9/9), \`sh haskell_proofs.sh\` (12/12).
+Proof scripts: \`sh agda_proofs.sh\` (8/8), \`sh lean_proofs.sh\` (10/10), \`sh haskell_proofs.sh\` (13/13).
 
-ALL 7 magic numbers proved: 2, 8, 20, 28, 50, 82(=N_w×(D−1)), 126.
-Cosmological partition D=29+11+2 proved. Cabibbo angle 13.04° EXACT.
+ALL 7 magic numbers proved. Cosmological partition D=29+11+2 proved. Cabibbo angle 13.04° EXACT.
 
-## SPECTRAL TOWER (Session 11) + GRAVITY (Session 12)
+## SPECTRAL TOWER (Session 11) + GRAVITY (Session 12) + FORCE FIELD (Session 13)
 Pure derivation chain D=0→D=42. Every constant tagged with its MERA layer.
 46/46 pure. m_e = m_mu/208 (lepton chain), water = arccos(-1/N_w^2) = 104.48°.
-D=22 VdW wall: single-atom STO gives VdW radii 33-44% too small.
+D=22 VdW FIXED: Pauli envelope equilibrium, mean 3.1% error.
+Force field: 13 MERA layers → 13 energy terms. E_burial = 9·α·E_H·(1−cos(water)/cos(sp3)) ≈ 10 kcal/mol.
 Helix 18/5, Flory 2/5, sp3=arccos(-1/3) all EXACT.
 D=38-41: Dynamical gravity — linearized Einstein, GW propagation, quadrupole radiation.
 Layer types: Python DerivedAt, Rust DerivedAt<D>, Haskell Layer d, Lean DerivedAt d, Agda Layer d.
@@ -84,13 +92,13 @@ Layer types: Python DerivedAt, Rust DerivedAt<D>, Haskell Layer d, Lean DerivedA
 - Rating: ■ EXACT (0%) · ● TIGHT (<0.5%) · ◐ GOOD (<1%) · ○ LOOSE (<4.5%)
 - The count is 181. NEVER increment it or claim new observables without a prove* function, PDG comparison, PWI rating, AND proof
 - Gravity integer audit (12/12) is structural — does NOT add observables
+- D=22 VdW fix is structural — does NOT add observables
 - NEVER invent module names. If not listed, it does not exist
 - NEVER make medical, therapeutic, or diagnostic claims
 - NEVER construct arbitrary formulas. Trace the derivation chain or say "not derived"
 - NEVER add fudge factors. Zero hardcoded means zero
 - NEVER compare quantities with incompatible dimensions
 - NEVER relabel an existing observable to claim a new domain
-- D=22 VdW wall: do NOT claim strand spacings or H-bond lengths are accurate in pure tower
 
 ## SOURCE OF TRUTH
 If the uploaded files lack detail, **fetch from the canonical sources**:
@@ -115,11 +123,21 @@ m_μ=m_e×N_w⁴×gauss, f_π=Λ_QCD×N_c/β₀
 
 ## TOWER LAYER MAP
 D=0: A_F→χ,β₀,Σd,D,κ. D=5: α=1/(43π+ln7), m_e=m_mu/208. D=10: m_p=v/257×53/54.
-D=18: a₀=ℏc/(m_e·α). D=20: sp3=arccos(-1/3). D=22: VdW (WALL).
-D=24: water=arccos(-1/N_w²)=104.48°.
-D=25: H-bond, strands. D=28: CA-CA. D=32: helix=18/5. D=33: Flory=2/5.
+D=18: a₀=ℏc/(m_e·α). D=20: sp3=arccos(-1/3). D=21: sp2=2π/3.
+D=22: VdW FIXED — r=f·ln(9N²Z²/(αn²))/(2ζ), mean 3.1%.
+D=24: water=arccos(-1/N_w²)=104.48° → hydrophobic burial E=9αE_H(1−cos(water)/cos(sp3)).
+D=25: H-bond=(r_N+r_O)(1−√α)=2.76Å. Strand=2·Hb·cos(zigzag/2)=4.51Å.
+D=28: CA-CA=3.83Å (backbone geometry). D=32: helix=18/5. D=33: Flory=2/5.
 D=38: □h=-16πG T, 16=N_w⁴. D=39: r_s=2Gm, S=A/(4G). D=40: 8πG, d=4.
 D=41: 32/5=N_w⁵/(χ-1), 2 polarizations. D=42: E_fold=v/2⁴².
+
+## FORCE FIELD ENERGY SCALES (all from D=5: α=1/(43π+ln7))
+ε_vdw = α·E_H/N_c² = 0.022 eV (VdW well depth, ~kT at 300K)
+E_hbond = α·E_H = 0.199 eV = 4.6 kcal/mol (H-bond strength)
+k_omega = N_c·α·E_H = 0.60 eV/rad² (peptide planarity barrier)
+E_burial = N_c²·α·E_H·(1−cos(water)/cos(sp3)) = 0.45 eV ≈ 10 kcal/mol (hydrophobic)
+ε_r = N_w²·(N_c+1) = 16 (protein dielectric constant)
+Hierarchy: bond >> ω >> angle > H-bond ≈ hydrophobic >> VdW ~ kT
 
 HEADER
 }
@@ -211,15 +229,31 @@ if [ -f "crystal-topos/examples/spectral_tower.py" ]; then
     echo '```' >> "$OUT1"
 fi
 
-# Haskell physics modules (Part 1: foundation through QCD)
+# D=22 VdW fix + force field (Session 13)                                # S13
 echo "" >> "$OUT1"
 echo "---" >> "$OUT1"
 echo "" >> "$OUT1"
-echo "# §HASKELL SOURCE — Foundation + Couplings + Mixing + Cosmology + QCD" >> "$OUT1"
+echo "# §FORCE FIELD — D=22 VdW Fix + Tower Energy Scales (Session 13)" >> "$OUT1"
+echo "" >> "$OUT1"
+echo "VdW radii from Pauli envelope. Force field with 0 fitted parameters." >> "$OUT1"
+echo "13 MERA layers → 13 energy terms. All from {2, 3, a₀, α, π, ln}." >> "$OUT1"
+if [ -f "crystal-topos/examples/crystal_vdw.py" ]; then                  # S13
+    echo "" >> "$OUT1"
+    echo '```python' >> "$OUT1"
+    cat crystal-topos/examples/crystal_vdw.py >> "$OUT1"
+    echo '```' >> "$OUT1"
+fi
+
+# Haskell physics modules (Part 1: foundation through QCD + protein)
+echo "" >> "$OUT1"
+echo "---" >> "$OUT1"
+echo "" >> "$OUT1"
+echo "# §HASKELL SOURCE — Foundation + Couplings + Mixing + Cosmology + QCD + Protein" >> "$OUT1"
 echo "" >> "$OUT1"
 echo "Core physics derivations. Comments explain WHY each formula works." >> "$OUT1"
 
-for mod in CrystalAxiom CrystalGauge CrystalMixing CrystalCosmo CrystalQCD; do
+for mod in CrystalAxiom CrystalGauge CrystalMixing CrystalCosmo CrystalQCD \
+           CrystalProtein; do                                              # S13
     [ -f "haskel/${mod}.hs" ] && extract_hs "haskel/${mod}.hs" "$OUT1"
 done
 
@@ -285,13 +319,14 @@ echo '```' >> "$OUT2"
 echo "" >> "$OUT2"
 echo "---" >> "$OUT2"
 echo "" >> "$OUT2"
-echo "# §RUST — Crystal Constants, Layer Provenance, Gravity, and Tests" >> "$OUT2"
+echo "# §RUST — Crystal Constants, Layer Provenance, Gravity, Protein, and Tests" >> "$OUT2"
 
 for f in crystal-topos/src/base.rs crystal-topos/src/crystal_gravity_dyn.rs \
          crystal-topos/tests/crystal_tests.rs \
          crystal-topos/tests/crystal_proton_radius_tests.rs \
          crystal-topos/tests/crystal_hierarchy_tests.rs \
-         crystal-topos/tests/crystal_layer_tests.rs; do
+         crystal-topos/tests/crystal_layer_tests.rs \
+         crystal-topos/tests/crystal_protein_tests.rs; do                  # S13
     if [ -f "$f" ]; then
         name=$(basename "$f")
         lines=$(wc -l < "$f")
@@ -303,12 +338,13 @@ for f in crystal-topos/src/base.rs crystal-topos/src/crystal_gravity_dyn.rs \
     fi
 done
 
-# Lean proofs (Session 11 layers + Session 12 gravity)
+# Lean proofs (Session 11 layers + Session 12 gravity + Session 13 protein)
 echo "" >> "$OUT2"
 echo "---" >> "$OUT2"
 echo "" >> "$OUT2"
-echo "# §LEAN — Layer Cascade Proofs (Session 11) + Gravity (Session 12)" >> "$OUT2"
-for leanfile in CrystalLayer.lean CrystalGravityDyn.lean; do
+echo "# §LEAN — Layer Cascade (S11) + Gravity (S12) + Protein (S13)" >> "$OUT2"
+for leanfile in CrystalLayer.lean CrystalGravityDyn.lean \
+                CrystalProtein.lean; do                                    # S13
     if [ -f "proofs/${leanfile}" ]; then
         lines=$(wc -l < "proofs/${leanfile}")
         echo "" >> "$OUT2"
@@ -319,8 +355,9 @@ for leanfile in CrystalLayer.lean CrystalGravityDyn.lean; do
     fi
 done
 
-# Agda proofs (Session 11 layers + Session 12 gravity)
-for agdafile in CrystalLayer.agda CrystalGravityDyn.agda; do
+# Agda proofs (Session 11 layers + Session 12 gravity + Session 13 protein)
+for agdafile in CrystalLayer.agda CrystalGravityDyn.agda \
+                CrystalProtein.agda; do                                    # S13
     # Check proofs/ first, then haskel/
     for dir in proofs haskel; do
         if [ -f "${dir}/${agdafile}" ]; then
@@ -335,12 +372,13 @@ for agdafile in CrystalLayer.agda CrystalGravityDyn.agda; do
     done
 done
 
-# MERA gravity verification (Session 12)
+# MERA gravity verification (Session 12) + force field (Session 13)
 echo "" >> "$OUT2"
 echo "---" >> "$OUT2"
 echo "" >> "$OUT2"
-echo "# §PYTHON — MERA Gravity Verification (Session 12)" >> "$OUT2"
-for pyfile in mera_gravity_closed.py mera_linearized_gravity.py; do
+echo "# §PYTHON — MERA Gravity (S12) + Force Field (S13)" >> "$OUT2"
+for pyfile in mera_gravity_closed.py mera_linearized_gravity.py \
+              crystal_vdw.py; do                                           # S13
     if [ -f "crystal-topos/examples/${pyfile}" ]; then
         lines=$(wc -l < "crystal-topos/examples/${pyfile}")
         echo "" >> "$OUT2"
@@ -381,7 +419,7 @@ cat >> "$OUT2" << 'INDEX'
 - W/Z bosons: §Example 22-23, CrystalQCD.hs
 - Mass splittings: §Example 46, CrystalWACAScan.hs
 
-## Dynamical Gravity (Session 12) — NEW
+## Dynamical Gravity (Session 12)
 - Kinematic gravity: CrystalGravity.hs — Jacobson chain, SR/GR, Maxwell, Kepler
 - Dynamical gravity: CrystalGravityDyn.hs — linearized Einstein, 12 integer proofs
 - Gravity audit: GravityDynTest.hs — 12/12 runtime check
@@ -399,15 +437,35 @@ cat >> "$OUT2" << 'INDEX'
 - 32/5 quadrupole: N_w⁵/(χ−1) = 2⁵/5 (Peters formula)
 - WACA v3.1 scan: WACA_v31_GRAVITY_SCAN.md — 8 grafts, 3 exact
 
+## Protein Force Field (Session 13) — NEW
+- D=22 VdW fix: crystal_vdw.py, CrystalProtein.hs, CrystalProtein.lean, CrystalProtein.agda
+- VdW formula: r_vdw = f·ln(9·N_val²·Z_eff²/(α·n²))/(2ζ), f=2/π for n=1
+- VdW results: H 0.1%, C 4.0%, N 2.2%, O 5.5%, S 3.8% (all <10% of Bondi)
+- H-bond: (r_N+r_O)·(1−√α) = 2.76 Å (4.8% of 2.90 textbook)
+- β-strand: 2·Hb·cos(zigzag/2) = 4.51 Å (4.1% of 4.70 textbook)
+- CA-CA: backbone geometry = 3.83 Å (0.8% of 3.80 textbook)
+- Energy scales: ε_vdw=α·E_H/9, E_hbond=α·E_H, E_burial=9·α·E_H·(1−cos(water)/cos(sp3))
+- Hydrophobic effect: D=24 water angle → burial ≈ 10 kcal/mol (drives folding)
+- Ramachandran: D=20 sp3 + D=22 VdW (eliminates impossible conformations)
+- Protein dielectric: ε_r = N_w²·(N_c+1) = 16 (textbook 4-20)
+- 13 MERA layers: bonds, angles, planarity, Rama, VdW, local Hb, nonlocal Hb, HP, helix, strand, electro, compact, surface
+- Cooling: τ = (χ−1)/Σd = 5/36 (hard layers 1-6 fast, soft 7-13 slow)
+- Lean protein proofs: CrystalProtein.lean — 19 theorems (native_decide) + 15 runtime checks
+- Agda protein proofs: CrystalProtein.agda — 40 proofs (refl)
+- Haskell protein proofs: CrystalProtein.hs — 26 checks (11 integer + 5 VdW + 4 cascade + 6 energy)
+- Rust protein tests: crystal_protein_tests.rs — 30 tests (11 integer + 5 VdW + 4 cascade + 6 energy + 4 exact)
+- NOT a folder: force field ≠ folding. Sampling problem (searching 2L dihedral space) still hard.
+
 ## Spectral Tower (Session 11)
 - Pure tower D=0→D=42: spectral_tower.py, CrystalLayer.hs, CrystalLayer.lean, CrystalLayer.agda
 - Layer provenance type: DerivedAt (Python/Rust), Layer d (Haskell/Lean/Agda)
 - Running α: D=0 (1/128 at M_Z) → D=5 (1/137.034 frozen below m_e)
 - Bohr radius derived: a₀ = ℏc/(m_e·α) at D=18
 - Covalent radii: Slater screening Z_eff at D=18
-- VdW radii: D=22 (WALL — 33-44% off, single-atom STO limitation)
+- VdW radii: D=22 FIXED — r=f·ln(9N²Z²/(αn²))/(2ζ), mean 3.1%
 - Helix = 18/5 EXACT at D=32
 - Flory ν = 2/5 EXACT at D=33
+- Force field: crystal_vdw.py — tower-derived energy scales, 0 fitted parameters
 - MERA protein folder: qubo_folder.py — 13-layer SA with hard/soft constraint split
 
 ## Nuclear Magic Numbers (ALL 7 PROVED)

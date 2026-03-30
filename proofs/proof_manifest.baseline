@@ -636,7 +636,26 @@ LEAN CrystalGravityDyn.lean jacobson_step4_EFE
 LEAN CrystalGravityDyn.lean jacobson_chain_complete
 LEAN CrystalGravityDyn.lean linearized_einstein_integers
 LEAN CrystalGravityDyn.lean dynamical_gravity_from_AF
-LEAN_FILES 9
+LEAN CrystalProtein.lean N_c_sq
+LEAN CrystalProtein.lean N_w_sq
+LEAN CrystalProtein.lean rep_exp
+LEAN CrystalProtein.lean london_denom
+LEAN CrystalProtein.lean helix_num
+LEAN CrystalProtein.lean helix_den
+LEAN CrystalProtein.lean flory_den
+LEAN CrystalProtein.lean einstein_16
+LEAN CrystalProtein.lean dielectric
+LEAN CrystalProtein.lean d_colour
+LEAN CrystalProtein.lean total_dim
+LEAN CrystalProtein.lean const_208
+LEAN CrystalProtein.lean nw5
+LEAN CrystalProtein.lean mera_split
+LEAN CrystalProtein.lean nv2_C
+LEAN CrystalProtein.lean nv2_N
+LEAN CrystalProtein.lean nv2_O
+LEAN CrystalProtein.lean n2_C
+LEAN CrystalProtein.lean n2_S
+LEAN_FILES 10
 # AGDA PROOFS
 AGDA CrystalTopos.agda the-one-law
 AGDA CrystalTopos.agda chi-eq
@@ -1125,7 +1144,42 @@ AGDA CrystalGravityDyn.agda jacobson-step2
 AGDA CrystalGravityDyn.agda jacobson-step3
 AGDA CrystalGravityDyn.agda jacobson-step4
 AGDA CrystalGravityDyn.agda equiv-principle
-AGDA_FILES 8
+AGDA CrystalProtein.agda N_c²
+AGDA CrystalProtein.agda N_w²
+AGDA CrystalProtein.agda rep-exp
+AGDA CrystalProtein.agda london
+AGDA CrystalProtein.agda chi-1
+AGDA CrystalProtein.agda flory-den
+AGDA CrystalProtein.agda helix-num
+AGDA CrystalProtein.agda N_w⁴
+AGDA CrystalProtein.agda D-check
+AGDA CrystalProtein.agda gauss-13
+AGDA CrystalProtein.agda d-colour
+AGDA CrystalProtein.agda nv²-H
+AGDA CrystalProtein.agda nv²-C
+AGDA CrystalProtein.agda nv²-N
+AGDA CrystalProtein.agda nv²-O
+AGDA CrystalProtein.agda nv²-S
+AGDA CrystalProtein.agda n²-H
+AGDA CrystalProtein.agda n²-C
+AGDA CrystalProtein.agda n²-S
+AGDA CrystalProtein.agda water-denom
+AGDA CrystalProtein.agda burial-factor
+AGDA CrystalProtein.agda helix-18
+AGDA CrystalProtein.agda helix-5
+AGDA CrystalProtein.agda flory-num
+AGDA CrystalProtein.agda flory-denom
+AGDA CrystalProtein.agda pol-count
+AGDA CrystalProtein.agda einstein
+AGDA CrystalProtein.agda nw5
+AGDA CrystalProtein.agda tau-num
+AGDA CrystalProtein.agda tau-den
+AGDA CrystalProtein.agda dielectric
+AGDA CrystalProtein.agda const-208
+AGDA CrystalProtein.agda hard-layers
+AGDA CrystalProtein.agda soft-layers
+AGDA CrystalProtein.agda total-layers
+AGDA_FILES 9
 # HASKELL MODULES
 HASKELL Main.hs
 HASKELL CrystalStructural.hs
@@ -1157,6 +1211,7 @@ HASKELL CrystalQAlgorithms.hs
 HASKELL CrystalQSimulation.hs
 HASKELL CrystalGravityDyn.hs
 HASKELL GravityDynTest.hs
+HASKELL CrystalProtein.hs
 HASKELL CrystalFullTest.hs
 # RUST TESTS
 RUST crystal_alpha_proton_tests.rs test_chi
@@ -1299,6 +1354,37 @@ RUST crystal_noether_tests.rs noether_amino
 RUST crystal_noether_tests.rs noether_phase_decomp
 RUST crystal_noether_tests.rs noether_algebra_tower
 RUST crystal_noether_tests.rs noether_sigma_d2
+RUST crystal_protein_tests.rs int_n_c
+RUST crystal_protein_tests.rs int_n_w
+RUST crystal_protein_tests.rs int_chi
+RUST crystal_protein_tests.rs int_gauss
+RUST crystal_protein_tests.rs int_n_c_sq
+RUST crystal_protein_tests.rs int_n_w_sq
+RUST crystal_protein_tests.rs int_rep_exp
+RUST crystal_protein_tests.rs int_helix_18
+RUST crystal_protein_tests.rs int_chi_1
+RUST crystal_protein_tests.rs int_flory_den
+RUST crystal_protein_tests.rs int_dielectric
+RUST crystal_protein_tests.rs d5_alpha
+RUST crystal_protein_tests.rs d20_sp3
+RUST crystal_protein_tests.rs d21_sp2
+RUST crystal_protein_tests.rs d22_vdw_h
+RUST crystal_protein_tests.rs d22_vdw_c
+RUST crystal_protein_tests.rs d22_vdw_n
+RUST crystal_protein_tests.rs d22_vdw_o
+RUST crystal_protein_tests.rs d22_vdw_s
+RUST crystal_protein_tests.rs d24_water
+RUST crystal_protein_tests.rs d25_hbond
+RUST crystal_protein_tests.rs d25_strand
+RUST crystal_protein_tests.rs d25_para
+RUST crystal_protein_tests.rs d28_caca
+RUST crystal_protein_tests.rs d32_helix
+RUST crystal_protein_tests.rs d33_flory
+RUST crystal_protein_tests.rs d38_tau
+RUST crystal_protein_tests.rs e_vdw_scale
+RUST crystal_protein_tests.rs e_hbond_scale
+RUST crystal_protein_tests.rs e_omega_scale
+RUST crystal_protein_tests.rs e_burial_scale
 RUST crystal_proton_radius_tests.rs dual_route_identity
 RUST crystal_proton_radius_tests.rs d4_squared_is_576
 RUST crystal_proton_radius_tests.rs two_d3_sigma_d_is_576
@@ -1487,6 +1573,7 @@ RUST_COUNT crystal_discovery_tests.rs 33
 RUST_COUNT crystal_hierarchy_tests.rs 41
 RUST_COUNT crystal_layer_tests.rs 17
 RUST_COUNT crystal_noether_tests.rs 21
+RUST_COUNT crystal_protein_tests.rs 31
 RUST_COUNT crystal_proton_radius_tests.rs 30
 RUST_COUNT crystal_structural_tests.rs 36
 RUST_COUNT crystal_tests.rs 87
@@ -1504,9 +1591,10 @@ PYTHON mera_gravity_closed.py
 PYTHON mera_linearized_gravity.py
 PYTHON spectral_tower.py
 PYTHON qubo_folder.py
+PYTHON crystal_vdw.py
 # SUMMARY COUNTS
-TOTAL_LEAN_THEOREMS      637
-TOTAL_AGDA_PROOFS      487
-TOTAL_RUST_TESTS      323
-TOTAL_HASKELL_MODULES       31
-TOTAL_PYTHON_MODULES       11
+TOTAL_LEAN_THEOREMS      656
+TOTAL_AGDA_PROOFS      522
+TOTAL_RUST_TESTS      354
+TOTAL_HASKELL_MODULES       32
+TOTAL_PYTHON_MODULES       12

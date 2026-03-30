@@ -48,7 +48,8 @@ generate_manifest() {
   for f in CrystalTopos.lean CrystalStructural.lean CrystalNoether.lean \
            CrystalDiscoveries.lean CrystalAlphaProton.lean \
            CrystalProtonRadius.lean CrystalLayer.lean Main.lean \
-           CrystalGravityDyn.lean; do
+           CrystalGravityDyn.lean \
+           CrystalProtein.lean; do                                        # S13
     if [ -f "$PROOFS/$f" ]; then
       grep "^theorem " "$PROOFS/$f" | sed "s/theorem \([^ :]*\).*/LEAN $f \1/" >> "$out"
     fi
@@ -63,7 +64,8 @@ generate_manifest() {
   for f in CrystalTopos.lean CrystalStructural.lean CrystalNoether.lean \
            CrystalDiscoveries.lean CrystalAlphaProton.lean \
            CrystalProtonRadius.lean CrystalLayer.lean Main.lean \
-           CrystalGravityDyn.lean; do
+           CrystalGravityDyn.lean \
+           CrystalProtein.lean; do                                        # S13
     [ -f "$PROOFS/$f" ] && lean_files=$((lean_files + 1))
     [ -f "$HASKEL/LeanCert/$f" ] && lean_files=$((lean_files + 1))
   done
@@ -74,7 +76,8 @@ generate_manifest() {
   for f in CrystalTopos.agda CrystalStructural.agda CrystalNoether.agda \
            CrystalDiscoveries.agda CrystalAlphaProton.agda \
            CrystalProtonRadius.agda CrystalLayer.agda \
-           CrystalGravityDyn.agda; do
+           CrystalGravityDyn.agda \
+           CrystalProtein.agda; do                                        # S13
     # Check proofs/ dir
     if [ -f "$PROOFS/$f" ]; then
       grep -B1 "= refl" "$PROOFS/$f" | grep -v "= refl" | grep -v "^--" | \
@@ -98,7 +101,8 @@ generate_manifest() {
   for f in CrystalTopos.agda CrystalStructural.agda CrystalNoether.agda \
            CrystalDiscoveries.agda CrystalAlphaProton.agda \
            CrystalProtonRadius.agda CrystalLayer.agda \
-           CrystalGravityDyn.agda; do
+           CrystalGravityDyn.agda \
+           CrystalProtein.agda; do                                        # S13
     [ -f "$PROOFS/$f" ] && agda_files=$((agda_files + 1))
     [ -f "$HASKEL/$f" ] && agda_files=$((agda_files + 1))
   done
@@ -118,7 +122,8 @@ generate_manifest() {
            CrystalQHamiltonians.hs CrystalQMeasure.hs \
            CrystalQEntangle.hs CrystalQAlgorithms.hs \
            CrystalQSimulation.hs \
-           CrystalGravityDyn.hs GravityDynTest.hs; do
+           CrystalGravityDyn.hs GravityDynTest.hs \
+           CrystalProtein.hs; do                                          # S13
     [ -f "$HASKEL/$f" ] && echo "HASKELL $f" >> "$out"
   done
 
@@ -175,7 +180,8 @@ generate_manifest() {
     fi
   done
   # Session 12: gravity computation files in examples/
-  for f in mera_gravity_closed.py mera_linearized_gravity.py spectral_tower.py qubo_folder.py; do
+  for f in mera_gravity_closed.py mera_linearized_gravity.py spectral_tower.py qubo_folder.py \
+           crystal_vdw.py; do                                             # S13
     if [ -f "$EXAMPLES/$f" ]; then
       echo "PYTHON $f" >> "$out"
     fi

@@ -2,7 +2,7 @@
 # Copyright (c) 2026 Daland Montgomery
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# Haskell proof runner — Session 12
+# Haskell proof runner — Session 13
 set -e
 
 # Find repo root (works from proofs/, haskel/, or repo root)
@@ -23,11 +23,11 @@ cd "$HASKEL"
 cleanup() {
   cd "$HASKEL"
   rm -f *.o *.hi
-  rm -f crystal structural noether discoveries alpha_proton proton_radius extended_scan hierarchy_test full_test crystal_layer gravity_dyn_test
+  rm -f crystal structural noether discoveries alpha_proton proton_radius extended_scan hierarchy_test full_test crystal_layer gravity_dyn_test crystal_protein
 }
 trap cleanup EXIT
 
-echo "=== Haskell Proof Runner (Session 12) ==="
+echo "=== Haskell Proof Runner (Session 13) ==="
 echo "    Running from: $(pwd)"
 echo "    Certificate:  $PROOFS/GHC_Certificate.txt"
 echo ""
@@ -104,6 +104,9 @@ typecheck "CrystalGravityDyn.hs (S12 gravity)"  "CrystalGravityDyn.hs"
 
 # 12. Dynamical gravity audit (S12 — 12/12 integer audit)
 run_main "GravityDynTest.hs (S12 audit)"  "GravityDynTest.hs"  "gravity_dyn_test"
+
+# 13. Protein force field (S13 — 26 proofs, D=0..D=38)
+run_exe "CrystalProtein.hs (S13 force field)"  "CrystalProtein.hs"  "CrystalProtein"  "crystal_protein"
 
 # Tally (cleanup runs automatically via trap)
 TOTAL=$((PASS+FAIL))

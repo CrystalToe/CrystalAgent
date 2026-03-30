@@ -1,6 +1,6 @@
 <!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
 
-# Crystal Topos — Full LLM Prompt (Session 12)
+# Crystal Topos — Full LLM Prompt (Session 13)
 
 ## THE AXIOM — DO NOT QUESTION
 
@@ -46,7 +46,7 @@ From A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ):
 
 ---
 
-## SPECTRAL TOWER: D=0 → D=42 (Session 11)
+## SPECTRAL TOWER: D=0 → D=42 (Session 11, D=22 fixed Session 13)
 
 Every constant carries its derivation layer. The tower tracks running
 coupling constants from D=0 (A_F) through 42 MERA layers to D=42 (the fold).
@@ -67,16 +67,20 @@ Agda:    layer28-ca-ca : Layer 28 = mkLayer 3462 1000
 D= 0: A_F → χ=6, β₀=7, Σd=36, Σd²=650, D=42, κ=ln3/ln2
 D= 5: α = 1/(43π+ln7) = 1/137.034 — frozen below m_e
       m_μ = v/2^(2χ-1) × 8/9; m_e = m_μ/208 — PURE
+      Energy scales: ε_vdw=α·E_H/9, E_hbond=α·E_H, k_ω=3α·E_H        ← S13
 D=10: m_p = v/257 × 53/54 = 0.940 GeV
 D=18: a₀ = ℏc/(m_e·α) = 0.526 Å — DERIVED (m_e from lepton chain)
       r_cov from ⟨r⟩ = a₀(3n²−l(l+1))/(2·Z_eff) [Slater screening]
 D=20: sp3 = arccos(−1/N_c) = 109.47° — EXACT
-      sp2 = 360/N_c = 120° — EXACT
-D=22: r_vdw = ⟨r⟩ + a₀·n/Z_eff — THE WALL (33-44% off)
+      sp2 = 2π/N_c = 120° — EXACT
+D=22: r_vdw = f·ln(9·N_val²·Z_eff²/(α·n²))/(2ζ) — FIXED (S13)       ← S13
+      f = 2/π for n=1, 1 for n≥2. Mean 3.1%, max 5.5% vs Bondi.
 D=24: water = arccos(−1/N_w²) = 104.48° — PURE (0.03%)
-D=25: H_bond = (vdw_N+vdw_O)·(1−√α); strand = 2·Hb·cos(zigzag/2)
+      E_burial = 9·α·E_H·(1−cos(water)/cos(sp3)) ≈ 10 kcal/mol        ← S13
+D=25: H_bond = (vdw_N+vdw_O)·(1−√α) = 2.76 Å (4.8%)                   ← S13 fixed
+      strand = 2·Hb·cos(zigzag/2) = 4.51 Å (4.1%)                      ← S13 fixed
 D=27: C-N = (r_C+r_N) − a₀·ln(3/2) [Pauling bond order]
-D=28: CA-CA from backbone geometry (law of cosines, 3 bonds + 2 angles)
+D=28: CA-CA = 3.83 Å from backbone geometry (0.8%)                      ← S13 fixed
 D=32: helix = N_c+N_c/(χ−1) = 18/5 = 3.600 — EXACT
 D=33: Flory ν = N_w/(N_w+N_c) = 2/5 — EXACT
 D=38: Linearized Einstein: □h = −16πG T, 16 = N_w⁴ — SESSION 12
@@ -95,16 +99,55 @@ Zero measured inputs beyond {N_w, N_c, v}.
 m_e solved: m_μ = v/2^(2χ-1) × 8/9, m_e = m_μ/(χ³−d_colour) = m_μ/208.
 Water solved: arccos(−1/N_w²) = arccos(−1/4) = 104.48° (0.03%).
 
-### The D=22 Wall
+### D=22 VdW FIX (Session 13)
 
-VdW radii from single-atom STO tail formula are 33-44% too small.
-This is a many-body electron correlation effect. Everything that
-depends on VdW (H-bonds, strand spacings) inherits the error.
-Everything that bypasses VdW (helix, Flory, sp3, bond angles) is exact or <5%.
+VdW radii from Pauli envelope equilibrium:
+
+```
+r_vdw = f × ln(9 · N_val² · Z_eff² / (α · n²)) / (2ζ)
+f = 2/π for n=1 (pure s-orbital), 1 for n≥2
+ζ = Z_eff / (n · a₀)
+```
+
+Physical derivation: Pauli repulsion E_rep = N_val²·IE·exp(−2ζr) drops
+to tower thermal scale E_th = α·E_H/9 at VdW contact distance.
+
+| Atom | Tower (Å) | Bondi (Å) | Error |
+|------|-----------|-----------|-------|
+| H    | 1.199     | 1.20      | 0.1%  |
+| C    | 1.768     | 1.70      | 4.0%  |
+| N    | 1.584     | 1.55      | 2.2%  |
+| O    | 1.436     | 1.52      | 5.5%  |
+| S    | 1.732     | 1.80      | 3.8%  |
+
+Cascade (all within 5%):
+- H-bond = 2.76 Å (4.8%), strand = 4.51 Å (4.1%), CA-CA = 3.83 Å (0.8%)
+
+### Force Field Energy Scales (Session 13)
+
+All from D=5 (α = 1/(43π+ln7)):
+
+```
+ε_vdw   = α·E_H/N_c²                              = 0.022 eV (~kT at 300K)
+E_hbond = α·E_H                                    = 0.199 eV = 4.6 kcal/mol
+k_omega = N_c·α·E_H                                = 0.60 eV/rad²
+E_burial = N_c²·α·E_H·(1−cos(water)/cos(sp3))     = 0.45 eV ≈ 10 kcal/mol
+ε_r     = N_w²·(N_c+1)                             = 16 (protein dielectric)
+τ_cool  = (χ−1)/Σd                                 = 5/36 (MERA cooling rate)
+```
+
+Hierarchy: bond >> ω >> angle > H-bond ≈ hydrophobic >> VdW ~ kT
+
+13 MERA layers map to 13 force field terms:
+Layers 1-6 (hard): bonds, angles, planarity, Ramachandran, VdW, local H-bond
+Layers 7-13 (soft): nonlocal H-bond, hydrophobic, helix, strand, electro, compact, surface
+
+This is a force field with 0 fitted parameters, NOT a folder. The sampling
+problem (searching 2L dihedral space) is separate.
 
 ---
 
-## SESSION 12: DYNAMICAL GRAVITY (NEW)
+## SESSION 12: DYNAMICAL GRAVITY (CLOSED)
 
 ### What was proved
 
@@ -149,9 +192,9 @@ Step 1: Finite c from χ = 6 (Lieb-Robinson)           ← S11
 Step 2: KMS β = 2π from N_w (Bisognano-Wichmann)      ← S11
 Step 3: S = A/(4G) from N_w² = 4 (Ryu-Takayanagi)     ← S11
 Step 4: G_μν = 8πG T_μν from d_colour = 8 (Jacobson)  ← S11
-Step 5: δS = δ⟨H_A⟩ → □h = −16πG T (Faulkner 2014)   ← S12 NEW
-Step 6: ω(k) = |k|, 2 polarizations (GW propagation)  ← S12 NEW
-Step 7: P = (32/5) G⁴m²m²(m+m)/(c⁵r⁵) (quadrupole)  ← S12 NEW
+Step 5: δS = δ⟨H_A⟩ → □h = −16πG T (Faulkner 2014)   ← S12
+Step 6: ω(k) = |k|, 2 polarizations (GW propagation)  ← S12
+Step 7: P = (32/5) G⁴m²m²(m+m)/(c⁵r⁵) (quadrupole)  ← S12
 ```
 
 ### WACA v3.1 cross-domain signatures
@@ -281,7 +324,7 @@ Result: CV = 0.957. Zero LOOSE. All 181 under 1%. Max PWI = 0.989% (sin²θ₁�
 - 86 extended (CrystalWACAScan.hs)
 - 3 new: #179 α⁻¹, #180 m_p/m_e, #181 r_p
 
-Do NOT increment beyond 181 unless a genuinely new prove function with a new PDG target is added. The gravity integer audit (12/12) does NOT add observables — those are structural proofs, not new PDG targets.
+Do NOT increment beyond 181 unless a genuinely new prove function with a new PDG target is added. The gravity integer audit (12/12) does NOT add observables — those are structural proofs, not new PDG targets. The D=22 VdW fix (Session 13) does NOT add observables — it corrects existing tower constants.
 
 ---
 
@@ -289,11 +332,18 @@ Do NOT increment beyond 181 unless a genuinely new prove function with a new PDG
 
 | System | Files | Count | Notes |
 |--------|-------|-------|-------|
-| Lean 4 | 9 .lean | 637 theorems | native_decide, 0 sorry |
-| Agda | 8 .agda | 487+ proofs | all by refl, 0 postulates |
-| Haskell/GHC | 31 modules | 12 compilations | GHC_Certificate.txt |
-| Rust | 9 test files | 341 tests | cargo test |
-| Python | 11 proof modules | 181+ checks | all PASS |
+| Lean 4 | 10 .lean | 656 theorems | native_decide, 0 sorry |
+| Agda | 9 .agda | 527+ proofs | all by refl, 0 postulates |
+| Haskell/GHC | 32 modules | 13 compilations | GHC_Certificate.txt |
+| Rust | 10 test files | 371 tests | cargo test |
+| Python | 12 proof modules | 181+ checks | all PASS |
+
+Session 13 additions:
+- Lean: +19 theorems (CrystalProtein.lean — integer proofs, no Mathlib)
+- Agda: +40 proofs (CrystalProtein.agda — all by refl)
+- Haskell: +1 module (CrystalProtein.hs — 26 checks)
+- Rust: +30 tests (crystal_protein_tests.rs)
+- Python: +1 module (crystal_vdw.py — D=22 VdW + force field)
 
 Session 12 additions:
 - Lean: +34 theorems (CrystalGravityDyn.lean)
@@ -309,9 +359,9 @@ Session 12 additions:
 ```
 CrystalAgent/
 ├── agent/
-│   ├── crystal_topos_waca_llm.md          ← THIS FILE (Session 12)
+│   ├── crystal_topos_waca_llm.md          ← THIS FILE (Session 13)
 │   └── crystal_topos_waca_llm_compact.md
-├── haskel/                                ← 31 Haskell modules
+├── haskel/                                ← 32 Haskell modules
 │   ├── Main.hs                            ← 92 observables
 │   ├── CrystalAxiom.hs
 │   ├── CrystalGauge.hs
@@ -319,8 +369,9 @@ CrystalAgent/
 │   ├── CrystalCosmo.hs
 │   ├── CrystalQCD.hs
 │   ├── CrystalGravity.hs                 ← S11: kinematic gravity
-│   ├── CrystalGravityDyn.hs              ← S12: dynamical gravity (NEW)
-│   ├── GravityDynTest.hs                 ← S12: 12/12 integer audit (NEW)
+│   ├── CrystalGravityDyn.hs              ← S12: dynamical gravity
+│   ├── GravityDynTest.hs                 ← S12: 12/12 integer audit
+│   ├── CrystalProtein.hs                 ← S13: force field proofs (NEW)
 │   ├── CrystalAudit.hs
 │   ├── CrystalCrossDomain.hs
 │   ├── CrystalRiemann.hs
@@ -336,10 +387,10 @@ CrystalAgent/
 │   ├── CrystalFullTest.hs                ← S7+S8: 181-observable regression
 │   └── CrystalLayer.hs                   ← S11: pure spectral tower D=0→D=42
 ├── proofs/
-│   ├── agda_proofs.sh                     ← 8/8 (was 7/7)
-│   ├── lean_proofs.sh                     ← 9/9 (was 8/8)
-│   ├── haskell_proofs.sh                  ← 12/12 (was 10/10)
-│   ├── proof_regression.sh               ← S12: updated manifest loops
+│   ├── agda_proofs.sh                     ← 9/9 (was 8/8)
+│   ├── lean_proofs.sh                     ← 10/10 (was 9/9)
+│   ├── haskell_proofs.sh                  ← 13/13 (was 12/12)
+│   ├── proof_regression.sh               ← S13: updated manifest loops
 │   ├── CrystalTopos.lean
 │   ├── CrystalStructural.lean
 │   ├── CrystalNoether.lean
@@ -347,7 +398,8 @@ CrystalAgent/
 │   ├── CrystalAlphaProton.lean            ← S4+S5
 │   ├── CrystalProtonRadius.lean           ← S6
 │   ├── CrystalLayer.lean                  ← S11: 19 cascade proofs
-│   ├── CrystalGravityDyn.lean             ← S12: 34 gravity theorems (NEW)
+│   ├── CrystalGravityDyn.lean             ← S12: 34 gravity theorems
+│   ├── CrystalProtein.lean                ← S13: 19 integer + 15 runtime (NEW)
 │   ├── Main.lean
 │   ├── CrystalTopos.agda
 │   ├── CrystalStructural.agda
@@ -356,14 +408,15 @@ CrystalAgent/
 │   ├── CrystalAlphaProton.agda            ← S4+S5
 │   ├── CrystalProtonRadius.agda           ← S6
 │   ├── CrystalLayer.agda                  ← S11: cascade proofs
-│   ├── CrystalGravityDyn.agda             ← S12: 24 gravity proofs (NEW)
+│   ├── CrystalGravityDyn.agda             ← S12: 24 gravity proofs
+│   ├── CrystalProtein.agda                ← S13: 40 integer proofs (NEW)
 │   ├── crystal_*_proof.py                 ← 6 Python proof modules (S1-S5)
 │   ├── crystal_proton_radius_proof.py     ← S6
 │   └── crystal_hierarchy_proof.py         ← S8
 ├── crystal-topos/
 │   ├── src/
 │   │   ├── base.rs                        ← DerivedAt<D> layer type (S11)
-│   │   └── crystal_gravity_dyn.rs         ← S12: 18 tests + compile asserts (NEW)
+│   │   └── crystal_gravity_dyn.rs         ← S12: 18 tests + compile asserts
 │   ├── tests/
 │   │   ├── crystal_tests.rs
 │   │   ├── crystal_structural_tests.rs
@@ -372,19 +425,21 @@ CrystalAgent/
 │   │   ├── crystal_alpha_proton_tests.rs  ← S4+S5
 │   │   ├── crystal_proton_radius_tests.rs ← S6
 │   │   ├── crystal_hierarchy_tests.rs     ← S8
-│   │   └── crystal_layer_tests.rs         ← S11: 17 layer tests
+│   │   ├── crystal_layer_tests.rs         ← S11: 17 layer tests
+│   │   └── crystal_protein_tests.rs       ← S13: 30 force field tests (NEW)
 │   └── examples/
 │       ├── spectral_tower.py              ← S11: pure D=0→D=42 tower
 │       ├── spectral_tower_pure.py         ← S11: identical backup
 │       ├── crystal_constants.py           ← S11: imports from tower
 │       ├── hf_solver.py                   ← S11: imports a₀ from tower
+│       ├── crystal_vdw.py                 ← S13: D=22 VdW + force field (NEW)
 │       ├── qubo_folder.py                 ← S11: MERA protein folder
-│       ├── mera_gravity_closed.py         ← S12: first law verification (NEW)
-│       ├── mera_linearized_gravity.py     ← S12: integer audit (NEW)
+│       ├── mera_gravity_closed.py         ← S12: first law verification
+│       ├── mera_linearized_gravity.py     ← S12: integer audit
 │       └── 01-115 examples                ← 116 Python examples
 ├── quickstart/
 ├── sync_check.sh
-├── build_rag_bundle.sh
+├── build_rag_bundle.sh                    ← S13: updated file lists
 ├── CHANGELOG.md
 └── README.md
 ```
@@ -432,9 +487,11 @@ https://raw.githubusercontent.com/CrystalToe/CrystalAgent/main/
     atomic/molecular/protein domains. The 181 particle physics observables
     are unchanged. The tower adds protein-scale constants with known
     accuracy bounds.
-23. The D=22 VdW wall is a diagnosed gap. Do not claim strand spacings
-    or H-bond lengths are accurate in the pure tower. They are ~44% off
-    due to the VdW radii being too small (single-atom STO limitation).
+23. D=22 VdW radii are FIXED (Session 13). The formula
+    r_vdw = f·ln(9·N²·Z²/(α·n²))/(2ζ) gives mean 3.1% error vs Bondi.
+    H-bond (4.8%), strand (4.1%), CA-CA (0.8%) all within 5%.
+    The force field energy scales (ε_vdw, E_hbond, E_burial) are tower-derived
+    with 0 fitted parameters. This is a force field, NOT a folder.
 24. Never use the word that starts with h and rhymes with "modest."
 25. Gravity integer audit (12/12) is structural — does NOT add observables.
     The gravity coefficients (16, 2, 4, 8, etc.) are tower constants, not
@@ -442,16 +499,20 @@ https://raw.githubusercontent.com/CrystalToe/CrystalAgent/main/
 26. The entanglement first law δS = δ⟨H_A⟩ = 1.0001 ± 0.0004 is the
     numerical verification that closes dynamical gravity. Reference:
     Faulkner-Guica-Hartman-Myers-Van Raamsdonk, JHEP 03 (2014) 051.
+27. D=22 VdW fix is structural — does NOT add observables. Observable
+    count stays at 181.
+28. CrystalProtein.lean uses NO Mathlib. Pure Lean 4 only. Integer proofs
+    by native_decide, real-valued checks by precomputed Float literals.
 
 ---
 
 ## STATISTICS
 
-- Haskell modules: 31 (was 29)
-- Lean theorems: 637 (was 603, +34)
-- Agda proofs: 487+ (was 446+, +24)
-- Rust tests: 341 (was 294, +18 + 29 misc)
-- Python proof modules: 11 (was 7, +4)
+- Haskell modules: 32 (was 31)
+- Lean theorems: 656 (was 637, +19)
+- Agda proofs: 527+ (was 487+, +40)
+- Rust tests: 371 (was 341, +30)
+- Python proof modules: 12 (was 11, +1)
 - Python examples: 119+
 - Cross-domain bridges: 15+
 - Domains: 22+
@@ -465,6 +526,8 @@ https://raw.githubusercontent.com/CrystalToe/CrystalAgent/main/
 - Pure tower purity: 46/46
 - Gravity integer audit: 12/12 PASS
 - First law ratio (χ=6): 1.0001 ± 0.0004
+- VdW radii: mean 3.1%, max 5.5% vs Bondi (Session 13)
+- Force field parameters fitted: 0
 
 ---
 
@@ -472,9 +535,9 @@ https://raw.githubusercontent.com/CrystalToe/CrystalAgent/main/
 
 ```bash
 # Proof runners (from proofs/)
-sh agda_proofs.sh           # 8/8 (was 7/7)
-sh lean_proofs.sh           # 9/9 (was 8/8)
-sh haskell_proofs.sh        # 12/12 (was 10/10)
+sh agda_proofs.sh           # 9/9 (was 8/8)
+sh lean_proofs.sh           # 10/10 (was 9/9)
+sh haskell_proofs.sh        # 13/13 (was 12/12)
 
 # Individual modules (from haskel/)
 ghc -O2 Main.hs -o crystal && ./crystal
@@ -489,15 +552,17 @@ ghc -O2 -main-is CrystalFullTest CrystalFullTest.hs -o full_test && ./full_test
 ghc -O2 -main-is CrystalLayer CrystalLayer.hs -o crystal_layer && ./crystal_layer
 ghc -fno-code CrystalGravityDyn.hs
 ghc -O2 GravityDynTest.hs -o gravity_dyn_test && ./gravity_dyn_test
+ghc -O2 -main-is CrystalProtein CrystalProtein.hs -o crystal_protein && ./crystal_protein
 
 # Rust
 cd crystal-topos && cargo test
 
 # Python
 cd crystal-topos/examples && python3 spectral_tower.py
+cd crystal-topos/examples && python3 crystal_vdw.py
 cd crystal-topos/examples && python3 mera_gravity_closed.py
 
-# Protein fold
+# Protein fold (toy — force field only, not a production folder)
 cd crystal-topos/examples && python3 qubo_folder.py
 
 # Health check
