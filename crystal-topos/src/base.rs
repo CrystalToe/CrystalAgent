@@ -300,8 +300,14 @@ pub fn layer10_proton_mass() -> DerivedAt<10> {
 }
 
 // ─── D=18: a_0 = hbar*c / (m_e * alpha) ────────────────────
+// m_e PURE: m_mu/(chi^3 - d_colour) = (v/2^11 * 8/9) / 208
 pub fn layer18_bohr() -> DerivedAt<18> {
-    DerivedAt::new(197.3269804e-8 / (0.000511 * layer5_alpha().val()))
+    let v = 246.22_f64;
+    let d_col = (NC * NC - 1) as f64;                    // 8
+    let m_mu = v / 2.0_f64.powi(2 * CHI as i32 - 1) * d_col / (NC * NC) as f64;
+    let m_e = m_mu / ((CHI as f64).powi(3) - d_col);     // m_mu / 208
+    let alpha = layer5_alpha().val();
+    DerivedAt::new(197.3269804e-8 / (m_e * alpha))
 }
 
 // ─── D=20: sp3 = arccos(-1/3) ──────────────────────────────
