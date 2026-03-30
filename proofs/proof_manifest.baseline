@@ -525,6 +525,25 @@ LEAN CrystalProtonRadius.lean trace_identity
 LEAN CrystalProtonRadius.lean correction_structure
 LEAN CrystalProtonRadius.lean rational_num
 LEAN CrystalProtonRadius.lean rational_den
+LEAN CrystalLayer.lean chi_eq
+LEAN CrystalLayer.lean beta0_eq
+LEAN CrystalLayer.lean towerD_eq
+LEAN CrystalLayer.lean sigmaD_eq
+LEAN CrystalLayer.lean gauss_eq
+LEAN CrystalLayer.lean sigmaD2_eq
+LEAN CrystalLayer.lean cascade_43
+LEAN CrystalLayer.lean fermat3
+LEAN CrystalLayer.lean binding_54
+LEAN CrystalLayer.lean binding_53
+LEAN CrystalLayer.lean sp3_denom
+LEAN CrystalLayer.lean strand_num
+LEAN CrystalLayer.lean strand_den
+LEAN CrystalLayer.lean helix_num
+LEAN CrystalLayer.lean helix_den
+LEAN CrystalLayer.lean flory_num
+LEAN CrystalLayer.lean flory_den
+LEAN CrystalLayer.lean tower_sum
+LEAN CrystalLayer.lean coprime
 LEAN Main.lean chi_eq
 LEAN Main.lean beta_0_eq
 LEAN Main.lean sigma_d_eq
@@ -583,7 +602,7 @@ LEAN Main.lean id_sigma_chi_sq
 LEAN Main.lean id_sigma_d2
 LEAN Main.lean id_D_decomp
 LEAN Main.lean id_algebra_N_c
-LEAN_FILES 7
+LEAN_FILES 8
 # AGDA PROOFS
 AGDA CrystalTopos.agda the-one-law
 AGDA CrystalTopos.agda chi-eq
@@ -1031,7 +1050,24 @@ AGDA CrystalProtonRadius.agda towerD-val
 AGDA CrystalProtonRadius.agda shared-core
 AGDA CrystalProtonRadius.agda alpha-channel
 AGDA CrystalProtonRadius.agda trace-identity
-AGDA_FILES 6
+AGDA CrystalLayer.agda chi-eq
+AGDA CrystalLayer.agda beta0-eq
+AGDA CrystalLayer.agda towerD-eq
+AGDA CrystalLayer.agda sigmaD-eq
+AGDA CrystalLayer.agda gauss-eq
+AGDA CrystalLayer.agda sigmaD2-eq
+AGDA CrystalLayer.agda alpha-int
+AGDA CrystalLayer.agda fermat3
+AGDA CrystalLayer.agda binding-54
+AGDA CrystalLayer.agda binding-53
+AGDA CrystalLayer.agda strand-ratio
+AGDA CrystalLayer.agda helix-num
+AGDA CrystalLayer.agda helix-den
+AGDA CrystalLayer.agda flory-num
+AGDA CrystalLayer.agda flory-den
+AGDA CrystalLayer.agda tower-sum
+AGDA CrystalLayer.agda coprime
+AGDA_FILES 7
 # HASKELL MODULES
 HASKELL Main.hs
 HASKELL CrystalStructural.hs
@@ -1040,6 +1076,8 @@ HASKELL CrystalDiscoveries.hs
 HASKELL CrystalAlphaProton.hs
 HASKELL CrystalProtonRadius.hs
 HASKELL WACAScanTest.hs
+HASKELL CrystalHierarchy.hs
+HASKELL CrystalLayer.hs
 HASKELL CrystalFullTest.hs
 # RUST TESTS
 RUST crystal_alpha_proton_tests.rs test_chi
@@ -1144,6 +1182,23 @@ RUST crystal_hierarchy_tests.rs test_sin13_clean_form
 RUST crystal_hierarchy_tests.rs test_sin13_corrected
 RUST crystal_hierarchy_tests.rs test_sin13_multiplier
 RUST crystal_hierarchy_tests.rs test_sin13_shares_2chi_minus_1
+RUST crystal_layer_tests.rs layer0_algebra
+RUST crystal_layer_tests.rs layer0_type_safety
+RUST crystal_layer_tests.rs layer5_alpha_value
+RUST crystal_layer_tests.rs layer5_alpha_reciprocal
+RUST crystal_layer_tests.rs layer10_proton
+RUST crystal_layer_tests.rs layer18_bohr_radius
+RUST crystal_layer_tests.rs layer20_sp3_exact
+RUST crystal_layer_tests.rs layer25_strand_anti_spacing
+RUST crystal_layer_tests.rs layer25_strand_par_spacing
+RUST crystal_layer_tests.rs layer25_strand_ratio
+RUST crystal_layer_tests.rs layer28_ca_ca_distance
+RUST crystal_layer_tests.rs layer32_helix_exact
+RUST crystal_layer_tests.rs layer32_helix_rise_exact
+RUST crystal_layer_tests.rs layer32_pitch
+RUST crystal_layer_tests.rs layer33_flory
+RUST crystal_layer_tests.rs layer42_energy_scale
+RUST crystal_layer_tests.rs cascade_integer_structure
 RUST crystal_noether_tests.rs noether_u1_generators
 RUST crystal_noether_tests.rs noether_su2_generators
 RUST crystal_noether_tests.rs noether_su3_generators
@@ -1321,6 +1376,7 @@ RUST crystal_tests.rs test_engineering_genetic_ecc
 RUST_COUNT crystal_alpha_proton_tests.rs 28
 RUST_COUNT crystal_discovery_tests.rs 33
 RUST_COUNT crystal_hierarchy_tests.rs 41
+RUST_COUNT crystal_layer_tests.rs 17
 RUST_COUNT crystal_noether_tests.rs 21
 RUST_COUNT crystal_proton_radius_tests.rs 30
 RUST_COUNT crystal_structural_tests.rs 36
@@ -1334,8 +1390,8 @@ PYTHON crystal_noether_proof.py
 PYTHON crystal_proton_radius_proof.py
 PYTHON crystal_structural_proof.py
 # SUMMARY COUNTS
-TOTAL_LEAN_THEOREMS      584
-TOTAL_AGDA_PROOFS      446
-TOTAL_RUST_TESTS      276
-TOTAL_HASKELL_MODULES        8
+TOTAL_LEAN_THEOREMS      603
+TOTAL_AGDA_PROOFS      463
+TOTAL_RUST_TESTS      293
+TOTAL_HASKELL_MODULES       10
 TOTAL_PYTHON_MODULES        7

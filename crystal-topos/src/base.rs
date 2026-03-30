@@ -255,3 +255,119 @@ pub const DNA_BASES: usize = NW * NW;                    // 4
 pub const CODONS: usize = (NW*NW) * (NW*NW) * (NW*NW);  // 64
 pub const AMINO_ACIDS: usize = NC*NC + NW*NW + (11*NC - 2*NW*NC)/3; // 20
 pub const CODON_SIGNALS: usize = NC * ((11*NC - 2*NW*NC)/3);         // 21
+
+// ═══════════════════════════════════════════════════════════════
+// §5  LAYER PROVENANCE — const-generic DerivedAt<D>
+// ═══════════════════════════════════════════════════════════════
+
+/// A physical constant tagged with its derivation layer in the spectral tower.
+#[derive(Clone, Copy, Debug)]
+pub struct DerivedAt<const D: usize> {
+    value: f64,
+}
+
+impl<const D: usize> DerivedAt<D> {
+    pub fn new(value: f64) -> Self { DerivedAt { value } }
+    pub fn val(&self) -> f64 { self.value }
+    pub fn layer(&self) -> usize { D }
+}
+
+impl<const D: usize> From<DerivedAt<D>> for f64 {
+    fn from(d: DerivedAt<D>) -> f64 { d.value }
+}
+
+// ─── D=0: Algebra constants ─────────────────────────────────
+pub fn layer0_chi() -> DerivedAt<0> { DerivedAt::new(6.0) }
+pub fn layer0_beta0() -> DerivedAt<0> { DerivedAt::new(7.0) }
+pub fn layer0_sigma_d() -> DerivedAt<0> { DerivedAt::new(36.0) }
+pub fn layer0_sigma_d2() -> DerivedAt<0> { DerivedAt::new(650.0) }
+pub fn layer0_d_max() -> DerivedAt<0> { DerivedAt::new(42.0) }
+pub fn layer0_v_higgs() -> DerivedAt<0> { DerivedAt::new(246.22) }
+
+// ─── D=5: Frozen fine structure constant ────────────────────
+// alpha_inv = (D+1)*pi + ln(beta_0) = 43*pi + ln(7)
+pub fn layer5_alpha_inv() -> DerivedAt<5> {
+    DerivedAt::new(43.0 * PI + 7.0_f64.ln())
+}
+
+pub fn layer5_alpha() -> DerivedAt<5> {
+    DerivedAt::new(1.0 / layer5_alpha_inv().val())
+}
+
+// ─── D=10: m_p = v/257 * 53/54 ─────────────────────────────
+pub fn layer10_proton_mass() -> DerivedAt<10> {
+    DerivedAt::new(246.22 / 257.0 * 53.0 / 54.0)
+}
+
+// ─── D=18: a_0 = hbar*c / (m_e * alpha) ────────────────────
+pub fn layer18_bohr() -> DerivedAt<18> {
+    DerivedAt::new(197.3269804e-8 / (0.000511 * layer5_alpha().val()))
+}
+
+// ─── D=20: sp3 = arccos(-1/3) ──────────────────────────────
+pub fn layer20_sp3() -> DerivedAt<20> {
+    DerivedAt::new((-1.0_f64 / 3.0).acos().to_degrees())
+}
+
+// ─── D=25: Strand spacings (pure derivation chain) ─────────
+pub fn layer25_strand_anti() -> DerivedAt<25> {
+    let a0 = layer18_bohr().val();
+    let sp3_rad = (-1.0_f64 / 3.0).acos();
+    let zigzag_half = (PI - sp3_rad) / 2.0;
+    // Slater Z_eff: N(2p) = 3.90, O(2p) = 4.55
+    let z_n = 7.0 - (2.0 * 0.85 + 4.0 * 0.35);
+    let z_o = 8.0 - (2.0 * 0.85 + 5.0 * 0.35);
+    let r_n = a0 * 10.0 / (2.0 * z_n);
+    let r_o = a0 * 10.0 / (2.0 * z_o);
+    let vdw_n = r_n + a0 * 2.0 / z_n;
+    let vdw_o = r_o + a0 * 2.0 / z_o;
+    let alpha = layer5_alpha().val();
+    let hbond = (vdw_n + vdw_o) * (1.0 - alpha.sqrt());
+    DerivedAt::new(2.0 * hbond * zigzag_half.cos())
+}
+
+pub fn layer25_strand_par() -> DerivedAt<25> {
+    DerivedAt::new(layer25_strand_anti().val() * (1.0 + 1.0 / 7.0))
+}
+
+// ─── D=28: CA-CA from backbone geometry ────────────────────
+pub fn layer28_ca_ca() -> DerivedAt<28> {
+    let a0 = layer18_bohr().val();
+    let z_c = 6.0 - (2.0 * 0.85 + 3.0 * 0.35);
+    let z_n = 7.0 - (2.0 * 0.85 + 4.0 * 0.35);
+    let r_c = a0 * 10.0 / (2.0 * z_c);
+    let r_n = a0 * 10.0 / (2.0 * z_n);
+    let ca_c = 2.0 * r_c;
+    let n_ca = r_n + r_c;
+    let cn = (r_c + r_n) - a0 * 1.5_f64.ln();
+    let sp3 = (-1.0_f64 / 3.0).acos().to_degrees();
+    let delta = 120.0 - sp3;
+    let x_c = z_c / 4.0;
+    let x_n = z_n / 4.0;
+    let diff = (x_n - x_c) / ((x_n + x_c) / 2.0);
+    let a1 = (120.0 - delta * diff).to_radians();
+    let a2 = (120.0 + delta * (-diff)).to_radians();
+    let d1 = (ca_c * ca_c + cn * cn - 2.0 * ca_c * cn * a1.cos()).sqrt();
+    let d2 = (d1 * d1 + n_ca * n_ca - 2.0 * d1 * n_ca * a2.cos()).sqrt();
+    DerivedAt::new(d2)
+}
+
+// ─── D=32: Helix geometry ──────────────────────────────────
+pub fn layer32_helix_per_turn() -> DerivedAt<32> {
+    DerivedAt::new(3.0 + 3.0 / 5.0)  // N_c + N_c/(chi-1) = 18/5
+}
+
+pub fn layer32_helix_rise() -> DerivedAt<32> {
+    DerivedAt::new(3.0 / 2.0)  // N_c/N_w
+}
+
+// ─── D=33: Flory exponent ──────────────────────────────────
+pub fn layer33_flory_nu() -> DerivedAt<33> {
+    DerivedAt::new(2.0 / 5.0)  // N_w/(N_w+N_c)
+}
+
+// ─── D=42: Fold energy scale ───────────────────────────────
+pub fn layer42_fold_energy() -> DerivedAt<42> {
+    DerivedAt::new(246.22 / 2.0_f64.powi(42))
+}
+
