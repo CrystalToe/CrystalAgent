@@ -38,8 +38,11 @@ ghc -fno-code CrystalGravityDyn.hs
 # 12. Dynamical gravity audit (S12 — 12/12 integer audit)
 ghc -O2 GravityDynTest.hs -o gravity_dyn_test && ./gravity_dyn_test
  
+# 13. Protein force field (S13 — 26 proofs, D=0..D=38)
+ghc -O2 -main-is CrystalProtein CrystalProtein.hs -o crystal_protein && ./crystal_protein
+ 
 # Clean up
-rm -f *.o *.hi crystal alpha_proton proton_radius extended_scan hierarchy_test full_test crystal_layer gravity_dyn_test
+rm -f *.o *.hi crystal alpha_proton proton_radius extended_scan hierarchy_test full_test crystal_layer gravity_dyn_test crystal_protein
  
 ```
 
