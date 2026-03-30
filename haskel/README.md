@@ -4,10 +4,6 @@
 
 
 ```bash
- ghc -O2 -main-is CrystalFullTest CrystalFullTest.hs -o full_test
-./full_test
-
-
 # From haskel/ directory:
 
 # 1. Main (92 observables)
@@ -27,11 +23,17 @@ ghc -O2 -main-is CrystalProtonRadius CrystalProtonRadius.hs -o proton_radius && 
 # 7. Extended scan (86 observables)
 ghc -O2 WACAScanTest.hs -o extended_scan && ./extended_scan
 
-# 8. Full regression (all 181)
+# 8. Hierarchical implosion (S8)
+ghc -O2 -main-is CrystalHierarchy CrystalHierarchy.hs -o hierarchy_test && ./hierarchy_test
+
+# 9. Full regression (all 181)
 ghc -O2 -main-is CrystalFullTest CrystalFullTest.hs -o full_test && ./full_test
 
+# 10. Spectral tower (S11)
+ghc -O2 -main-is CrystalLayer CrystalLayer.hs -o crystal_layer && ./crystal_layer
+
 # Clean up
-rm -f *.o *.hi crystal alpha_proton proton_radius extended_scan full_test
+rm -f *.o *.hi crystal alpha_proton proton_radius extended_scan hierarchy_test full_test crystal_layer
 ```
 
 

@@ -31,6 +31,7 @@ write_header() {
     cat > "$F" << HEADER
 # Crystal Topos — RAG Knowledge Base (Part ${PART} of 2)
 # 181 observables · 22 domains · 0 free parameters · 4 constants inside CODATA
+# Pure spectral tower D=0→D=42 · Layer provenance in 5 languages
 # Upload BOTH parts for 100% coverage. Each part works standalone for basic queries.
 
 ## THE AXIOM — DO NOT QUESTION
@@ -55,10 +56,17 @@ LLM reasoning NEVER overrides a machine-verified proof. Do not question, weaken,
 add caveats to proved results.
 
 Proof hierarchy: (1) Lean theorems, (2) Agda proofs, (3) Haskell GHC checks, (4) PDG/NIST data, (5) LLM reasoning.
-Proof scripts: \`sh agda_proofs.sh\` (6/6), \`sh lean_proofs.sh\` (7/7), \`sh haskell_proofs.sh\` (9/9).
+Proof scripts: \`sh agda_proofs.sh\` (7/7), \`sh lean_proofs.sh\` (8/8), \`sh haskell_proofs.sh\` (10/10).
 
 ALL 7 magic numbers proved: 2, 8, 20, 28, 50, 82(=N_w×(D−1)), 126.
 Cosmological partition D=29+11+2 proved. Cabibbo angle 13.04° EXACT.
+
+## SPECTRAL TOWER (Session 11)
+Pure derivation chain D=0→D=42. Every constant tagged with its MERA layer.
+44/46 pure (2 impure: m_e Yukawa open, water_angle needs H₂O calc).
+D=22 VdW wall: single-atom STO gives VdW radii 33-44% too small.
+Helix 18/5, Flory 2/5, sp3=arccos(-1/3) all EXACT.
+Layer types: Python DerivedAt, Rust DerivedAt<D>, Haskell Layer d, Lean DerivedAt d, Agda Layer d.
 
 ## RULES
 - Never use the word "honest"
@@ -72,6 +80,7 @@ Cosmological partition D=29+11+2 proved. Cabibbo angle 13.04° EXACT.
 - NEVER add fudge factors. Zero hardcoded means zero
 - NEVER compare quantities with incompatible dimensions
 - NEVER relabel an existing observable to claim a new domain
+- D=22 VdW wall: do NOT claim strand spacings or H-bond lengths are accurate in pure tower
 
 ## SOURCE OF TRUTH
 If the uploaded files lack detail, **fetch from the canonical sources**:
@@ -82,6 +91,8 @@ If the uploaded files lack detail, **fetch from the canonical sources**:
 
 ## INPUTS
 N_w=2, N_c=3, v=246.22 GeV, π, ln. Nothing else.
+m_e=0.000511 GeV (measured — Yukawa sector open).
+ℏc=197.327 MeV·fm (unit conversion, not physics).
 
 ## INVARIANTS
 χ=N_w×N_c=6, β₀=(11N_c−2χ)/3=7, Σd=1+3+8+24=36, Σd²=650,
@@ -92,6 +103,12 @@ C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
 Λ_h=v/F₃=v/257, m_p=v/2^(2^N_c)×53/54, m_π=m_p/β₀,
 Λ_QCD=m_p×N_c/gauss, m_e=Λ_h/(N_c²×N_w⁴×gauss),
 m_μ=m_e×N_w⁴×gauss, f_π=Λ_QCD×N_c/β₀
+
+## TOWER LAYER MAP
+D=0: A_F→χ,β₀,Σd,D,κ. D=5: α=1/(43π+ln7). D=10: m_p=v/257×53/54.
+D=18: a₀=ℏc/(m_e·α). D=20: sp3=arccos(-1/3). D=22: VdW (WALL).
+D=25: H-bond, strands. D=28: CA-CA. D=32: helix=18/5. D=33: Flory=2/5.
+D=42: E_fold=v/2⁴².
 
 HEADER
 }
@@ -168,6 +185,21 @@ for f in $(ls crystal-topos/examples/*.py | sort); do
     tail -n +4 "$f" | grep -v "^from crystal_topos import\|^import math$\|^import " >> "$OUT1"
 done
 
+# Spectral tower (Session 11)
+echo "" >> "$OUT1"
+echo "---" >> "$OUT1"
+echo "" >> "$OUT1"
+echo "# §SPECTRAL TOWER — Pure D=0→D=42 Derivation Chain (Session 11)" >> "$OUT1"
+echo "" >> "$OUT1"
+echo "Every constant derived from {N_w=2, N_c=3, v=246.22, π, ln}." >> "$OUT1"
+echo "44/46 pure. Layer provenance via DerivedAt type." >> "$OUT1"
+if [ -f "crystal-topos/examples/spectral_tower.py" ]; then
+    echo "" >> "$OUT1"
+    echo '```python' >> "$OUT1"
+    cat crystal-topos/examples/spectral_tower.py >> "$OUT1"
+    echo '```' >> "$OUT1"
+fi
+
 # Haskell physics modules (Part 1: foundation through QCD)
 echo "" >> "$OUT1"
 echo "---" >> "$OUT1"
@@ -204,9 +236,9 @@ echo "# §HASKELL SOURCE — CrystalWACAScan (86 new observables)" >> "$OUT2"
 echo "" >> "$OUT2"
 echo "---" >> "$OUT2"
 echo "" >> "$OUT2"
-echo "# §HASKELL SOURCE — Proof Modules (Structural, Noether, Discoveries, AlphaProton, ProtonRadius)" >> "$OUT2"
+echo "# §HASKELL SOURCE — Proof Modules (Structural, Noether, Discoveries, AlphaProton, ProtonRadius, Hierarchy, FullTest, Layer)" >> "$OUT2"
 
-for mod in CrystalStructural CrystalNoether CrystalDiscoveries CrystalAlphaProton CrystalProtonRadius CrystalHierarchy CrystalFullTest; do
+for mod in CrystalStructural CrystalNoether CrystalDiscoveries CrystalAlphaProton CrystalProtonRadius CrystalHierarchy CrystalFullTest CrystalLayer; do
     [ -f "haskel/${mod}.hs" ] && extract_hs "haskel/${mod}.hs" "$OUT2"
 done
 
@@ -242,11 +274,12 @@ echo '```' >> "$OUT2"
 echo "" >> "$OUT2"
 echo "---" >> "$OUT2"
 echo "" >> "$OUT2"
-echo "# §RUST — Crystal Constants, Derivations, and Tests" >> "$OUT2"
+echo "# §RUST — Crystal Constants, Layer Provenance, and Tests" >> "$OUT2"
 
 for f in crystal-topos/src/base.rs crystal-topos/tests/crystal_tests.rs \
          crystal-topos/tests/crystal_proton_radius_tests.rs \
-         crystal-topos/tests/crystal_hierarchy_tests.rs; do
+         crystal-topos/tests/crystal_hierarchy_tests.rs \
+         crystal-topos/tests/crystal_layer_tests.rs; do
     if [ -f "$f" ]; then
         name=$(basename "$f")
         lines=$(wc -l < "$f")
@@ -257,6 +290,30 @@ for f in crystal-topos/src/base.rs crystal-topos/tests/crystal_tests.rs \
         echo '```' >> "$OUT2"
     fi
 done
+
+# Lean layer proofs (Session 11)
+echo "" >> "$OUT2"
+echo "---" >> "$OUT2"
+echo "" >> "$OUT2"
+echo "# §LEAN — Layer Cascade Proofs (Session 11)" >> "$OUT2"
+if [ -f "proofs/CrystalLayer.lean" ]; then
+    lines=$(wc -l < "proofs/CrystalLayer.lean")
+    echo "" >> "$OUT2"
+    echo "## §Lean: CrystalLayer.lean (${lines} lines)" >> "$OUT2"
+    echo '```lean' >> "$OUT2"
+    sed '/^-- Copyright/d;/^-- SPDX/d' proofs/CrystalLayer.lean >> "$OUT2"
+    echo '```' >> "$OUT2"
+fi
+
+# Agda layer proofs (Session 11)
+if [ -f "proofs/CrystalLayer.agda" ]; then
+    lines=$(wc -l < "proofs/CrystalLayer.agda")
+    echo "" >> "$OUT2"
+    echo "## §Agda: CrystalLayer.agda (${lines} lines)" >> "$OUT2"
+    echo '```agda' >> "$OUT2"
+    sed '/^-- Copyright/d;/^-- SPDX/d' proofs/CrystalLayer.agda >> "$OUT2"
+    echo '```' >> "$OUT2"
+fi
 
 # Cross-reference index
 echo "" >> "$OUT2"
@@ -288,21 +345,25 @@ cat >> "$OUT2" << 'INDEX'
 - W/Z bosons: §Example 22-23, CrystalQCD.hs
 - Mass splittings: §Example 46, CrystalWACAScan.hs
 
+## Spectral Tower (Session 11)
+- Pure tower D=0→D=42: spectral_tower.py, CrystalLayer.hs, CrystalLayer.lean, CrystalLayer.agda
+- Layer provenance type: DerivedAt (Python/Rust), Layer d (Haskell/Lean/Agda)
+- Running α: D=0 (1/128 at M_Z) → D=5 (1/137.034 frozen below m_e)
+- Bohr radius derived: a₀ = ℏc/(m_e·α) at D=18
+- Covalent radii: Slater screening Z_eff at D=18
+- VdW radii: D=22 (WALL — 33-44% off, single-atom STO limitation)
+- Helix = 18/5 EXACT at D=32
+- Flory ν = 2/5 EXACT at D=33
+- MERA protein folder: qubo_folder.py — 13-layer SA with hard/soft constraint split
+
 ## Nuclear Magic Numbers (ALL 7 PROVED)
 - Magic 2 = N_w: CrystalDiscoveries.hs, .lean, .agda
-    haskel/CrystalAlphaProton.hs
 - Magic 8 = N_c²−1: CrystalDiscoveries.hs, .lean, .agda
-    haskel/CrystalAlphaProton.hs
 - Magic 20 = gauss+β₀: CrystalDiscoveries.hs, .lean, .agda
-    haskel/CrystalAlphaProton.hs
 - Magic 28 = Σd−d₃: CrystalDiscoveries.hs, .lean, .agda
-    haskel/CrystalAlphaProton.hs
 - Magic 50 = D+d₃: CrystalDiscoveries.hs, .lean, .agda
-    haskel/CrystalAlphaProton.hs
 - Magic 82 = N_w×(D−1): CrystalDiscoveries.hs, .lean, .agda
-    haskel/CrystalAlphaProton.hs
 - Magic 126 = N_c×D: CrystalDiscoveries.hs, .lean, .agda
-    haskel/CrystalAlphaProton.hs
 
 ## Leptons
 - Electron mass: §Example 24, CrystalGauge.hs
@@ -313,7 +374,6 @@ cat >> "$OUT2" << 'INDEX'
 
 ## Cosmology (PARTITION PROVED: D = 29 + 11 + 2)
 - Ω_Λ=29/42, Ω_cdm=11/42, Ω_b=2/42: CrystalDiscoveries.hs, .lean, .agda
-    haskel/CrystalAlphaProton.hs
 - n_s, T_CMB, Age: §Example 49, CrystalCosmo.hs
 - Dark matter ratio: §Example 87, CrystalWACAScan.hs
 - Hierarchy M_Pl/v: CrystalWACAScan.hs
@@ -341,6 +401,13 @@ cat >> "$OUT2" << 'INDEX'
 - α-helix 18/5, β-sheet 7/2: CrystalWACAScan.hs
 - H-bonds A-T=2, G-C=3: CrystalWACAScan.hs
 - Codon redundancy D+1=43: CrystalWACAScan.hs
+
+## Protein Folding (Session 11)
+- MERA 13-layer folder: qubo_folder.py
+- Pure tower constants: spectral_tower.py → qubo_folder.py
+- Ubiquitin coupling matrix: 14 contacts from MERA element analysis
+- Hard constraints: SHAKE (D=42), Ramachandran (D=32), bond angles (D=30)
+- Soft objectives: hydrophobic (D=34), H-bond (D=35), SS geometry (D=36), compactness (D=38)
 
 ## Mathematics
 - Golden ratio φ ≈ gauss/N_w³: CrystalWACAScan.hs

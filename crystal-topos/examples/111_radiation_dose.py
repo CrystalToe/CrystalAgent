@@ -20,7 +20,8 @@ from crystal_constants import (N_c, N_w, chi, beta_0, C_F, C_A, gauss, D, PI)
 # Fine structure constant (existing observable)
 # α ≈ 1/137, crystal derives from spectral action
 # Here we use the PDG value and note the crystal derivation exists
-alpha_em = 1.0 / 137.036
+import math
+alpha_em = 1.0 / ((42 + 1) * math.pi + math.log(7))  # (D+1)*pi + ln(beta_0)
 
 # QCD coupling at Z mass (existing observable)
 # α_s(M_Z) ≈ 0.118, running governed by β₀=7

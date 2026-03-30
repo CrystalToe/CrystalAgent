@@ -46,7 +46,7 @@ generate_manifest() {
   echo "# LEAN THEOREMS" >> "$out"
   for f in CrystalTopos.lean CrystalStructural.lean CrystalNoether.lean \
            CrystalDiscoveries.lean CrystalAlphaProton.lean \
-           CrystalProtonRadius.lean Main.lean; do
+           CrystalProtonRadius.lean CrystalLayer.lean Main.lean; do
     if [ -f "$PROOFS/$f" ]; then
       grep "^theorem " "$PROOFS/$f" | sed "s/theorem \([^ :]*\).*/LEAN $f \1/" >> "$out"
     fi
@@ -56,7 +56,7 @@ generate_manifest() {
   local lean_files=0
   for f in CrystalTopos.lean CrystalStructural.lean CrystalNoether.lean \
            CrystalDiscoveries.lean CrystalAlphaProton.lean \
-           CrystalProtonRadius.lean Main.lean; do
+           CrystalProtonRadius.lean CrystalLayer.lean Main.lean; do
     [ -f "$PROOFS/$f" ] && lean_files=$((lean_files + 1))
   done
   echo "LEAN_FILES $lean_files" >> "$out"
@@ -65,7 +65,7 @@ generate_manifest() {
   echo "# AGDA PROOFS" >> "$out"
   for f in CrystalTopos.agda CrystalStructural.agda CrystalNoether.agda \
            CrystalDiscoveries.agda CrystalAlphaProton.agda \
-           CrystalProtonRadius.agda; do
+           CrystalProtonRadius.agda CrystalLayer.agda; do
     if [ -f "$PROOFS/$f" ]; then
       grep -B1 "= refl" "$PROOFS/$f" | grep -v "= refl" | grep -v "^--" | \
         sed 's/^ *//' | sed "s/ .*//" | grep -v "^$" | \
@@ -79,7 +79,7 @@ generate_manifest() {
   local agda_files=0
   for f in CrystalTopos.agda CrystalStructural.agda CrystalNoether.agda \
            CrystalDiscoveries.agda CrystalAlphaProton.agda \
-           CrystalProtonRadius.agda; do
+           CrystalProtonRadius.agda CrystalLayer.agda; do
     [ -f "$PROOFS/$f" ] && agda_files=$((agda_files + 1))
   done
   echo "AGDA_FILES $agda_files" >> "$out"
@@ -88,7 +88,8 @@ generate_manifest() {
   echo "# HASKELL MODULES" >> "$out"
   for f in Main.hs CrystalStructural.hs CrystalNoether.hs \
            CrystalDiscoveries.hs CrystalAlphaProton.hs \
-           CrystalProtonRadius.hs WACAScanTest.hs; do
+           CrystalProtonRadius.hs WACAScanTest.hs \
+           CrystalHierarchy.hs CrystalLayer.hs; do
     [ -f "$HASKEL/$f" ] && echo "HASKELL $f" >> "$out"
   done
 
