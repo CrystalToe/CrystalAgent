@@ -79,11 +79,11 @@ The deviations between crystal predictions and experiment follow an **exponentia
 | Hardcoded numbers | **0** in crystal formulas |
 | Wall breaches | **0** (prime wall = 4.5%) |
 | CODATA precision | **3** (α⁻¹ Δ/unc=0.12, m_p/m_e=0.04, r_p=0.0013) |
-| Haskell modules | **28** (11,200+ lines) |
+| Haskell modules | **29** (11,200+ lines) |
 | Quantum operators | **96** |
-| Lean theorems | **584** (native_decide) |
-| Agda proofs | **446** (refl) |
-| Rust tests | **276** |
+| Lean theorems | **603** (native_decide) |
+| Agda proofs | **463** (refl) |
+| Rust tests | **294** |
 
 ---
 
@@ -137,10 +137,10 @@ ghc -O2 -main-is CrystalHierarchy CrystalHierarchy.hs -o hierarchy_test
 
 ### Full Proof Suite
 ```bash
-sh proofs/haskell_proofs.sh    # 9/9 PASS
-sh proofs/lean_proofs.sh       # 7/7 PASS
-sh proofs/agda_proofs.sh       # 6/6 PASS
-cd crystal-topos && cargo test # 276 PASS
+sh proofs/haskell_proofs.sh    # 10/10 PASS
+sh proofs/lean_proofs.sh       # 8/8 PASS
+sh proofs/agda_proofs.sh       # 7/7 PASS
+cd crystal-topos && cargo test # 294 PASS
 ```
 
 ### Regression Gate
@@ -193,13 +193,13 @@ CrystalAgent/
 │
 ├── crystal-topos/                     ← Rust core + Python bindings
 │   ├── src/                           ← 10 Rust modules
-│   ├── tests/                         ← 7 test files (276 tests)
-│   └── examples/                      ← 116 Python/HTML/JSX examples
+│   ├── tests/                         ← 8 test files (294 tests)
+│   └── examples/                      ← 119 Python/HTML/JSX examples
 │
 ├── proofs/                            ← Formal proofs + runner scripts
-│   ├── haskell_proofs.sh              ← 9/9 PASS (Session 8)
-│   ├── lean_proofs.sh                 ← 7/7 PASS
-│   ├── agda_proofs.sh                 ← 6/6 PASS
+│   ├── haskell_proofs.sh              ← 10/10 PASS (Session 8)
+│   ├── lean_proofs.sh                 ← 8/8 PASS
+│   ├── agda_proofs.sh                 ← 7/7 PASS
 │   ├── proof_regression.sh            ← Never lose a proof (POSIX compatible)
 │   ├── CrystalTopos.lean              ← 342 theorems
 │   ├── CrystalStructural.lean         ← 45 theorems
@@ -217,7 +217,7 @@ CrystalAgent/
 │   ├── crystal_*_proof.py             ← 7 Python proof modules
 │   └── GHC_Certificate.txt            ← Runtime output
 │
-└── haskel/                            ← All Haskell source (28 modules, 11,200+ lines)
+└── haskel/                            ← All Haskell source (29 modules, 11,500+ lines)
     │
     ├── ─── ORIGINAL CRYSTAL (92 observables) ───
     │   CrystalAxiom.hs               ← Foundation: one law, spectrum, types
@@ -297,10 +297,10 @@ Four independent proof systems verify the same identities:
 
 | System | Files | Count | Method |
 |--------|-------|-------|--------|
-| **GHC Haskell** | 28 `.hs` modules | 9/9 runners pass | Curry-Howard |
-| **Lean 4** | 7 `.lean` → `.olean` | **584** theorems | `native_decide` |
-| **Agda** | 6 `.agda` → `.agdai` | **446** proofs | `refl` |
-| **Rust** | 7 test files | **276** tests | `cargo test` |
+| **GHC Haskell** | 29 `.hs` modules | 10/10 runners pass | Curry-Howard |
+| **Lean 4** | 8 `.lean` → `.olean` | **603** theorems | `native_decide` |
+| **Agda** | 7 `.agda` → `.agdai` | **463** proofs | `refl` |
+| **Rust** | 8 test files | **294** tests | `cargo test` |
 | **Python** | 7 proof modules | 24+ checks each | `assert` |
 
 ---

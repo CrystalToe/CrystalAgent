@@ -74,9 +74,17 @@ _v = 246.22  -- GeV (spectral action on A_F)
 _hbarc :: Double
 _hbarc = 197.3269804e-8  -- GeV*Å
 
--- m_e: measured (Yukawa sector open)
+-- m_e: PURE — from lepton mass chain
+-- m_mu = v / 2^(2chi-1) * d_colour/N_c^2 = v/2^11 * 8/9
+-- m_e = m_mu / (chi^3 - d_colour) = m_mu / 208
+_d_colour :: Double
+_d_colour = n_c^(2::Int) - 1  -- 8
+
+_m_mu :: Double
+_m_mu = _v / 2^(2 * round _chi - 1 :: Int) * _d_colour / n_c^(2::Int)
+
 _m_e :: Double
-_m_e = 0.000511  -- GeV
+_m_e = _m_mu / (_chi^(3::Int) - _d_colour)
 
 layer0_chi, layer0_beta0, layer0_sigma_d, layer0_sigma_d2 :: Layer 0
 layer0_gauss, layer0_d_max, layer0_kappa, layer0_v_higgs :: Layer 0

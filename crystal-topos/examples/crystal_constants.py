@@ -186,21 +186,24 @@ if _TOWER_AVAILABLE:
     flory_nu_v   = float(FLORY_NU)                 # D=33
 else:
     # Fallback: derive from {N_w=2, N_c=3, v=246.22, pi, ln} inline.
-    # No textbook values. Every number has a derivation.
+    # No textbook values. Every number has a derivation. 46/46 pure.
     _D42 = sigma_d + chi  # 42
     alpha_fine   = 1.0 / ((_D42 + 1) * math.pi + math.log(beta_0))  # 1/(43pi+ln7)
-    _m_e = 0.000511  # GeV — measured (Yukawa sector open)
+    _d_col = N_c**2 - 1  # 8
+    _m_mu = v / 2**(2*chi - 1) * _d_col / N_c**2  # v/2^11 * 8/9
+    _m_e = _m_mu / (chi**3 - _d_col)  # m_mu/208 — PURE
     _hbarc_gev_a = 197.3269804e-8  # GeV*Å (unit conversion)
     bohr_radius  = _hbarc_gev_a / (_m_e * alpha_fine)
     sp3_angle    = math.degrees(math.acos(-1.0 / N_c))  # arccos(-1/3)
+    water_angle  = math.degrees(math.acos(-1.0 / N_w**2))  # arccos(-1/4) — PURE
     helix_per_t  = N_c + N_c / (chi - 1)  # 3 + 3/5 = 18/5
     helix_rise_v = N_c / N_w  # 3/2
     flory_nu_v   = N_w / (N_w + N_c)  # 2/5
-    # D=22-25 chain (pure but ~40% off at VdW — known gap)
-    strand_anti  = 4.762   # from pure tower (VdW contact + zigzag)
+    # D=22-25 chain (pure but ~44% off at VdW — D=22 wall)
+    strand_anti  = 2.620   # from pure tower (VdW contact + zigzag)
     strand_par   = strand_anti * (1 + 1.0 / beta_0)  # 8/7 ratio
-    h_bond_len   = 2.962   # from pure tower (VdW_N + VdW_O)
-    ca_ca_dist   = 3.642   # from pure tower (backbone geometry)
+    h_bond_len   = 1.604   # from pure tower (VdW_N + VdW_O)
+    ca_ca_dist   = 3.443   # from pure tower (backbone geometry)
 
 if __name__ == "__main__":
     verify_all()

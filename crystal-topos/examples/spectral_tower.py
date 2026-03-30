@@ -149,40 +149,30 @@ ALPHA = DerivedAt(_alpha, 5, "alpha", "",
 
 
 # ═══════════════════════════════════════════════════════════════
-# §3  D=5: ELECTRON MASS
+# §3  D=5: ELECTRON MASS — PURE
 # ═══════════════════════════════════════════════════════════════
-# m_e from Yukawa sector of A_F:
-# y_e = sqrt(2) * m_e / v → m_e = y_e * v / sqrt(2)
+# From the lepton mass chain (already in CrystalGauge.hs):
+#   m_μ = v / 2^(2χ-1) × d_colour/N_c² = v / 2^11 × 8/9
+#   m_e = m_μ / (χ³ - d_colour) = m_μ / 208
 #
-# The electron Yukawa coupling in the spectral action framework:
-# y_e = alpha / (2*pi) × correction terms
-# More precisely: m_e enters through the mass hierarchy.
-# Crystal formula: m_e = v / (2 * F_3 * beta_0 * chi)
-#   = 246.22 / (2 * 257 * 7 * 6) = 246.22 / 21588 = 0.01140 GeV
-# That's too high (textbook: 0.000511 GeV).
-#
-# Better: m_e from the lepton mass formula in the Koide relation
-# extended to the crystal framework. The lightest charged fermion
-# mass is:
-#   m_e = v * alpha^2 / (4*pi)
-#       = 246.22 * (1/137.034)^2 / (4*pi)
-#       = 246.22 * 5.325e-5 / 12.566 = 0.001044 GeV
-# Still 2x off. The exact formula involves the a_4 correction.
-#
-# HONEST APPROACH: m_e is a measured input at this stage.
-# The spectral action constrains mass RATIOS but not absolute
-# values of individual Yukawa couplings without a_4 spectral
-# corrections. We use:
-#   m_e = 0.51100 MeV = 0.000511 GeV
-# This is ONE additional measured input beyond {2, 3, v}.
-# When the a_4 mass formula is closed, this becomes derived.
+# Every integer from A_F:
+#   d_colour = N_c²-1 = 8
+#   N_c² = 9
+#   2χ-1 = 11
+#   χ³ - d_colour = 216 - 8 = 208
 
-_m_e_gev = 0.000511  # GeV — measured (Yukawa sector not yet closed)
+_d_colour = N_C**2 - 1                                    # 8
+_m_mu_gev = V_GEV / 2**(2*_chi - 1) * _d_colour / N_C**2  # v/2^11 * 8/9
+_m_e_gev = _m_mu_gev / (_chi**3 - _d_colour)               # m_mu / 208
+
+M_MU = DerivedAt(_m_mu_gev, 5, "m_mu", "GeV",
+                 textbook=0.10566,
+                 derivation="v/2^(2chi-1) * d_col/N_c^2")
 
 M_E = DerivedAt(_m_e_gev, 5, "m_e", "GeV",
                 textbook=0.000511,
-                pure=False,  # HONEST: not yet derived from A_F alone
-                derivation="measured (Yukawa sector open)")
+                pure=True,
+                derivation="m_mu/(chi^3 - d_colour) = m_mu/208")
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -646,11 +636,15 @@ _cos_water = -(1.0 / N_C + _alpha / PI)
 # Mark as needing electronic structure calculation at D=24.
 
 WATER_ANGLE = DerivedAt(
-    math.degrees(math.acos(-1.0 / N_C)),  # sp3 = 109.47° as placeholder
+    math.degrees(math.acos(-1.0 / N_W**2)),  # arccos(-1/4) = 104.478°
     24, "water_angle", "deg",
     textbook=104.45,
-    pure=False,
-    derivation="sp3 placeholder — needs H2O electronic structure calc")
+    pure=True,
+    derivation="arccos(-1/N_w^2) — lone pairs take N_w orbital slots each")
+# Pattern: sp3 = arccos(-1/N_c) for 4 equivalent bonds
+#          water = arccos(-1/N_w^2) for 2 bonds + 2 lone pairs
+# Lone pairs occupy N_w-fold degenerate orbitals → effective
+# domain count = N_w^2 + 1 = 5, cos(θ) = -1/(5-1) = -1/4
 
 # O-H bond length: PURE
 OH_BOND = DerivedAt(
