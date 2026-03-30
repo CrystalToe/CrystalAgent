@@ -602,7 +602,41 @@ LEAN Main.lean id_sigma_chi_sq
 LEAN Main.lean id_sigma_d2
 LEAN Main.lean id_D_decomp
 LEAN Main.lean id_algebra_N_c
-LEAN_FILES 8
+LEAN CrystalGravityDyn.lean coeff_16piG
+LEAN CrystalGravityDyn.lean coeff_16_from_primes
+LEAN CrystalGravityDyn.lean coeff_16_decompose
+LEAN CrystalGravityDyn.lean schwarzschild_2
+LEAN CrystalGravityDyn.lean RT_four
+LEAN CrystalGravityDyn.lean EFE_eight
+LEAN CrystalGravityDyn.lean EFE_d_colour
+LEAN CrystalGravityDyn.lean GW_speed
+LEAN CrystalGravityDyn.lean LR_bound_universal
+LEAN CrystalGravityDyn.lean GW_polarizations
+LEAN CrystalGravityDyn.lean polarizations_eq_schwarzschild
+LEAN CrystalGravityDyn.lean quadrupole_32
+LEAN CrystalGravityDyn.lean quadrupole_5
+LEAN CrystalGravityDyn.lean quadrupole_ratio_num
+LEAN CrystalGravityDyn.lean quadrupole_ratio_den
+LEAN CrystalGravityDyn.lean spacetime_dim
+LEAN CrystalGravityDyn.lean spatial_dim
+LEAN CrystalGravityDyn.lean clifford_dim
+LEAN CrystalGravityDyn.lean spinor_dim
+LEAN CrystalGravityDyn.lean all_from_two_three
+LEAN CrystalGravityDyn.lean chi_eq
+LEAN CrystalGravityDyn.lean beta0_eq
+LEAN CrystalGravityDyn.lean D_eq
+LEAN CrystalGravityDyn.lean gauss_eq
+LEAN CrystalGravityDyn.lean sigma_d_eq
+LEAN CrystalGravityDyn.lean sigma_d2_eq
+LEAN CrystalGravityDyn.lean equiv_principle
+LEAN CrystalGravityDyn.lean jacobson_step1_LR
+LEAN CrystalGravityDyn.lean jacobson_step2_KMS
+LEAN CrystalGravityDyn.lean jacobson_step3_RT
+LEAN CrystalGravityDyn.lean jacobson_step4_EFE
+LEAN CrystalGravityDyn.lean jacobson_chain_complete
+LEAN CrystalGravityDyn.lean linearized_einstein_integers
+LEAN CrystalGravityDyn.lean dynamical_gravity_from_AF
+LEAN_FILES 9
 # AGDA PROOFS
 AGDA CrystalTopos.agda the-one-law
 AGDA CrystalTopos.agda chi-eq
@@ -1067,7 +1101,31 @@ AGDA CrystalLayer.agda flory-num
 AGDA CrystalLayer.agda flory-den
 AGDA CrystalLayer.agda tower-sum
 AGDA CrystalLayer.agda coprime
-AGDA_FILES 7
+AGDA CrystalGravityDyn.agda chi-eq
+AGDA CrystalGravityDyn.agda beta0-eq
+AGDA CrystalGravityDyn.agda sigma-d-eq
+AGDA CrystalGravityDyn.agda sigma-d2-eq
+AGDA CrystalGravityDyn.agda gauss-eq
+AGDA CrystalGravityDyn.agda D-eq
+AGDA CrystalGravityDyn.agda coeff-16πG
+AGDA CrystalGravityDyn.agda schwarzschild-2
+AGDA CrystalGravityDyn.agda RT-four
+AGDA CrystalGravityDyn.agda EFE-eight
+AGDA CrystalGravityDyn.agda d-colour-eq
+AGDA CrystalGravityDyn.agda GW-speed-structural
+AGDA CrystalGravityDyn.agda GW-polarizations
+AGDA CrystalGravityDyn.agda pol-eq-schwarz
+AGDA CrystalGravityDyn.agda quadrupole-32
+AGDA CrystalGravityDyn.agda quadrupole-5
+AGDA CrystalGravityDyn.agda spacetime-dim
+AGDA CrystalGravityDyn.agda clifford-dim
+AGDA CrystalGravityDyn.agda spinor-dim
+AGDA CrystalGravityDyn.agda jacobson-step1
+AGDA CrystalGravityDyn.agda jacobson-step2
+AGDA CrystalGravityDyn.agda jacobson-step3
+AGDA CrystalGravityDyn.agda jacobson-step4
+AGDA CrystalGravityDyn.agda equiv-principle
+AGDA_FILES 8
 # HASKELL MODULES
 HASKELL Main.hs
 HASKELL CrystalStructural.hs
@@ -1078,6 +1136,27 @@ HASKELL CrystalProtonRadius.hs
 HASKELL WACAScanTest.hs
 HASKELL CrystalHierarchy.hs
 HASKELL CrystalLayer.hs
+HASKELL CrystalAxiom.hs
+HASKELL CrystalGauge.hs
+HASKELL CrystalMixing.hs
+HASKELL CrystalCosmo.hs
+HASKELL CrystalQCD.hs
+HASKELL CrystalGravity.hs
+HASKELL CrystalAudit.hs
+HASKELL CrystalCrossDomain.hs
+HASKELL CrystalRiemann.hs
+HASKELL CrystalWACAScan.hs
+HASKELL CrystalQuantum.hs
+HASKELL CrystalQBase.hs
+HASKELL CrystalQGates.hs
+HASKELL CrystalQChannels.hs
+HASKELL CrystalQHamiltonians.hs
+HASKELL CrystalQMeasure.hs
+HASKELL CrystalQEntangle.hs
+HASKELL CrystalQAlgorithms.hs
+HASKELL CrystalQSimulation.hs
+HASKELL CrystalGravityDyn.hs
+HASKELL GravityDynTest.hs
 HASKELL CrystalFullTest.hs
 # RUST TESTS
 RUST crystal_alpha_proton_tests.rs test_chi
@@ -1373,6 +1452,36 @@ RUST crystal_tests.rs test_engineering_jwst_stability
 RUST crystal_tests.rs test_engineering_protein_geometry
 RUST crystal_tests.rs test_engineering_refractive_indices
 RUST crystal_tests.rs test_engineering_genetic_ecc
+RUST crystal_gravity_dyn.rs test_coeff_16pi_g
+RUST crystal_gravity_dyn.rs test_schwarzschild_2
+RUST crystal_gravity_dyn.rs test_rt_four
+RUST crystal_gravity_dyn.rs test_efe_eight
+RUST crystal_gravity_dyn.rs test_gw_speed
+RUST crystal_gravity_dyn.rs test_gw_polarizations
+RUST crystal_gravity_dyn.rs test_quadrupole_32
+RUST crystal_gravity_dyn.rs test_quadrupole_5
+RUST crystal_gravity_dyn.rs test_quadrupole_ratio
+RUST crystal_gravity_dyn.rs test_spacetime_dim
+RUST crystal_gravity_dyn.rs test_clifford_dim
+RUST crystal_gravity_dyn.rs test_spinor_dim
+RUST crystal_gravity_dyn.rs test_equiv_principle
+RUST crystal_gravity_dyn.rs test_kolmogorov_five_thirds
+RUST crystal_gravity_dyn.rs test_cross_checks
+RUST crystal_gravity_dyn.rs test_all_12_pass
+RUST crystal_gravity_dyn.rs test_jacobson_chain_kinematic
+RUST crystal_gravity_dyn.rs test_jacobson_chain_dynamical
+RUST crystal_tests.rs test_crystal_constants
+RUST crystal_tests.rs test_two_particles_is_algebra
+RUST crystal_tests.rs test_entanglement_is_arrow
+RUST crystal_tests.rs test_fermion_is_su4
+RUST crystal_tests.rs test_ppt_decidable
+RUST crystal_tests.rs test_gate_count
+RUST crystal_tests.rs test_fock_limit
+RUST crystal_tests.rs test_ladder_symmetric
+RUST crystal_tests.rs test_interactions_duality
+RUST crystal_tests.rs test_cnot_neutrino
+RUST crystal_tests.rs test_max_entangled_entropy
+RUST crystal_tests.rs test_hadamard_is_unitary
 RUST_COUNT crystal_alpha_proton_tests.rs 28
 RUST_COUNT crystal_discovery_tests.rs 33
 RUST_COUNT crystal_hierarchy_tests.rs 41
@@ -1381,6 +1490,8 @@ RUST_COUNT crystal_noether_tests.rs 21
 RUST_COUNT crystal_proton_radius_tests.rs 30
 RUST_COUNT crystal_structural_tests.rs 36
 RUST_COUNT crystal_tests.rs 87
+RUST_COUNT crystal_gravity_dyn.rs 18
+RUST_COUNT crystal_tests.rs 12
 # PYTHON PROOF MODULES
 PYTHON crystal_alpha_proton_proof.py
 PYTHON crystal_certificate_proof.py
@@ -1389,9 +1500,13 @@ PYTHON crystal_hierarchy_proof.py
 PYTHON crystal_noether_proof.py
 PYTHON crystal_proton_radius_proof.py
 PYTHON crystal_structural_proof.py
+PYTHON mera_gravity_closed.py
+PYTHON mera_linearized_gravity.py
+PYTHON spectral_tower.py
+PYTHON qubo_folder.py
 # SUMMARY COUNTS
-TOTAL_LEAN_THEOREMS      603
-TOTAL_AGDA_PROOFS      463
-TOTAL_RUST_TESTS      293
-TOTAL_HASKELL_MODULES       10
-TOTAL_PYTHON_MODULES        7
+TOTAL_LEAN_THEOREMS      637
+TOTAL_AGDA_PROOFS      487
+TOTAL_RUST_TESTS      323
+TOTAL_HASKELL_MODULES       31
+TOTAL_PYTHON_MODULES       11
