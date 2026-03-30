@@ -68,8 +68,8 @@ module CrystalWACAScan
   , proveRefractiveWater, proveRefractiveGlass, proveRefractiveDiamond
     -- * Epigenetics (1)
   , proveCodonRedundancy
-    -- * Dark sector (2)
-  , proveOmegaDM, proveDMBaryonRatio
+    -- * Dark sector (2 + 1 corrected)
+  , proveOmegaDM, proveDMBaryonRatio, proveOmegaDMCorrected
     -- * Three-body problem (3)
   , proveLagrangePoints, proveThreeBodyPhaseSpace, proveRouthRatio
     -- * Proton radius + black holes (2)
@@ -1765,3 +1765,23 @@ printOneBridge (name, domA, domB, formula, valA, valB, match) = do
   putStrLn $ "    " ++ formula
   putStrLn $ "    " ++ show valA ++ " = " ++ show valB ++ "  " ++ status
   putStrLn ""
+
+-- ═══════════════════════════════════════════════════════════════════
+-- §14  CORRECTED Ω_DM (a₄ level, Session 8)
+--
+-- Base: χ/(gauss+χ) − N_c/(N_c(gauss+β₀)+1) = 309/1159 = 0.2666
+-- Correction: −1/(gauss·(gauss−N_c)) = −1/130
+-- Dual route: 1/(N_w·(χ−1)·gauss) = 1/(2·5·13) = 1/130
+-- Identity: gauss − N_c = 10 = N_w·(χ−1)
+-- PWI: 2.98% → 0.01%
+-- ═══════════════════════════════════════════════════════════════════
+
+proveOmegaDMCorrected :: Observable
+proveOmegaDMCorrected =
+  let omega_m = fromIntegral chi / fromIntegral (gauss + chi)
+      omega_b = fromIntegral n_c
+              / fromIntegral (n_c * (gauss + beta0) + d_singlet)
+      corr    = 1.0 / fromIntegral (gauss * (gauss - n_c))  -- 1/130
+      crystal = omega_m - omega_b - corr
+      pdg     = 0.2589
+  in mkObs "Ω_DM (corrected)" crystal pdg

@@ -230,3 +230,90 @@ theorem beta0_from_primes :
 -- Equivalent form: D/(χ·d₄·Σd²) = 42/93600 = 7/15600
 theorem sin2_equiv :
     towerD * 15600 = beta0 * (chi * d₄ * sigma_d2) := by native_decide
+
+-- ══════════════════════════════════════════════════
+-- SESSION 8: HIERARCHICAL IMPLOSION — 5 DUAL ROUTES
+--
+-- Each outlier correction has two independent A_F
+-- derivations that give the same rational number.
+-- The dual route is the prolongation operator.
+-- ══════════════════════════════════════════════════
+
+-- m_Υ: N_c³/(χ·Σd) = N_c²/(N_w·Σd) = 1/8
+-- Identity: χ = N_w·N_c, so N_c divides out.
+theorem upsilon_dual_route :
+    N_c ^ 3 * (N_w * sigma_d) = N_c ^ 2 * (chi * sigma_d) := by native_decide
+
+theorem upsilon_corr_val :
+    N_c ^ 3 * 8 = chi * sigma_d := by native_decide
+
+-- m_D: D/(d₄·Σd) = 1/d₄ + χ/(d₄·Σd) (= 7/144)
+-- Identity: D = Σd + χ splits the numerator.
+theorem dmeson_dual_route :
+    towerD * 144 = 7 * (d₄ * sigma_d) := by native_decide
+
+theorem dmeson_split :
+    towerD = sigma_d + chi := by native_decide
+
+-- m_ρ: T_F/χ = N_c/Σd (= 1/12)
+-- Identity: T_F·Σd = χ·N_c (both = 18)
+-- T_F = 1/2, so 1/(2·χ) = N_c/Σd ↔ Σd = 2·χ·N_c = 2·6·3 = 36. ✓
+theorem rho_dual_route :
+    1 * sigma_d = 2 * chi * N_c := by native_decide
+-- Read as: T_F·Σd (=½·36=18) = χ·N_c (=6·3=18)
+-- Proving: Σd = 2·χ·N_c is wrong. Let me be exact.
+-- T_F/χ = (1/2)/6 = 1/12; N_c/Σd = 3/36 = 1/12.
+-- Cross-multiply: 1 × Σd = 2 × χ × N_c? No: Σd = 36, 2·χ·N_c = 36. ✓
+-- Actually: Σd/(2·χ) = 36/12 = 3 = N_c. That's the identity.
+theorem rho_identity :
+    sigma_d = 2 * chi * N_c := by native_decide
+
+-- m_φ: N_w/(N_c·Σd) = (d₄−d₃)/(d₄·Σd) (= 1/54)
+-- Identity: d₄ − d₃ = 16 = N_w·d₃; and d₃·N_c = d₄.
+theorem phi_dual_route :
+    N_w * (d₄ * sigma_d) = (d₄ - d₃) * (N_c * sigma_d) := by native_decide
+
+theorem phi_identity_d4_minus_d3 :
+    d₄ - d₃ = N_w * d₃ := by native_decide
+
+theorem phi_identity_d3_nc :
+    d₃ * N_c = d₄ := by native_decide
+
+-- Ω_DM: 1/(gauss·(gauss−N_c)) = 1/(N_w·(χ−1)·gauss) (= 1/130)
+-- Identity: gauss − N_c = 10 = N_w·(χ−1)
+theorem omega_dm_dual_route :
+    gauss * (gauss - N_c) = N_w * (chi - 1) * gauss := by native_decide
+
+theorem omega_dm_identity :
+    gauss - N_c = N_w * (chi - 1) := by native_decide
+
+theorem omega_dm_corr_val :
+    gauss * (gauss - N_c) = 130 := by native_decide
+
+-- r_p (session 6, included for completeness):
+-- T_F/(d₃·Σd) = 1/d₄² (= 1/576)
+-- Identity: 2·d₃·Σd = d₄²
+theorem rp_dual_route :
+    2 * d₃ * sigma_d = d₄ ^ 2 := by native_decide
+
+-- ALL 6 dual routes use only A_F atoms (N_w, N_c, dᵢ, Σd, χ, D, gauss)
+-- ALL corrections are rational (integer denominators from A_F)
+-- ALL corrections are negative for QCD sector observables
+
+-- sin²θ₁₃: (D+d_w)·N_w²·(χ−1)² = Σd·(χ−1)³ = 4500
+-- where d_w = N_w² − 1 = 3
+def d_w : Nat := N_w ^ 2 - 1
+
+theorem sin13_dual_route :
+    (towerD + d_w) * N_w ^ 2 * (chi - 1) ^ 2 =
+    sigma_d * (chi - 1) ^ 3 := by native_decide
+
+theorem sin13_corr_val :
+    (towerD + d_w) * N_w ^ 2 * (chi - 1) ^ 2 = 4500 := by native_decide
+
+theorem sin13_identity :
+    (towerD + d_w) * N_w ^ 2 = sigma_d * (chi - 1) := by native_decide
+
+-- Clean form: (2χ−1)/(N_w²·(χ−1)³) = 11/500
+theorem sin13_numerator : 2 * chi - 1 = 11 := by native_decide
+theorem sin13_denominator : N_w ^ 2 * (chi - 1) ^ 3 = 500 := by native_decide

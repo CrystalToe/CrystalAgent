@@ -55,7 +55,7 @@ LLM reasoning NEVER overrides a machine-verified proof. Do not question, weaken,
 add caveats to proved results.
 
 Proof hierarchy: (1) Lean theorems, (2) Agda proofs, (3) Haskell GHC checks, (4) PDG/NIST data, (5) LLM reasoning.
-Proof scripts: \`sh agda_proofs.sh\` (6/6), \`sh lean_proofs.sh\` (7/7), \`sh haskell_proofs.sh\` (7/7).
+Proof scripts: \`sh agda_proofs.sh\` (6/6), \`sh lean_proofs.sh\` (7/7), \`sh haskell_proofs.sh\` (9/9).
 
 ALL 7 magic numbers proved: 2, 8, 20, 28, 50, 82(=N_w×(D−1)), 126.
 Cosmological partition D=29+11+2 proved. Cabibbo angle 13.04° EXACT.
@@ -206,7 +206,7 @@ echo "---" >> "$OUT2"
 echo "" >> "$OUT2"
 echo "# §HASKELL SOURCE — Proof Modules (Structural, Noether, Discoveries, AlphaProton, ProtonRadius)" >> "$OUT2"
 
-for mod in CrystalStructural CrystalNoether CrystalDiscoveries CrystalAlphaProton CrystalProtonRadius; do
+for mod in CrystalStructural CrystalNoether CrystalDiscoveries CrystalAlphaProton CrystalProtonRadius CrystalHierarchy CrystalFullTest; do
     [ -f "haskel/${mod}.hs" ] && extract_hs "haskel/${mod}.hs" "$OUT2"
 done
 
@@ -245,7 +245,8 @@ echo "" >> "$OUT2"
 echo "# §RUST — Crystal Constants, Derivations, and Tests" >> "$OUT2"
 
 for f in crystal-topos/src/base.rs crystal-topos/tests/crystal_tests.rs \
-         crystal-topos/tests/crystal_proton_radius_tests.rs; do
+         crystal-topos/tests/crystal_proton_radius_tests.rs \
+         crystal-topos/tests/crystal_hierarchy_tests.rs; do
     if [ -f "$f" ]; then
         name=$(basename "$f")
         lines=$(wc -l < "$f")
@@ -269,6 +270,8 @@ cat >> "$OUT2" << 'INDEX'
 - Proton-electron mass ratio: CrystalAlphaProton.hs
 - Weak mixing angle: CrystalAlphaProton.hs, CrystalGauge.hs
 - Proton charge radius: CrystalProtonRadius.hs — r_p = (C_F·N_c − T_F/(d₃·Σd)) × ℏ/(m_p·c)
+- Hierarchical implosion (S8): CrystalHierarchy.hs — 7 dual routes, 10 corrections, CV=0.957
+- sin²θ₁₃ = 11/500: CrystalMixing.hs — (2χ−1)/(N_w²(χ−1)³), dual route verified
 - Proton mass: §Example 41, CrystalQCD.hs
 - Pion mass: §Example 30, CrystalQCD.hs
 - Kaon masses: §Example 32, CrystalWACAScan.hs

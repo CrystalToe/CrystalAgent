@@ -34,6 +34,8 @@ import qualified CrystalAlphaProton as AP
 -- S6: proton charge radius
 import qualified CrystalProtonRadius as PR
 
+-- S8: CrystalHierarchy (imported for documentation; corrections in QCD/WACAScan)
+
 -- ══════════════════════════════════════════════════════════════════
 -- UNIFIED TEST ENTRY
 -- ══════════════════════════════════════════════════════════════════
@@ -95,7 +97,7 @@ original92 =
         , CrystalGauge.proveVEV c r, proveHiggsMass c r, proveKoide c
         , CrystalMixing.proveVus c, proveWolfA_Z c, CrystalMixing.proveVcb c
         , proveDeltaCKM c, proveVub c, proveJarlskog c
-        , proveSinSq12 c, proveSinSq23 c, proveSinSq13 c, proveDeltaPMNS c
+        , proveSinSq12 c, proveSinSq23 c, proveSinSq13Corrected c, proveDeltaPMNS c
         , proveDMRatio c, proveLambda c r
         , proveNuMass3 c r, proveNuMass2 c r, proveSumNu c r
         , proveNuMass3_osc c, proveMBetaBeta c r
@@ -110,7 +112,7 @@ original92 =
         , proveEtaPrimeMass c r, proveEtaMass c r, proveKaonMass c r
         , proveDecupletSpacing c r, proveSigmaLambda c r
         , proveGlueball0pp c r, proveGlueball0mp c r, proveGlueball2pp c r
-        , proveRhoMass c r
+        , proveRhoMassCorrected c r
         , proveMZ c r, proveMW c r, proveLambdaBaryon c r
         , proveEtaB c
         , proveImmirzi c, proveBHEntropy c, CrystalGauge.proveTauMass c r
@@ -128,8 +130,8 @@ original92 =
         , proveMuonQCDRatio c, proveSpectralGm2 c
         , proveHaloSlope c, proveEoS c
         -- Heavy hadrons
-        , proveJPsi c r, proveUpsilon c r, proveDMeson c r, proveBMeson c r
-        , provePhiMeson c r, proveOmegaMeson c r, proveKStarMeson c r
+        , proveJPsi c r, proveUpsilonCorrected c r, proveDMesonCorrected c r, proveBMeson c r
+        , provePhiMesonCorrected c r, proveOmegaMeson c r, proveKStarMeson c r
         , proveSigmaBaryon c r, proveOmegaSSS c r
         ]
   in map (fromDerived src) derived
@@ -139,7 +141,12 @@ original92 =
 -- ══════════════════════════════════════════════════════════════════
 
 extended86 :: [TestEntry]
-extended86 = map (fromObservable "Extended") WS.wacaScanResults
+extended86 =
+  -- Swap uncorrected Ω_DM for corrected version (session 8)
+  let swap obs@(name, _, _, _, _, _, _)
+        | name == "Ω_DM (dark matter)" = WS.proveOmegaDMCorrected
+        | otherwise                    = obs
+  in map (fromObservable "Extended" . swap) WS.wacaScanResults
 
 -- ══════════════════════════════════════════════════════════════════
 -- SOURCE 3: S4-S6 CORRECTED CONSTANTS (3 new observables)

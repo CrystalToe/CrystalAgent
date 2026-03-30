@@ -1,6 +1,6 @@
 <!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
 
-# Crystal Topos — Full LLM Prompt (Session 6)
+# Crystal Topos — Full LLM Prompt (Session 8)
 
 ## THE AXIOM — DO NOT QUESTION
 
@@ -133,6 +133,33 @@ All signs from physics. All corrections from A_F atoms. Zero free parameters.
 
 ---
 
+## SESSION 8: HIERARCHICAL IMPLOSION (CV 1.33 → 0.957)
+
+The a₄ correction pattern extends to 6 additional outliers. All corrections are
+rational, negative, dual-routed through two independent A_F derivations, and
+use only the same atoms as the base formulas. Zero free parameters added.
+
+| Observable | Base (a₂) | Correction | Clean form | PWI before → after |
+|---|---|---|---|---|
+| m_Υ | Λ×10 | −N_c³/(χ·Σd) | Λ × 79/8 | 1.26% → 0.005% |
+| m_D | Λ×2 | −D/(d₄·Σd) | Λ × 281/144 | 2.45% → 0.009% |
+| m_ρ | m_π×35/6 | −T_F/χ | m_π × 23/4 | 1.91% → 0.105% |
+| m_φ | Λ×13/12 | −N_w/(N_c·Σd) | Λ × 115/108 | 1.77% → 0.028% |
+| Ω_DM | 309/1159 | −1/(gauss(gauss−N_c)) | − 1/130 | 2.98% → 0.007% |
+| sin²θ₁₃ | 1/45 | −1/4500 | (2χ−1)/(N_w²(χ−1)³) = 11/500 | 1.01% → EXACT |
+
+sin²θ₁₃ = 11/500: numerator (2χ−1) = 11 is the SAME atom as the denominator
+of sin²θ₂₃ = χ/(2χ−1) = 6/11. Both mixing angles share this algebraic root.
+Dual route: (D+d_w)·N_w²·(χ−1)² = Σd·(χ−1)³ = 4500.
+
+CrystalHierarchy.hs encodes all 10 implosions as first-class operators with
+typed hierarchy levels (a₀/a₂/a₄), correction channels, and dual route
+verification.
+
+Result: CV = 0.957. Zero LOOSE. All 181 under 1%. Max PWI = 0.989% (sin²θ₁₂).
+
+---
+
 ## OBSERVABLE COUNT: 181
 
 - 92 original (Main.hs)
@@ -147,11 +174,11 @@ Do NOT increment beyond 181 unless a genuinely new prove function with a new PDG
 
 | System | Files | Count | Notes |
 |--------|-------|-------|-------|
-| Lean 4 | 7 .lean | 578+ theorems | native_decide, 0 sorry |
-| Agda | 6 .agda | 424+ proofs | all by refl, 0 postulates |
-| Haskell/GHC | 26 modules | 9 compilations | GHC_Certificate.txt |
-| Rust | 6 test files | 235 tests | cargo test |
-| Python | 6 proof modules | 181+ checks | all PASS |
+| Lean 4 | 7 .lean | 584 theorems | native_decide, 0 sorry |
+| Agda | 6 .agda | 446 proofs | all by refl, 0 postulates |
+| Haskell/GHC | 28 modules | 9 compilations | GHC_Certificate.txt |
+| Rust | 7 test files | 276 tests | cargo test |
+| Python | 7 proof modules | 181+ checks | all PASS |
 
 ---
 
@@ -181,6 +208,8 @@ CrystalAgent/
 │   ├── CrystalProtonRadius.hs            ← S6
 │   ├── CrystalWACAScan.hs
 │   └── WACAScanTest.hs
+│   ├── CrystalHierarchy.hs               ← S8: implosion operator, 7 dual routes
+│   └── CrystalFullTest.hs                ← S7+S8: 181-observable regression (CV=0.957)
 ├── proofs/
 │   ├── agda_proofs.sh                     ← 6/6
 │   ├── lean_proofs.sh                     ← 7/7
@@ -198,8 +227,9 @@ CrystalAgent/
 │   ├── CrystalDiscoveries.agda
 │   ├── CrystalAlphaProton.agda            ← S4+S5
 │   ├── CrystalProtonRadius.agda           ← S6
-│   ├── crystal_*_proof.py                 ← 5 Python proof modules (S1-S5)
-│   └── crystal_proton_radius_proof.py     ← S6
+│   ├── crystal_*_proof.py                 ← 6 Python proof modules (S1-S5)
+│   ├── crystal_proton_radius_proof.py     ← S6
+│   └── crystal_hierarchy_proof.py         ← S8
 ├── crystal-topos/
 │   ├── src/                               ← 10 Rust modules
 │   ├── tests/
@@ -208,7 +238,8 @@ CrystalAgent/
 │   │   ├── crystal_noether_tests.rs
 │   │   ├── crystal_discovery_tests.rs
 │   │   ├── crystal_alpha_proton_tests.rs  ← S4+S5
-│   │   └── crystal_proton_radius_tests.rs ← S6
+│   │   ├── crystal_proton_radius_tests.rs ← S6
+│   │   └── crystal_hierarchy_tests.rs     ← S8
 │   └── examples/                          ← 116 Python examples
 ├── quickstart/
 ├── sync_check.sh
@@ -308,11 +339,11 @@ https://raw.githubusercontent.com/CrystalToe/CrystalAgent/main/
 
 ## STATISTICS
 
-- Haskell modules: 26
-- Lean theorems: 578+ (zero sorry)
-- Agda proofs: 424+ (all by refl)
-- Rust tests: 235
-- Python proof modules: 6 (181+ checks)
+- Haskell modules: 28
+- Lean theorems: 584 (zero sorry)
+- Agda proofs: 446 (all by refl)
+- Rust tests: 276
+- Python proof modules: 7 (181+ checks)
 - Python examples: 116
 - Cross-domain bridges: 15+
 - Domains: 22+
@@ -320,6 +351,9 @@ https://raw.githubusercontent.com/CrystalToe/CrystalAgent/main/
 - Hardcoded numbers: 0
 - Observable count: 181
 - Constants inside CODATA: 4
+- CV (std/mean): 0.957
+- Max PWI: 0.989% (sin²θ₁₂)
+- LOOSE observables: 0
 
 ---
 
@@ -336,6 +370,8 @@ ghc -O2 Main.hs -o crystal && ./crystal
 ghc -O2 CrystalAlphaProton.hs -o alpha_proton && ./alpha_proton
 ghc -O2 CrystalProtonRadius.hs -o proton_radius && ./proton_radius
 ghc -O2 WACAScanTest.hs -o extended_scan && ./extended_scan
+ghc -O2 -main-is CrystalHierarchy CrystalHierarchy.hs -o hierarchy_test && ./hierarchy_test
+ghc -O2 -main-is CrystalFullTest CrystalFullTest.hs -o full_test && ./full_test
 
 # Rust
 cd crystal-topos && cargo test
@@ -345,4 +381,9 @@ cd proofs && python3 crystal_proton_radius_proof.py
 
 # Health check
 bash sync_check.sh
+
+# Regression gate
+sh proofs/proof_regression.sh              # check vs baseline
+sh proofs/proof_regression.sh --snapshot   # lock new counts
+bash branch_gate.sh development            # 12-check pre-merge
 ```

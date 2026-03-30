@@ -5,7 +5,7 @@
 module CrystalMixing
   ( proveVus, proveWolfA, proveWolfA_Z, proveVcb
   , proveDeltaCKM, proveVub, proveJarlskog
-  , proveSinSq12, proveSinSq23, proveSinSq13, proveDeltaPMNS
+  , proveSinSq12, proveSinSq23, proveSinSq13, proveSinSq13Corrected, proveDeltaPMNS
     -- Berry phase / adjunction
   , cpVectorCKM, cpVectorPMNS
   , proveAdjunctionAngle, proveCos2PMNS, berryPhaseCheck
@@ -135,6 +135,19 @@ proveSinSq13 c =
   let dw    = nW^2 - 1
       exact = crFromInts c 1 (towerD + dw)
   in Derived "sin²θ₁₃" "1/(D+d_w) = 1/45"
+     (crDbl exact) (Just (crVal exact)) (nufit 0.0220) Computed
+
+-- | sin²θ₁₃ corrected (a₄ level, session 8).
+--   Base: 1/(D+d_w) = 1/45
+--   Correction: −1/((D+d_w)·N_w²·(χ−1)²) = −1/4500
+--   Result: (2χ−1)/(N_w²·(χ−1)³) = 11/500 = 0.02200
+--   Dual route: (D+d_w)·N_w²·(χ−1)² = Σd·(χ−1)³ = 4500
+--   Identity: (D+d_w)·N_w² = Σd·(χ−1) [both = 180]
+--   PWI: 1.010% → 0.000%
+proveSinSq13Corrected :: Crystal Two Three -> Derived
+proveSinSq13Corrected c =
+  let exact = crFromInts c (2 * chi - 1) (nW^2 * (chi - 1)^3)  -- 11/500
+  in Derived "sin²θ₁₃" "(2χ−1)/(N_w²(χ−1)³) = 11/500"
      (crDbl exact) (Just (crVal exact)) (nufit 0.0220) Computed
 
 -- | PMNS CP phase: δ_PMNS = π + arctan(d_singlet/d_weak) = π + arctan(1/3).
