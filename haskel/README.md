@@ -5,35 +5,42 @@
 
 ```bash
 # From haskel/ directory:
-
+ 
 # 1. Main (92 observables)
 ghc -O2 Main.hs -o crystal && ./crystal
-
+ 
 # 2-4. Library proof modules (type-check = proof, no main)
 ghc -fno-code CrystalStructural.hs
 ghc -fno-code CrystalNoether.hs
 ghc -fno-code CrystalDiscoveries.hs
-
+ 
 # 5. Alpha + proton mass (S4+S5)
 ghc -O2 -main-is CrystalAlphaProton CrystalAlphaProton.hs -o alpha_proton && ./alpha_proton
-
+ 
 # 6. Proton radius (S6)
 ghc -O2 -main-is CrystalProtonRadius CrystalProtonRadius.hs -o proton_radius && ./proton_radius
-
+ 
 # 7. Extended scan (86 observables)
 ghc -O2 WACAScanTest.hs -o extended_scan && ./extended_scan
-
+ 
 # 8. Hierarchical implosion (S8)
 ghc -O2 -main-is CrystalHierarchy CrystalHierarchy.hs -o hierarchy_test && ./hierarchy_test
-
+ 
 # 9. Full regression (all 181)
 ghc -O2 -main-is CrystalFullTest CrystalFullTest.hs -o full_test && ./full_test
-
+ 
 # 10. Spectral tower (S11)
 ghc -O2 -main-is CrystalLayer CrystalLayer.hs -o crystal_layer && ./crystal_layer
-
+ 
+# 11. Dynamical gravity type-check (S12 — Curry-Howard proof)
+ghc -fno-code CrystalGravityDyn.hs
+ 
+# 12. Dynamical gravity audit (S12 — 12/12 integer audit)
+ghc -O2 GravityDynTest.hs -o gravity_dyn_test && ./gravity_dyn_test
+ 
 # Clean up
-rm -f *.o *.hi crystal alpha_proton proton_radius extended_scan hierarchy_test full_test crystal_layer
+rm -f *.o *.hi crystal alpha_proton proton_radius extended_scan hierarchy_test full_test crystal_layer gravity_dyn_test
+ 
 ```
 
 

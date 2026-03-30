@@ -2,7 +2,7 @@
 # Copyright (c) 2026 Daland Montgomery
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# Haskell proof runner — Session 8
+# Haskell proof runner — Session 12
 set -e
 
 # Find repo root (works from proofs/, haskel/, or repo root)
@@ -23,11 +23,11 @@ cd "$HASKEL"
 cleanup() {
   cd "$HASKEL"
   rm -f *.o *.hi
-  rm -f crystal structural noether discoveries alpha_proton proton_radius extended_scan hierarchy_test full_test crystal_layer
+  rm -f crystal structural noether discoveries alpha_proton proton_radius extended_scan hierarchy_test full_test crystal_layer gravity_dyn_test
 }
 trap cleanup EXIT
 
-echo "=== Haskell Proof Runner (Session 8) ==="
+echo "=== Haskell Proof Runner (Session 12) ==="
 echo "    Running from: $(pwd)"
 echo "    Certificate:  $PROOFS/GHC_Certificate.txt"
 echo ""
@@ -61,7 +61,7 @@ typecheck() {
   local label="$1" src="$2"
   echo "--- $label (type-check = proof) ---"
   if ghc -fno-code "$src" 2>&1; then
-    echo "  Type-checks ✓ (Curry-Howard: compilation = proof)"
+    echo "  Type-checks OK (Curry-Howard: compilation = proof)"
     PASS=$((PASS+1))
   else
     echo "  TYPE-CHECK FAILED"; FAIL=$((FAIL+1))
@@ -69,7 +69,7 @@ typecheck() {
   echo ""
 }
 
-# 1. Original 92 observables (module Main) → GHC_Certificate.txt
+# 1. Original 92 observables (module Main) -> GHC_Certificate.txt
 echo "--- Main.hs (92 observables) ---"
 if ghc -O2 Main.hs -o crystal 2>&1; then
   ./crystal | tee "$PROOFS/GHC_Certificate.txt" && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
@@ -78,7 +78,7 @@ else
 fi
 echo ""
 
-# 2-4. Library proof modules (no main — type-check IS the proof)
+# 2-4. Library proof modules (no main -- type-check IS the proof)
 typecheck "CrystalStructural.hs"  "CrystalStructural.hs"
 typecheck "CrystalNoether.hs"     "CrystalNoether.hs"
 typecheck "CrystalDiscoveries.hs" "CrystalDiscoveries.hs"
@@ -98,6 +98,12 @@ run_exe "CrystalFullTest.hs (181 obs)"  "CrystalFullTest.hs"  "CrystalFullTest" 
 
 # 10. Spectral tower layer provenance (S11)
 run_exe "CrystalLayer.hs (S11 tower)"  "CrystalLayer.hs"  "CrystalLayer"  "crystal_layer"
+
+# 11. Dynamical gravity type-check (S12)
+typecheck "CrystalGravityDyn.hs (S12 gravity)"  "CrystalGravityDyn.hs"
+
+# 12. Dynamical gravity audit (S12 — 12/12 integer audit)
+run_main "GravityDynTest.hs (S12 audit)"  "GravityDynTest.hs"  "gravity_dyn_test"
 
 # Tally (cleanup runs automatically via trap)
 TOTAL=$((PASS+FAIL))
