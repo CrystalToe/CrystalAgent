@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Copyright (c) 2026 Daland Montgomery
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -183,48 +183,34 @@ FAIL=0
 WARN=0
 ADDED=0
 
+# Temp files for POSIX compatibility (no process substitution)
+TMPCHECK="/tmp/proof_regression_check.$$"
+trap 'rm -f "$CANDIDATE" "$TMPCHECK"' EXIT
+
 # ── Check: every baseline proof still exists in candidate ──
 echo "  Checking for lost proofs..."
 
-# Lean theorems
-while IFS= read -r line; do
-  if ! grep -qF "$line" "$CANDIDATE"; then
-    echo "    FAIL (DELETED): $line"
-    FAIL=$((FAIL + 1))
+check_deleted() {
+  local prefix="$1"
+  local exclude="$2"
+  if [ -n "$exclude" ]; then
+    grep "^$prefix " "$BASELINE" | grep -v "$exclude" > "$TMPCHECK" 2>/dev/null || true
+  else
+    grep "^$prefix " "$BASELINE" > "$TMPCHECK" 2>/dev/null || true
   fi
-done < <(grep "^LEAN " "$BASELINE" | grep -v "LEAN_FILES")
+  while IFS= read -r line; do
+    if ! grep -qF "$line" "$CANDIDATE"; then
+      echo "    FAIL (DELETED): $line"
+      FAIL=$((FAIL + 1))
+    fi
+  done < "$TMPCHECK"
+}
 
-# Agda proofs
-while IFS= read -r line; do
-  if ! grep -qF "$line" "$CANDIDATE"; then
-    echo "    FAIL (DELETED): $line"
-    FAIL=$((FAIL + 1))
-  fi
-done < <(grep "^AGDA " "$BASELINE" | grep -v "AGDA_FILES")
-
-# Rust tests
-while IFS= read -r line; do
-  if ! grep -qF "$line" "$CANDIDATE"; then
-    echo "    FAIL (DELETED): $line"
-    FAIL=$((FAIL + 1))
-  fi
-done < <(grep "^RUST " "$BASELINE" | grep -v "RUST_COUNT")
-
-# Haskell modules
-while IFS= read -r line; do
-  if ! grep -qF "$line" "$CANDIDATE"; then
-    echo "    FAIL (DELETED): $line"
-    FAIL=$((FAIL + 1))
-  fi
-done < <(grep "^HASKELL " "$BASELINE")
-
-# Python modules
-while IFS= read -r line; do
-  if ! grep -qF "$line" "$CANDIDATE"; then
-    echo "    FAIL (DELETED): $line"
-    FAIL=$((FAIL + 1))
-  fi
-done < <(grep "^PYTHON " "$BASELINE")
+check_deleted "LEAN" "LEAN_FILES"
+check_deleted "AGDA" "AGDA_FILES"
+check_deleted "RUST" "RUST_COUNT"
+check_deleted "HASKELL" ""
+check_deleted "PYTHON" ""
 
 # ── Check: no count decreases ──
 echo ""
@@ -258,6 +244,7 @@ check_count "LEAN_FILES"
 check_count "AGDA_FILES"
 
 # ── Check per-file Rust counts ──
+grep "^RUST_COUNT " "$BASELINE" > "$TMPCHECK" 2>/dev/null || true
 while IFS= read -r line; do
   fname=$(echo "$line" | awk '{print $2}')
   base_count=$(echo "$line" | awk '{print $3}')
@@ -267,19 +254,20 @@ while IFS= read -r line; do
     echo "    FAIL: Rust $fname decreased from $base_count to $cand_count"
     FAIL=$((FAIL + 1))
   fi
-done < <(grep "^RUST_COUNT " "$BASELINE")
+done < "$TMPCHECK"
 
 # ── Check for new proofs (additions — just report) ──
 echo ""
 echo "  Checking for new proofs..."
 NEW_PROOFS=0
+grep "^LEAN \|^AGDA \|^RUST \|^HASKELL \|^PYTHON " "$CANDIDATE" | \
+  grep -v "LEAN_FILES\|AGDA_FILES\|RUST_COUNT" > "$TMPCHECK" 2>/dev/null || true
 while IFS= read -r line; do
   if ! grep -qF "$line" "$BASELINE"; then
     echo "    NEW: $line"
     NEW_PROOFS=$((NEW_PROOFS + 1))
   fi
-done < <(grep "^LEAN \|^AGDA \|^RUST \|^HASKELL \|^PYTHON " "$CANDIDATE" | \
-         grep -v "LEAN_FILES\|AGDA_FILES\|RUST_COUNT")
+done < "$TMPCHECK"
 
 if [ "$NEW_PROOFS" -eq 0 ]; then
   echo "    (none)"
@@ -291,7 +279,6 @@ echo "  ════════════════════════
 if [ "$FAIL" -gt 0 ]; then
   echo "  RESULT: FAIL — $FAIL proof(s) lost or count(s) decreased"
   echo "  ══════════════════════════════════════════"
-  rm -f "$CANDIDATE"
   exit 1
 else
   echo "  RESULT: PASS"
@@ -302,6 +289,5 @@ else
     echo "    No changes from baseline"
   fi
   echo "  ══════════════════════════════════════════"
-  rm -f "$CANDIDATE"
   exit 0
 fi
