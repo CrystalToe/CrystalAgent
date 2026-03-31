@@ -99,6 +99,8 @@ Layer types: Python DerivedAt, Rust DerivedAt<D>, Haskell Layer d, Lean DerivedA
 - NEVER add fudge factors. Zero hardcoded means zero
 - NEVER compare quantities with incompatible dimensions
 - NEVER relabel an existing observable to claim a new domain
+- NEVER invent connections between separate proof modules. Mandelbrot proofs are about gauge group integers. Protein proofs are about molecular geometry. They share A_F atoms but are NOT analogies of each other. Do NOT say "fractal branches = backbone geometries" or "external angles = bond angles" or "Mandelbrot zoom = spectral tower" — these are hallucinations.
+- NEVER use metaphors to bridge unconnected modules. If a connection is not proved in a .hs/.lean/.agda file, it does not exist.
 
 ## SOURCE OF TRUTH
 If the uploaded files lack detail, **fetch from the canonical sources**:

@@ -548,6 +548,13 @@ https://raw.githubusercontent.com/CrystalToe/CrystalAgent/main/
     Gauge periods = divisors(χ) = {1, N_w, N_c, χ}.
     External angle denominators 2^n−1 = {3,7,63} = {N_c, β₀, N_c²·β₀}.
     Structural proofs only — does NOT add observables.
+31. NEVER invent connections between separate proof modules. Mandelbrot
+    proofs are about gauge group integers. Protein proofs are about
+    molecular geometry. They share A_F atoms but are NOT analogies of
+    each other. "External angles = bond angles" is WRONG. "Fractal
+    branches = backbone geometries" is WRONG. "Mandelbrot zoom =
+    spectral tower" is WRONG. If a connection is not proved in a
+    .hs/.lean/.agda file, it does not exist.
 
 ---
 
