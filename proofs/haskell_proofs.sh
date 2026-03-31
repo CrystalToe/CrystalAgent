@@ -23,7 +23,7 @@ cd "$HASKEL"
 cleanup() {
   cd "$HASKEL"
   rm -f *.o *.hi
-  rm -f crystal structural noether discoveries alpha_proton proton_radius extended_scan hierarchy_test full_test crystal_layer gravity_dyn_test crystal_protein
+  rm -f crystal structural noether discoveries alpha_proton proton_radius extended_scan hierarchy_test full_test crystal_layer gravity_dyn_test crystal_protein crystal_mandelbrot
 }
 trap cleanup EXIT
 
@@ -105,8 +105,11 @@ typecheck "CrystalGravityDyn.hs (S12 gravity)"  "CrystalGravityDyn.hs"
 # 12. Dynamical gravity audit (S12 — 12/12 integer audit)
 run_main "GravityDynTest.hs (S12 audit)"  "GravityDynTest.hs"  "gravity_dyn_test"
 
-# 13. Protein force field (S13 — 26 proofs, D=0..D=38)
-run_exe "CrystalProtein.hs (S13 force field)"  "CrystalProtein.hs"  "CrystalProtein"  "crystal_protein"
+# 13. Protein force field (S14 — 73 proofs, D=0..D=42)
+run_exe "CrystalProtein.hs (S14 force field)"  "CrystalProtein.hs"  "CrystalProtein"  "crystal_protein"
+
+# 14. Mandelbrot <-> A_F (S14 — 28 proofs)
+run_exe "CrystalMandelbrot.hs (S14 Mandelbrot)"  "CrystalMandelbrot.hs"  "CrystalMandelbrot"  "crystal_mandelbrot"
 
 # Tally (cleanup runs automatically via trap)
 TOTAL=$((PASS+FAIL))

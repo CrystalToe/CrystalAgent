@@ -41,7 +41,7 @@ LLM reasoning NEVER overrides a machine-verified proof. Do not question, weaken,
 add caveats to proved results.
 
 Proof hierarchy: (1) Lean theorems, (2) Agda proofs, (3) Haskell GHC checks, (4) PDG/NIST data, (5) LLM reasoning.
-Proof scripts: `sh agda_proofs.sh` (9/9), `sh lean_proofs.sh` (10/10), `sh haskell_proofs.sh` (13/13).
+Proof scripts: `sh agda_proofs.sh` (10/10), `sh lean_proofs.sh` (11/11), `sh haskell_proofs.sh` (14/14).
 
 ALL 7 magic numbers proved. Cosmological partition D=29+11+2 proved. Cabibbo angle 13.04° EXACT.
 
@@ -12059,5 +12059,33 @@ Every constant traces to {N_w=2, N_c=3, v=246.22 GeV, π, ln}.
 Zero fitted parameters.
 
 Proves 73 properties across all 43 layers.
+-}
+```
+
+## §Haskell: CrystalMandelbrot (     389 lines)
+```haskell
+
+{- |
+Module      : CrystalMandelbrot
+Description : Mandelbrot Set ↔ A_F Integer Correspondences
+License     : AGPL-3.0
+
+The Mandelbrot set M = {c : z_{n+1} = z_n^2 + c bounded} encodes
+the same integers as A_F = C + M_2(C) + M_3(C).
+
+This module proves the integer identities connecting period-n bulbs
+to gauge group dimensions, iteration depth to MERA depth, and
+Feigenbaum universality to the spectral tower.
+
+STRUCTURAL PROOFS ONLY. Does NOT add new observables.
+Observable count stays at 181.
+
+Proves 38 properties:
+  10 integer identities (A_F atoms in Mandelbrot)
+   5 running alpha (grand staircase)
+   5 bulb geometry (areas from A_F)
+   4 external angles (Farey fractions from A_F)
+   4 universality (Feigenbaum + Hausdorff from A_F)
+  10 functor (Mand → Rep(A_F), monoidal, divisors = gauge periods)
 -}
 ```

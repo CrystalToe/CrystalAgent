@@ -674,7 +674,37 @@ LEAN CrystalProtein.lean imp_vdist
 LEAN CrystalProtein.lean imp_hbdist_d
 LEAN CrystalProtein.lean imp_hbdist_h
 LEAN CrystalProtein.lean imp_alpha_ch
-LEAN_FILES 10
+LEAN CrystalMandelbrot.lean period2_eq_Nw
+LEAN CrystalMandelbrot.lean period3_eq_Nc
+LEAN CrystalMandelbrot.lean period6_eq_chi
+LEAN CrystalMandelbrot.lean period6_is_lcm
+LEAN CrystalMandelbrot.lean depth_43
+LEAN CrystalMandelbrot.lean hausdorff_eq_Nw
+LEAN CrystalMandelbrot.lean cardioid_denom
+LEAN CrystalMandelbrot.lean period2_area_16
+LEAN CrystalMandelbrot.lean area_16_eq_einst
+LEAN CrystalMandelbrot.lean area_order
+LEAN CrystalMandelbrot.lean ext_denom_2
+LEAN CrystalMandelbrot.lean ext_denom_2_Nc
+LEAN CrystalMandelbrot.lean ext_denom_3
+LEAN CrystalMandelbrot.lean ext_denom_3_b0
+LEAN CrystalMandelbrot.lean ext_denom_6
+LEAN CrystalMandelbrot.lean ext_denom_6_fac
+LEAN CrystalMandelbrot.lean feig_num
+LEAN CrystalMandelbrot.lean feig_den
+LEAN CrystalMandelbrot.lean feig_reduced
+LEAN CrystalMandelbrot.lean staircase_steps
+LEAN CrystalMandelbrot.lean planck_ln_arg
+LEAN CrystalMandelbrot.lean sigma_plus_chi
+LEAN CrystalMandelbrot.lean div_1
+LEAN CrystalMandelbrot.lean div_2
+LEAN CrystalMandelbrot.lean div_3
+LEAN CrystalMandelbrot.lean div_6
+LEAN CrystalMandelbrot.lean mersenne_2_Nc
+LEAN CrystalMandelbrot.lean mersenne_3_b0
+LEAN CrystalMandelbrot.lean tuning_23_chi
+LEAN CrystalMandelbrot.lean tuning_22_Nwsq
+LEAN_FILES 11
 # AGDA PROOFS
 AGDA CrystalTopos.agda the-one-law
 AGDA CrystalTopos.agda chi-eq
@@ -1216,7 +1246,35 @@ AGDA CrystalProtein.agda imp-hb-dist-den
 AGDA CrystalProtein.agda imp-hb-dist-half
 AGDA CrystalProtein.agda layer-count
 AGDA CrystalProtein.agda energy-modes
-AGDA_FILES 9
+AGDA CrystalMandelbrot.agda period2
+AGDA CrystalMandelbrot.agda period3
+AGDA CrystalMandelbrot.agda period6
+AGDA CrystalMandelbrot.agda depth-43
+AGDA CrystalMandelbrot.agda hausdorff
+AGDA CrystalMandelbrot.agda sigma-chi
+AGDA CrystalMandelbrot.agda cardioid-denom
+AGDA CrystalMandelbrot.agda period2-area
+AGDA CrystalMandelbrot.agda einstein-16
+AGDA CrystalMandelbrot.agda nw-sq
+AGDA CrystalMandelbrot.agda nc-sq
+AGDA CrystalMandelbrot.agda ext-denom-2
+AGDA CrystalMandelbrot.agda ext-denom-2-Nc
+AGDA CrystalMandelbrot.agda ext-denom-3
+AGDA CrystalMandelbrot.agda ext-denom-3-b0
+AGDA CrystalMandelbrot.agda ext-denom-6
+AGDA CrystalMandelbrot.agda ext-denom-6-fac
+AGDA CrystalMandelbrot.agda feig-num
+AGDA CrystalMandelbrot.agda feig-den
+AGDA CrystalMandelbrot.agda feig-reduced
+AGDA CrystalMandelbrot.agda staircase-steps
+AGDA CrystalMandelbrot.agda planck-ln-arg
+AGDA CrystalMandelbrot.agda div-1
+AGDA CrystalMandelbrot.agda div-2
+AGDA CrystalMandelbrot.agda div-3
+AGDA CrystalMandelbrot.agda mersenne-2
+AGDA CrystalMandelbrot.agda mersenne-3
+AGDA CrystalMandelbrot.agda tuning-23
+AGDA_FILES 10
 # HASKELL MODULES
 HASKELL Main.hs
 HASKELL CrystalStructural.hs
@@ -1249,6 +1307,7 @@ HASKELL CrystalQSimulation.hs
 HASKELL CrystalGravityDyn.hs
 HASKELL GravityDynTest.hs
 HASKELL CrystalProtein.hs
+HASKELL CrystalMandelbrot.hs
 HASKELL CrystalFullTest.hs
 # RUST TESTS
 RUST crystal_alpha_proton_tests.rs test_chi
@@ -1370,6 +1429,44 @@ RUST crystal_layer_tests.rs layer32_pitch
 RUST crystal_layer_tests.rs layer33_flory
 RUST crystal_layer_tests.rs layer42_energy_scale
 RUST crystal_layer_tests.rs cascade_integer_structure
+RUST crystal_mandelbrot_tests.rs period2_eq_nw
+RUST crystal_mandelbrot_tests.rs period3_eq_nc
+RUST crystal_mandelbrot_tests.rs period6_eq_chi
+RUST crystal_mandelbrot_tests.rs period6_is_lcm
+RUST crystal_mandelbrot_tests.rs depth_43
+RUST crystal_mandelbrot_tests.rs hausdorff_eq_nw
+RUST crystal_mandelbrot_tests.rs cardioid_denom
+RUST crystal_mandelbrot_tests.rs period2_area_16
+RUST crystal_mandelbrot_tests.rs area_16_einstein
+RUST crystal_mandelbrot_tests.rs beta0_eq_7
+RUST crystal_mandelbrot_tests.rs staircase_steps
+RUST crystal_mandelbrot_tests.rs alpha_inv_planck
+RUST crystal_mandelbrot_tests.rs alpha_inv_world
+RUST crystal_mandelbrot_tests.rs step_size_pi
+RUST crystal_mandelbrot_tests.rs monotone_pi
+RUST crystal_mandelbrot_tests.rs cardioid_area
+RUST crystal_mandelbrot_tests.rs period2_area
+RUST crystal_mandelbrot_tests.rs area_order
+RUST crystal_mandelbrot_tests.rs coupling_order
+RUST crystal_mandelbrot_tests.rs area_eq_coupling
+RUST crystal_mandelbrot_tests.rs ext_denom_2_nc
+RUST crystal_mandelbrot_tests.rs ext_denom_3_b0
+RUST crystal_mandelbrot_tests.rs ext_denom_6_fac
+RUST crystal_mandelbrot_tests.rs ext_pattern
+RUST crystal_mandelbrot_tests.rs feig_num
+RUST crystal_mandelbrot_tests.rs feig_den
+RUST crystal_mandelbrot_tests.rs feig_reduced
+RUST crystal_mandelbrot_tests.rs feig_delta
+RUST crystal_mandelbrot_tests.rs divisors_chi
+RUST crystal_mandelbrot_tests.rs gauge_eq_divisors
+RUST crystal_mandelbrot_tests.rs divisors_af
+RUST crystal_mandelbrot_tests.rs mersenne2_nc
+RUST crystal_mandelbrot_tests.rs mersenne3_b0
+RUST crystal_mandelbrot_tests.rs mersenne6_nc2b0
+RUST crystal_mandelbrot_tests.rs functor_unit
+RUST crystal_mandelbrot_tests.rs functor_tau_23
+RUST crystal_mandelbrot_tests.rs functor_tau_22
+RUST crystal_mandelbrot_tests.rs functor_tau_33
 RUST crystal_noether_tests.rs noether_u1_generators
 RUST crystal_noether_tests.rs noether_su2_generators
 RUST crystal_noether_tests.rs noether_su3_generators
@@ -1638,6 +1735,7 @@ RUST_COUNT crystal_alpha_proton_tests.rs 28
 RUST_COUNT crystal_discovery_tests.rs 33
 RUST_COUNT crystal_hierarchy_tests.rs 41
 RUST_COUNT crystal_layer_tests.rs 17
+RUST_COUNT crystal_mandelbrot_tests.rs 38
 RUST_COUNT crystal_noether_tests.rs 21
 RUST_COUNT crystal_protein_tests.rs 60
 RUST_COUNT crystal_proton_radius_tests.rs 30
@@ -1659,8 +1757,8 @@ PYTHON spectral_tower.py
 PYTHON qubo_folder.py
 PYTHON crystal_vdw.py
 # SUMMARY COUNTS
-TOTAL_LEAN_THEOREMS      675
-TOTAL_AGDA_PROOFS      540
-TOTAL_RUST_TESTS      383
-TOTAL_HASKELL_MODULES       32
+TOTAL_LEAN_THEOREMS      705
+TOTAL_AGDA_PROOFS      568
+TOTAL_RUST_TESTS      421
+TOTAL_HASKELL_MODULES       33
 TOTAL_PYTHON_MODULES       12

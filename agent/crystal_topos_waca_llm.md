@@ -353,13 +353,19 @@ Do NOT increment beyond 181 unless a genuinely new prove function with a new PDG
 
 | System | Files | Count | Notes |
 |--------|-------|-------|-------|
-| Lean 4 | 10 .lean | 675 theorems | native_decide, 0 sorry |
-| Agda | 9 .agda | 540+ proofs | all by refl, 0 postulates |
-| Haskell/GHC | 32 modules | 13 compilations | GHC_Certificate.txt |
-| Rust | 10 test files | 383 tests | cargo test |
+| Lean 4 | 11 .lean | 705 theorems | native_decide, 0 sorry |
+| Agda | 10 .agda | 568+ proofs | all by refl, 0 postulates |
+| Haskell/GHC | 33 modules | 14 compilations | GHC_Certificate.txt |
+| Rust | 11 test files | 421 tests | cargo test |
 | Python | 12 proof modules | 181+ checks | all PASS |
 
 Session 14 additions (protein rewrite — all 43 D-layers, implosion, running α):
+
+Session 14 additions (Mandelbrot functor — period-n = gauge group):
+- Lean: +31 theorems (CrystalMandelbrot.lean — functor + external angles)
+- Agda: +28 proofs (CrystalMandelbrot.agda — functor + Mersenne)
+- Haskell: +1 module (CrystalMandelbrot.hs — 38 checks, functor complete)
+- Rust: +38 tests (crystal_mandelbrot_tests.rs — functor + staircase)
 - Lean: 19→40 theorems (CrystalProtein.lean — implosion + cosmological integers)
 - Agda: 40→53 proofs (CrystalProtein.agda — implosion cross-multiply proofs)
 - Haskell: 26→73 checks (CrystalProtein.hs — full tower D=0..42, all imploded)
@@ -388,7 +394,7 @@ CrystalAgent/
 ├── agent/
 │   ├── crystal_topos_waca_llm.md          ← THIS FILE (Session 14)
 │   └── crystal_topos_waca_llm_compact.md
-├── haskel/                                ← 32 Haskell modules
+├── haskel/                                ← 33 Haskell modules
 │   ├── Main.hs                            ← 92 observables
 │   ├── CrystalAxiom.hs
 │   ├── CrystalGauge.hs
@@ -399,6 +405,7 @@ CrystalAgent/
 │   ├── CrystalGravityDyn.hs              ← S12: dynamical gravity
 │   ├── GravityDynTest.hs                 ← S12: 12/12 integer audit
 │   ├── CrystalProtein.hs                 ← S14: full tower D=0..42, 73 proofs
+│   ├── CrystalMandelbrot.hs              ← S14: Mandelbrot functor, 38 proofs
 │   ├── CrystalAudit.hs
 │   ├── CrystalCrossDomain.hs
 │   ├── CrystalRiemann.hs
@@ -427,6 +434,7 @@ CrystalAgent/
 │   ├── CrystalLayer.lean                  ← S11: 19 cascade proofs
 │   ├── CrystalGravityDyn.lean             ← S12: 34 gravity theorems
 │   ├── CrystalProtein.lean                ← S14: 40 integer + 20 runtime
+│   ├── CrystalMandelbrot.lean            ← S14: 31 theorems (functor)
 │   ├── Main.lean
 │   ├── CrystalTopos.agda
 │   ├── CrystalStructural.agda
@@ -437,6 +445,7 @@ CrystalAgent/
 │   ├── CrystalLayer.agda                  ← S11: cascade proofs
 │   ├── CrystalGravityDyn.agda             ← S12: 24 gravity proofs
 │   ├── CrystalProtein.agda                ← S14: 53 integer proofs (implosion)
+│   ├── CrystalMandelbrot.agda            ← S14: 28 proofs (functor)
 │   ├── crystal_*_proof.py                 ← 6 Python proof modules (S1-S5)
 │   ├── crystal_proton_radius_proof.py     ← S6
 │   └── crystal_hierarchy_proof.py         ← S8
@@ -454,6 +463,7 @@ CrystalAgent/
 │   │   ├── crystal_hierarchy_tests.rs     ← S8
 │   │   ├── crystal_layer_tests.rs         ← S11: 17 layer tests
 │   │   └── crystal_protein_tests.rs       ← S14: 60 force field tests (implosion)
+│   │   ├── crystal_mandelbrot_tests.rs   ← S14: 38 Mandelbrot tests (functor)
 │   └── examples/
 │       ├── spectral_tower.py              ← S11: pure D=0→D=42 tower
 │       ├── spectral_tower_pure.py         ← S11: identical backup
@@ -534,15 +544,19 @@ https://raw.githubusercontent.com/CrystalToe/CrystalAgent/main/
 29. Session 14 protein rewrite: all 43 D-layers, running α(D), hierarchical
     implosion on every energy term, cosmological partition, varimax loading.
     Proof counts: Haskell 73, Agda 53, Lean 60, Rust 60.
+30. Mandelbrot proof (S14): monoidal functor F: Mand → Rep(A_F).
+    Gauge periods = divisors(χ) = {1, N_w, N_c, χ}.
+    External angle denominators 2^n−1 = {3,7,63} = {N_c, β₀, N_c²·β₀}.
+    Structural proofs only — does NOT add observables.
 
 ---
 
 ## STATISTICS
 
-- Haskell modules: 32 (was 31)
-- Lean theorems: 675 (was 656, S14 protein rewrite)
-- Agda proofs: 540+ (was 527+, S14 protein rewrite)
-- Rust tests: 383 (was 371, S14 protein rewrite)
+- Haskell modules: 33 (was 32, +CrystalMandelbrot)
+- Lean theorems: 705 (was 675, +31 Mandelbrot)
+- Agda proofs: 568+ (was 540+, +28 Mandelbrot)
+- Rust tests: 421 (was 383, +38 Mandelbrot)
 - Python proof modules: 12 (was 11, +1)
 - Python examples: 119+
 - Cross-domain bridges: 15+
@@ -566,9 +580,9 @@ https://raw.githubusercontent.com/CrystalToe/CrystalAgent/main/
 
 ```bash
 # Proof runners (from proofs/)
-sh agda_proofs.sh           # 9/9 (was 8/8)
-sh lean_proofs.sh           # 10/10 (was 9/9)
-sh haskell_proofs.sh        # 13/13 (was 12/12)
+sh agda_proofs.sh           # 10/10 (was 9/9)
+sh lean_proofs.sh           # 11/11 (was 10/10)
+sh haskell_proofs.sh        # 14/14 (was 13/13)
 
 # Individual modules (from haskel/)
 ghc -O2 Main.hs -o crystal && ./crystal
@@ -584,6 +598,7 @@ ghc -O2 -main-is CrystalLayer CrystalLayer.hs -o crystal_layer && ./crystal_laye
 ghc -fno-code CrystalGravityDyn.hs
 ghc -O2 GravityDynTest.hs -o gravity_dyn_test && ./gravity_dyn_test
 ghc -O2 -main-is CrystalProtein CrystalProtein.hs -o crystal_protein && ./crystal_protein
+ghc -O2 -main-is CrystalMandelbrot CrystalMandelbrot.hs -o crystal_mandelbrot && ./crystal_mandelbrot
 
 # Rust
 cd crystal-topos && cargo test
