@@ -2,7 +2,7 @@
 -- SPDX-License-Identifier: AGPL-3.0-or-later
 
 -- | CrystalFullTest.hs
--- One-command regression test for the full 181-observable catalogue.
+-- One-command regression test for the full 195-observable catalogue.
 -- Imports from all source modules, normalises into a single test list,
 -- computes combined CV, prints PASS/FAIL for each observable.
 --
@@ -209,7 +209,7 @@ main = do
 
   putStrLn ""
   putStrLn "=================================================================="
-  putStrLn "  CRYSTAL TOPOS — FULL 181-OBSERVABLE REGRESSION TEST"
+  putStrLn "  CRYSTAL TOPOS — FULL 195-OBSERVABLE REGRESSION TEST"
   putStrLn "  A_F = C + M2(C) + M3(C).  Zero free parameters."
   putStrLn "=================================================================="
   putStrLn ""
@@ -229,15 +229,15 @@ main = do
   putStrLn ""
 
   -- Flag count mismatches
-  let countOK = nOrig == 92 && nExt == 86 && nS46 == 3 && nAll == 181
+  let countOK = nOrig == 92 && nExt == 100 && nS46 == 3 && nAll == 195
   if countOK
-    then putStrLn "  COUNT CHECK: PASS (92 + 86 + 3 = 181)"
+    then putStrLn "  COUNT CHECK: PASS (92 + 100 + 3 = 195)"
     else do
       putStrLn "  COUNT CHECK: *** FAIL ***"
       if nOrig /= 92  then printf "    Expected 92 original, got %d\n" nOrig   else pure ()
-      if nExt  /= 86  then printf "    Expected 86 extended, got %d\n" nExt    else pure ()
+      if nExt  /= 100 then printf "    Expected 100 extended, got %d\n" nExt    else pure ()
       if nS46  /= 3   then printf "    Expected 3 S4-S6, got %d\n"    nS46    else pure ()
-      if nAll  /= 181 then printf "    Expected 181 total, got %d\n"   nAll    else pure ()
+      if nAll  /= 195 then printf "    Expected 195 total, got %d\n"   nAll    else pure ()
   putStrLn ""
 
   -- ── Full table ──
@@ -348,7 +348,7 @@ main = do
   let allPass = nOver == 0
   putStrLn "=================================================================="
   if allPass && countOK
-    then putStrLn "  RESULT: ALL 181 OBSERVABLES PASS (under prime wall)"
+    then putStrLn "  RESULT: ALL 195 OBSERVABLES PASS (under prime wall)"
     else do
       if not countOK then putStrLn "  RESULT: COUNT MISMATCH — see above"
                      else pure ()

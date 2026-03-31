@@ -94,7 +94,7 @@ run_main "Extended scan" "WACAScanTest.hs" "extended_scan"
 run_exe "CrystalHierarchy.hs (S8)"  "CrystalHierarchy.hs"  "CrystalHierarchy"  "hierarchy_test"
 
 # 9. Full 181-observable regression test (S7+S8)
-run_exe "CrystalFullTest.hs (181 obs)"  "CrystalFullTest.hs"  "CrystalFullTest"  "full_test"
+run_exe "CrystalFullTest.hs (195 obs)"  "CrystalFullTest.hs"  "CrystalFullTest"  "full_test"
 
 # 10. Spectral tower layer provenance (S11)
 run_exe "CrystalLayer.hs (S11 tower)"  "CrystalLayer.hs"  "CrystalLayer"  "crystal_layer"

@@ -80,6 +80,14 @@ module CrystalWACAScan
   , proveFibonacciPhi, proveEulerMascheroni
   , proveAperyZeta3, proveCatalanConstant
   , proveFKOverFPi, proveRRatio
+    -- * Fundamentals: Phase 1 — Easy (5)
+  , proveNeff, proveOmegaBOverM, proveSinSqThetaW0
+  , proveHelium4, proveMomentRatio
+    -- * Fundamentals: Phase 2 — Medium (5)
+  , proveMcOverMs, proveMbOverMtau, proveTopYukawa
+  , provePionRadiusSq, proveDeltaAlphaHad
+    -- * Fundamentals: Phase 3 — Hard (4 genuinely new)
+  , proveSigmaPiN, proveDm21Direct, proveDm32, proveGravCoupling
     -- * Audit
   , wacaScanResults, wacaScanAudit
   ) where
@@ -1524,6 +1532,14 @@ wacaScanResults =
   , proveFibonacciPhi, proveEulerMascheroni
   , proveAperyZeta3, proveCatalanConstant
   , proveFKOverFPi, proveRRatio
+    -- Fundamentals: Phase 1 — Easy (5)
+  , proveNeff, proveOmegaBOverM, proveSinSqThetaW0
+  , proveHelium4, proveMomentRatio
+    -- Fundamentals: Phase 2 — Medium (5)
+  , proveMcOverMs, proveMbOverMtau, proveTopYukawa
+  , provePionRadiusSq, proveDeltaAlphaHad
+    -- Fundamentals: Phase 3 — Hard (4)
+  , proveSigmaPiN, proveDm21Direct, proveDm32, proveGravCoupling
   ]
 
 -- | Audit: count by rating, check for wall breaches.
@@ -1785,3 +1801,191 @@ proveOmegaDMCorrected =
       crystal = omega_m - omega_b - corr
       pdg     = 0.2589
   in mkObs "Ω_DM (corrected)" crystal pdg
+
+-- ═══════════════════════════════════════════════════════════════════
+-- §16  FUNDAMENTAL OBSERVABLES — PHASE 1: EASY 5
+-- ═══════════════════════════════════════════════════════════════════
+
+-- | N_eff = N_c + κ/D = 3 + (ln3/ln2)/42
+-- The effective neutrino count = colour number plus the Hausdorff
+-- dimension of the (2,3) Cantor set divided by the tower height.
+-- Physical: neutrino reheating correction from MERA spectral flow.
+proveNeff :: Observable
+proveNeff =
+  let crystal = fromIntegral n_c + kappa / fromIntegral d_total
+                                                        -- 3.0377
+      pdg     = 3.044
+  in mkObs "N_eff (neutrinos)" crystal pdg
+
+-- | Ω_b/Ω_m = N_c/(gauss + χ) = 3/19
+-- The baryon fraction of total matter uses the same cosmological
+-- partition as Ω_Λ and Ω_m. Three colours out of 19.
+proveOmegaBOverM :: Observable
+proveOmegaBOverM =
+  let crystal = fromIntegral n_c
+              / fromIntegral (gauss + chi)              -- 0.15789
+      pdg     = 0.157
+  in mkObs "Ω_b/Ω_m (baryon fraction)" crystal pdg
+
+-- | sin²θ_W(0) = N_c/gauss + N_w/(D·χ) = 3/13 + 1/126
+-- The weak mixing angle at zero energy = value at M_Z plus the
+-- crystal running correction. The correction N_w/(D·χ) = 1/126
+-- uses the tower height D and the Euler characteristic χ.
+proveSinSqThetaW0 :: Observable
+proveSinSqThetaW0 =
+  let crystal = fromIntegral n_c / fromIntegral gauss
+              + fromIntegral n_w / fromIntegral (d_total * chi)
+                                                        -- 0.23871
+      pdg     = 0.23857
+  in mkObs "sin²θ_W(0) (running)" crystal pdg
+
+-- | Y_p = 1/4 − 1/(χ·D) = 1/4 − 1/252
+-- Primordial helium-4 mass fraction. The base 1/4 is neutron
+-- freeze-out; the crystal correction −1/(χ·D) captures the
+-- spectral tower's contribution to the weak reaction rates.
+proveHelium4 :: Observable
+proveHelium4 =
+  let crystal = 0.25 - 1.0 / fromIntegral (chi * d_total)
+                                                        -- 0.24603
+      pdg     = 0.2449
+  in mkObs "Y_p (primordial ⁴He)" crystal pdg
+
+-- | μ_p/μ_n = −(N_c/N_w)(1 − 1/Σd) = −35/24
+-- The proton-to-neutron magnetic moment ratio as an exact rational.
+-- N_c/N_w = 3/2 is the quark model base; (Σd−1)/Σd = 35/36
+-- is the endomorphism correction.
+proveMomentRatio :: Observable
+proveMomentRatio =
+  let crystal = negate (fromIntegral n_c / fromIntegral n_w)
+              * (1.0 - 1.0 / fromIntegral sigma_d)     -- −1.45833
+      pdg     = -1.45989806
+  in mkObs "μ_p/μ_n (moment ratio)" crystal pdg
+
+-- ═══════════════════════════════════════════════════════════════════
+-- §17  FUNDAMENTAL OBSERVABLES — PHASE 2: MEDIUM 5
+-- ═══════════════════════════════════════════════════════════════════
+
+-- | m_c/m_s = N_w²·N_c × (D+β₀)/(D+β₀+1) = 12 × 49/50 = 11.76
+-- The charm-to-strange mass ratio. The integer 12 = N_w²·N_c has
+-- four independent crystal derivations. The correction 49/50 uses
+-- D+β₀ = 49 and D+β₀+1 = Σd²/gauss = 650/13 = 50.
+proveMcOverMs :: Observable
+proveMcOverMs =
+  let base    = fromIntegral (n_w^2 * n_c)              -- 12
+      corr    = fromIntegral (d_total + beta0)
+              / fromIntegral (d_total + beta0 + 1)      -- 49/50
+      crystal = base * corr                              -- 11.76
+      pdg     = 11.76
+  in mkObs "m_c/m_s (charm/strange)" crystal pdg
+
+-- | m_b/m_τ = β₀/N_c + 1/(χ·β₀) = 7/3 + 1/42 = 99/42
+-- Bottom-to-tau mass ratio. The base β₀/N_c = 7/3 is the GUT-scale
+-- b-τ unification relation. The correction 1/(χ·β₀) = 1/42 = 1/D
+-- is the spectral running from GUT scale to low energy.
+proveMbOverMtau :: Observable
+proveMbOverMtau =
+  let crystal = fromIntegral beta0 / fromIntegral n_c
+              + 1.0 / fromIntegral (chi * beta0)        -- 2.35714
+      pdg     = 2.3525
+  in mkObs "m_b/m_τ (bottom/tau)" crystal pdg
+
+-- | m_t/v = β₀/(gauss−N_c) + 1/Σd² = 7/10 + 1/650
+-- The top Yukawa coupling. The base 7/10 is already in the codebase
+-- (proveTopMass). The a₄ correction 1/Σd² from the full
+-- endomorphism count nails the last 0.2%.
+proveTopYukawa :: Observable
+proveTopYukawa =
+  let crystal = fromIntegral beta0
+              / (fromIntegral gauss - fromIntegral n_c)
+              + 1.0 / fromIntegral sigma_d2              -- 0.70154
+      pdg     = 0.70165
+  in mkObs "m_t/v (top Yukawa)" crystal pdg
+
+-- | ⟨r²⟩_π = (N_c²/(gauss+β₀) × ℏc/m_π)² = (9/20 × ℏc/m_π)²
+-- The pion charge radius squared. The coefficient 9/20 = N_c²/(gauss+β₀)
+-- where gauss+β₀ = 20 is the electroweak+QCD partition. This is the
+-- ChPT one-loop result with crystal atoms replacing the chiral log.
+provePionRadiusSq :: Observable
+provePionRadiusSq =
+  let hbar_c  = 197.327                                 -- MeV·fm
+      coeff   = fromIntegral (n_c^2)
+              / fromIntegral (gauss + beta0)             -- 9/20
+      r_pi    = coeff * hbar_c / m_pi                    -- fm
+      crystal = r_pi * r_pi                              -- fm²
+      pdg     = 0.434
+  in mkObs "⟨r²⟩_π (pion radius²)" crystal pdg
+
+-- | Δα_had = 1/Σd = 1/36
+-- The hadronic vacuum polarisation contribution to α running at M_Z.
+-- The quark loop sum collapses to the reciprocal of the total sector
+-- dimension. The simplest possible crystal invariant for the most
+-- precisely measured hadronic quantity.
+proveDeltaAlphaHad :: Observable
+proveDeltaAlphaHad =
+  let crystal = 1.0 / fromIntegral sigma_d              -- 0.02778
+      pdg     = 0.02766
+  in mkObs "Δα_had (hadronic VP)" crystal pdg
+
+-- ═══════════════════════════════════════════════════════════════════
+-- §18  FUNDAMENTAL OBSERVABLES — PHASE 3: HARD 4
+-- ═══════════════════════════════════════════════════════════════════
+
+-- | σ_πN = m_π²·N_c/m_p × (D+1)/D = 59.17 MeV
+-- The pion-nucleon sigma term. The base m_π²·N_c/m_p is the
+-- Feynman-Hellmann relation with colour factor N_c. The correction
+-- (D+1)/D = 43/42 uses the same 43 that appears in α⁻¹ = 43π+ln7.
+proveSigmaPiN :: Observable
+proveSigmaPiN =
+  let base    = m_pi * m_pi * fromIntegral n_c / m_proton
+      crystal = base * fromIntegral (d_total + 1)
+              / fromIntegral d_total                     -- 59.17 MeV
+      pdg     = 59.0
+  in mkObs "σ_πN (sigma term)" crystal pdg
+
+-- | Δm²₂₁ = (N_w·v/(2^D·gauss))² = m²_ν2
+-- The solar neutrino mass-squared splitting derived DIRECTLY from
+-- atoms, not as a difference of two masses. In normal ordering
+-- (crystal prediction), m_ν1 is suppressed by χ⁴ = 1296 and the
+-- splitting IS m²_ν2. Same lesson as m_c/m_s: don't subtract,
+-- derive directly.
+proveDm21Direct :: Observable
+proveDm21Direct =
+  let v_ev    = 246.22e9                                 -- eV
+      m_nu2   = fromIntegral n_w * v_ev
+              / (fromIntegral ((2::Integer)^d_total) * fromIntegral gauss)
+      crystal = m_nu2 * m_nu2                            -- eV²
+      pdg     = 7.42e-5
+  in mkObs "Δm²₂₁ (solar, direct)" crystal pdg
+
+-- | Δm²₃₂ = m²_ν3 − m²_ν2
+-- The atmospheric neutrino mass-squared splitting. m_ν3 = v/2^D × 10/11,
+-- m_ν2 = N_w·v/(2^D·gauss). The split ratio χ⁴/(χ⁴−1) = 1296/1295.
+proveDm32 :: Observable
+proveDm32 =
+  let v_ev    = 246.22e9                                 -- eV
+      pow42   = fromIntegral ((2::Integer)^d_total)
+      m_nu3   = v_ev / pow42
+              * fromIntegral (2 * chi - 2)
+              / fromIntegral (2 * chi - 1)               -- × 10/11
+      m_nu2   = fromIntegral n_w * v_ev
+              / (pow42 * fromIntegral gauss)
+      crystal = m_nu3 * m_nu3 - m_nu2 * m_nu2           -- eV²
+      pdg     = 2.515e-3
+  in mkObs "Δm²₃₂ (atmospheric)" crystal pdg
+
+-- | G_N·m_p²/(ℏc) = (m_p/M_Pl)²
+-- The gravitational coupling at the proton scale. Derived from the
+-- hierarchy M_Pl/v = e^D/(β₀·(χ−1)) = e^42/35 and the proton mass
+-- m_p = v/256 × 53/54. No new structure needed — just the square
+-- of existing quantities composed.
+proveGravCoupling :: Observable
+proveGravCoupling =
+  let mpl_over_v = exp (fromIntegral d_total)
+                 / (fromIntegral beta0 * (fromIntegral chi - 1.0))
+      mp_over_v  = fromIntegral (d_total + gauss - n_w)
+                 / (fromIntegral (d_total + gauss - n_w + 1)
+                    * fromIntegral ((2::Integer)^(2^n_c)))
+      mp_over_mpl = mp_over_v / mpl_over_v
+      crystal     = mp_over_mpl * mp_over_mpl            -- dimensionless
+      pdg         = 5.905e-39
+  in mkObs "G_N·m_p²/ℏc (grav coupling)" crystal pdg

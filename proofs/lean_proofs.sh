@@ -20,6 +20,7 @@ FILES=(
   CrystalGravityDyn.lean
   CrystalProtein.lean
   CrystalMandelbrot.lean
+  CrystalFundamentals.lean
   Main.lean
 )
 
