@@ -83,7 +83,7 @@ Proved: `alphaInvAtD d+1 - alphaInvAtD d == pi` for all d ∈ [0..41]
 - Fractal branches are NOT backbone geometries.
 - Mandelbrot zoom is NOT the spectral tower.
 - The functor does NOT produce new observables.
-- Observable count stays at 181.
+- Observable count stays at 198.
 
 The Mandelbrot module shares A_F atoms with the protein module
 (both use N_c, N_w, β₀, χ). They are NOT analogies of each other.

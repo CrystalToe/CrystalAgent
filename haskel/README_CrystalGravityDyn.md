@@ -124,7 +124,7 @@ adds the explicit A_F integer structure that prior work lacked.
 - Does NOT compute G_N numerically (the hierarchy problem remains open).
 - Does NOT derive the cosmological constant from first principles.
 - Does NOT add new observables. The 12 integers are structural proofs,
-  not PDG targets. Observable count stays at 181.
+  not PDG targets. Observable count stays at 198.
 - Does NOT extend beyond linearized gravity. Full nonlinear GR from
   the MERA is an open problem.
 
