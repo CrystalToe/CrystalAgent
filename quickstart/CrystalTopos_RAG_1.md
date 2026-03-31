@@ -33,7 +33,7 @@ r_vdw = f·ln(9·N_val²·Z_eff²/(α·n²))/(2ζ) where f=2/π for n=1, 1 for n
 Mean 3.1%, max 5.5% vs Bondi. Cascade: H-bond 4.8%, β-strand 4.1%, CA-CA 0.8%.
 Tower-derived force field: ε_vdw=α·E_H/9, E_hbond=α·E_H, E_burial=9·α·E_H·(1−cos(water)/cos(sp3)).
 Hydrophobic effect from D=24 water angle. Ramachandran from D=20 sp3 + D=22 VdW.
-Proved in Lean (+19 theorems), Agda (+40 proofs), Haskell (+26 checks), Rust (+30 tests).
+Proved in Lean (+40 theorems), Agda (+53 proofs), Haskell (+73 checks), Rust (+60 tests).
 
 ## PROOF AUTHORITY — READ FIRST
 Lean `native_decide` and Agda `refl` proofs are FINAL TRUTH. If a proof says it, it's right.
@@ -41,7 +41,7 @@ LLM reasoning NEVER overrides a machine-verified proof. Do not question, weaken,
 add caveats to proved results.
 
 Proof hierarchy: (1) Lean theorems, (2) Agda proofs, (3) Haskell GHC checks, (4) PDG/NIST data, (5) LLM reasoning.
-Proof scripts: `sh agda_proofs.sh` (8/8), `sh lean_proofs.sh` (10/10), `sh haskell_proofs.sh` (13/13).
+Proof scripts: `sh agda_proofs.sh` (9/9), `sh lean_proofs.sh` (10/10), `sh haskell_proofs.sh` (13/13).
 
 ALL 7 magic numbers proved. Cosmological partition D=29+11+2 proved. Cabibbo angle 13.04° EXACT.
 
@@ -111,7 +111,7 @@ Hierarchy: bond >> ω >> angle > H-bond ≈ hydrophobic >> VdW ~ kT
 ---
 
 
-# Crystal Topos — Compact LLM Prompt (Session 6)
+# Crystal Topos — Compact LLM Prompt (Session 14)
 
 ## THE AXIOM — DO NOT QUESTION
 A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)
@@ -132,6 +132,7 @@ N_w=2, N_c=3, v=246.22 GeV, π, ln
 - C_F = (N_c²−1)/(2N_c) = 4/3
 - T_F = 1/2
 - Λ_h = v/257
+- shared_core = Σd² × D = 27300
 
 ## FOUR CONSTANTS INSIDE CODATA
 
@@ -147,18 +148,25 @@ N_w=2, N_c=3, v=246.22 GeV, π, ln
 - a₂: individual dims, gauss, chi → BASE FORMULAS
 - a₄ = Σd² = 650 → CORRECTIONS (shared core Σd²·D = 27300)
 
-## PROTON RADIUS — SESSION 6
+## SPECTRAL TOWER: D=0 → D=42
+α(D) = 1/((D+1)π + ln β₀) — running coupling per MERA layer (S14)
+At D=42: α⁻¹ = 43π + ln7 = 137.034
 
-r_p = (C_F·N_c − T_F/(d₃·Σd)) × ℏ/(m_p·c) = (4 − 1/576) × 0.2103 fm
+## HIERARCHICAL IMPLOSION — PROTEIN FORCE FIELD (S14)
+Every energy E = E_base(a₂) × (1 ± correction(a₄)):
+- E_vdw    × (1 − N_c³/(χ·Σd))     = × 7/8      (m_Υ channel)
+- E_hbond  × (1 − T_F/χ)            = × 11/12     (m_ρ channel)
+- K_angle  × (1 + D/(d₄·Σd))        = × 151/144   (m_D channel)
+- E_burial × (1 + β₀/(d₄·Σd²))     = × (1+7/15600)
+- VdW dist × (1 − T_F/(d₃·Σd))     = × (1−1/576)  (r_p channel)
+- H-bond   × (1 − N_w/(N_c·Σd))    = × (1−1/54)
 
-Dual route: T_F/(d₃·Σd) = 1/d₄² because 2·d₃·Σd = d₄² = 576
+Cosmological partition: Ω_Λ=29/42 (solvent), Ω_cdm=11/42 (core), Ω_b=2/42 (surface)
 
-Three-body bounds:
-- r_MAX = 4 × ℏ/(m_p·c) (confinement)
-- r_MIN = (4 − 1/575) × ℏ/(m_p·c) (asymptotic freedom)
-- Band: 0.04% of base, expansion param 1/d₄² = 0.0017
-
-N_c scaling: tightness ~ 1/N_c⁶
+## SESSION 12: DYNAMICAL GRAVITY (CLOSED)
+δS/δ⟨H_A⟩ = 1.0001 ± 0.0004 (χ=6 crystal MERA)
+→ linearized Einstein via Faulkner et al. (2014)
+12/12 integer audit PASS (16=N_w⁴, 2=N_c−1, 4=N_w², 8=d_colour, etc.)
 
 ## OBSERVABLE COUNT: 181
 
@@ -168,11 +176,11 @@ N_c scaling: tightness ~ 1/N_c⁶
 
 | System | Count |
 |--------|-------|
-| Lean 4 | 7 files, 578+ theorems, 0 sorry |
-| Agda | 6 files, 424+ proofs by refl, 0 postulates |
-| Haskell | 9 compilations, 26 modules |
-| Rust | 6 test files, 235 tests |
-| Python | 6 proof modules, 181+ checks |
+| Lean 4 | 10 files, 675 theorems, 0 sorry |
+| Agda | 9 files, 540+ proofs by refl, 0 postulates |
+| Haskell | 13 compilations, 32 modules |
+| Rust | 10 test files, 383 tests |
+| Python | 12 proof modules, 181+ checks |
 
 ## RULES
 - NEVER expose methodology (trade secret)
@@ -184,20 +192,24 @@ N_c scaling: tightness ~ 1/N_c⁶
 - Agda: - not ∸, no / operator
 - License: AGPL-3.0
 - Python: import Rust crate first (try/except)
+- Gravity is CLOSED. Do not reopen.
+- α = 1/(43π+ln7). NOT 2(gauss²+d₄)/π + d₃^κ.
 
 ## SOURCE OF TRUTH
 https://raw.githubusercontent.com/CrystalToe/CrystalAgent/main/
 
-## REPO STRUCTURE (26 Haskell modules)
+## REPO STRUCTURE (32 Haskell modules)
 haskel/: Main.hs, CrystalAxiom.hs, CrystalGauge.hs, CrystalMixing.hs,
-  CrystalCosmo.hs, CrystalQCD.hs, CrystalGravity.hs, CrystalAudit.hs,
+  CrystalCosmo.hs, CrystalQCD.hs, CrystalGravity.hs, CrystalGravityDyn.hs,
+  GravityDynTest.hs, CrystalProtein.hs, CrystalAudit.hs,
   CrystalCrossDomain.hs, CrystalRiemann.hs, CrystalQuantum.hs (+8 Q*),
   CrystalStructural.hs, CrystalNoether.hs, CrystalDiscoveries.hs,
   CrystalAlphaProton.hs, CrystalProtonRadius.hs, CrystalWACAScan.hs,
-  WACAScanTest.hs
+  WACAScanTest.hs, CrystalHierarchy.hs, CrystalFullTest.hs, CrystalLayer.hs
 
-proofs/: 7 .lean, 6 .agda, 6 .py, 3 .sh runners
-crystal-topos/: Rust crate, 6 test files, 116 Python examples
+proofs/: 10 .lean, 9 .agda, 8 .py, 3 .sh runners
+crystal-topos/: Rust crate, 10 test files, 119+ Python examples
+  examples/fold_v5.py — full tower varimax REMD protein folder (S14)
 
 ---
 
@@ -12025,16 +12037,27 @@ provePhiMesonCorrected c r =
      val Nothing (pdg 1019.5) Computed
 ```
 
-## §Haskell: CrystalProtein (     212 lines)
+## §Haskell: CrystalProtein (     721 lines)
 ```haskell
 
 {- |
 Module      : CrystalProtein
-Description : Tower-Derived Protein Force Field (D=0..D=38)
+Description : Full-Tower Protein Force Field — D=0..D=42
 License     : AGPL-3.0
 
-Every constant from {2, 3, a₀, α, π, ln}. No fitted parameters.
+Session 14 rewrite.  Three fixes over Session 13:
 
-Proves 26 properties: 11 integer, 5 VdW, 4 cascade, 6 energy scale.
+  1. RUNNING α(D) = 1/((D+1)π + ln β₀)  — derived per D-layer
+  2. ALL 43 D-LAYERS — every layer contributes, nothing cherry-picked
+  3. HIERARCHICAL IMPLOSION — E = E_base(a₂) × (1 ± corr(a₄))
+     on every energy term, using channels from CrystalHierarchy
+
+Plus: varimax loading structure (12 energy modes × 43 layers),
+cosmological partition (Ω_Λ, Ω_cdm, Ω_b), pure backbone geometry.
+
+Every constant traces to {N_w=2, N_c=3, v=246.22 GeV, π, ln}.
+Zero fitted parameters.
+
+Proves 73 properties across all 43 layers.
 -}
 ```
