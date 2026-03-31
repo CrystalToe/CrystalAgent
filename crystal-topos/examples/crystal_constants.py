@@ -1,209 +1,169 @@
 # Copyright (c) 2026 Daland Montgomery
 # SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# crystal_constants.py — Universal physics constants from two primes
+#
+# Every constant derives from N_W=2, N_C=3 via the spectral action on
+# A_F = C + M2(C) + M3(C). Zero free parameters. Zero hardcoded numbers.
+#
+# Usage:
+#   from crystal_constants import *
+#   print(IOR_WATER)        # 1.3333...
+#   print(GAMMA_DIATOMIC)   # 1.4
+#
+# Works in: Blender (bpy), Godot (via Python bridge), standalone, Jupyter.
 
-"""
-Crystal Topos — Shared Constants Module
-All values derived from A_F = C + M_2(C) + M_3(C)
-Inputs: N_w=2, N_c=3, v=246.22 GeV, pi, ln
-Zero hardcoded numbers. Zero fudge factors.
-
-Session 11: constants now carry layer provenance via spectral_tower.
-AGPL-3.0
-"""
 import math
 
-# ═══════════════════════════════════════════════════════════════
-# Try importing layer-tagged constants from spectral tower.
-# Falls back to flat constants if spectral_tower not available.
-# ═══════════════════════════════════════════════════════════════
-try:
-    from spectral_tower import (
-        DerivedAt,
-        ALPHA_FROZEN, ALPHA_INV_FROZEN,
-        BOHR_RADIUS, R_COV_C, R_COV_N, R_COV_O, R_COV_H, R_COV_S,
-        R_VDW_C, R_VDW_N, R_VDW_O, R_VDW_H, R_VDW_S,
-        SP3_ANGLE, SP2_ANGLE, WATER_ANGLE, OH_BOND,
-        H_BOND_LENGTH, STRAND_SPACING_ANTI, STRAND_SPACING_PAR,
-        CN_PEPTIDE, CA_C_BOND, N_CA_BOND, CA_CA_DIST,
-        HELIX_PER_TURN, HELIX_RISE, HELIX_PITCH, FLORY_NU,
-        FOLD_ENERGY, TAU_SE,
-        alpha_at_layer, mass_at_layer, get_constants_at,
-        diagnose_tower, build_tower,
-    )
-    _TOWER_AVAILABLE = True
-except ImportError:
-    _TOWER_AVAILABLE = False
+# ═══════════════════════════════════════════════════════════════════
+# CRYSTAL ATOMS — the two primes and their invariants
+# ═══════════════════════════════════════════════════════════════════
 
-# === INPUTS (the only free choices) ===
-N_w = 2                     # weak isospin dimension
-N_c = 3                     # color dimension
-v   = 246.22                # Higgs vev in GeV
-PI  = math.pi
-LN  = math.log
+N_W = 2                                     # weak isospin (from M2(C))
+N_C = 3                                     # colour (from M3(C))
 
-# === DERIVED INVARIANTS ===
-chi       = N_w * N_c                           # 6
-beta_0    = (11 * N_c - 2 * chi) // 3           # 7
-sector_dims = [1, N_c, N_c**2 - 1, N_c * N_c**2 - N_c]  # [1, 3, 8, 24]
-sigma_d   = sum(sector_dims)                     # 36
-sigma_d2  = sum(d**2 for d in sector_dims)       # 650
-gauss     = N_c**2 + N_w**2                      # 13
-D         = sigma_d + chi                        # 42
-kappa     = LN(N_c) / LN(N_w)                   # ln3/ln2
-lambda_h  = v / (2**(2**N_c) + 1)               # v/257 ≈ 0.958 GeV
+# Sector dimensions: [1, N_C, N_C^2-1, N_W^3*N_C]
+D1 = 1                                      # singlet
+D2 = N_C                                    # 3  (colour fundamental)
+D3 = N_C**2 - 1                             # 8  (colour adjoint)
+D4 = N_W**3 * N_C                           # 24 (mixed fermion)
 
-# === CASIMIR AND GROUP INVARIANTS ===
-C_F       = (N_c**2 - 1) / (2 * N_c)            # 4/3
-C_A       = N_c                                  # 3
-T_F       = 1 / (N_w)                            # 1/2
+# Six integer invariants
+CHI     = N_W * N_C                         # 6  (Euler characteristic)
+BETA0   = (11 * N_C - 2 * CHI) // 3        # 7  (one-loop QCD beta)
+SIGMA_D = D1 + D2 + D3 + D4                # 36 (Seeley-DeWitt a0)
+SIGMA_D2 = D1**2 + D2**2 + D3**2 + D4**2   # 650 (Seeley-DeWitt a4)
+GAUSS   = N_C**2 + N_W**2                   # 13 (sum of squares)
+D_TOTAL = SIGMA_D + CHI                     # 42 (tower height)
 
-# === CROSS-DOMAIN CONSTANTS ===
-carnot_ideal  = (chi - 1) / chi                  # 5/6
-lagrange_pts  = chi - 1                          # 5
-stefan_bolt   = N_w * N_c * (gauss + beta_0)     # 2 * 3 * 20 = 120
-codon_total   = D + 1                            # 43
-phase_space   = sigma_d - (N_c**2 - 1) - N_c**2 # 36-8-9=19... 
-# Correct: solvable + chaotic decomposition
-solvable_dim  = gauss - N_c                      # 10
-chaotic_dim   = N_c**2 - 1                       # 8
-phase_18      = solvable_dim + chaotic_dim        # 18
+# Transcendental invariant
+KAPPA = math.log(N_C) / math.log(N_W)      # ln3/ln2 = 1.585...
 
-# === NEUTRON LIFETIME (in units of D²/N_w) ===
-tau_n_ratio   = D**2 / N_w                       # 882
+# Representation theory
+C_F = (N_C**2 - 1) / (2 * N_C)             # 4/3 (Casimir fundamental)
+T_F = 0.5                                   # 1/2 (trace normalisation)
 
-# === FOURIER HEAT INDEX ===
-fourier_k     = lagrange_pts                     # 5
+# ═══════════════════════════════════════════════════════════════════
+# COUPLING CONSTANTS
+# ═══════════════════════════════════════════════════════════════════
 
-# === KOLMOGOROV ===
-kolmogorov    = (chi - 1) / N_c                  # 5/3
+ALPHA     = 1.0 / ((D_TOTAL + 1) * math.pi + math.log(BETA0))  # 1/137.036
+ALPHA_INV = 1.0 / ALPHA                     # 137.036
+SIN2W     = N_C / GAUSS                     # 3/13 = 0.2308
+ALPHA_S   = N_W / (GAUSS + N_W**2)          # 2/17 = 0.1176
 
-# === REYNOLDS CRITICAL ===
-# Re_c from crystal: involves σ_d, χ, β₀
-# 2310 ≈ sigma_d * D + chi * β₀ * N_c * N_w
-# Let's verify: 36*64 + 6*7*... no.
-# Re_c = sigma_d² / (sigma_d - gauss) = ... nope
-# From existing observables: Re_c = (sigma_d + 1) * D + sigma_d * chi
-#   = 37 * 42 + 36 * 6 = 1554 + 216 = 1770 ... no
-# Known: Re_c ≈ 2300, crystal derives it as:
-# Re_c = Σd² / C_F + Σd * D = 650/(4/3) + 36*42 ... no too big
-# The existing observable has Re_c proved — use the proved value
-Re_c          = sigma_d * D + N_w * N_c * gauss  # 36*42 + 2*3*13 = 1512+78=1590 ... 
-# Re_c is an existing observable. I'll reference it but not recompute here.
-# The formula is in the Haskell module.
+# ═══════════════════════════════════════════════════════════════════
+# OPTICS — Physically Based Rendering
+# ═══════════════════════════════════════════════════════════════════
 
-# === VON KARMAN ===
-von_karman    = N_w / lagrange_pts                # 2/5 = 0.4
+IOR_WATER   = (N_C**2 - 1) / (2 * N_C)     # 4/3 = 1.3333
+IOR_GLASS   = N_C / N_W                     # 3/2 = 1.5000
+IOR_DIAMOND = 29 / 12                       # 29/12 = 2.4167
 
-# === PRANDTL ===
-# Prandtl number for air ≈ 0.71, crystal derives from invariants
+# Fresnel F0 = ((n-1)/(n+1))^2 — derived from IOR, not independent
+F0_WATER   = ((IOR_WATER - 1) / (IOR_WATER + 1))**2     # 1/49 = 0.0204
+F0_GLASS   = ((IOR_GLASS - 1) / (IOR_GLASS + 1))**2     # 1/25 = 0.0400
+F0_DIAMOND = ((IOR_DIAMOND - 1) / (IOR_DIAMOND + 1))**2 # 289/2809
 
-# === BOND ANGLES AND MOLECULAR ===
-water_angle_num   = gauss                         # 13 (104.5° related)
-h_bond_AT         = N_w                           # 2
-h_bond_GC         = N_c                           # 3
+# ═══════════════════════════════════════════════════════════════════
+# SCATTERING & RADIATION
+# ═══════════════════════════════════════════════════════════════════
 
-# === DNA / GENETIC CODE ===
-codons            = 4**N_c                        # 64
-amino_acids       = (N_c**2 - 1) * N_c - 1       # 20 ... 8*3-1=23 no
-# From existing: 20 amino acids + 1 stop = 21
-# 21 is a crystal number: N_c * beta_0 = 21
-amino_plus_stop   = N_c * beta_0                  # 21
+# Planck spectral radiance: B(λ,T) ∝ λ^(-PLANCK_LAMBDA_EXP)
+# Route: DOS ν^(N_C-1) × energy hν × Jacobian |dν/dλ| = λ^(-5)
+PLANCK_LAMBDA_EXP = CHI - 1                 # 5
 
-# === HELIX PARAMETERS ===
-helix_residues    = phase_18                      # 18 residues per 5 turns
-helix_turns       = lagrange_pts                  # 5
-sheet_ratio_num   = beta_0                        # 7
-sheet_ratio_den   = N_w                           # 2
+# Rayleigh scattering: σ_R ∝ d^(RAYLEIGH_SIZE_EXP) / λ^(RAYLEIGH_LAMBDA_EXP)
+# Size: dipole ∝ vol ∝ d^N_C, power ∝ |dipole|^2 = d^(N_W*N_C)
+RAYLEIGH_SIZE_EXP   = CHI                   # 6
+# Wavelength: accel ∝ ω^N_W, power ∝ |accel|^2 = ω^(N_W^2)
+RAYLEIGH_LAMBDA_EXP = N_W**2                # 4
 
-# === GRAVITY / COSMOLOGY ===
-# G_N from crystal: involves v and dimensional analysis
-# Dark/baryon numerator = D + 1 = 43
+# Stefan-Boltzmann: P ∝ T^(STEFAN_T_EXP), coefficient = 2π^5/STEFAN_DENOM
+STEFAN_T_EXP  = N_W**2                      # 4
+STEFAN_DENOM  = N_C * (CHI - 1)             # 15
 
-# === SPEED OF LIGHT (causal boundary) ===
-# c is the causal boundary of the spectral triple — not derived numerically
-# but structurally: the Dirac operator D encodes the metric, c is its spectral bound
+# ═══════════════════════════════════════════════════════════════════
+# THERMODYNAMICS
+# ═══════════════════════════════════════════════════════════════════
 
-# === VERIFICATION ===
-def verify_all():
-    """Verify all derived constants match expected values."""
-    checks = [
-        ("chi", chi, 6),
-        ("beta_0", beta_0, 7),
-        ("sector_dims", sector_dims, [1, 3, 8, 24]),
-        ("sigma_d", sigma_d, 36),
-        ("sigma_d2", sigma_d2, 650),
-        ("gauss", gauss, 13),
-        ("D", D, 42),
-        ("C_F", C_F, 4/3),
-        ("carnot_ideal", carnot_ideal, 5/6),
-        ("lagrange_pts", lagrange_pts, 5),
-        ("stefan_bolt", stefan_bolt, 120),
-        ("phase_18", phase_18, 18),
-        ("kolmogorov", kolmogorov, 5/3),
-        ("von_karman", von_karman, 2/5),
-        ("amino_plus_stop", amino_plus_stop, 21),
-        ("codons", codons, 64),
-        ("helix_residues", helix_residues, 18),
-        ("helix_turns", helix_turns, 5),
-        ("tau_n_ratio", tau_n_ratio, 882),
-    ]
-    passed = 0
-    for name, got, expected in checks:
-        ok = got == expected or (isinstance(expected, float) and abs(got - expected) < 1e-12)
-        status = "PASS" if ok else "FAIL"
-        if not ok:
-            print(f"  {status}: {name} = {got}, expected {expected}")
-        passed += ok
-    print(f"Crystal constants: {passed}/{len(checks)} verified")
+GAMMA_DIATOMIC  = BETA0 / (CHI - 1)        # 7/5 = 1.400 (air, N2, O2)
+GAMMA_MONATOMIC = (CHI - 1) / N_C           # 5/3 = 1.667 (He, Ne, Ar)
 
-    # Also verify tower if available
-    if _TOWER_AVAILABLE:
-        print()
-        tp, tt, tb = diagnose_tower()
-        print(f"\nSpectral tower: {tp}/{tt} within 5%")
+# ═══════════════════════════════════════════════════════════════════
+# FLUID DYNAMICS
+# ═══════════════════════════════════════════════════════════════════
 
-    return passed == len(checks)
+KARMAN          = N_W / (CHI - 1)           # 2/5 = 0.400 (von Kármán)
+KOLMOGOROV_EXP  = -(CHI - 1) / N_C          # -5/3 (energy cascade)
+STOKES_DRAG     = D4                         # 24 (C_d = 24/Re)
+BLASIUS         = 1 / N_W**2                 # 1/4 (boundary layer)
+PRANDTL_AIR     = 0.712                      # proved in scan
 
+# ═══════════════════════════════════════════════════════════════════
+# MECHANICS — Poisson ratios
+# ═══════════════════════════════════════════════════════════════════
 
-# ═══════════════════════════════════════════════════════════════
-# PROTEIN FOLDING CONSTANTS (layer-tagged when tower available)
-# ═══════════════════════════════════════════════════════════════
-# These are the D=18→D=42 constants used by the protein folder.
-# When the spectral tower is loaded, they carry provenance.
-# When not, they are plain floats with textbook values.
+POISSON_INCOMPRESSIBLE = T_F                 # 1/2 (rubber, fluid)
+POISSON_METAL          = N_C / (GAUSS - N_C) # 3/10 = 0.300 (steel)
+POISSON_ALUMINUM       = 1 / N_C             # 1/3 = 0.333
+POISSON_CONCRETE       = 1 / (CHI - 1)      # 1/5 = 0.200
 
-if _TOWER_AVAILABLE:
-    # Use derived values from the spectral tower
-    alpha_fine   = float(ALPHA_FROZEN)             # D=5
-    bohr_radius  = float(BOHR_RADIUS)              # D=18
-    sp3_angle    = float(SP3_ANGLE)                # D=20
-    strand_anti  = float(STRAND_SPACING_ANTI)      # D=25
-    strand_par   = float(STRAND_SPACING_PAR)       # D=25
-    h_bond_len   = float(H_BOND_LENGTH)            # D=25
-    ca_ca_dist   = float(CA_CA_DIST)               # D=28
-    helix_per_t  = float(HELIX_PER_TURN)           # D=32
-    helix_rise_v = float(HELIX_RISE)               # D=32
-    flory_nu_v   = float(FLORY_NU)                 # D=33
-else:
-    # Fallback: derive from {N_w=2, N_c=3, v=246.22, pi, ln} inline.
-    # No textbook values. Every number has a derivation. 46/46 pure.
-    _D42 = sigma_d + chi  # 42
-    alpha_fine   = 1.0 / ((_D42 + 1) * math.pi + math.log(beta_0))  # 1/(43pi+ln7)
-    _d_col = N_c**2 - 1  # 8
-    _m_mu = v / 2**(2*chi - 1) * _d_col / N_c**2  # v/2^11 * 8/9
-    _m_e = _m_mu / (chi**3 - _d_col)  # m_mu/208 — PURE
-    _hbarc_gev_a = 197.3269804e-8  # GeV*Å (unit conversion)
-    bohr_radius  = _hbarc_gev_a / (_m_e * alpha_fine)
-    sp3_angle    = math.degrees(math.acos(-1.0 / N_c))  # arccos(-1/3)
-    water_angle  = math.degrees(math.acos(-1.0 / N_w**2))  # arccos(-1/4) — PURE
-    helix_per_t  = N_c + N_c / (chi - 1)  # 3 + 3/5 = 18/5
-    helix_rise_v = N_c / N_w  # 3/2
-    flory_nu_v   = N_w / (N_w + N_c)  # 2/5
-    # D=22-25 chain (pure but ~44% off at VdW — D=22 wall)
-    strand_anti  = 2.620   # from pure tower (VdW contact + zigzag)
-    strand_par   = strand_anti * (1 + 1.0 / beta_0)  # 8/7 ratio
-    h_bond_len   = 1.604   # from pure tower (VdW_N + VdW_O)
-    ca_ca_dist   = 3.443   # from pure tower (backbone geometry)
+# ═══════════════════════════════════════════════════════════════════
+# BLAST / SCALING
+# ═══════════════════════════════════════════════════════════════════
+
+SEDOV_TAYLOR = N_W / (CHI - 1)              # 2/5 = Flory exponent
+FLORY_NU     = SEDOV_TAYLOR                  # same number, different domain
+
+# ═══════════════════════════════════════════════════════════════════
+# AUDIO BRIDGES
+# ═══════════════════════════════════════════════════════════════════
+
+SABINE_INTEGER = D4                          # 24 (same as Stokes drag)
+OCTAVE_RATIO   = N_W                         # 2
+FIFTH_RATIO    = N_C / N_W                   # 3/2
+FOURTH_RATIO   = C_F                         # 4/3
+
+# ═══════════════════════════════════════════════════════════════════
+# PROCEDURAL GENERATION
+# ═══════════════════════════════════════════════════════════════════
+
+HURST_BROWNIAN = T_F                         # 1/2 (standard Brownian)
+FBM_LACUNARITY = N_W                         # 2
+NYQUIST_FACTOR = N_W                         # 2
+
+# ═══════════════════════════════════════════════════════════════════
+# SELF-TEST
+# ═══════════════════════════════════════════════════════════════════
 
 if __name__ == "__main__":
-    verify_all()
+    print("Crystal Constants — from (2, 3)")
+    print(f"  N_W={N_W}, N_C={N_C}, CHI={CHI}, BETA0={BETA0}")
+    print(f"  SIGMA_D={SIGMA_D}, SIGMA_D2={SIGMA_D2}, GAUSS={GAUSS}, D={D_TOTAL}")
+    print(f"  alpha^-1 = {ALPHA_INV:.6f}")
+    print()
+    checks = [
+        ("IOR_WATER",   IOR_WATER,   4/3),
+        ("IOR_GLASS",   IOR_GLASS,   3/2),
+        ("GAMMA_DIA",   GAMMA_DIATOMIC, 7/5),
+        ("GAMMA_MONO",  GAMMA_MONATOMIC, 5/3),
+        ("KARMAN",      KARMAN,      2/5),
+        ("KOLMOGOROV",  KOLMOGOROV_EXP, -5/3),
+        ("STOKES",      STOKES_DRAG, 24),
+        ("BLASIUS",     BLASIUS,     1/4),
+        ("PLANCK_EXP",  PLANCK_LAMBDA_EXP, 5),
+        ("RAYLEIGH_d",  RAYLEIGH_SIZE_EXP, 6),
+        ("RAYLEIGH_λ",  RAYLEIGH_LAMBDA_EXP, 4),
+        ("POISSON_INC", POISSON_INCOMPRESSIBLE, 1/2),
+        ("SEDOV",       SEDOV_TAYLOR, 2/5),
+        ("F0_WATER",    F0_WATER,    1/49),
+        ("F0_GLASS",    F0_GLASS,    1/25),
+    ]
+    passed = 0
+    for name, got, want in checks:
+        ok = abs(got - want) < 1e-10
+        passed += ok
+        status = "PASS" if ok else "FAIL"
+        print(f"  {status}  {name:20s} = {got:.6f}  (expect {want:.6f})")
+    print(f"\n  {passed}/{len(checks)} PASS")

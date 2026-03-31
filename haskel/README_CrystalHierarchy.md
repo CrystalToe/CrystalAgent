@@ -7,7 +7,7 @@
 This module implements the Seeley-DeWitt hierarchical implosion operator.
 It takes base formulas at the a₂ level and applies a₄ corrections using
 sector dimensions {1, 3, 8, 24}. Result: CV dropped from 1.33 to 0.957.
-All 181 observables under 1%. Zero LOOSE. Zero free parameters.
+All 198 observables under 1%. Zero LOOSE. Zero free parameters.
 
 ---
 
@@ -138,14 +138,14 @@ Both regimes use the same algebra. The channel selects the scale.
 | LOOSE (>1%) | 6 | **0** |
 | OVER (>4.5%) | 0 | 0 |
 
-All 181 observables under 1%. The coefficient of variation crossed
+All 198 observables under 1%. The coefficient of variation crossed
 below 1.0. This is a complete force field: no observable is an outlier.
 
 ---
 
 ## What This Does NOT Do
 
-- Does NOT add new observables. Count stays at 181.
+- Does NOT add new observables. Count stays at 198.
 - Does NOT change the base formulas. a₂ level is preserved.
 - Does NOT introduce free parameters. Corrections are from A_F atoms.
 - Does NOT guarantee the corrections are unique. Other channel

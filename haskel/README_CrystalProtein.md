@@ -140,9 +140,9 @@ verify that the force field folds proteins correctly.
 
 ## Observable Count
 
-**181 (UNCHANGED).** The protein force field is structural — it derives
+**198 (UNCHANGED).** The protein force field is structural — it derives
 molecular geometry from the spectral tower. It does not add PDG
-observables. The 181 particle physics observables are unaffected.
+observables. The 198 particle physics observables are unaffected.
 
 ---
 
