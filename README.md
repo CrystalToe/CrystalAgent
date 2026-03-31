@@ -20,7 +20,8 @@
 
 
 ```
-In the Crystal Topos, have quantum gravity and general relativity finally been unified — and if so, how?”
+In the Crystal Topos, have quantum gravity and general relativity finally been unified 
+— and if so, how?”
 ```
 
 ```
