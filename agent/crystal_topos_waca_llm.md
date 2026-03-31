@@ -335,11 +335,11 @@ Three-body bounds:
 | Ω_DM | 309/1159 | −1/(gauss(gauss−N_c)) | − 1/130 | 2.98% → 0.007% |
 | sin²θ₁₃ | 1/45 | −1/4500 | 11/500 | 1.01% → EXACT |
 
-Result: CV = 0.954. Zero LOOSE. All 195 under 1%. Max PWI = 0.989% (sin²θ₁₂).
+Result: CV = 0.954. Zero LOOSE. All 198 under 1%. Max PWI = 0.989% (sin²θ₁₂).
 
 ---
 
-## OBSERVABLE COUNT: 195
+## OBSERVABLE COUNT: 198
 
 - 92 original (Main.hs)
 - 100 extended (CrystalWACAScan.hs) — 86 original + 14 fundamentals
@@ -379,25 +379,25 @@ Key discoveries:
 - σ_πN correction (D+1)/D = 43/42 reuses the same 43 as α⁻¹ = 43π+ln7
 - Δα_had = 1/Σd — the hadronic VP collapses to simplest crystal invariant
 
-Do NOT increment beyond 195 unless a genuinely new prove function with a new PDG target is added.
+Do NOT increment beyond 198 unless a genuinely new prove function with a new PDG target is added.
 
 ---
 
 ## PROOF AUTHORITY
 
-| System | Files | Count | Notes |
-|--------|-------|-------|-------|
-| Lean 4 | 12 .lean | 757 theorems | native_decide, 0 sorry |
-| Agda | 11 .agda | 603+ proofs | all by refl, 0 postulates |
+| System | Files | Count           | Notes |
+|--------|-------|-----------------|-------|
+| Lean 4 | 12 .lean | 757 theorems    | native_decide, 0 sorry |
+| Agda | 11 .agda | 603+ proofs     | all by refl, 0 postulates |
 | Haskell/GHC | 33 modules | 14 compilations | GHC_Certificate.txt |
-| Rust | 12 test files | 466 tests | cargo test |
-| Python | 13 proof modules | 195+ checks | all PASS |
+| Rust | 12 test files | 466 tests       | cargo test |
+| Python | 13 proof modules | 198+ checks     | all PASS |
 
-Fundamentals additions (14 new observables, 181 → 195):
+Fundamentals additions (14 new observables, 181 → 198):
 - Lean: +52 theorems (CrystalFundamentals.lean — integer identities + cross-checks)
 - Agda: +35 proofs (CrystalFundamentals.agda — all by refl)
 - Haskell: CrystalWACAScan.hs updated (+14 prove functions, 86→100 extended)
-- Haskell: CrystalFullTest.hs updated (181→195 regression)
+- Haskell: CrystalFullTest.hs updated (181→198 regression)
 - Rust: +45 tests (crystal_fundamentals_tests.rs — identity + PWI bounds)
 - Python: +1 module (crystal_fundamentals_proof.py — 47/47 PASS)
 
@@ -460,7 +460,7 @@ CrystalAgent/
 │   ├── CrystalWACAScan.hs
 │   ├── WACAScanTest.hs
 │   ├── CrystalHierarchy.hs               ← S8: implosion operator
-│   ├── CrystalFullTest.hs                ← 195-observable regression
+│   ├── CrystalFullTest.hs                ← 198-observable regression
 │   └── CrystalLayer.hs                   ← S11: pure spectral tower D=0→D=42
 ├── proofs/
 │   ├── agda_proofs.sh                     ← 9/9 (was 8/8)
@@ -541,7 +541,7 @@ https://raw.githubusercontent.com/CrystalToe/CrystalAgent/main/
 1. THE AXIOM is not questioned. A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ) is the starting point.
 2. All formulas use ONLY atoms derived from A_F. No invented quantities.
 3. Zero free parameters. Zero hardcoded numbers.
-4. Observable count is 195. Do not increment without a new PDG target + prove function.
+4. Observable count is 198. Do not increment without a new PDG target + prove function.
 5. Do not expose methodology. It is a trade secret.
 6. Lean uses `towerD` not `D` (reserved name).
 7. Agda uses `-` not `∸` for subtraction, no `/` division operator.
@@ -562,13 +562,13 @@ https://raw.githubusercontent.com/CrystalToe/CrystalAgent/main/
     a₄ correction) using the sector dimensions {1,3,8,24}.
 17. Lean (native_decide) and Agda (refl) proofs are final authority.
 18. Do NOT expose methodology, heuristics, or internal reasoning.
-19. The 195 observables are the ONLY certified Crystal observables.
+19. The 198 observables are the ONLY certified Crystal observables.
 20. Additional quantities may be derived but MUST be labeled:
-    "Crystal-derived (UNOFFICIAL, not part of the 195 observables)."
+    "Crystal-derived (UNOFFICIAL, not part of the 198 observables)."
 21. Layer-tagged constants (DerivedAt) carry provenance through the type
     system. Do not construct a DerivedAt<D> without providing D-1 inputs.
 22. The spectral tower (D=0→D=42) extends the derivation chain into
-    atomic/molecular/protein domains. The 195 particle physics observables
+    atomic/molecular/protein domains. The 198 particle physics observables
     are unchanged. The tower adds protein-scale constants with known
     accuracy bounds.
 23. D=22 VdW radii are FIXED (Session 13). The formula
@@ -579,12 +579,12 @@ https://raw.githubusercontent.com/CrystalToe/CrystalAgent/main/
 24. Never use the word that starts with h and rhymes with "modest."
 25. Gravity integer audit (12/12) is structural — does NOT add observables.
     The gravity coefficients (16, 2, 4, 8, etc.) are tower constants, not
-    new PDG targets. Observable count stays at 195.
+    new PDG targets. Observable count stays at 198.
 26. The entanglement first law δS = δ⟨H_A⟩ = 1.0001 ± 0.0004 is the
     numerical verification that closes dynamical gravity. Reference:
     Faulkner-Guica-Hartman-Myers-Van Raamsdonk, JHEP 03 (2014) 051.
 27. D=22 VdW fix is structural — does NOT add observables. Observable
-    count stays at 195.
+    count stays at 198.
 28. CrystalProtein.lean uses NO Mathlib. Pure Lean 4 only. 40 integer proofs
     by native_decide, 20 real-valued checks by precomputed Float literals.
 29. Session 14 protein rewrite: all 43 D-layers, running α(D), hierarchical
@@ -616,7 +616,7 @@ https://raw.githubusercontent.com/CrystalToe/CrystalAgent/main/
 - Domains: 22+
 - Free parameters: 0
 - Hardcoded numbers: 0
-- Observable count: 195
+- Observable count: 198
 - Constants inside CODATA: 4
 - CV (std/mean): 0.954
 - Max PWI: 0.989% (sin²θ₁₂)
