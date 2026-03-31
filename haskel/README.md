@@ -40,6 +40,9 @@ ghc -O2 GravityDynTest.hs -o gravity_dyn_test && ./gravity_dyn_test
  
 # 13. Protein force field (S13 — 26 proofs, D=0..D=38)
 ghc -O2 -main-is CrystalProtein CrystalProtein.hs -o crystal_protein && ./crystal_protein
+
+# 14. Mandelbrot <-> A_F (S14 — 38 proofs, functor + external angles)
+ghc -O2 -main-is CrystalMandelbrot CrystalMandelbrot.hs -o crystal_mandelbrot && ./crystal_mandelbrot
  
 # Clean up
 rm -f *.o *.hi crystal alpha_proton proton_radius extended_scan hierarchy_test full_test crystal_layer gravity_dyn_test crystal_protein
