@@ -18,7 +18,7 @@ the Standard Model (1996). It encodes U(1) × SU(2) × SU(3).
 Only these:
 - N_w = 2 (weak doublet dimension)
 - N_c = 3 (color triplet dimension)
-- v = 246.22 GeV (electroweak VEV — the only dimensionful input)
+- v = 246.22 GeV (electroweak VEV — derived from the spectral action potential on A_F)
 - π, ln (mathematical constants)
 - ℏc = 197.327 MeV·fm (unit conversion, not physics)
 
