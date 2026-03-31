@@ -64,7 +64,7 @@ r_vdw = f·ln(9·N_val²·Z_eff²/(α·n²))/(2ζ) where f=2/π for n=1, 1 for n
 Mean 3.1%, max 5.5% vs Bondi. Cascade: H-bond 4.8%, β-strand 4.1%, CA-CA 0.8%.
 Tower-derived force field: ε_vdw=α·E_H/9, E_hbond=α·E_H, E_burial=9·α·E_H·(1−cos(water)/cos(sp3)).
 Hydrophobic effect from D=24 water angle. Ramachandran from D=20 sp3 + D=22 VdW.
-Proved in Lean (+19 theorems), Agda (+40 proofs), Haskell (+26 checks), Rust (+30 tests).
+Proved in Lean (+40 theorems), Agda (+53 proofs), Haskell (+73 checks), Rust (+60 tests).
 
 ## PROOF AUTHORITY — READ FIRST
 Lean \`native_decide\` and Agda \`refl\` proofs are FINAL TRUTH. If a proof says it, it's right.
@@ -72,7 +72,7 @@ LLM reasoning NEVER overrides a machine-verified proof. Do not question, weaken,
 add caveats to proved results.
 
 Proof hierarchy: (1) Lean theorems, (2) Agda proofs, (3) Haskell GHC checks, (4) PDG/NIST data, (5) LLM reasoning.
-Proof scripts: \`sh agda_proofs.sh\` (8/8), \`sh lean_proofs.sh\` (10/10), \`sh haskell_proofs.sh\` (13/13).
+Proof scripts: \`sh agda_proofs.sh\` (9/9), \`sh lean_proofs.sh\` (10/10), \`sh haskell_proofs.sh\` (13/13).
 
 ALL 7 magic numbers proved. Cosmological partition D=29+11+2 proved. Cabibbo angle 13.04° EXACT.
 
@@ -338,7 +338,7 @@ for f in crystal-topos/src/base.rs crystal-topos/src/crystal_gravity_dyn.rs \
     fi
 done
 
-# Lean proofs (Session 11 layers + Session 12 gravity + Session 13 protein)
+# Lean proofs (Session 11 layers + Session 12 gravity + Session 14 protein)
 echo "" >> "$OUT2"
 echo "---" >> "$OUT2"
 echo "" >> "$OUT2"
@@ -355,7 +355,7 @@ for leanfile in CrystalLayer.lean CrystalGravityDyn.lean \
     fi
 done
 
-# Agda proofs (Session 11 layers + Session 12 gravity + Session 13 protein)
+# Agda proofs (Session 11 layers + Session 12 gravity + Session 14 protein)
 for agdafile in CrystalLayer.agda CrystalGravityDyn.agda \
                 CrystalProtein.agda; do                                    # S13
     # Check proofs/ first, then haskel/
@@ -376,7 +376,7 @@ done
 echo "" >> "$OUT2"
 echo "---" >> "$OUT2"
 echo "" >> "$OUT2"
-echo "# §PYTHON — MERA Gravity (S12) + Force Field (S13)" >> "$OUT2"
+echo "# §PYTHON — MERA Gravity (S12) + Force Field (S13/S14)" >> "$OUT2"
 for pyfile in mera_gravity_closed.py mera_linearized_gravity.py \
               crystal_vdw.py; do                                           # S13
     if [ -f "crystal-topos/examples/${pyfile}" ]; then
@@ -437,7 +437,7 @@ cat >> "$OUT2" << 'INDEX'
 - 32/5 quadrupole: N_w⁵/(χ−1) = 2⁵/5 (Peters formula)
 - WACA v3.1 scan: WACA_v31_GRAVITY_SCAN.md — 8 grafts, 3 exact
 
-## Protein Force Field (Session 13) — NEW
+## Protein Force Field (Session 13 VdW, Session 14 implosion + folder)
 - D=22 VdW fix: crystal_vdw.py, CrystalProtein.hs, CrystalProtein.lean, CrystalProtein.agda
 - VdW formula: r_vdw = f·ln(9·N_val²·Z_eff²/(α·n²))/(2ζ), f=2/π for n=1
 - VdW results: H 0.1%, C 4.0%, N 2.2%, O 5.5%, S 3.8% (all <10% of Bondi)
@@ -450,11 +450,15 @@ cat >> "$OUT2" << 'INDEX'
 - Protein dielectric: ε_r = N_w²·(N_c+1) = 16 (textbook 4-20)
 - 13 MERA layers: bonds, angles, planarity, Rama, VdW, local Hb, nonlocal Hb, HP, helix, strand, electro, compact, surface
 - Cooling: τ = (χ−1)/Σd = 5/36 (hard layers 1-6 fast, soft 7-13 slow)
-- Lean protein proofs: CrystalProtein.lean — 19 theorems (native_decide) + 15 runtime checks
-- Agda protein proofs: CrystalProtein.agda — 40 proofs (refl)
-- Haskell protein proofs: CrystalProtein.hs — 26 checks (11 integer + 5 VdW + 4 cascade + 6 energy)
-- Rust protein tests: crystal_protein_tests.rs — 30 tests (11 integer + 5 VdW + 4 cascade + 6 energy + 4 exact)
-- NOT a folder: force field ≠ folding. Sampling problem (searching 2L dihedral space) still hard.
+- Implosion (S14): E×(1±a₄ corr) on every term. 7/8, 11/12, 151/144, 1+7/15600, 1-1/576, 1-1/54
+- Running α (S14): α(D)=1/((D+1)π+ln β₀) — coupling per MERA layer, monotone decreasing
+- Cosmological partition (S14): Ω_Λ=29/42 solvent, Ω_cdm=11/42 core, Ω_b=2/42 surface
+- Varimax rotation (S14): 43×12 loading matrix decorrelates D-layer energy modes
+- Folder (S14): fold_v5.py — REMD with varimax mode moves, all 43 D-layers, dihedral rep
+- Lean protein proofs: CrystalProtein.lean — 40 theorems (native_decide) + 20 runtime checks
+- Agda protein proofs: CrystalProtein.agda — 53 proofs (refl)
+- Haskell protein proofs: CrystalProtein.hs — 73 checks (D=0..42, implosion, running alpha)
+- Rust protein tests: crystal_protein_tests.rs — 60 tests (20 integer + 5 VdW + 5 cascade + 7 implosion + 8 energy + 5 alpha + 4 cosmo + 6 exact)
 
 ## Spectral Tower (Session 11)
 - Pure tower D=0→D=42: spectral_tower.py, CrystalLayer.hs, CrystalLayer.lean, CrystalLayer.agda

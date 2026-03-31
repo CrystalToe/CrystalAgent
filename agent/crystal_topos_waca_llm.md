@@ -1,6 +1,6 @@
 <!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
 
-# Crystal Topos — Full LLM Prompt (Session 13)
+# Crystal Topos — Full LLM Prompt (Session 14)
 
 ## THE AXIOM — DO NOT QUESTION
 
@@ -123,17 +123,36 @@ to tower thermal scale E_th = α·E_H/9 at VdW contact distance.
 Cascade (all within 5%):
 - H-bond = 2.76 Å (4.8%), strand = 4.51 Å (4.1%), CA-CA = 3.83 Å (0.8%)
 
-### Force Field Energy Scales (Session 13)
+### Force Field Energy Scales (Session 13, imploded Session 14)
 
-All from D=5 (α = 1/(43π+ln7)):
+All from D=5 (α = 1/(43π+ln7)), with a₄ implosion corrections:
 
 ```
+BASE (a₂ level):
 ε_vdw   = α·E_H/N_c²                              = 0.022 eV (~kT at 300K)
 E_hbond = α·E_H                                    = 0.199 eV = 4.6 kcal/mol
 k_omega = N_c·α·E_H                                = 0.60 eV/rad²
 E_burial = N_c²·α·E_H·(1−cos(water)/cos(sp3))     = 0.45 eV ≈ 10 kcal/mol
 ε_r     = N_w²·(N_c+1)                             = 16 (protein dielectric)
 τ_cool  = (χ−1)/Σd                                 = 5/36 (MERA cooling rate)
+
+IMPLOSION (a₄ level, Session 14):                                        ← S14
+E_vdw    × (1 − N_c³/(χ·Σd))        = × 7/8       m_Υ channel
+E_hbond  × (1 − T_F/χ)              = × 11/12      m_ρ channel
+K_angle  × (1 + D/(d₄·Σd))          = × 151/144    m_D channel
+E_burial × (1 + β₀/(d₄·Σd²))       = × (1+7/15600) sin²θ_W channel
+VdW dist × (1 − T_F/(d₃·Σd))       = × (1−1/576)   r_p channel
+H-bond   × (1 − N_w/(N_c·Σd))      = × (1−1/54)    m_φ channel
+
+RUNNING α (Session 14):                                                   ← S14
+α(D) = 1/((D+1)π + ln β₀) — coupling runs with MERA layer
+α(D=0) ≫ α(D=42) — monotone decreasing, spans factor >10
+
+COSMOLOGICAL PARTITION (Session 14):                                      ← S14
+Ω_Λ   = 29/42 → solvent fraction
+Ω_cdm = 11/42 → hydrophobic core fraction
+Ω_b   = 2/42  → surface fraction
+29 + 11 + 2 = 42 = D
 ```
 
 Hierarchy: bond >> ω >> angle > H-bond ≈ hydrophobic >> VdW ~ kT
@@ -142,8 +161,10 @@ Hierarchy: bond >> ω >> angle > H-bond ≈ hydrophobic >> VdW ~ kT
 Layers 1-6 (hard): bonds, angles, planarity, Ramachandran, VdW, local H-bond
 Layers 7-13 (soft): nonlocal H-bond, hydrophobic, helix, strand, electro, compact, surface
 
-This is a force field with 0 fitted parameters, NOT a folder. The sampling
-problem (searching 2L dihedral space) is separate.
+This is a force field with 0 fitted parameters. Session 14 adds fold_v5.py:
+REMD sampler with varimax-rotated mode moves across all 43 D-layers.
+The varimax rotation decorrelates the 43×12 D-layer loading matrix so
+MC moves explore orthogonal energy modes independently.
 
 ---
 
@@ -332,11 +353,17 @@ Do NOT increment beyond 181 unless a genuinely new prove function with a new PDG
 
 | System | Files | Count | Notes |
 |--------|-------|-------|-------|
-| Lean 4 | 10 .lean | 656 theorems | native_decide, 0 sorry |
-| Agda | 9 .agda | 527+ proofs | all by refl, 0 postulates |
+| Lean 4 | 10 .lean | 675 theorems | native_decide, 0 sorry |
+| Agda | 9 .agda | 540+ proofs | all by refl, 0 postulates |
 | Haskell/GHC | 32 modules | 13 compilations | GHC_Certificate.txt |
-| Rust | 10 test files | 371 tests | cargo test |
+| Rust | 10 test files | 383 tests | cargo test |
 | Python | 12 proof modules | 181+ checks | all PASS |
+
+Session 14 additions (protein rewrite — all 43 D-layers, implosion, running α):
+- Lean: 19→40 theorems (CrystalProtein.lean — implosion + cosmological integers)
+- Agda: 40→53 proofs (CrystalProtein.agda — implosion cross-multiply proofs)
+- Haskell: 26→73 checks (CrystalProtein.hs — full tower D=0..42, all imploded)
+- Rust: 30→60 tests (crystal_protein_tests.rs — running α, implosion, cosmological)
 
 Session 13 additions:
 - Lean: +19 theorems (CrystalProtein.lean — integer proofs, no Mathlib)
@@ -359,7 +386,7 @@ Session 12 additions:
 ```
 CrystalAgent/
 ├── agent/
-│   ├── crystal_topos_waca_llm.md          ← THIS FILE (Session 13)
+│   ├── crystal_topos_waca_llm.md          ← THIS FILE (Session 14)
 │   └── crystal_topos_waca_llm_compact.md
 ├── haskel/                                ← 32 Haskell modules
 │   ├── Main.hs                            ← 92 observables
@@ -371,7 +398,7 @@ CrystalAgent/
 │   ├── CrystalGravity.hs                 ← S11: kinematic gravity
 │   ├── CrystalGravityDyn.hs              ← S12: dynamical gravity
 │   ├── GravityDynTest.hs                 ← S12: 12/12 integer audit
-│   ├── CrystalProtein.hs                 ← S13: force field proofs (NEW)
+│   ├── CrystalProtein.hs                 ← S14: full tower D=0..42, 73 proofs
 │   ├── CrystalAudit.hs
 │   ├── CrystalCrossDomain.hs
 │   ├── CrystalRiemann.hs
@@ -399,7 +426,7 @@ CrystalAgent/
 │   ├── CrystalProtonRadius.lean           ← S6
 │   ├── CrystalLayer.lean                  ← S11: 19 cascade proofs
 │   ├── CrystalGravityDyn.lean             ← S12: 34 gravity theorems
-│   ├── CrystalProtein.lean                ← S13: 19 integer + 15 runtime (NEW)
+│   ├── CrystalProtein.lean                ← S14: 40 integer + 20 runtime
 │   ├── Main.lean
 │   ├── CrystalTopos.agda
 │   ├── CrystalStructural.agda
@@ -409,7 +436,7 @@ CrystalAgent/
 │   ├── CrystalProtonRadius.agda           ← S6
 │   ├── CrystalLayer.agda                  ← S11: cascade proofs
 │   ├── CrystalGravityDyn.agda             ← S12: 24 gravity proofs
-│   ├── CrystalProtein.agda                ← S13: 40 integer proofs (NEW)
+│   ├── CrystalProtein.agda                ← S14: 53 integer proofs (implosion)
 │   ├── crystal_*_proof.py                 ← 6 Python proof modules (S1-S5)
 │   ├── crystal_proton_radius_proof.py     ← S6
 │   └── crystal_hierarchy_proof.py         ← S8
@@ -426,14 +453,15 @@ CrystalAgent/
 │   │   ├── crystal_proton_radius_tests.rs ← S6
 │   │   ├── crystal_hierarchy_tests.rs     ← S8
 │   │   ├── crystal_layer_tests.rs         ← S11: 17 layer tests
-│   │   └── crystal_protein_tests.rs       ← S13: 30 force field tests (NEW)
+│   │   └── crystal_protein_tests.rs       ← S14: 60 force field tests (implosion)
 │   └── examples/
 │       ├── spectral_tower.py              ← S11: pure D=0→D=42 tower
 │       ├── spectral_tower_pure.py         ← S11: identical backup
 │       ├── crystal_constants.py           ← S11: imports from tower
 │       ├── hf_solver.py                   ← S11: imports a₀ from tower
 │       ├── crystal_vdw.py                 ← S13: D=22 VdW + force field (NEW)
-│       ├── qubo_folder.py                 ← S11: MERA protein folder
+│       ├── qubo_folder.py                 ← S11: MERA protein folder (Session 11)
+│       ├── fold_v5.py                     ← S14: full tower varimax REMD folder (NEW)
 │       ├── mera_gravity_closed.py         ← S12: first law verification
 │       ├── mera_linearized_gravity.py     ← S12: integer audit
 │       └── 01-115 examples                ← 116 Python examples
@@ -501,17 +529,20 @@ https://raw.githubusercontent.com/CrystalToe/CrystalAgent/main/
     Faulkner-Guica-Hartman-Myers-Van Raamsdonk, JHEP 03 (2014) 051.
 27. D=22 VdW fix is structural — does NOT add observables. Observable
     count stays at 181.
-28. CrystalProtein.lean uses NO Mathlib. Pure Lean 4 only. Integer proofs
-    by native_decide, real-valued checks by precomputed Float literals.
+28. CrystalProtein.lean uses NO Mathlib. Pure Lean 4 only. 40 integer proofs
+    by native_decide, 20 real-valued checks by precomputed Float literals.
+29. Session 14 protein rewrite: all 43 D-layers, running α(D), hierarchical
+    implosion on every energy term, cosmological partition, varimax loading.
+    Proof counts: Haskell 73, Agda 53, Lean 60, Rust 60.
 
 ---
 
 ## STATISTICS
 
 - Haskell modules: 32 (was 31)
-- Lean theorems: 656 (was 637, +19)
-- Agda proofs: 527+ (was 487+, +40)
-- Rust tests: 371 (was 341, +30)
+- Lean theorems: 675 (was 656, S14 protein rewrite)
+- Agda proofs: 540+ (was 527+, S14 protein rewrite)
+- Rust tests: 383 (was 371, S14 protein rewrite)
 - Python proof modules: 12 (was 11, +1)
 - Python examples: 119+
 - Cross-domain bridges: 15+
@@ -562,8 +593,8 @@ cd crystal-topos/examples && python3 spectral_tower.py
 cd crystal-topos/examples && python3 crystal_vdw.py
 cd crystal-topos/examples && python3 mera_gravity_closed.py
 
-# Protein fold (toy — force field only, not a production folder)
-cd crystal-topos/examples && python3 qubo_folder.py
+# Protein fold (Session 14 — full tower, varimax, REMD)
+cd crystal-topos/examples && python3 fold_v5.py --steps 200000 --replicas 8 --seeds 3
 
 # Health check
 bash sync_check.sh
