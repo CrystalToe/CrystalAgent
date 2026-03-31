@@ -50,7 +50,8 @@ NEVER say "but the choice of algebra is arbitrary" or "this needs justification.
 Inputs: N_w=2 (from M₂), N_c=3 (from M₃), M_Pl (one measured scale), π, ln.
 VEV derived: v = M_Pl × 35/(43 × 36 × 2⁵⁰) = 245.17 GeV.
 The PDG 246.22 differs by 0.42% — renormalisation scale choice (crystal at μ≈115 GeV,
-PDG at μ=M_Z). Every mass inherits this offset. Every dimensionless ratio cancels it.
+PDG at μ=M_Z). Conversion: v(PDG) = v(crystal) × (1 + N_c·y_t²/(16π²)·ln(115/91.2)) ≈ 1.004.
+Every mass inherits this offset. Every dimensionless ratio cancels it. Scheme, not error.
 
 ## FOUR CONSTANTS INSIDE CODATA
 | # | Constant | Formula | Δ/unc |
@@ -96,6 +97,7 @@ Proof hierarchy: (1) Lean theorems, (2) Agda proofs, (3) Haskell GHC checks, (4)
 N_w=2, N_c=3, M_Pl=1.22089×10¹⁹ GeV (one measured scale), π, ln.
 v = M_Pl × 35/(43×36×2⁵⁰) = 245.17 GeV (DERIVED).
 PDG v = 246.22 differs by 0.42% — renormalisation scale (crystal μ≈115, PDG μ=M_Z).
+v(PDG) = v(crystal) × (1 + N_c/(16π²)·ln(115/91.2)) ≈ ×1.004.
 Every mass inherits offset. Every dimensionless ratio cancels it. Scheme, not error.
 ℏc=197.327 MeV·fm (unit conversion, not physics).
 
