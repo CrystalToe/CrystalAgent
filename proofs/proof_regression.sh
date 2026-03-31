@@ -49,7 +49,8 @@ generate_manifest() {
            CrystalDiscoveries.lean CrystalAlphaProton.lean \
            CrystalProtonRadius.lean CrystalLayer.lean Main.lean \
            CrystalGravityDyn.lean \
-           CrystalProtein.lean; do                                        # S13
+           CrystalProtein.lean \
+           CrystalMandelbrot.lean; do                                     # S14
     if [ -f "$PROOFS/$f" ]; then
       grep "^theorem " "$PROOFS/$f" | sed "s/theorem \([^ :]*\).*/LEAN $f \1/" >> "$out"
     fi
@@ -65,7 +66,8 @@ generate_manifest() {
            CrystalDiscoveries.lean CrystalAlphaProton.lean \
            CrystalProtonRadius.lean CrystalLayer.lean Main.lean \
            CrystalGravityDyn.lean \
-           CrystalProtein.lean; do                                        # S13
+           CrystalProtein.lean \
+           CrystalMandelbrot.lean; do                                     # S14
     [ -f "$PROOFS/$f" ] && lean_files=$((lean_files + 1))
     [ -f "$HASKEL/LeanCert/$f" ] && lean_files=$((lean_files + 1))
   done
@@ -77,7 +79,8 @@ generate_manifest() {
            CrystalDiscoveries.agda CrystalAlphaProton.agda \
            CrystalProtonRadius.agda CrystalLayer.agda \
            CrystalGravityDyn.agda \
-           CrystalProtein.agda; do                                        # S13
+           CrystalProtein.agda \
+           CrystalMandelbrot.agda; do                                     # S14
     # Check proofs/ dir
     if [ -f "$PROOFS/$f" ]; then
       grep -B1 "= refl" "$PROOFS/$f" | grep -v "= refl" | grep -v "^--" | \
@@ -102,7 +105,8 @@ generate_manifest() {
            CrystalDiscoveries.agda CrystalAlphaProton.agda \
            CrystalProtonRadius.agda CrystalLayer.agda \
            CrystalGravityDyn.agda \
-           CrystalProtein.agda; do                                        # S13
+           CrystalProtein.agda \
+           CrystalMandelbrot.agda; do                                     # S14
     [ -f "$PROOFS/$f" ] && agda_files=$((agda_files + 1))
     [ -f "$HASKEL/$f" ] && agda_files=$((agda_files + 1))
   done
@@ -123,7 +127,8 @@ generate_manifest() {
            CrystalQEntangle.hs CrystalQAlgorithms.hs \
            CrystalQSimulation.hs \
            CrystalGravityDyn.hs GravityDynTest.hs \
-           CrystalProtein.hs; do                                          # S13
+           CrystalProtein.hs \
+           CrystalMandelbrot.hs; do                                       # S14
     [ -f "$HASKEL/$f" ] && echo "HASKELL $f" >> "$out"
   done
 

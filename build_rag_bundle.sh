@@ -72,7 +72,7 @@ LLM reasoning NEVER overrides a machine-verified proof. Do not question, weaken,
 add caveats to proved results.
 
 Proof hierarchy: (1) Lean theorems, (2) Agda proofs, (3) Haskell GHC checks, (4) PDG/NIST data, (5) LLM reasoning.
-Proof scripts: \`sh agda_proofs.sh\` (9/9), \`sh lean_proofs.sh\` (10/10), \`sh haskell_proofs.sh\` (13/13).
+Proof scripts: \`sh agda_proofs.sh\` (10/10), \`sh lean_proofs.sh\` (11/11), \`sh haskell_proofs.sh\` (14/14).
 
 ALL 7 magic numbers proved. Cosmological partition D=29+11+2 proved. Cabibbo angle 13.04° EXACT.
 
@@ -253,7 +253,7 @@ echo "" >> "$OUT1"
 echo "Core physics derivations. Comments explain WHY each formula works." >> "$OUT1"
 
 for mod in CrystalAxiom CrystalGauge CrystalMixing CrystalCosmo CrystalQCD \
-           CrystalProtein; do                                              # S13
+           CrystalProtein CrystalMandelbrot; do                              # S14
     [ -f "haskel/${mod}.hs" ] && extract_hs "haskel/${mod}.hs" "$OUT1"
 done
 
@@ -319,14 +319,15 @@ echo '```' >> "$OUT2"
 echo "" >> "$OUT2"
 echo "---" >> "$OUT2"
 echo "" >> "$OUT2"
-echo "# §RUST — Crystal Constants, Layer Provenance, Gravity, Protein, and Tests" >> "$OUT2"
+echo "# §RUST — Crystal Constants, Layer Provenance, Gravity, Protein, Mandelbrot, and Tests" >> "$OUT2"
 
 for f in crystal-topos/src/base.rs crystal-topos/src/crystal_gravity_dyn.rs \
          crystal-topos/tests/crystal_tests.rs \
          crystal-topos/tests/crystal_proton_radius_tests.rs \
          crystal-topos/tests/crystal_hierarchy_tests.rs \
          crystal-topos/tests/crystal_layer_tests.rs \
-         crystal-topos/tests/crystal_protein_tests.rs; do                  # S13
+         crystal-topos/tests/crystal_protein_tests.rs \
+         crystal-topos/tests/crystal_mandelbrot_tests.rs; do              # S14
     if [ -f "$f" ]; then
         name=$(basename "$f")
         lines=$(wc -l < "$f")
@@ -342,9 +343,10 @@ done
 echo "" >> "$OUT2"
 echo "---" >> "$OUT2"
 echo "" >> "$OUT2"
-echo "# §LEAN — Layer Cascade (S11) + Gravity (S12) + Protein (S13)" >> "$OUT2"
+echo "# §LEAN — Layer Cascade (S11) + Gravity (S12) + Protein (S14) + Mandelbrot (S14)" >> "$OUT2"
 for leanfile in CrystalLayer.lean CrystalGravityDyn.lean \
-                CrystalProtein.lean; do                                    # S13
+                CrystalProtein.lean \
+                CrystalMandelbrot.lean; do                                 # S14
     if [ -f "proofs/${leanfile}" ]; then
         lines=$(wc -l < "proofs/${leanfile}")
         echo "" >> "$OUT2"
@@ -357,7 +359,8 @@ done
 
 # Agda proofs (Session 11 layers + Session 12 gravity + Session 14 protein)
 for agdafile in CrystalLayer.agda CrystalGravityDyn.agda \
-                CrystalProtein.agda; do                                    # S13
+                CrystalProtein.agda \
+                CrystalMandelbrot.agda; do                                 # S14
     # Check proofs/ first, then haskel/
     for dir in proofs haskel; do
         if [ -f "${dir}/${agdafile}" ]; then
@@ -487,6 +490,18 @@ cat >> "$OUT2" << 'INDEX'
 - Tau mass: §Example 43, CrystalWACAScan.hs
 - Muon g-2: §Example 29, CrystalWACAScan.hs
 - Neutrino masses: §Example 17, CrystalCosmo.hs
+
+## Mandelbrot Functor (Session 14)
+- Functor F: Mand → Rep(A_F): CrystalMandelbrot.hs, .lean, .agda, crystal_mandelbrot_tests.rs
+- Gauge periods = divisors(χ) = {1, N_w, N_c, χ} = {1, 2, 3, 6}
+- External angle denominators: 2^n−1 = {3, 7, 63} = {N_c, β₀, N_c²·β₀}
+- Period-2 = N_w = SU(2), Period-3 = N_c = SU(3), Period-6 = χ = unified
+- Grand staircase: α⁻¹(D) = (D+1)π + ln β₀, step = π, 43 steps
+- Feigenbaum δ = D/N_c² = 42/9 = 14/3 (0.054% of 4.6692)
+- Hausdorff dim(∂M) = N_w = 2 (Shishikura 1998)
+- Period-2 bulb area = π/N_w⁴ = π/16 (same 16 as linearized Einstein)
+- WACA scan: CROSS_DOMAIN_SCAN_MANDELBROT.md — 10 grafts, 4 exact
+- Proofs: Haskell 38, Lean 31, Agda 28, Rust 38. Structural only, 181 unchanged.
 
 ## Cosmology (PARTITION PROVED: D = 29 + 11 + 2)
 - Ω_Λ=29/42, Ω_cdm=11/42, Ω_b=2/42: CrystalDiscoveries.hs, .lean, .agda

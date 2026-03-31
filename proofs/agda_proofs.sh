@@ -19,6 +19,7 @@ FILES=(
   CrystalLayer.agda
   CrystalGravityDyn.agda
   CrystalProtein.agda
+  CrystalMandelbrot.agda
 )
 
 PASS=0
