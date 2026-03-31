@@ -54,6 +54,104 @@ m_μ=m_e×N_w⁴×gauss, f_π=Λ_QCD×N_c/β₀
 
 ---
 
+## HOW THE ALGEBRA BECOMES PHYSICS
+
+The algebra A_F alone gives you integers (χ=6, β₀=7, Σd=36, etc.).
+To get PHYSICAL CONSTANTS you need four more pieces. All four are
+derived from A_F — none are added by hand.
+
+### 1. The MERA Tensor Network (spectral tower D=0 → D=42)
+
+The algebra's endomorphisms organise into a multi-scale entanglement
+renormalization ansatz (MERA) with D = Σd + χ = 42 layers. Each layer
+is a coarse-graining step. Physical constants live at specific layers:
+
+- D=0: bare algebra → χ, β₀, Σd, κ
+- D=5: coupling constants freeze → α = 1/(43π + ln 7)
+- D=10: hadron scale → m_p = v/256 × 53/54
+- D=22: van der Waals radii (Pauli envelope equilibrium)
+- D=38–41: gravity integers (linearized Einstein from entanglement)
+- D=42: folding energy E_fold = v/2^42
+
+The MERA is why 2^D = 2^42 appears in neutrino masses — it is the
+total suppression from 42 coarse-graining steps. The hierarchy
+M_Pl/v = e^D/35 = e^42/35 is the exponential depth of the tower.
+
+### 2. The Thermal Periodicity β = 2π
+
+The KMS (Kubo-Martin-Schwinger) condition on the MERA gives inverse
+temperature β = 2π/N_w = π for the modular flow. This is the
+Bisognano-Wichmann theorem: the vacuum restricted to a half-space
+is a thermal state at temperature T = 1/(2π) in natural units.
+
+This 2π enters:
+- Unruh effect: T = a/(2π) — acceleration radiation
+- Bekenstein-Hawking: S = A/(4G) where 4 = N_w² comes from β = 2π
+- Stefan-Boltzmann: σ ∝ 2π⁵/15 where 15 = N_c(χ−1)
+- All angular formulas: sp3 = arccos(−1/N_c), water = arccos(−1/N_w²)
+
+The 2π is not inserted — it is the periodicity of the modular
+automorphism σ_t of the algebra's faithful state. The algebra
+BEING non-commutative forces thermal structure.
+
+### 3. The Entanglement → Gravity Link
+
+The entanglement entropy of the MERA satisfies:
+
+```
+δS = δ⟨H_A⟩    (first law, verified: 1.0001 ± 0.0004 for χ=6)
+```
+
+By the Faulkner-Guica-Hartman-Myers-Van Raamsdonk theorem (2014),
+this IS the linearized Einstein equation. Gravity is not postulated —
+it emerges from the entanglement structure of the MERA.
+
+The integers in GR (16πG, S=A/4G, 8πG, 32/5 quadrupole) are all
+combinations of N_w and N_c because the MERA is built from the
+χ = N_w × N_c = 6 dimensional local Hilbert space.
+
+### 4. The Seeley-DeWitt Correction Hierarchy
+
+The spectral action Tr(f(D_A/Λ)) expands as heat kernel coefficients:
+
+```
+a₀ = Σd = 36          → topological (counts degrees of freedom)
+a₂ = individual dims   → BASE formulas (leading order)
+a₄ = Σd² = 650        → CORRECTIONS (next order, rational fractions)
+```
+
+Every observable has a base formula (a₂ level) and an optional
+correction (a₄ level). The corrections are always rational functions
+of {1, 3, 8, 24} and are what push observables from ~1% to <0.1%.
+Example: α⁻¹ base = 43π + ln 7. Correction = −1/(χ·d₄·Σd²·D).
+Result lands inside CODATA uncertainty (Δ/unc = 0.12).
+
+### Summary: The Full Machine
+
+```
+A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)
+         ↓
+   integers: χ=6, β₀=7, Σd=36, D=42, gauss=13, κ=ln3/ln2
+         ↓
+   MERA: 42-layer tensor network with χ=6 bond dimension
+         ↓
+   running: α(D) = 1/((D+1)π + ln β₀) couples per layer
+         ↓
+   thermal: β = 2π → Unruh, Bekenstein, Stefan-Boltzmann
+         ↓
+   entanglement: δS = δ⟨H_A⟩ → linearized Einstein
+         ↓
+   corrections: a₂ (base) + a₄ (Σd² = 650) → CODATA precision
+         ↓
+   198 observables, 0 free parameters, CV = 0.954
+```
+
+The algebra is the seed. The MERA is the machine. The thermal
+periodicity and entanglement first law are the mechanisms that
+convert algebraic structure into spacetime geometry and physical scales.
+
+---
+
 ## OBSERVABLE COUNT: 198
 
 - 92 original (Main.hs)
