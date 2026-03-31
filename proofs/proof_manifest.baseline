@@ -1,4 +1,367 @@
 # LEAN THEOREMS
+LEAN CrystalAlphaProton.lean chi_eq
+LEAN CrystalAlphaProton.lean beta0_eq
+LEAN CrystalAlphaProton.lean sigma_d_eq
+LEAN CrystalAlphaProton.lean sigma_d2_eq
+LEAN CrystalAlphaProton.lean gauss_eq
+LEAN CrystalAlphaProton.lean towerD_eq
+LEAN CrystalAlphaProton.lean alpha_sindy_rational_num
+LEAN CrystalAlphaProton.lean gauss_sq
+LEAN CrystalAlphaProton.lean alpha_sindy_sum
+LEAN CrystalAlphaProton.lean towerD_sq
+LEAN CrystalAlphaProton.lean mp_sindy_numerator
+LEAN CrystalAlphaProton.lean mp_sindy_rational
+LEAN CrystalAlphaProton.lean gauss_cubed
+LEAN CrystalAlphaProton.lean gauss_cubed_alt
+LEAN CrystalAlphaProton.lean cross_domain_gauss_alpha
+LEAN CrystalAlphaProton.lean cross_domain_gauss_mp
+LEAN CrystalAlphaProton.lean hmc_corr_denom
+LEAN CrystalAlphaProton.lean a0_inv
+LEAN CrystalAlphaProton.lean a4_inv
+LEAN CrystalAlphaProton.lean shared_core
+LEAN CrystalAlphaProton.lean hierarchy_numerator
+LEAN CrystalAlphaProton.lean hierarchy_denominator
+LEAN CrystalAlphaProton.lean alpha_corr_denom
+LEAN CrystalAlphaProton.lean alpha_channel
+LEAN CrystalAlphaProton.lean mp_corr_denom
+LEAN CrystalAlphaProton.lean mp_channel
+LEAN CrystalAlphaProton.lean corr_denom_ratio
+LEAN CrystalAlphaProton.lean d4_over_nw
+LEAN CrystalAlphaProton.lean channel_ratio
+LEAN CrystalAlphaProton.lean alpha_via_core
+LEAN CrystalAlphaProton.lean mp_via_core
+LEAN CrystalAlphaProton.lean alpha_corr_primes
+LEAN CrystalAlphaProton.lean mp_corr_primes
+LEAN CrystalAlphaProton.lean magic_82
+LEAN CrystalAlphaProton.lean magic_82_alt
+LEAN CrystalAlphaProton.lean magic_82_identity
+LEAN CrystalAlphaProton.lean sin2_corr_denom
+LEAN CrystalAlphaProton.lean sin2_corr_num
+LEAN CrystalAlphaProton.lean all_share_a4
+LEAN CrystalAlphaProton.lean sin2_alpha_share_d4
+LEAN CrystalAlphaProton.lean beta0_from_primes
+LEAN CrystalAlphaProton.lean sin2_equiv
+LEAN CrystalAlphaProton.lean upsilon_dual_route
+LEAN CrystalAlphaProton.lean upsilon_corr_val
+LEAN CrystalAlphaProton.lean dmeson_dual_route
+LEAN CrystalAlphaProton.lean dmeson_split
+LEAN CrystalAlphaProton.lean rho_dual_route
+LEAN CrystalAlphaProton.lean rho_identity
+LEAN CrystalAlphaProton.lean phi_dual_route
+LEAN CrystalAlphaProton.lean phi_identity_d4_minus_d3
+LEAN CrystalAlphaProton.lean phi_identity_d3_nc
+LEAN CrystalAlphaProton.lean omega_dm_dual_route
+LEAN CrystalAlphaProton.lean omega_dm_identity
+LEAN CrystalAlphaProton.lean omega_dm_corr_val
+LEAN CrystalAlphaProton.lean rp_dual_route
+LEAN CrystalAlphaProton.lean sin13_dual_route
+LEAN CrystalAlphaProton.lean sin13_corr_val
+LEAN CrystalAlphaProton.lean sin13_identity
+LEAN CrystalAlphaProton.lean sin13_numerator
+LEAN CrystalAlphaProton.lean sin13_denominator
+LEAN CrystalDiscoveries.lean dark_energy_eq
+LEAN CrystalDiscoveries.lean cdm_eq
+LEAN CrystalDiscoveries.lean baryons_eq
+LEAN CrystalDiscoveries.lean partition_exhaustive
+LEAN CrystalDiscoveries.lean partition_42
+LEAN CrystalDiscoveries.lean omega_lambda_num
+LEAN CrystalDiscoveries.lean omega_lambda_den
+LEAN CrystalDiscoveries.lean omega_cdm_num
+LEAN CrystalDiscoveries.lean omega_b_num
+LEAN CrystalDiscoveries.lean omega_b_simplified
+LEAN CrystalDiscoveries.lean dark_baryon_num
+LEAN CrystalDiscoveries.lean dark_baryon_den
+LEAN CrystalDiscoveries.lean magic_2
+LEAN CrystalDiscoveries.lean magic_8
+LEAN CrystalDiscoveries.lean magic_20
+LEAN CrystalDiscoveries.lean magic_28
+LEAN CrystalDiscoveries.lean magic_50
+LEAN CrystalDiscoveries.lean magic_82
+LEAN CrystalDiscoveries.lean magic_82_alt
+LEAN CrystalDiscoveries.lean magic_82_identity
+LEAN CrystalDiscoveries.lean magic_126
+LEAN CrystalDiscoveries.lean magic_50_alt
+LEAN CrystalDiscoveries.lean magic_50_ratio
+LEAN CrystalDiscoveries.lean cabibbo_num
+LEAN CrystalDiscoveries.lean cabibbo_den
+LEAN CrystalDiscoveries.lean vus_cross
+LEAN CrystalDiscoveries.lean vcb_denom
+LEAN CrystalDiscoveries.lean vub_denom
+LEAN CrystalDiscoveries.lean ckm_hierarchy_1
+LEAN CrystalDiscoveries.lean ckm_hierarchy_2
+LEAN CrystalDiscoveries.lean bell_base
+LEAN CrystalDiscoveries.lean bell_power
+LEAN CrystalDiscoveries.lean eddington_int
+LEAN CrystalDiscoveries.lean saturation_cross
+LEAN CrystalFundamentals.lean neff_denom
+LEAN CrystalFundamentals.lean ob_om_num
+LEAN CrystalFundamentals.lean ob_om_den
+LEAN CrystalFundamentals.lean sw0_base_den
+LEAN CrystalFundamentals.lean sw0_corr_den
+LEAN CrystalFundamentals.lean sw0_corr_simplify
+LEAN CrystalFundamentals.lean yp_corr_den
+LEAN CrystalFundamentals.lean moment_ratio_num
+LEAN CrystalFundamentals.lean moment_ratio_den
+LEAN CrystalFundamentals.lean moment_ratio_reduced_num
+LEAN CrystalFundamentals.lean moment_ratio_reduced_den
+LEAN CrystalFundamentals.lean mcms_base
+LEAN CrystalFundamentals.lean mcms_base_alt
+LEAN CrystalFundamentals.lean mcms_base_alt2
+LEAN CrystalFundamentals.lean mcms_base_alt3
+LEAN CrystalFundamentals.lean mcms_corr_num
+LEAN CrystalFundamentals.lean mcms_corr_den
+LEAN CrystalFundamentals.lean mcms_den_route2
+LEAN CrystalFundamentals.lean mcms_product
+LEAN CrystalFundamentals.lean mbtau_base_num
+LEAN CrystalFundamentals.lean mbtau_base_den
+LEAN CrystalFundamentals.lean mbtau_corr_den
+LEAN CrystalFundamentals.lean mbtau_corr_is_D
+LEAN CrystalFundamentals.lean mbtau_combined_num
+LEAN CrystalFundamentals.lean mbtau_combined_den
+LEAN CrystalFundamentals.lean yt_base_num
+LEAN CrystalFundamentals.lean yt_base_den
+LEAN CrystalFundamentals.lean yt_corr_den
+LEAN CrystalFundamentals.lean rpi_num
+LEAN CrystalFundamentals.lean rpi_den
+LEAN CrystalFundamentals.lean dalpha_den
+LEAN CrystalFundamentals.lean sigma_corr_num
+LEAN CrystalFundamentals.lean sigma_corr_den
+LEAN CrystalFundamentals.lean sigma_same_43
+LEAN CrystalFundamentals.lean dm21_tower
+LEAN CrystalFundamentals.lean dm21_gauss
+LEAN CrystalFundamentals.lean dm32_nu3_num
+LEAN CrystalFundamentals.lean dm32_nu3_den
+LEAN CrystalFundamentals.lean dm32_nu2_num
+LEAN CrystalFundamentals.lean dm32_nu2_den
+LEAN CrystalFundamentals.lean split_ratio_num
+LEAN CrystalFundamentals.lean split_ratio_den
+LEAN CrystalFundamentals.lean grav_hierarchy_den
+LEAN CrystalFundamentals.lean grav_mp_num
+LEAN CrystalFundamentals.lean grav_mp_den
+LEAN CrystalFundamentals.lean grav_fermat
+LEAN CrystalFundamentals.lean partition_19
+LEAN CrystalFundamentals.lean partition_20
+LEAN CrystalFundamentals.lean partition_50
+LEAN CrystalFundamentals.lean the_43
+LEAN CrystalFundamentals.lean chi4
+LEAN CrystalFundamentals.lean fermat_prime
+LEAN CrystalGravityDyn.lean coeff_16piG
+LEAN CrystalGravityDyn.lean coeff_16_from_primes
+LEAN CrystalGravityDyn.lean coeff_16_decompose
+LEAN CrystalGravityDyn.lean schwarzschild_2
+LEAN CrystalGravityDyn.lean RT_four
+LEAN CrystalGravityDyn.lean EFE_eight
+LEAN CrystalGravityDyn.lean EFE_d_colour
+LEAN CrystalGravityDyn.lean GW_speed
+LEAN CrystalGravityDyn.lean LR_bound_universal
+LEAN CrystalGravityDyn.lean GW_polarizations
+LEAN CrystalGravityDyn.lean polarizations_eq_schwarzschild
+LEAN CrystalGravityDyn.lean quadrupole_32
+LEAN CrystalGravityDyn.lean quadrupole_5
+LEAN CrystalGravityDyn.lean quadrupole_ratio_num
+LEAN CrystalGravityDyn.lean quadrupole_ratio_den
+LEAN CrystalGravityDyn.lean spacetime_dim
+LEAN CrystalGravityDyn.lean spatial_dim
+LEAN CrystalGravityDyn.lean clifford_dim
+LEAN CrystalGravityDyn.lean spinor_dim
+LEAN CrystalGravityDyn.lean all_from_two_three
+LEAN CrystalGravityDyn.lean chi_eq
+LEAN CrystalGravityDyn.lean beta0_eq
+LEAN CrystalGravityDyn.lean D_eq
+LEAN CrystalGravityDyn.lean gauss_eq
+LEAN CrystalGravityDyn.lean sigma_d_eq
+LEAN CrystalGravityDyn.lean sigma_d2_eq
+LEAN CrystalGravityDyn.lean equiv_principle
+LEAN CrystalGravityDyn.lean jacobson_step1_LR
+LEAN CrystalGravityDyn.lean jacobson_step2_KMS
+LEAN CrystalGravityDyn.lean jacobson_step3_RT
+LEAN CrystalGravityDyn.lean jacobson_step4_EFE
+LEAN CrystalGravityDyn.lean jacobson_chain_complete
+LEAN CrystalGravityDyn.lean linearized_einstein_integers
+LEAN CrystalGravityDyn.lean dynamical_gravity_from_AF
+LEAN CrystalLayer.lean chi_eq
+LEAN CrystalLayer.lean beta0_eq
+LEAN CrystalLayer.lean towerD_eq
+LEAN CrystalLayer.lean sigmaD_eq
+LEAN CrystalLayer.lean gauss_eq
+LEAN CrystalLayer.lean sigmaD2_eq
+LEAN CrystalLayer.lean cascade_43
+LEAN CrystalLayer.lean fermat3
+LEAN CrystalLayer.lean binding_54
+LEAN CrystalLayer.lean binding_53
+LEAN CrystalLayer.lean sp3_denom
+LEAN CrystalLayer.lean strand_num
+LEAN CrystalLayer.lean strand_den
+LEAN CrystalLayer.lean helix_num
+LEAN CrystalLayer.lean helix_den
+LEAN CrystalLayer.lean flory_num
+LEAN CrystalLayer.lean flory_den
+LEAN CrystalLayer.lean tower_sum
+LEAN CrystalLayer.lean coprime
+LEAN CrystalMandelbrot.lean period2_eq_Nw
+LEAN CrystalMandelbrot.lean period3_eq_Nc
+LEAN CrystalMandelbrot.lean period6_eq_chi
+LEAN CrystalMandelbrot.lean period6_is_lcm
+LEAN CrystalMandelbrot.lean depth_43
+LEAN CrystalMandelbrot.lean hausdorff_eq_Nw
+LEAN CrystalMandelbrot.lean cardioid_denom
+LEAN CrystalMandelbrot.lean period2_area_16
+LEAN CrystalMandelbrot.lean area_16_eq_einst
+LEAN CrystalMandelbrot.lean area_order
+LEAN CrystalMandelbrot.lean ext_denom_2
+LEAN CrystalMandelbrot.lean ext_denom_2_Nc
+LEAN CrystalMandelbrot.lean ext_denom_3
+LEAN CrystalMandelbrot.lean ext_denom_3_b0
+LEAN CrystalMandelbrot.lean ext_denom_6
+LEAN CrystalMandelbrot.lean ext_denom_6_fac
+LEAN CrystalMandelbrot.lean feig_num
+LEAN CrystalMandelbrot.lean feig_den
+LEAN CrystalMandelbrot.lean feig_reduced
+LEAN CrystalMandelbrot.lean staircase_steps
+LEAN CrystalMandelbrot.lean planck_ln_arg
+LEAN CrystalMandelbrot.lean sigma_plus_chi
+LEAN CrystalMandelbrot.lean div_1
+LEAN CrystalMandelbrot.lean div_2
+LEAN CrystalMandelbrot.lean div_3
+LEAN CrystalMandelbrot.lean div_6
+LEAN CrystalMandelbrot.lean mersenne_2_Nc
+LEAN CrystalMandelbrot.lean mersenne_3_b0
+LEAN CrystalMandelbrot.lean tuning_23_chi
+LEAN CrystalMandelbrot.lean tuning_22_Nwsq
+LEAN CrystalNoether.lean generators_eq_12
+LEAN CrystalNoether.lean noether_currents
+LEAN CrystalNoether.lean rank_drop_eq
+LEAN CrystalNoether.lean lorentz_eq_chi
+LEAN CrystalNoether.lean poincare_eq_10
+LEAN CrystalNoether.lean poincare_eq_solvable
+LEAN CrystalNoether.lean total_conservation_eq
+LEAN CrystalNoether.lean overdetermined
+LEAN CrystalNoether.lean carnot_num
+LEAN CrystalNoether.lean carnot_den
+LEAN CrystalNoether.lean carnot_cross
+LEAN CrystalNoether.lean stefan_bolt_120
+LEAN CrystalNoether.lean lattice_lock
+LEAN CrystalNoether.lean kolmogorov_exact
+LEAN CrystalNoether.lean tau_n
+LEAN CrystalProtein.lean d2_eq_Nc
+LEAN CrystalProtein.lean d3_eq
+LEAN CrystalProtein.lean d4_eq
+LEAN CrystalProtein.lean chi_eq
+LEAN CrystalProtein.lean sigma_d_eq
+LEAN CrystalProtein.lean sigma_d2_eq
+LEAN CrystalProtein.lean gauss_eq
+LEAN CrystalProtein.lean D_max_eq
+LEAN CrystalProtein.lean F3_eq
+LEAN CrystalProtein.lean shared_core
+LEAN CrystalProtein.lean N_c_sq
+LEAN CrystalProtein.lean N_w_sq
+LEAN CrystalProtein.lean chi_beta0
+LEAN CrystalProtein.lean epsilon_r
+LEAN CrystalProtein.lean alpha_int
+LEAN CrystalProtein.lean const_208
+LEAN CrystalProtein.lean nv2_C
+LEAN CrystalProtein.lean nv2_N
+LEAN CrystalProtein.lean nv2_O
+LEAN CrystalProtein.lean rama_denom
+LEAN CrystalProtein.lean helix_num
+LEAN CrystalProtein.lean helix_den
+LEAN CrystalProtein.lean flory_den
+LEAN CrystalProtein.lean cosmo_sum
+LEAN CrystalProtein.lean tau_num
+LEAN CrystalProtein.lean tau_den
+LEAN CrystalProtein.lean imp_vdw_num
+LEAN CrystalProtein.lean imp_vdw_den
+LEAN CrystalProtein.lean imp_vdw_cross
+LEAN CrystalProtein.lean imp_hb_den
+LEAN CrystalProtein.lean imp_ang_den
+LEAN CrystalProtein.lean imp_ang_total
+LEAN CrystalProtein.lean imp_ang_cross
+LEAN CrystalProtein.lean imp_bur_den
+LEAN CrystalProtein.lean imp_vdist
+LEAN CrystalProtein.lean imp_hbdist_d
+LEAN CrystalProtein.lean imp_hbdist_h
+LEAN CrystalProtein.lean imp_alpha_ch
+LEAN CrystalProtonRadius.lean dual_route_d4_sq
+LEAN CrystalProtonRadius.lean d4_sq_eq_576
+LEAN CrystalProtonRadius.lean two_d3_sigma_d_eq_576
+LEAN CrystalProtonRadius.lean nc_sq_minus_one
+LEAN CrystalProtonRadius.lean cf_nc_numerator
+LEAN CrystalProtonRadius.lean two_cf_nc
+LEAN CrystalProtonRadius.lean correction_denom
+LEAN CrystalProtonRadius.lean d3_times_sigma_d
+LEAN CrystalProtonRadius.lean d4_times_d4
+LEAN CrystalProtonRadius.lean af_floor_denom
+LEAN CrystalProtonRadius.lean band_denom
+LEAN CrystalProtonRadius.lean d3_is_adjoint
+LEAN CrystalProtonRadius.lean sigma_d_val
+LEAN CrystalProtonRadius.lean quark_pairs
+LEAN CrystalProtonRadius.lean d4_nc2
+LEAN CrystalProtonRadius.lean eps_denom_nc2
+LEAN CrystalProtonRadius.lean d4_nc3
+LEAN CrystalProtonRadius.lean eps_denom_nc3
+LEAN CrystalProtonRadius.lean d4_nc4
+LEAN CrystalProtonRadius.lean eps_denom_nc4
+LEAN CrystalProtonRadius.lean nc3_tighter_than_nc2
+LEAN CrystalProtonRadius.lean sigma_d2_val
+LEAN CrystalProtonRadius.lean towerD_val
+LEAN CrystalProtonRadius.lean shared_core
+LEAN CrystalProtonRadius.lean d4_sq_factored
+LEAN CrystalProtonRadius.lean alpha_channel
+LEAN CrystalProtonRadius.lean trace_identity
+LEAN CrystalProtonRadius.lean correction_structure
+LEAN CrystalProtonRadius.lean rational_num
+LEAN CrystalProtonRadius.lean rational_den
+LEAN CrystalRendering.lean planck_wavelength_exp
+LEAN CrystalRendering.lean rayleigh_size_exp
+LEAN CrystalRendering.lean rayleigh_size_decomposition
+LEAN CrystalRendering.lean rayleigh_wavelength_exp
+LEAN CrystalRendering.lean rayleigh_wave_decomposition
+LEAN CrystalRendering.lean planck_ne_stefan
+LEAN CrystalStructural.lean chi_eq
+LEAN CrystalStructural.lean beta_0_eq
+LEAN CrystalStructural.lean sigma_d_eq
+LEAN CrystalStructural.lean towerD_eq
+LEAN CrystalStructural.lean gauss_eq
+LEAN CrystalStructural.lean dim_singlet_eq
+LEAN CrystalStructural.lean dim_fund_eq
+LEAN CrystalStructural.lean dim_adj_eq
+LEAN CrystalStructural.lean dim_mixed_eq
+LEAN CrystalStructural.lean conservation_count
+LEAN CrystalStructural.lean noether_currents_eq_gauge
+LEAN CrystalStructural.lean spin_states_fermion
+LEAN CrystalStructural.lean spin_stat_z2
+LEAN CrystalStructural.lean ko_dim_eq
+LEAN CrystalStructural.lean N_c_odd
+LEAN CrystalStructural.lean no_clone_fund
+LEAN CrystalStructural.lean no_clone_adj
+LEAN CrystalStructural.lean no_clone_mixed
+LEAN CrystalStructural.lean singlet_trivial
+LEAN CrystalStructural.lean dof_eff_eq
+LEAN CrystalStructural.lean fermion_components_eq
+LEAN CrystalStructural.lean lorentz_eq_chi
+LEAN CrystalStructural.lean poincare_eq_solvable
+LEAN CrystalStructural.lean metric_modes
+LEAN CrystalStructural.lean casimir_num
+LEAN CrystalStructural.lean beta_0_bridge
+LEAN CrystalStructural.lean kolmogorov_num
+LEAN CrystalStructural.lean kolmogorov_den
+LEAN CrystalStructural.lean phase_decomp
+LEAN CrystalStructural.lean codon_bridge
+LEAN CrystalStructural.lean lagrange_bridge
+LEAN CrystalStructural.lean lattice_lock
+LEAN CrystalStructural.lean carnot_num
+LEAN CrystalStructural.lean carnot_den
+LEAN CrystalStructural.lean stefan_bolt
+LEAN CrystalStructural.lean h_bond_AT
+LEAN CrystalStructural.lean h_bond_GC
+LEAN CrystalStructural.lean tetrahedral_denom
+LEAN CrystalStructural.lean amino_bridge
+LEAN CrystalStructural.lean codon_count
+LEAN CrystalStructural.lean algebra_dim_eq
+LEAN CrystalStructural.lean algebra_towerD
+LEAN CrystalStructural.lean sigma_d_eq_chi_sq
+LEAN CrystalStructural.lean sigma_d2_eq
+LEAN CrystalStructural.lean tau_n_ratio
 LEAN CrystalTopos.lean the_one_law
 LEAN CrystalTopos.lean chi_eq
 LEAN CrystalTopos.lean beta0_eq
@@ -341,209 +704,6 @@ LEAN CrystalTopos.lean inv_sigmaD
 LEAN CrystalTopos.lean inv_gauss
 LEAN CrystalTopos.lean inv_towerD
 LEAN CrystalTopos.lean inv_sigmaD2
-LEAN CrystalStructural.lean chi_eq
-LEAN CrystalStructural.lean beta_0_eq
-LEAN CrystalStructural.lean sigma_d_eq
-LEAN CrystalStructural.lean towerD_eq
-LEAN CrystalStructural.lean gauss_eq
-LEAN CrystalStructural.lean dim_singlet_eq
-LEAN CrystalStructural.lean dim_fund_eq
-LEAN CrystalStructural.lean dim_adj_eq
-LEAN CrystalStructural.lean dim_mixed_eq
-LEAN CrystalStructural.lean conservation_count
-LEAN CrystalStructural.lean noether_currents_eq_gauge
-LEAN CrystalStructural.lean spin_states_fermion
-LEAN CrystalStructural.lean spin_stat_z2
-LEAN CrystalStructural.lean ko_dim_eq
-LEAN CrystalStructural.lean N_c_odd
-LEAN CrystalStructural.lean no_clone_fund
-LEAN CrystalStructural.lean no_clone_adj
-LEAN CrystalStructural.lean no_clone_mixed
-LEAN CrystalStructural.lean singlet_trivial
-LEAN CrystalStructural.lean dof_eff_eq
-LEAN CrystalStructural.lean fermion_components_eq
-LEAN CrystalStructural.lean lorentz_eq_chi
-LEAN CrystalStructural.lean poincare_eq_solvable
-LEAN CrystalStructural.lean metric_modes
-LEAN CrystalStructural.lean casimir_num
-LEAN CrystalStructural.lean beta_0_bridge
-LEAN CrystalStructural.lean kolmogorov_num
-LEAN CrystalStructural.lean kolmogorov_den
-LEAN CrystalStructural.lean phase_decomp
-LEAN CrystalStructural.lean codon_bridge
-LEAN CrystalStructural.lean lagrange_bridge
-LEAN CrystalStructural.lean lattice_lock
-LEAN CrystalStructural.lean carnot_num
-LEAN CrystalStructural.lean carnot_den
-LEAN CrystalStructural.lean stefan_bolt
-LEAN CrystalStructural.lean h_bond_AT
-LEAN CrystalStructural.lean h_bond_GC
-LEAN CrystalStructural.lean tetrahedral_denom
-LEAN CrystalStructural.lean amino_bridge
-LEAN CrystalStructural.lean codon_count
-LEAN CrystalStructural.lean algebra_dim_eq
-LEAN CrystalStructural.lean algebra_towerD
-LEAN CrystalStructural.lean sigma_d_eq_chi_sq
-LEAN CrystalStructural.lean sigma_d2_eq
-LEAN CrystalStructural.lean tau_n_ratio
-LEAN CrystalNoether.lean generators_eq_12
-LEAN CrystalNoether.lean noether_currents
-LEAN CrystalNoether.lean rank_drop_eq
-LEAN CrystalNoether.lean lorentz_eq_chi
-LEAN CrystalNoether.lean poincare_eq_10
-LEAN CrystalNoether.lean poincare_eq_solvable
-LEAN CrystalNoether.lean total_conservation_eq
-LEAN CrystalNoether.lean overdetermined
-LEAN CrystalNoether.lean carnot_num
-LEAN CrystalNoether.lean carnot_den
-LEAN CrystalNoether.lean carnot_cross
-LEAN CrystalNoether.lean stefan_bolt_120
-LEAN CrystalNoether.lean lattice_lock
-LEAN CrystalNoether.lean kolmogorov_exact
-LEAN CrystalNoether.lean tau_n
-LEAN CrystalDiscoveries.lean dark_energy_eq
-LEAN CrystalDiscoveries.lean cdm_eq
-LEAN CrystalDiscoveries.lean baryons_eq
-LEAN CrystalDiscoveries.lean partition_exhaustive
-LEAN CrystalDiscoveries.lean partition_42
-LEAN CrystalDiscoveries.lean omega_lambda_num
-LEAN CrystalDiscoveries.lean omega_lambda_den
-LEAN CrystalDiscoveries.lean omega_cdm_num
-LEAN CrystalDiscoveries.lean omega_b_num
-LEAN CrystalDiscoveries.lean omega_b_simplified
-LEAN CrystalDiscoveries.lean dark_baryon_num
-LEAN CrystalDiscoveries.lean dark_baryon_den
-LEAN CrystalDiscoveries.lean magic_2
-LEAN CrystalDiscoveries.lean magic_8
-LEAN CrystalDiscoveries.lean magic_20
-LEAN CrystalDiscoveries.lean magic_28
-LEAN CrystalDiscoveries.lean magic_50
-LEAN CrystalDiscoveries.lean magic_82
-LEAN CrystalDiscoveries.lean magic_82_alt
-LEAN CrystalDiscoveries.lean magic_82_identity
-LEAN CrystalDiscoveries.lean magic_126
-LEAN CrystalDiscoveries.lean magic_50_alt
-LEAN CrystalDiscoveries.lean magic_50_ratio
-LEAN CrystalDiscoveries.lean cabibbo_num
-LEAN CrystalDiscoveries.lean cabibbo_den
-LEAN CrystalDiscoveries.lean vus_cross
-LEAN CrystalDiscoveries.lean vcb_denom
-LEAN CrystalDiscoveries.lean vub_denom
-LEAN CrystalDiscoveries.lean ckm_hierarchy_1
-LEAN CrystalDiscoveries.lean ckm_hierarchy_2
-LEAN CrystalDiscoveries.lean bell_base
-LEAN CrystalDiscoveries.lean bell_power
-LEAN CrystalDiscoveries.lean eddington_int
-LEAN CrystalDiscoveries.lean saturation_cross
-LEAN CrystalAlphaProton.lean chi_eq
-LEAN CrystalAlphaProton.lean beta0_eq
-LEAN CrystalAlphaProton.lean sigma_d_eq
-LEAN CrystalAlphaProton.lean sigma_d2_eq
-LEAN CrystalAlphaProton.lean gauss_eq
-LEAN CrystalAlphaProton.lean towerD_eq
-LEAN CrystalAlphaProton.lean alpha_sindy_rational_num
-LEAN CrystalAlphaProton.lean gauss_sq
-LEAN CrystalAlphaProton.lean alpha_sindy_sum
-LEAN CrystalAlphaProton.lean towerD_sq
-LEAN CrystalAlphaProton.lean mp_sindy_numerator
-LEAN CrystalAlphaProton.lean mp_sindy_rational
-LEAN CrystalAlphaProton.lean gauss_cubed
-LEAN CrystalAlphaProton.lean gauss_cubed_alt
-LEAN CrystalAlphaProton.lean cross_domain_gauss_alpha
-LEAN CrystalAlphaProton.lean cross_domain_gauss_mp
-LEAN CrystalAlphaProton.lean hmc_corr_denom
-LEAN CrystalAlphaProton.lean a0_inv
-LEAN CrystalAlphaProton.lean a4_inv
-LEAN CrystalAlphaProton.lean shared_core
-LEAN CrystalAlphaProton.lean hierarchy_numerator
-LEAN CrystalAlphaProton.lean hierarchy_denominator
-LEAN CrystalAlphaProton.lean alpha_corr_denom
-LEAN CrystalAlphaProton.lean alpha_channel
-LEAN CrystalAlphaProton.lean mp_corr_denom
-LEAN CrystalAlphaProton.lean mp_channel
-LEAN CrystalAlphaProton.lean corr_denom_ratio
-LEAN CrystalAlphaProton.lean d4_over_nw
-LEAN CrystalAlphaProton.lean channel_ratio
-LEAN CrystalAlphaProton.lean alpha_via_core
-LEAN CrystalAlphaProton.lean mp_via_core
-LEAN CrystalAlphaProton.lean alpha_corr_primes
-LEAN CrystalAlphaProton.lean mp_corr_primes
-LEAN CrystalAlphaProton.lean magic_82
-LEAN CrystalAlphaProton.lean magic_82_alt
-LEAN CrystalAlphaProton.lean magic_82_identity
-LEAN CrystalAlphaProton.lean sin2_corr_denom
-LEAN CrystalAlphaProton.lean sin2_corr_num
-LEAN CrystalAlphaProton.lean all_share_a4
-LEAN CrystalAlphaProton.lean sin2_alpha_share_d4
-LEAN CrystalAlphaProton.lean beta0_from_primes
-LEAN CrystalAlphaProton.lean sin2_equiv
-LEAN CrystalAlphaProton.lean upsilon_dual_route
-LEAN CrystalAlphaProton.lean upsilon_corr_val
-LEAN CrystalAlphaProton.lean dmeson_dual_route
-LEAN CrystalAlphaProton.lean dmeson_split
-LEAN CrystalAlphaProton.lean rho_dual_route
-LEAN CrystalAlphaProton.lean rho_identity
-LEAN CrystalAlphaProton.lean phi_dual_route
-LEAN CrystalAlphaProton.lean phi_identity_d4_minus_d3
-LEAN CrystalAlphaProton.lean phi_identity_d3_nc
-LEAN CrystalAlphaProton.lean omega_dm_dual_route
-LEAN CrystalAlphaProton.lean omega_dm_identity
-LEAN CrystalAlphaProton.lean omega_dm_corr_val
-LEAN CrystalAlphaProton.lean rp_dual_route
-LEAN CrystalAlphaProton.lean sin13_dual_route
-LEAN CrystalAlphaProton.lean sin13_corr_val
-LEAN CrystalAlphaProton.lean sin13_identity
-LEAN CrystalAlphaProton.lean sin13_numerator
-LEAN CrystalAlphaProton.lean sin13_denominator
-LEAN CrystalProtonRadius.lean dual_route_d4_sq
-LEAN CrystalProtonRadius.lean d4_sq_eq_576
-LEAN CrystalProtonRadius.lean two_d3_sigma_d_eq_576
-LEAN CrystalProtonRadius.lean nc_sq_minus_one
-LEAN CrystalProtonRadius.lean cf_nc_numerator
-LEAN CrystalProtonRadius.lean two_cf_nc
-LEAN CrystalProtonRadius.lean correction_denom
-LEAN CrystalProtonRadius.lean d3_times_sigma_d
-LEAN CrystalProtonRadius.lean d4_times_d4
-LEAN CrystalProtonRadius.lean af_floor_denom
-LEAN CrystalProtonRadius.lean band_denom
-LEAN CrystalProtonRadius.lean d3_is_adjoint
-LEAN CrystalProtonRadius.lean sigma_d_val
-LEAN CrystalProtonRadius.lean quark_pairs
-LEAN CrystalProtonRadius.lean d4_nc2
-LEAN CrystalProtonRadius.lean eps_denom_nc2
-LEAN CrystalProtonRadius.lean d4_nc3
-LEAN CrystalProtonRadius.lean eps_denom_nc3
-LEAN CrystalProtonRadius.lean d4_nc4
-LEAN CrystalProtonRadius.lean eps_denom_nc4
-LEAN CrystalProtonRadius.lean nc3_tighter_than_nc2
-LEAN CrystalProtonRadius.lean sigma_d2_val
-LEAN CrystalProtonRadius.lean towerD_val
-LEAN CrystalProtonRadius.lean shared_core
-LEAN CrystalProtonRadius.lean d4_sq_factored
-LEAN CrystalProtonRadius.lean alpha_channel
-LEAN CrystalProtonRadius.lean trace_identity
-LEAN CrystalProtonRadius.lean correction_structure
-LEAN CrystalProtonRadius.lean rational_num
-LEAN CrystalProtonRadius.lean rational_den
-LEAN CrystalLayer.lean chi_eq
-LEAN CrystalLayer.lean beta0_eq
-LEAN CrystalLayer.lean towerD_eq
-LEAN CrystalLayer.lean sigmaD_eq
-LEAN CrystalLayer.lean gauss_eq
-LEAN CrystalLayer.lean sigmaD2_eq
-LEAN CrystalLayer.lean cascade_43
-LEAN CrystalLayer.lean fermat3
-LEAN CrystalLayer.lean binding_54
-LEAN CrystalLayer.lean binding_53
-LEAN CrystalLayer.lean sp3_denom
-LEAN CrystalLayer.lean strand_num
-LEAN CrystalLayer.lean strand_den
-LEAN CrystalLayer.lean helix_num
-LEAN CrystalLayer.lean helix_den
-LEAN CrystalLayer.lean flory_num
-LEAN CrystalLayer.lean flory_den
-LEAN CrystalLayer.lean tower_sum
-LEAN CrystalLayer.lean coprime
 LEAN Main.lean chi_eq
 LEAN Main.lean beta_0_eq
 LEAN Main.lean sigma_d_eq
@@ -602,162 +762,345 @@ LEAN Main.lean id_sigma_chi_sq
 LEAN Main.lean id_sigma_d2
 LEAN Main.lean id_D_decomp
 LEAN Main.lean id_algebra_N_c
-LEAN CrystalGravityDyn.lean coeff_16piG
-LEAN CrystalGravityDyn.lean coeff_16_from_primes
-LEAN CrystalGravityDyn.lean coeff_16_decompose
-LEAN CrystalGravityDyn.lean schwarzschild_2
-LEAN CrystalGravityDyn.lean RT_four
-LEAN CrystalGravityDyn.lean EFE_eight
-LEAN CrystalGravityDyn.lean EFE_d_colour
-LEAN CrystalGravityDyn.lean GW_speed
-LEAN CrystalGravityDyn.lean LR_bound_universal
-LEAN CrystalGravityDyn.lean GW_polarizations
-LEAN CrystalGravityDyn.lean polarizations_eq_schwarzschild
-LEAN CrystalGravityDyn.lean quadrupole_32
-LEAN CrystalGravityDyn.lean quadrupole_5
-LEAN CrystalGravityDyn.lean quadrupole_ratio_num
-LEAN CrystalGravityDyn.lean quadrupole_ratio_den
-LEAN CrystalGravityDyn.lean spacetime_dim
-LEAN CrystalGravityDyn.lean spatial_dim
-LEAN CrystalGravityDyn.lean clifford_dim
-LEAN CrystalGravityDyn.lean spinor_dim
-LEAN CrystalGravityDyn.lean all_from_two_three
-LEAN CrystalGravityDyn.lean chi_eq
-LEAN CrystalGravityDyn.lean beta0_eq
-LEAN CrystalGravityDyn.lean D_eq
-LEAN CrystalGravityDyn.lean gauss_eq
-LEAN CrystalGravityDyn.lean sigma_d_eq
-LEAN CrystalGravityDyn.lean sigma_d2_eq
-LEAN CrystalGravityDyn.lean equiv_principle
-LEAN CrystalGravityDyn.lean jacobson_step1_LR
-LEAN CrystalGravityDyn.lean jacobson_step2_KMS
-LEAN CrystalGravityDyn.lean jacobson_step3_RT
-LEAN CrystalGravityDyn.lean jacobson_step4_EFE
-LEAN CrystalGravityDyn.lean jacobson_chain_complete
-LEAN CrystalGravityDyn.lean linearized_einstein_integers
-LEAN CrystalGravityDyn.lean dynamical_gravity_from_AF
-LEAN CrystalProtein.lean d2_eq_Nc
-LEAN CrystalProtein.lean d3_eq
-LEAN CrystalProtein.lean d4_eq
-LEAN CrystalProtein.lean chi_eq
-LEAN CrystalProtein.lean sigma_d_eq
-LEAN CrystalProtein.lean sigma_d2_eq
-LEAN CrystalProtein.lean gauss_eq
-LEAN CrystalProtein.lean D_max_eq
-LEAN CrystalProtein.lean F3_eq
-LEAN CrystalProtein.lean shared_core
-LEAN CrystalProtein.lean N_c_sq
-LEAN CrystalProtein.lean N_w_sq
-LEAN CrystalProtein.lean chi_beta0
-LEAN CrystalProtein.lean epsilon_r
-LEAN CrystalProtein.lean alpha_int
-LEAN CrystalProtein.lean const_208
-LEAN CrystalProtein.lean nv2_C
-LEAN CrystalProtein.lean nv2_N
-LEAN CrystalProtein.lean nv2_O
-LEAN CrystalProtein.lean rama_denom
-LEAN CrystalProtein.lean helix_num
-LEAN CrystalProtein.lean helix_den
-LEAN CrystalProtein.lean flory_den
-LEAN CrystalProtein.lean cosmo_sum
-LEAN CrystalProtein.lean tau_num
-LEAN CrystalProtein.lean tau_den
-LEAN CrystalProtein.lean imp_vdw_num
-LEAN CrystalProtein.lean imp_vdw_den
-LEAN CrystalProtein.lean imp_vdw_cross
-LEAN CrystalProtein.lean imp_hb_den
-LEAN CrystalProtein.lean imp_ang_den
-LEAN CrystalProtein.lean imp_ang_total
-LEAN CrystalProtein.lean imp_ang_cross
-LEAN CrystalProtein.lean imp_bur_den
-LEAN CrystalProtein.lean imp_vdist
-LEAN CrystalProtein.lean imp_hbdist_d
-LEAN CrystalProtein.lean imp_hbdist_h
-LEAN CrystalProtein.lean imp_alpha_ch
-LEAN CrystalMandelbrot.lean period2_eq_Nw
-LEAN CrystalMandelbrot.lean period3_eq_Nc
-LEAN CrystalMandelbrot.lean period6_eq_chi
-LEAN CrystalMandelbrot.lean period6_is_lcm
-LEAN CrystalMandelbrot.lean depth_43
-LEAN CrystalMandelbrot.lean hausdorff_eq_Nw
-LEAN CrystalMandelbrot.lean cardioid_denom
-LEAN CrystalMandelbrot.lean period2_area_16
-LEAN CrystalMandelbrot.lean area_16_eq_einst
-LEAN CrystalMandelbrot.lean area_order
-LEAN CrystalMandelbrot.lean ext_denom_2
-LEAN CrystalMandelbrot.lean ext_denom_2_Nc
-LEAN CrystalMandelbrot.lean ext_denom_3
-LEAN CrystalMandelbrot.lean ext_denom_3_b0
-LEAN CrystalMandelbrot.lean ext_denom_6
-LEAN CrystalMandelbrot.lean ext_denom_6_fac
-LEAN CrystalMandelbrot.lean feig_num
-LEAN CrystalMandelbrot.lean feig_den
-LEAN CrystalMandelbrot.lean feig_reduced
-LEAN CrystalMandelbrot.lean staircase_steps
-LEAN CrystalMandelbrot.lean planck_ln_arg
-LEAN CrystalMandelbrot.lean sigma_plus_chi
-LEAN CrystalMandelbrot.lean div_1
-LEAN CrystalMandelbrot.lean div_2
-LEAN CrystalMandelbrot.lean div_3
-LEAN CrystalMandelbrot.lean div_6
-LEAN CrystalMandelbrot.lean mersenne_2_Nc
-LEAN CrystalMandelbrot.lean mersenne_3_b0
-LEAN CrystalMandelbrot.lean tuning_23_chi
-LEAN CrystalMandelbrot.lean tuning_22_Nwsq
-LEAN CrystalFundamentals.lean neff_denom
-LEAN CrystalFundamentals.lean ob_om_num
-LEAN CrystalFundamentals.lean ob_om_den
-LEAN CrystalFundamentals.lean sw0_base_den
-LEAN CrystalFundamentals.lean sw0_corr_den
-LEAN CrystalFundamentals.lean sw0_corr_simplify
-LEAN CrystalFundamentals.lean yp_corr_den
-LEAN CrystalFundamentals.lean moment_ratio_num
-LEAN CrystalFundamentals.lean moment_ratio_den
-LEAN CrystalFundamentals.lean moment_ratio_reduced_num
-LEAN CrystalFundamentals.lean moment_ratio_reduced_den
-LEAN CrystalFundamentals.lean mcms_base
-LEAN CrystalFundamentals.lean mcms_base_alt
-LEAN CrystalFundamentals.lean mcms_base_alt2
-LEAN CrystalFundamentals.lean mcms_base_alt3
-LEAN CrystalFundamentals.lean mcms_corr_num
-LEAN CrystalFundamentals.lean mcms_corr_den
-LEAN CrystalFundamentals.lean mcms_den_route2
-LEAN CrystalFundamentals.lean mcms_product
-LEAN CrystalFundamentals.lean mbtau_base_num
-LEAN CrystalFundamentals.lean mbtau_base_den
-LEAN CrystalFundamentals.lean mbtau_corr_den
-LEAN CrystalFundamentals.lean mbtau_corr_is_D
-LEAN CrystalFundamentals.lean mbtau_combined_num
-LEAN CrystalFundamentals.lean mbtau_combined_den
-LEAN CrystalFundamentals.lean yt_base_num
-LEAN CrystalFundamentals.lean yt_base_den
-LEAN CrystalFundamentals.lean yt_corr_den
-LEAN CrystalFundamentals.lean rpi_num
-LEAN CrystalFundamentals.lean rpi_den
-LEAN CrystalFundamentals.lean dalpha_den
-LEAN CrystalFundamentals.lean sigma_corr_num
-LEAN CrystalFundamentals.lean sigma_corr_den
-LEAN CrystalFundamentals.lean sigma_same_43
-LEAN CrystalFundamentals.lean dm21_tower
-LEAN CrystalFundamentals.lean dm21_gauss
-LEAN CrystalFundamentals.lean dm32_nu3_num
-LEAN CrystalFundamentals.lean dm32_nu3_den
-LEAN CrystalFundamentals.lean dm32_nu2_num
-LEAN CrystalFundamentals.lean dm32_nu2_den
-LEAN CrystalFundamentals.lean split_ratio_num
-LEAN CrystalFundamentals.lean split_ratio_den
-LEAN CrystalFundamentals.lean grav_hierarchy_den
-LEAN CrystalFundamentals.lean grav_mp_num
-LEAN CrystalFundamentals.lean grav_mp_den
-LEAN CrystalFundamentals.lean grav_fermat
-LEAN CrystalFundamentals.lean partition_19
-LEAN CrystalFundamentals.lean partition_20
-LEAN CrystalFundamentals.lean partition_50
-LEAN CrystalFundamentals.lean the_43
-LEAN CrystalFundamentals.lean chi4
-LEAN CrystalFundamentals.lean fermat_prime
-LEAN_FILES 12
+LEAN_FILES 13
 # AGDA PROOFS
+AGDA CrystalAlphaProton.agda chi-eq
+AGDA CrystalAlphaProton.agda sigma-d-eq
+AGDA CrystalAlphaProton.agda gauss-eq
+AGDA CrystalAlphaProton.agda towerD-eq
+AGDA CrystalAlphaProton.agda gauss-sq
+AGDA CrystalAlphaProton.agda alpha-sindy-sum
+AGDA CrystalAlphaProton.agda alpha-sindy-rational
+AGDA CrystalAlphaProton.agda towerD-sq
+AGDA CrystalAlphaProton.agda mp-sindy-numerator
+AGDA CrystalAlphaProton.agda mp-sindy-double
+AGDA CrystalAlphaProton.agda gauss-cubed
+AGDA CrystalAlphaProton.agda gauss-cubed-alt
+AGDA CrystalAlphaProton.agda sigma-d2-eq
+AGDA CrystalAlphaProton.agda a0-inv
+AGDA CrystalAlphaProton.agda a4-inv
+AGDA CrystalAlphaProton.agda shared-core
+AGDA CrystalAlphaProton.agda alpha-corr-denom
+AGDA CrystalAlphaProton.agda alpha-channel
+AGDA CrystalAlphaProton.agda mp-corr-denom
+AGDA CrystalAlphaProton.agda mp-channel
+AGDA CrystalAlphaProton.agda d4-over-nw
+AGDA CrystalAlphaProton.agda corr-ratio
+AGDA CrystalAlphaProton.agda magic-82
+AGDA CrystalAlphaProton.agda magic-82-alt
+AGDA CrystalAlphaProton.agda beta0-numerator
+AGDA CrystalAlphaProton.agda sin2-corr-denom
+AGDA CrystalAlphaProton.agda beta0-eq
+AGDA CrystalAlphaProton.agda all-share-a4
+AGDA CrystalAlphaProton.agda upsilon-dual
+AGDA CrystalAlphaProton.agda upsilon-corr
+AGDA CrystalAlphaProton.agda dmeson-dual
+AGDA CrystalAlphaProton.agda dmeson-split
+AGDA CrystalAlphaProton.agda rho-dual
+AGDA CrystalAlphaProton.agda phi-dual
+AGDA CrystalAlphaProton.agda phi-d4-minus-d3
+AGDA CrystalAlphaProton.agda phi-d3-nc
+AGDA CrystalAlphaProton.agda omega-dm-dual
+AGDA CrystalAlphaProton.agda omega-dm-val
+AGDA CrystalAlphaProton.agda omega-dm-identity
+AGDA CrystalAlphaProton.agda rp-dual
+AGDA CrystalAlphaProton.agda sin13-dual
+AGDA CrystalAlphaProton.agda sin13-corr
+AGDA CrystalAlphaProton.agda sin13-identity
+AGDA CrystalAlphaProton.agda sin13-num
+AGDA CrystalAlphaProton.agda sin13-denom
+AGDA CrystalDiscoveries.agda dark-energy-eq
+AGDA CrystalDiscoveries.agda cdm-eq
+AGDA CrystalDiscoveries.agda baryons-eq
+AGDA CrystalDiscoveries.agda partition-exhaustive
+AGDA CrystalDiscoveries.agda partition-42
+AGDA CrystalDiscoveries.agda tower-42
+AGDA CrystalDiscoveries.agda omega-lambda-num
+AGDA CrystalDiscoveries.agda omega-cdm-num
+AGDA CrystalDiscoveries.agda omega-b-simplified
+AGDA CrystalDiscoveries.agda dark-baryon-num
+AGDA CrystalDiscoveries.agda dark-baryon-den
+AGDA CrystalDiscoveries.agda magic-2
+AGDA CrystalDiscoveries.agda magic-8
+AGDA CrystalDiscoveries.agda magic-20
+AGDA CrystalDiscoveries.agda magic-28
+AGDA CrystalDiscoveries.agda magic-50
+AGDA CrystalDiscoveries.agda magic-82
+AGDA CrystalDiscoveries.agda magic-82-alt
+AGDA CrystalDiscoveries.agda magic-126
+AGDA CrystalDiscoveries.agda sigma-d2-eq
+AGDA CrystalDiscoveries.agda magic-50-alt
+AGDA CrystalDiscoveries.agda cabibbo-num
+AGDA CrystalDiscoveries.agda cabibbo-den
+AGDA CrystalDiscoveries.agda vus-cross
+AGDA CrystalDiscoveries.agda vcb-denom
+AGDA CrystalDiscoveries.agda vub-denom
+AGDA CrystalDiscoveries.agda ckm-hier-1
+AGDA CrystalDiscoveries.agda ckm-hier-2
+AGDA CrystalDiscoveries.agda bell-base
+AGDA CrystalDiscoveries.agda steane-n
+AGDA CrystalDiscoveries.agda steane-d
+AGDA CrystalDiscoveries.agda eddington
+AGDA CrystalDiscoveries.agda saturation
+AGDA CrystalDiscoveries.agda gauss-decomp
+AGDA CrystalDiscoveries.agda non-gauge
+AGDA CrystalDiscoveries.agda gauge-dark
+AGDA CrystalDiscoveries.agda sigma-chi-sq
+AGDA CrystalDiscoveries.agda tower-decomp
+AGDA CrystalFundamentals.agda neff-denom
+AGDA CrystalFundamentals.agda ob-om-num
+AGDA CrystalFundamentals.agda ob-om-den
+AGDA CrystalFundamentals.agda sw0-corr-den
+AGDA CrystalFundamentals.agda yp-corr-den
+AGDA CrystalFundamentals.agda moment-num
+AGDA CrystalFundamentals.agda moment-den
+AGDA CrystalFundamentals.agda mcms-base
+AGDA CrystalFundamentals.agda mcms-base-alt
+AGDA CrystalFundamentals.agda mcms-corr-num
+AGDA CrystalFundamentals.agda mcms-corr-den
+AGDA CrystalFundamentals.agda mcms-den-route2
+AGDA CrystalFundamentals.agda mcms-product
+AGDA CrystalFundamentals.agda mbtau-corr-den
+AGDA CrystalFundamentals.agda mbtau-corr-is-D
+AGDA CrystalFundamentals.agda yt-base-den
+AGDA CrystalFundamentals.agda yt-corr-den
+AGDA CrystalFundamentals.agda rpi-num
+AGDA CrystalFundamentals.agda rpi-den
+AGDA CrystalFundamentals.agda dalpha-den
+AGDA CrystalFundamentals.agda sigma-corr-num
+AGDA CrystalFundamentals.agda sigma-same-43
+AGDA CrystalFundamentals.agda dm21-tower
+AGDA CrystalFundamentals.agda dm21-gauss
+AGDA CrystalFundamentals.agda dm32-nu3-num
+AGDA CrystalFundamentals.agda dm32-nu3-den
+AGDA CrystalFundamentals.agda split-chi4
+AGDA CrystalFundamentals.agda split-chi4-minus1
+AGDA CrystalFundamentals.agda grav-den
+AGDA CrystalFundamentals.agda grav-mp-num
+AGDA CrystalFundamentals.agda grav-mp-den
+AGDA CrystalFundamentals.agda partition-19
+AGDA CrystalFundamentals.agda partition-20
+AGDA CrystalFundamentals.agda the-43
+AGDA CrystalFundamentals.agda fermat-257
+AGDA CrystalGravityDyn.agda chi-eq
+AGDA CrystalGravityDyn.agda beta0-eq
+AGDA CrystalGravityDyn.agda sigma-d-eq
+AGDA CrystalGravityDyn.agda sigma-d2-eq
+AGDA CrystalGravityDyn.agda gauss-eq
+AGDA CrystalGravityDyn.agda D-eq
+AGDA CrystalGravityDyn.agda coeff-16πG
+AGDA CrystalGravityDyn.agda schwarzschild-2
+AGDA CrystalGravityDyn.agda RT-four
+AGDA CrystalGravityDyn.agda EFE-eight
+AGDA CrystalGravityDyn.agda d-colour-eq
+AGDA CrystalGravityDyn.agda GW-speed-structural
+AGDA CrystalGravityDyn.agda GW-polarizations
+AGDA CrystalGravityDyn.agda pol-eq-schwarz
+AGDA CrystalGravityDyn.agda quadrupole-32
+AGDA CrystalGravityDyn.agda quadrupole-5
+AGDA CrystalGravityDyn.agda spacetime-dim
+AGDA CrystalGravityDyn.agda clifford-dim
+AGDA CrystalGravityDyn.agda spinor-dim
+AGDA CrystalGravityDyn.agda jacobson-step1
+AGDA CrystalGravityDyn.agda jacobson-step2
+AGDA CrystalGravityDyn.agda jacobson-step3
+AGDA CrystalGravityDyn.agda jacobson-step4
+AGDA CrystalGravityDyn.agda equiv-principle
+AGDA CrystalLayer.agda chi-eq
+AGDA CrystalLayer.agda beta0-eq
+AGDA CrystalLayer.agda towerD-eq
+AGDA CrystalLayer.agda sigmaD-eq
+AGDA CrystalLayer.agda gauss-eq
+AGDA CrystalLayer.agda sigmaD2-eq
+AGDA CrystalLayer.agda alpha-int
+AGDA CrystalLayer.agda fermat3
+AGDA CrystalLayer.agda binding-54
+AGDA CrystalLayer.agda binding-53
+AGDA CrystalLayer.agda strand-ratio
+AGDA CrystalLayer.agda helix-num
+AGDA CrystalLayer.agda helix-den
+AGDA CrystalLayer.agda flory-num
+AGDA CrystalLayer.agda flory-den
+AGDA CrystalLayer.agda tower-sum
+AGDA CrystalLayer.agda coprime
+AGDA CrystalMandelbrot.agda period2
+AGDA CrystalMandelbrot.agda period3
+AGDA CrystalMandelbrot.agda period6
+AGDA CrystalMandelbrot.agda depth-43
+AGDA CrystalMandelbrot.agda hausdorff
+AGDA CrystalMandelbrot.agda sigma-chi
+AGDA CrystalMandelbrot.agda cardioid-denom
+AGDA CrystalMandelbrot.agda period2-area
+AGDA CrystalMandelbrot.agda einstein-16
+AGDA CrystalMandelbrot.agda nw-sq
+AGDA CrystalMandelbrot.agda nc-sq
+AGDA CrystalMandelbrot.agda ext-denom-2
+AGDA CrystalMandelbrot.agda ext-denom-2-Nc
+AGDA CrystalMandelbrot.agda ext-denom-3
+AGDA CrystalMandelbrot.agda ext-denom-3-b0
+AGDA CrystalMandelbrot.agda ext-denom-6
+AGDA CrystalMandelbrot.agda ext-denom-6-fac
+AGDA CrystalMandelbrot.agda feig-num
+AGDA CrystalMandelbrot.agda feig-den
+AGDA CrystalMandelbrot.agda feig-reduced
+AGDA CrystalMandelbrot.agda staircase-steps
+AGDA CrystalMandelbrot.agda planck-ln-arg
+AGDA CrystalMandelbrot.agda div-1
+AGDA CrystalMandelbrot.agda div-2
+AGDA CrystalMandelbrot.agda div-3
+AGDA CrystalMandelbrot.agda mersenne-2
+AGDA CrystalMandelbrot.agda mersenne-3
+AGDA CrystalMandelbrot.agda tuning-23
+AGDA CrystalNoether.agda generators-eq-12
+AGDA CrystalNoether.agda lorentz-double
+AGDA CrystalNoether.agda poincare-eq-10
+AGDA CrystalNoether.agda poincare-eq-solvable
+AGDA CrystalNoether.agda total-eq-22
+AGDA CrystalNoether.agda algebra-dim-eq
+AGDA CrystalNoether.agda carnot-cross
+AGDA CrystalNoether.agda stefan-bolt
+AGDA CrystalNoether.agda lattice-lock
+AGDA CrystalNoether.agda kolmogorov-cross
+AGDA CrystalNoether.agda tau-n-cross
+AGDA CrystalNoether.agda von-karman-cross
+AGDA CrystalNoether.agda rank-drop-eq
+AGDA CrystalNoether.agda casimir-cross
+AGDA CrystalNoether.agda codons
+AGDA CrystalNoether.agda amino-stop
+AGDA CrystalNoether.agda phase-18
+AGDA CrystalProtein.agda d1-eq
+AGDA CrystalProtein.agda d2-eq
+AGDA CrystalProtein.agda d3-eq
+AGDA CrystalProtein.agda d4-eq
+AGDA CrystalProtein.agda chi-eq
+AGDA CrystalProtein.agda beta0-eq
+AGDA CrystalProtein.agda sigma-d-eq
+AGDA CrystalProtein.agda sigma-d2-eq
+AGDA CrystalProtein.agda gauss-eq
+AGDA CrystalProtein.agda D-max-eq
+AGDA CrystalProtein.agda F3-eq
+AGDA CrystalProtein.agda shared-core
+AGDA CrystalProtein.agda N_c-sq
+AGDA CrystalProtein.agda N_w-sq
+AGDA CrystalProtein.agda chi-plus-beta0
+AGDA CrystalProtein.agda epsilon-r
+AGDA CrystalProtein.agda alpha-inv-int
+AGDA CrystalProtein.agda imp-alpha-denom
+AGDA CrystalProtein.agda const-208
+AGDA CrystalProtein.agda nv2-H
+AGDA CrystalProtein.agda nv2-C
+AGDA CrystalProtein.agda nv2-N
+AGDA CrystalProtein.agda nv2-O
+AGDA CrystalProtein.agda nv2-S
+AGDA CrystalProtein.agda n2-H
+AGDA CrystalProtein.agda n2-C
+AGDA CrystalProtein.agda n2-S
+AGDA CrystalProtein.agda water-denom
+AGDA CrystalProtein.agda strand-factor-num
+AGDA CrystalProtein.agda rama-denom
+AGDA CrystalProtein.agda helix-num
+AGDA CrystalProtein.agda helix-den
+AGDA CrystalProtein.agda flory-num
+AGDA CrystalProtein.agda flory-den
+AGDA CrystalProtein.agda cosmo-sum
+AGDA CrystalProtein.agda cosmo-lambda
+AGDA CrystalProtein.agda cosmo-baryon
+AGDA CrystalProtein.agda tau-num
+AGDA CrystalProtein.agda tau-den
+AGDA CrystalProtein.agda imp-vdw-num
+AGDA CrystalProtein.agda imp-vdw-den
+AGDA CrystalProtein.agda imp-vdw-cross
+AGDA CrystalProtein.agda imp-hbond-den
+AGDA CrystalProtein.agda imp-hbond-cross
+AGDA CrystalProtein.agda imp-angle-den
+AGDA CrystalProtein.agda imp-angle-total
+AGDA CrystalProtein.agda imp-angle-cross
+AGDA CrystalProtein.agda imp-burial-den
+AGDA CrystalProtein.agda imp-vdw-dist
+AGDA CrystalProtein.agda imp-hb-dist-den
+AGDA CrystalProtein.agda imp-hb-dist-half
+AGDA CrystalProtein.agda layer-count
+AGDA CrystalProtein.agda energy-modes
+AGDA CrystalProtonRadius.agda dual-route
+AGDA CrystalProtonRadius.agda d4-sq-576
+AGDA CrystalProtonRadius.agda two-d3-sigma-d
+AGDA CrystalProtonRadius.agda nc-sq-minus-1
+AGDA CrystalProtonRadius.agda two-times-four
+AGDA CrystalProtonRadius.agda cf-nc-check
+AGDA CrystalProtonRadius.agda d3-times-sigma-d
+AGDA CrystalProtonRadius.agda two-times-288
+AGDA CrystalProtonRadius.agda d4-times-d4
+AGDA CrystalProtonRadius.agda af-floor-denom
+AGDA CrystalProtonRadius.agda band-denom
+AGDA CrystalProtonRadius.agda d3-adjoint
+AGDA CrystalProtonRadius.agda sigma-d-val
+AGDA CrystalProtonRadius.agda quark-pair-product
+AGDA CrystalProtonRadius.agda d4-nc2
+AGDA CrystalProtonRadius.agda eps-nc2
+AGDA CrystalProtonRadius.agda d4-nc3
+AGDA CrystalProtonRadius.agda eps-nc3
+AGDA CrystalProtonRadius.agda d4-nc4
+AGDA CrystalProtonRadius.agda eps-nc4
+AGDA CrystalProtonRadius.agda sigma-d2-val
+AGDA CrystalProtonRadius.agda towerD-val
+AGDA CrystalProtonRadius.agda shared-core
+AGDA CrystalProtonRadius.agda alpha-channel
+AGDA CrystalProtonRadius.agda trace-identity
+AGDA CrystalRendering.agda planck-wavelength-exp
+AGDA CrystalRendering.agda rayleigh-size-exp
+AGDA CrystalRendering.agda rayleigh-size-decomp
+AGDA CrystalRendering.agda rayleigh-wavelength-exp
+AGDA CrystalRendering.agda planck-exp-is-five
+AGDA CrystalRendering.agda stefan-exp-is-four
+AGDA CrystalStructural.agda chi-eq
+AGDA CrystalStructural.agda beta-0-eq
+AGDA CrystalStructural.agda sigma-d-eq
+AGDA CrystalStructural.agda towerD-eq
+AGDA CrystalStructural.agda gauss-eq
+AGDA CrystalStructural.agda dim-singlet-eq
+AGDA CrystalStructural.agda dim-fund-eq
+AGDA CrystalStructural.agda dim-adj-eq
+AGDA CrystalStructural.agda dim-mixed-eq
+AGDA CrystalStructural.agda conservation-count
+AGDA CrystalStructural.agda spin-states
+AGDA CrystalStructural.agda ko-dim-eq
+AGDA CrystalStructural.agda N-c-is-3
+AGDA CrystalStructural.agda no-clone-fund
+AGDA CrystalStructural.agda no-clone-adj
+AGDA CrystalStructural.agda no-clone-mixed
+AGDA CrystalStructural.agda dof-eff-eq
+AGDA CrystalStructural.agda fermion-eq
+AGDA CrystalStructural.agda lorentz-product
+AGDA CrystalStructural.agda lorentz-double-chi
+AGDA CrystalStructural.agda poincare-eq-solvable
+AGDA CrystalStructural.agda poincare-eq-10
+AGDA CrystalStructural.agda metric-modes-eq-chi
+AGDA CrystalStructural.agda casimir-num
+AGDA CrystalStructural.agda casimir-denom
+AGDA CrystalStructural.agda nfw-bridge
+AGDA CrystalStructural.agda kolmogorov-num
+AGDA CrystalStructural.agda kolmogorov-den
+AGDA CrystalStructural.agda phase-decomp
+AGDA CrystalStructural.agda codon-bridge
+AGDA CrystalStructural.agda lagrange-bridge
+AGDA CrystalStructural.agda lattice-lock
+AGDA CrystalStructural.agda carnot-num
+AGDA CrystalStructural.agda carnot-den
+AGDA CrystalStructural.agda stefan-bolt
+AGDA CrystalStructural.agda h-bond-AT
+AGDA CrystalStructural.agda h-bond-GC
+AGDA CrystalStructural.agda tetrahedral
+AGDA CrystalStructural.agda amino-bridge
+AGDA CrystalStructural.agda codon-count
+AGDA CrystalStructural.agda tau-n-product
+AGDA CrystalStructural.agda algebra-dim-eq
+AGDA CrystalStructural.agda algebra-towerD
+AGDA CrystalStructural.agda sigma-chi-sq
+AGDA CrystalStructural.agda sigma-d2-eq
+AGDA CrystalStructural.agda helix-residues
+AGDA CrystalStructural.agda helix-turns
+AGDA CrystalStructural.agda sheet-num
+AGDA CrystalStructural.agda sheet-den
 AGDA CrystalTopos.agda the-one-law
 AGDA CrystalTopos.agda chi-eq
 AGDA CrystalTopos.agda beta0-eq
@@ -1030,372 +1373,41 @@ AGDA CrystalTopos.agda bridge-string-den
 AGDA CrystalTopos.agda endomorphisms-bridge
 AGDA CrystalTopos.agda sector-sum-bridge
 AGDA CrystalTopos.agda spectral-dim-bridge
-AGDA CrystalStructural.agda chi-eq
-AGDA CrystalStructural.agda beta-0-eq
-AGDA CrystalStructural.agda sigma-d-eq
-AGDA CrystalStructural.agda towerD-eq
-AGDA CrystalStructural.agda gauss-eq
-AGDA CrystalStructural.agda dim-singlet-eq
-AGDA CrystalStructural.agda dim-fund-eq
-AGDA CrystalStructural.agda dim-adj-eq
-AGDA CrystalStructural.agda dim-mixed-eq
-AGDA CrystalStructural.agda conservation-count
-AGDA CrystalStructural.agda spin-states
-AGDA CrystalStructural.agda ko-dim-eq
-AGDA CrystalStructural.agda N-c-is-3
-AGDA CrystalStructural.agda no-clone-fund
-AGDA CrystalStructural.agda no-clone-adj
-AGDA CrystalStructural.agda no-clone-mixed
-AGDA CrystalStructural.agda dof-eff-eq
-AGDA CrystalStructural.agda fermion-eq
-AGDA CrystalStructural.agda lorentz-product
-AGDA CrystalStructural.agda lorentz-double-chi
-AGDA CrystalStructural.agda poincare-eq-solvable
-AGDA CrystalStructural.agda poincare-eq-10
-AGDA CrystalStructural.agda metric-modes-eq-chi
-AGDA CrystalStructural.agda casimir-num
-AGDA CrystalStructural.agda casimir-denom
-AGDA CrystalStructural.agda nfw-bridge
-AGDA CrystalStructural.agda kolmogorov-num
-AGDA CrystalStructural.agda kolmogorov-den
-AGDA CrystalStructural.agda phase-decomp
-AGDA CrystalStructural.agda codon-bridge
-AGDA CrystalStructural.agda lagrange-bridge
-AGDA CrystalStructural.agda lattice-lock
-AGDA CrystalStructural.agda carnot-num
-AGDA CrystalStructural.agda carnot-den
-AGDA CrystalStructural.agda stefan-bolt
-AGDA CrystalStructural.agda h-bond-AT
-AGDA CrystalStructural.agda h-bond-GC
-AGDA CrystalStructural.agda tetrahedral
-AGDA CrystalStructural.agda amino-bridge
-AGDA CrystalStructural.agda codon-count
-AGDA CrystalStructural.agda tau-n-product
-AGDA CrystalStructural.agda algebra-dim-eq
-AGDA CrystalStructural.agda algebra-towerD
-AGDA CrystalStructural.agda sigma-chi-sq
-AGDA CrystalStructural.agda sigma-d2-eq
-AGDA CrystalStructural.agda helix-residues
-AGDA CrystalStructural.agda helix-turns
-AGDA CrystalStructural.agda sheet-num
-AGDA CrystalStructural.agda sheet-den
-AGDA CrystalNoether.agda generators-eq-12
-AGDA CrystalNoether.agda lorentz-double
-AGDA CrystalNoether.agda poincare-eq-10
-AGDA CrystalNoether.agda poincare-eq-solvable
-AGDA CrystalNoether.agda total-eq-22
-AGDA CrystalNoether.agda algebra-dim-eq
-AGDA CrystalNoether.agda carnot-cross
-AGDA CrystalNoether.agda stefan-bolt
-AGDA CrystalNoether.agda lattice-lock
-AGDA CrystalNoether.agda kolmogorov-cross
-AGDA CrystalNoether.agda tau-n-cross
-AGDA CrystalNoether.agda von-karman-cross
-AGDA CrystalNoether.agda rank-drop-eq
-AGDA CrystalNoether.agda casimir-cross
-AGDA CrystalNoether.agda codons
-AGDA CrystalNoether.agda amino-stop
-AGDA CrystalNoether.agda phase-18
-AGDA CrystalDiscoveries.agda dark-energy-eq
-AGDA CrystalDiscoveries.agda cdm-eq
-AGDA CrystalDiscoveries.agda baryons-eq
-AGDA CrystalDiscoveries.agda partition-exhaustive
-AGDA CrystalDiscoveries.agda partition-42
-AGDA CrystalDiscoveries.agda tower-42
-AGDA CrystalDiscoveries.agda omega-lambda-num
-AGDA CrystalDiscoveries.agda omega-cdm-num
-AGDA CrystalDiscoveries.agda omega-b-simplified
-AGDA CrystalDiscoveries.agda dark-baryon-num
-AGDA CrystalDiscoveries.agda dark-baryon-den
-AGDA CrystalDiscoveries.agda magic-2
-AGDA CrystalDiscoveries.agda magic-8
-AGDA CrystalDiscoveries.agda magic-20
-AGDA CrystalDiscoveries.agda magic-28
-AGDA CrystalDiscoveries.agda magic-50
-AGDA CrystalDiscoveries.agda magic-82
-AGDA CrystalDiscoveries.agda magic-82-alt
-AGDA CrystalDiscoveries.agda magic-126
-AGDA CrystalDiscoveries.agda sigma-d2-eq
-AGDA CrystalDiscoveries.agda magic-50-alt
-AGDA CrystalDiscoveries.agda cabibbo-num
-AGDA CrystalDiscoveries.agda cabibbo-den
-AGDA CrystalDiscoveries.agda vus-cross
-AGDA CrystalDiscoveries.agda vcb-denom
-AGDA CrystalDiscoveries.agda vub-denom
-AGDA CrystalDiscoveries.agda ckm-hier-1
-AGDA CrystalDiscoveries.agda ckm-hier-2
-AGDA CrystalDiscoveries.agda bell-base
-AGDA CrystalDiscoveries.agda steane-n
-AGDA CrystalDiscoveries.agda steane-d
-AGDA CrystalDiscoveries.agda eddington
-AGDA CrystalDiscoveries.agda saturation
-AGDA CrystalDiscoveries.agda gauss-decomp
-AGDA CrystalDiscoveries.agda non-gauge
-AGDA CrystalDiscoveries.agda gauge-dark
-AGDA CrystalDiscoveries.agda sigma-chi-sq
-AGDA CrystalDiscoveries.agda tower-decomp
-AGDA CrystalAlphaProton.agda chi-eq
-AGDA CrystalAlphaProton.agda sigma-d-eq
-AGDA CrystalAlphaProton.agda gauss-eq
-AGDA CrystalAlphaProton.agda towerD-eq
-AGDA CrystalAlphaProton.agda gauss-sq
-AGDA CrystalAlphaProton.agda alpha-sindy-sum
-AGDA CrystalAlphaProton.agda alpha-sindy-rational
-AGDA CrystalAlphaProton.agda towerD-sq
-AGDA CrystalAlphaProton.agda mp-sindy-numerator
-AGDA CrystalAlphaProton.agda mp-sindy-double
-AGDA CrystalAlphaProton.agda gauss-cubed
-AGDA CrystalAlphaProton.agda gauss-cubed-alt
-AGDA CrystalAlphaProton.agda sigma-d2-eq
-AGDA CrystalAlphaProton.agda a0-inv
-AGDA CrystalAlphaProton.agda a4-inv
-AGDA CrystalAlphaProton.agda shared-core
-AGDA CrystalAlphaProton.agda alpha-corr-denom
-AGDA CrystalAlphaProton.agda alpha-channel
-AGDA CrystalAlphaProton.agda mp-corr-denom
-AGDA CrystalAlphaProton.agda mp-channel
-AGDA CrystalAlphaProton.agda d4-over-nw
-AGDA CrystalAlphaProton.agda corr-ratio
-AGDA CrystalAlphaProton.agda magic-82
-AGDA CrystalAlphaProton.agda magic-82-alt
-AGDA CrystalAlphaProton.agda beta0-numerator
-AGDA CrystalAlphaProton.agda sin2-corr-denom
-AGDA CrystalAlphaProton.agda beta0-eq
-AGDA CrystalAlphaProton.agda all-share-a4
-AGDA CrystalAlphaProton.agda upsilon-dual
-AGDA CrystalAlphaProton.agda upsilon-corr
-AGDA CrystalAlphaProton.agda dmeson-dual
-AGDA CrystalAlphaProton.agda dmeson-split
-AGDA CrystalAlphaProton.agda rho-dual
-AGDA CrystalAlphaProton.agda phi-dual
-AGDA CrystalAlphaProton.agda phi-d4-minus-d3
-AGDA CrystalAlphaProton.agda phi-d3-nc
-AGDA CrystalAlphaProton.agda omega-dm-dual
-AGDA CrystalAlphaProton.agda omega-dm-val
-AGDA CrystalAlphaProton.agda omega-dm-identity
-AGDA CrystalAlphaProton.agda rp-dual
-AGDA CrystalAlphaProton.agda sin13-dual
-AGDA CrystalAlphaProton.agda sin13-corr
-AGDA CrystalAlphaProton.agda sin13-identity
-AGDA CrystalAlphaProton.agda sin13-num
-AGDA CrystalAlphaProton.agda sin13-denom
-AGDA CrystalProtonRadius.agda dual-route
-AGDA CrystalProtonRadius.agda d4-sq-576
-AGDA CrystalProtonRadius.agda two-d3-sigma-d
-AGDA CrystalProtonRadius.agda nc-sq-minus-1
-AGDA CrystalProtonRadius.agda two-times-four
-AGDA CrystalProtonRadius.agda cf-nc-check
-AGDA CrystalProtonRadius.agda d3-times-sigma-d
-AGDA CrystalProtonRadius.agda two-times-288
-AGDA CrystalProtonRadius.agda d4-times-d4
-AGDA CrystalProtonRadius.agda af-floor-denom
-AGDA CrystalProtonRadius.agda band-denom
-AGDA CrystalProtonRadius.agda d3-adjoint
-AGDA CrystalProtonRadius.agda sigma-d-val
-AGDA CrystalProtonRadius.agda quark-pair-product
-AGDA CrystalProtonRadius.agda d4-nc2
-AGDA CrystalProtonRadius.agda eps-nc2
-AGDA CrystalProtonRadius.agda d4-nc3
-AGDA CrystalProtonRadius.agda eps-nc3
-AGDA CrystalProtonRadius.agda d4-nc4
-AGDA CrystalProtonRadius.agda eps-nc4
-AGDA CrystalProtonRadius.agda sigma-d2-val
-AGDA CrystalProtonRadius.agda towerD-val
-AGDA CrystalProtonRadius.agda shared-core
-AGDA CrystalProtonRadius.agda alpha-channel
-AGDA CrystalProtonRadius.agda trace-identity
-AGDA CrystalLayer.agda chi-eq
-AGDA CrystalLayer.agda beta0-eq
-AGDA CrystalLayer.agda towerD-eq
-AGDA CrystalLayer.agda sigmaD-eq
-AGDA CrystalLayer.agda gauss-eq
-AGDA CrystalLayer.agda sigmaD2-eq
-AGDA CrystalLayer.agda alpha-int
-AGDA CrystalLayer.agda fermat3
-AGDA CrystalLayer.agda binding-54
-AGDA CrystalLayer.agda binding-53
-AGDA CrystalLayer.agda strand-ratio
-AGDA CrystalLayer.agda helix-num
-AGDA CrystalLayer.agda helix-den
-AGDA CrystalLayer.agda flory-num
-AGDA CrystalLayer.agda flory-den
-AGDA CrystalLayer.agda tower-sum
-AGDA CrystalLayer.agda coprime
-AGDA CrystalGravityDyn.agda chi-eq
-AGDA CrystalGravityDyn.agda beta0-eq
-AGDA CrystalGravityDyn.agda sigma-d-eq
-AGDA CrystalGravityDyn.agda sigma-d2-eq
-AGDA CrystalGravityDyn.agda gauss-eq
-AGDA CrystalGravityDyn.agda D-eq
-AGDA CrystalGravityDyn.agda coeff-16πG
-AGDA CrystalGravityDyn.agda schwarzschild-2
-AGDA CrystalGravityDyn.agda RT-four
-AGDA CrystalGravityDyn.agda EFE-eight
-AGDA CrystalGravityDyn.agda d-colour-eq
-AGDA CrystalGravityDyn.agda GW-speed-structural
-AGDA CrystalGravityDyn.agda GW-polarizations
-AGDA CrystalGravityDyn.agda pol-eq-schwarz
-AGDA CrystalGravityDyn.agda quadrupole-32
-AGDA CrystalGravityDyn.agda quadrupole-5
-AGDA CrystalGravityDyn.agda spacetime-dim
-AGDA CrystalGravityDyn.agda clifford-dim
-AGDA CrystalGravityDyn.agda spinor-dim
-AGDA CrystalGravityDyn.agda jacobson-step1
-AGDA CrystalGravityDyn.agda jacobson-step2
-AGDA CrystalGravityDyn.agda jacobson-step3
-AGDA CrystalGravityDyn.agda jacobson-step4
-AGDA CrystalGravityDyn.agda equiv-principle
-AGDA CrystalProtein.agda d1-eq
-AGDA CrystalProtein.agda d2-eq
-AGDA CrystalProtein.agda d3-eq
-AGDA CrystalProtein.agda d4-eq
-AGDA CrystalProtein.agda chi-eq
-AGDA CrystalProtein.agda beta0-eq
-AGDA CrystalProtein.agda sigma-d-eq
-AGDA CrystalProtein.agda sigma-d2-eq
-AGDA CrystalProtein.agda gauss-eq
-AGDA CrystalProtein.agda D-max-eq
-AGDA CrystalProtein.agda F3-eq
-AGDA CrystalProtein.agda shared-core
-AGDA CrystalProtein.agda N_c-sq
-AGDA CrystalProtein.agda N_w-sq
-AGDA CrystalProtein.agda chi-plus-beta0
-AGDA CrystalProtein.agda epsilon-r
-AGDA CrystalProtein.agda alpha-inv-int
-AGDA CrystalProtein.agda imp-alpha-denom
-AGDA CrystalProtein.agda const-208
-AGDA CrystalProtein.agda nv2-H
-AGDA CrystalProtein.agda nv2-C
-AGDA CrystalProtein.agda nv2-N
-AGDA CrystalProtein.agda nv2-O
-AGDA CrystalProtein.agda nv2-S
-AGDA CrystalProtein.agda n2-H
-AGDA CrystalProtein.agda n2-C
-AGDA CrystalProtein.agda n2-S
-AGDA CrystalProtein.agda water-denom
-AGDA CrystalProtein.agda strand-factor-num
-AGDA CrystalProtein.agda rama-denom
-AGDA CrystalProtein.agda helix-num
-AGDA CrystalProtein.agda helix-den
-AGDA CrystalProtein.agda flory-num
-AGDA CrystalProtein.agda flory-den
-AGDA CrystalProtein.agda cosmo-sum
-AGDA CrystalProtein.agda cosmo-lambda
-AGDA CrystalProtein.agda cosmo-baryon
-AGDA CrystalProtein.agda tau-num
-AGDA CrystalProtein.agda tau-den
-AGDA CrystalProtein.agda imp-vdw-num
-AGDA CrystalProtein.agda imp-vdw-den
-AGDA CrystalProtein.agda imp-vdw-cross
-AGDA CrystalProtein.agda imp-hbond-den
-AGDA CrystalProtein.agda imp-hbond-cross
-AGDA CrystalProtein.agda imp-angle-den
-AGDA CrystalProtein.agda imp-angle-total
-AGDA CrystalProtein.agda imp-angle-cross
-AGDA CrystalProtein.agda imp-burial-den
-AGDA CrystalProtein.agda imp-vdw-dist
-AGDA CrystalProtein.agda imp-hb-dist-den
-AGDA CrystalProtein.agda imp-hb-dist-half
-AGDA CrystalProtein.agda layer-count
-AGDA CrystalProtein.agda energy-modes
-AGDA CrystalMandelbrot.agda period2
-AGDA CrystalMandelbrot.agda period3
-AGDA CrystalMandelbrot.agda period6
-AGDA CrystalMandelbrot.agda depth-43
-AGDA CrystalMandelbrot.agda hausdorff
-AGDA CrystalMandelbrot.agda sigma-chi
-AGDA CrystalMandelbrot.agda cardioid-denom
-AGDA CrystalMandelbrot.agda period2-area
-AGDA CrystalMandelbrot.agda einstein-16
-AGDA CrystalMandelbrot.agda nw-sq
-AGDA CrystalMandelbrot.agda nc-sq
-AGDA CrystalMandelbrot.agda ext-denom-2
-AGDA CrystalMandelbrot.agda ext-denom-2-Nc
-AGDA CrystalMandelbrot.agda ext-denom-3
-AGDA CrystalMandelbrot.agda ext-denom-3-b0
-AGDA CrystalMandelbrot.agda ext-denom-6
-AGDA CrystalMandelbrot.agda ext-denom-6-fac
-AGDA CrystalMandelbrot.agda feig-num
-AGDA CrystalMandelbrot.agda feig-den
-AGDA CrystalMandelbrot.agda feig-reduced
-AGDA CrystalMandelbrot.agda staircase-steps
-AGDA CrystalMandelbrot.agda planck-ln-arg
-AGDA CrystalMandelbrot.agda div-1
-AGDA CrystalMandelbrot.agda div-2
-AGDA CrystalMandelbrot.agda div-3
-AGDA CrystalMandelbrot.agda mersenne-2
-AGDA CrystalMandelbrot.agda mersenne-3
-AGDA CrystalMandelbrot.agda tuning-23
-AGDA CrystalFundamentals.agda neff-denom
-AGDA CrystalFundamentals.agda ob-om-num
-AGDA CrystalFundamentals.agda ob-om-den
-AGDA CrystalFundamentals.agda sw0-corr-den
-AGDA CrystalFundamentals.agda yp-corr-den
-AGDA CrystalFundamentals.agda moment-num
-AGDA CrystalFundamentals.agda moment-den
-AGDA CrystalFundamentals.agda mcms-base
-AGDA CrystalFundamentals.agda mcms-base-alt
-AGDA CrystalFundamentals.agda mcms-corr-num
-AGDA CrystalFundamentals.agda mcms-corr-den
-AGDA CrystalFundamentals.agda mcms-den-route2
-AGDA CrystalFundamentals.agda mcms-product
-AGDA CrystalFundamentals.agda mbtau-corr-den
-AGDA CrystalFundamentals.agda mbtau-corr-is-D
-AGDA CrystalFundamentals.agda yt-base-den
-AGDA CrystalFundamentals.agda yt-corr-den
-AGDA CrystalFundamentals.agda rpi-num
-AGDA CrystalFundamentals.agda rpi-den
-AGDA CrystalFundamentals.agda dalpha-den
-AGDA CrystalFundamentals.agda sigma-corr-num
-AGDA CrystalFundamentals.agda sigma-same-43
-AGDA CrystalFundamentals.agda dm21-tower
-AGDA CrystalFundamentals.agda dm21-gauss
-AGDA CrystalFundamentals.agda dm32-nu3-num
-AGDA CrystalFundamentals.agda dm32-nu3-den
-AGDA CrystalFundamentals.agda split-chi4
-AGDA CrystalFundamentals.agda split-chi4-minus1
-AGDA CrystalFundamentals.agda grav-den
-AGDA CrystalFundamentals.agda grav-mp-num
-AGDA CrystalFundamentals.agda grav-mp-den
-AGDA CrystalFundamentals.agda partition-19
-AGDA CrystalFundamentals.agda partition-20
-AGDA CrystalFundamentals.agda the-43
-AGDA CrystalFundamentals.agda fermat-257
-AGDA_FILES 11
+AGDA_FILES 12
 # HASKELL MODULES
-HASKELL Main.hs
-HASKELL CrystalStructural.hs
-HASKELL CrystalNoether.hs
-HASKELL CrystalDiscoveries.hs
 HASKELL CrystalAlphaProton.hs
-HASKELL CrystalProtonRadius.hs
-HASKELL WACAScanTest.hs
+HASKELL CrystalAudit.hs
+HASKELL CrystalAxiom.hs
+HASKELL CrystalCosmo.hs
+HASKELL CrystalCrossDomain.hs
+HASKELL CrystalDiscoveries.hs
+HASKELL CrystalFullTest.hs
+HASKELL CrystalGauge.hs
+HASKELL CrystalGravity.hs
+HASKELL CrystalGravityDyn.hs
 HASKELL CrystalHierarchy.hs
 HASKELL CrystalLayer.hs
-HASKELL CrystalAxiom.hs
-HASKELL CrystalGauge.hs
+HASKELL CrystalMandelbrot.hs
 HASKELL CrystalMixing.hs
-HASKELL CrystalCosmo.hs
-HASKELL CrystalQCD.hs
-HASKELL CrystalGravity.hs
-HASKELL CrystalAudit.hs
-HASKELL CrystalCrossDomain.hs
-HASKELL CrystalRiemann.hs
-HASKELL CrystalWACAScan.hs
-HASKELL CrystalQuantum.hs
+HASKELL CrystalNoether.hs
+HASKELL CrystalProtein.hs
+HASKELL CrystalProtonRadius.hs
+HASKELL CrystalQAlgorithms.hs
 HASKELL CrystalQBase.hs
-HASKELL CrystalQGates.hs
+HASKELL CrystalQCD.hs
 HASKELL CrystalQChannels.hs
+HASKELL CrystalQEntangle.hs
+HASKELL CrystalQGates.hs
 HASKELL CrystalQHamiltonians.hs
 HASKELL CrystalQMeasure.hs
-HASKELL CrystalQEntangle.hs
-HASKELL CrystalQAlgorithms.hs
 HASKELL CrystalQSimulation.hs
-HASKELL CrystalGravityDyn.hs
+HASKELL CrystalQuantum.hs
+HASKELL CrystalRiemann.hs
+HASKELL CrystalStructural.hs
+HASKELL CrystalWACAScan.hs
 HASKELL GravityDynTest.hs
-HASKELL CrystalProtein.hs
-HASKELL CrystalMandelbrot.hs
-HASKELL CrystalFullTest.hs
+HASKELL Main.hs
+HASKELL WACAScanTest.hs
 # RUST TESTS
 RUST crystal_alpha_proton_tests.rs test_chi
 RUST crystal_alpha_proton_tests.rs test_beta0
@@ -1710,6 +1722,12 @@ RUST crystal_proton_radius_tests.rs trace_identity
 RUST crystal_proton_radius_tests.rs d3_times_sigma_d
 RUST crystal_proton_radius_tests.rs resummed_also_inside
 RUST crystal_proton_radius_tests.rs band_denom_value
+RUST crystal_rendering_tests.rs prove_planck_wavelength_exp
+RUST crystal_rendering_tests.rs prove_rayleigh_size_exp
+RUST crystal_rendering_tests.rs prove_rayleigh_wavelength_exp
+RUST crystal_rendering_tests.rs planck_ne_stefan_boltzmann
+RUST crystal_rendering_tests.rs rayleigh_size_is_sector_count
+RUST crystal_rendering_tests.rs rayleigh_wave_is_nw_squared
 RUST crystal_structural_tests.rs test_chi
 RUST crystal_structural_tests.rs test_beta_0
 RUST crystal_structural_tests.rs test_sigma_d
@@ -1872,6 +1890,7 @@ RUST_COUNT crystal_mandelbrot_tests.rs 38
 RUST_COUNT crystal_noether_tests.rs 21
 RUST_COUNT crystal_protein_tests.rs 60
 RUST_COUNT crystal_proton_radius_tests.rs 30
+RUST_COUNT crystal_rendering_tests.rs 6
 RUST_COUNT crystal_structural_tests.rs 36
 RUST_COUNT crystal_tests.rs 87
 RUST_COUNT crystal_gravity_dyn.rs 18
@@ -1884,15 +1903,133 @@ PYTHON crystal_fundamentals_proof.py
 PYTHON crystal_hierarchy_proof.py
 PYTHON crystal_noether_proof.py
 PYTHON crystal_proton_radius_proof.py
+PYTHON crystal_rendering_proof.py
 PYTHON crystal_structural_proof.py
+PYTHON 01_hello_crystal.py
+PYTHON 02_sector_spectrum.py
+PYTHON 03_time_evolution.py
+PYTHON 04_creation_annihilation.py
+PYTHON 05_two_particles.py
+PYTHON 06_entanglement.py
+PYTHON 07_grover_search.py
+PYTHON 08_qft_phases.py
+PYTHON 09_decoherence.py
+PYTHON 10_full_simulation.py
+PYTHON 100_genetic_code_ecc.py
+PYTHON 101_nfw_navigation.py
+PYTHON 102_metamaterial_design.py
+PYTHON 103_drug_docking.py
+PYTHON 104_casimir_water_bridge.py
+PYTHON 105_beta0_nfw_bridge.py
+PYTHON 106_turbulence_algebra.py
+PYTHON 107_codons_dark_matter.py
+PYTHON 108_hohmann_transfer.py
+PYTHON 109_gravitational_slingshot.py
+PYTHON 11_newton_laws.py
+PYTHON 110_atmospheric_drag.py
+PYTHON 111_radiation_dose.py
+PYTHON 112_solar_panel_efficiency.py
+PYTHON 113_rtg_power.py
+PYTHON 114_signal_delay.py
+PYTHON 115_117_qec_thermal_propellant.py
+PYTHON 12_kepler_orbits.py
+PYTHON 13_maxwell_equations.py
+PYTHON 14_schwarzschild.py
+PYTHON 15_special_relativity.py
+PYTHON 16_general_relativity.py
+PYTHON 17_neutrino_masses.py
+PYTHON 18_ckm_matrix.py
+PYTHON 19_pmns_matrix.py
+PYTHON 20_weak_mixing.py
+PYTHON 21_higgs_mass.py
+PYTHON 22_w_boson.py
+PYTHON 23_z_boson.py
+PYTHON 24_electron_mass.py
+PYTHON 25_neutron_star.py
+PYTHON 26_black_hole_thermo.py
+PYTHON 27_gravitational_waves.py
+PYTHON 28_muon_mass.py
+PYTHON 29_muon_g2.py
+PYTHON 30_pion_mass.py
+PYTHON 31_rho_meson.py
+PYTHON 32_kaon.py
+PYTHON 33_eta_mesons.py
+PYTHON 34_jpsi.py
+PYTHON 35_upsilon.py
+PYTHON 36_qcd_scale.py
+PYTHON 37_quark_ratios.py
+PYTHON 38_strange_quark.py
+PYTHON 39_charm_quark.py
+PYTHON 40_bottom_quark.py
+PYTHON 41_proton_mass.py
+PYTHON 42_top_quark.py
+PYTHON 43_tau_lepton.py
+PYTHON 44_hadron_spectrum.py
+PYTHON 45_fine_structure.py
+PYTHON 46_mass_splittings.py
+PYTHON 47_nuclear_binding.py
+PYTHON 48_magnetic_moments.py
+PYTHON 49_cosmo_constants.py
+PYTHON 50_complete_catalogue.py
+PYTHON 51_carnot_engine.py
+PYTHON 52_stefan_boltzmann.py
+PYTHON 53_fourier_heat.py
+PYTHON 54_kolmogorov.py
+PYTHON 55_prandtl.py
+PYTHON 56_confinement.py
+PYTHON 57_dna_code.py
+PYTHON 58_complexity_42.py
+PYTHON 59_chirality.py
+PYTHON 60_simulate_life.py
+PYTHON 61_helix_folding.py
+PYTHON 62_beta_sheet.py
+PYTHON 63_hydrogen_bonds.py
+PYTHON 64_dna_groove.py
+PYTHON 65_error_correction.py
+PYTHON 66_protein_space.py
+PYTHON 67_disease_decoherence.py
+PYTHON 68_crispr_vs_lattice.py
+PYTHON 69_periodic_table.py
+PYTHON 70_simulate_cell.py
+PYTHON 71_drug_discovery.py
+PYTHON 72_superconductors.py
+PYTHON 73_synthetic_life.py
+PYTHON 74_catalyst_design.py
+PYTHON 75_metallic_hydrogen.py
+PYTHON 76_material_design.py
+PYTHON 77_cross_domain_table.py
+PYTHON 78_verify_all.py
+PYTHON 79_superconductor.py
+PYTHON 80_type_safe_flow.py
+PYTHON 81_arrow_of_time.py
+PYTHON 82_second_law_proof.py
+PYTHON 83_kms_equilibrium.py
+PYTHON 84_entropy_budget.py
+PYTHON 85_io_monad_time.py
+PYTHON 86_refractive_index.py
+PYTHON 87_dark_matter.py
+PYTHON 88_epigenetic_clock.py
+PYTHON 89_metamaterial.py
+PYTHON 90_hardcode_audit.py
+PYTHON 91_cosmic_audit.py
+PYTHON 92_derivation_chain.py
+PYTHON 93_why_42.py
+PYTHON 94_everything_table.py
+PYTHON 95_three_body.py
+PYTHON 96_superconductor_screen.py
+PYTHON 97_alphafold_constraints.py
+PYTHON 98_mission_planning.py
+PYTHON 99_turbulence_cfd.py
+PYTHON crystal_constants.py
+PYTHON crystal_vdw.py
+PYTHON hf_solver.py
 PYTHON mera_gravity_closed.py
 PYTHON mera_linearized_gravity.py
-PYTHON spectral_tower.py
 PYTHON qubo_folder.py
-PYTHON crystal_vdw.py
+PYTHON spectral_tower.py
 # SUMMARY COUNTS
-TOTAL_LEAN_THEOREMS      757
-TOTAL_AGDA_PROOFS      603
-TOTAL_RUST_TESTS      466
+TOTAL_LEAN_THEOREMS      763
+TOTAL_AGDA_PROOFS      609
+TOTAL_RUST_TESTS      472
 TOTAL_HASKELL_MODULES       33
-TOTAL_PYTHON_MODULES       13
+TOTAL_PYTHON_MODULES      131

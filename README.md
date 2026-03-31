@@ -2,7 +2,7 @@
 
 # Crystal Topos
 
-### 195 Physical Constants from Two Primes. Zero Free Parameters.
+### 198 Physical Constants from Two Primes. Zero Free Parameters.
 
 ### 📄 [Read the Paper: "The Crystal Topos: A Complete Physics Framework from A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)"](https://zenodo.org/records/19217129)
 
@@ -13,8 +13,9 @@
 1. **Open** [Gemini](https://gemini.google.com/), [Copilot](https://copilot.microsoft.com/), [Claude](https://claude.ai/), or [ChatGPT](https://chat.openai.com/)
 2. **Upload** three files from the [`quickstart/`](quickstart/) folder:
    - `crystal_topos_waca_llm.md` (the prompt — tells the LLM how to behave)
-   - `CrystalTopos_RAG_1.md` (267 KB — Python examples + physics Haskell)
-   - `CrystalTopos_RAG_2.md` (306 KB — QCD, gravity, quantum, extended scan)
+   - `CrystalTopos_RAG_1.md` (Python examples + READMEs + spectral tower + force field)
+   - `CrystalTopos_RAG_2.md` (All Haskell source (33 modules) + GHC certificate)
+   - `CrystalTopos_RAG_3.md` (Lean + Agda + Rust + Python proofs + cross-ref index)
 3. **Paste** any of these:
 
 ```
@@ -69,23 +70,23 @@ The deviations between crystal predictions and experiment follow an **exponentia
 
 ## The Numbers
 
-| Metric | Value |
-|--------|-------|
-| Total observables | **195** |
-| Sub-1% accuracy | **195 / 195** (100%) |
-| Mean deviation (PWI) | **0.25%** |
-| Maximum deviation | **0.989%** (sin²θ₁₂) |
-| CV (should be 1.0) | **0.954** |
-| Free parameters | **0** |
-| Hardcoded numbers | **0** in crystal formulas |
-| Wall breaches | **0** (prime wall = 4.5%) |
+| Metric | Value                                            |
+|--------|--------------------------------------------------|
+| Total observables | **198**                                          |
+| Sub-1% accuracy | **198 / 198** (100%)                             |
+| Mean deviation (PWI) | **0.25%**                                        |
+| Maximum deviation | **0.989%** (sin²θ₁₂)                             |
+| CV (should be 1.0) | **0.954**                                        |
+| Free parameters | **0**                                            |
+| Hardcoded numbers | **0** in crystal formulas                        |
+| Wall breaches | **0** (prime wall = 4.5%)                        |
 | CODATA precision | **3** (α⁻¹ Δ/unc=0.12, m_p/m_e=0.04, r_p=0.0013) |
-| First law δS/δ⟨H_A⟩ | **1.0001 ± 0.0004** (χ=6 crystal) |
-| Haskell modules | **31** |
-| Quantum operators | **96** |
-| Lean theorems | **757** (native_decide) |
-| Agda proofs | **603** (refl) |
-| Rust tests | **466** |
+| First law δS/δ⟨H_A⟩ | **1.0001 ± 0.0004** (χ=6 crystal)                |
+| Haskell modules | **31**                                           |
+| Quantum operators | **96**                                           |
+| Lean theorems | **763** (native_decide)                          |
+| Agda proofs | **609** (refl)                                   |
+| Rust tests | **472**                                          |
 
 ---
 

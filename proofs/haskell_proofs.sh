@@ -2,10 +2,14 @@
 # Copyright (c) 2026 Daland Montgomery
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# Haskell proof runner — Session 13
+# Haskell proof runner — auto-discovers all .hs files
+# Detects run mode from file content:
+#   module Main + main  → compile & run (output binary)
+#   main :: / main =    → compile & run with -main-is Module
+#   neither             → type-check only (Curry-Howard: compilation = proof)
 set -e
 
-# Find repo root (works from proofs/, haskel/, or repo root)
+# Find repo root
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 if [ -d "$SCRIPT_DIR/../haskel" ]; then
   REPO="$SCRIPT_DIR/.."
@@ -19,99 +23,75 @@ HASKEL="$REPO/haskel"
 PROOFS="$REPO/proofs"
 cd "$HASKEL"
 
-# Clean up build artifacts on exit (always, even on failure)
 cleanup() {
   cd "$HASKEL"
   rm -f *.o *.hi
-  rm -f crystal structural noether discoveries alpha_proton proton_radius extended_scan hierarchy_test full_test crystal_layer gravity_dyn_test crystal_protein crystal_mandelbrot
+  rm -f /tmp/hs_proof_bin_*
 }
 trap cleanup EXIT
 
-echo "=== Haskell Proof Runner (Session 13) ==="
+echo "=== Haskell Proof Runner ==="
 echo "    Running from: $(pwd)"
-echo "    Certificate:  $PROOFS/GHC_Certificate.txt"
 echo ""
 
 PASS=0
 FAIL=0
 
-run_main() {
-  local label="$1" src="$2" out="$3"
-  echo "--- $label ---"
-  if ghc -O2 "$src" -o "$out" 2>&1; then
-    ./"$out" && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
-  else
-    echo "  COMPILE FAILED"; FAIL=$((FAIL+1))
-  fi
-  echo ""
-}
+for f in *.hs; do
+  [ -f "$f" ] || continue
 
-run_exe() {
-  local label="$1" src="$2" mod="$3" out="$4"
-  echo "--- $label ---"
-  if ghc -O2 -main-is "$mod" "$src" -o "$out" 2>&1; then
-    ./"$out" && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
-  else
-    echo "  COMPILE FAILED"; FAIL=$((FAIL+1))
-  fi
-  echo ""
-}
+  # Extract module name from file
+  mod=$(grep "^module " "$f" | head -1 | awk '{print $2}')
+  mod=${mod%%(*}   # strip (blah) if present e.g. "Main(main)"
 
-typecheck() {
-  local label="$1" src="$2"
-  echo "--- $label (type-check = proof) ---"
-  if ghc -fno-code "$src" 2>&1; then
-    echo "  Type-checks OK (Curry-Howard: compilation = proof)"
-    PASS=$((PASS+1))
-  else
-    echo "  TYPE-CHECK FAILED"; FAIL=$((FAIL+1))
-  fi
-  echo ""
-}
+  has_module_main=false
+  has_main_func=false
 
-# 1. Original 92 observables (module Main) -> GHC_Certificate.txt
-echo "--- Main.hs (92 observables) ---"
-if ghc -O2 Main.hs -o crystal 2>&1; then
-  ./crystal | tee "$PROOFS/GHC_Certificate.txt" && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
-else
-  echo "  COMPILE FAILED"; FAIL=$((FAIL+1))
-fi
+  if echo "$mod" | grep -q "^Main$"; then
+    has_module_main=true
+  fi
+
+  if grep -q "^main " "$f" || grep -q "^main=" "$f" || grep -q "^main ::" "$f"; then
+    has_main_func=true
+  fi
+
+  bin="/tmp/hs_proof_bin_$$_$(echo "$f" | sed 's/\.hs$//')"
+
+  if $has_module_main && $has_main_func; then
+    # module Main with main → compile & run
+    printf "  %s (run) ... " "$f"
+    if ghc -O2 "$f" -o "$bin" 2>/dev/null; then
+      if [ "$f" = "Main.hs" ]; then
+        # Special: Main.hs writes GHC certificate
+        "$bin" > "$PROOFS/GHC_Certificate.txt" 2>&1 && { echo "PASS"; PASS=$((PASS+1)); } || { echo "FAIL"; FAIL=$((FAIL+1)); }
+      else
+        "$bin" > /dev/null 2>&1 && { echo "PASS"; PASS=$((PASS+1)); } || { echo "FAIL"; FAIL=$((FAIL+1)); }
+      fi
+    else
+      echo "COMPILE FAIL"; FAIL=$((FAIL+1))
+    fi
+
+  elif $has_main_func; then
+    # Has main but not module Main → compile with -main-is
+    printf "  %s (-main-is %s) ... " "$f" "$mod"
+    if ghc -O2 -main-is "$mod" "$f" -o "$bin" 2>/dev/null; then
+      "$bin" > /dev/null 2>&1 && { echo "PASS"; PASS=$((PASS+1)); } || { echo "FAIL"; FAIL=$((FAIL+1)); }
+    else
+      echo "COMPILE FAIL"; FAIL=$((FAIL+1))
+    fi
+
+  else
+    # No main → type-check only (Curry-Howard)
+    printf "  %s (type-check) ... " "$f"
+    if ghc -fno-code "$f" 2>/dev/null; then
+      echo "PASS"; PASS=$((PASS+1))
+    else
+      echo "FAIL"; FAIL=$((FAIL+1))
+    fi
+  fi
+done
+
+TOTAL=$((PASS + FAIL))
 echo ""
-
-# 2-4. Library proof modules (no main -- type-check IS the proof)
-typecheck "CrystalStructural.hs"  "CrystalStructural.hs"
-typecheck "CrystalNoether.hs"     "CrystalNoether.hs"
-typecheck "CrystalDiscoveries.hs" "CrystalDiscoveries.hs"
-
-# 5-6. Standalone proof modules (have main, need -main-is)
-run_exe "CrystalAlphaProton.hs (S4+S5)"  "CrystalAlphaProton.hs"  "CrystalAlphaProton"  "alpha_proton"
-run_exe "CrystalProtonRadius.hs (S6)"    "CrystalProtonRadius.hs" "CrystalProtonRadius" "proton_radius"
-
-# 7. Extended scan (module Main)
-run_main "Extended scan" "WACAScanTest.hs" "extended_scan"
-
-# 8. Hierarchical implosion (S8)
-run_exe "CrystalHierarchy.hs (S8)"  "CrystalHierarchy.hs"  "CrystalHierarchy"  "hierarchy_test"
-
-# 9. Full 181-observable regression test (S7+S8)
-run_exe "CrystalFullTest.hs (195 obs)"  "CrystalFullTest.hs"  "CrystalFullTest"  "full_test"
-
-# 10. Spectral tower layer provenance (S11)
-run_exe "CrystalLayer.hs (S11 tower)"  "CrystalLayer.hs"  "CrystalLayer"  "crystal_layer"
-
-# 11. Dynamical gravity type-check (S12)
-typecheck "CrystalGravityDyn.hs (S12 gravity)"  "CrystalGravityDyn.hs"
-
-# 12. Dynamical gravity audit (S12 — 12/12 integer audit)
-run_main "GravityDynTest.hs (S12 audit)"  "GravityDynTest.hs"  "gravity_dyn_test"
-
-# 13. Protein force field (S14 — 73 proofs, D=0..D=42)
-run_exe "CrystalProtein.hs (S14 force field)"  "CrystalProtein.hs"  "CrystalProtein"  "crystal_protein"
-
-# 14. Mandelbrot <-> A_F (S14 — 28 proofs)
-run_exe "CrystalMandelbrot.hs (S14 Mandelbrot)"  "CrystalMandelbrot.hs"  "CrystalMandelbrot"  "crystal_mandelbrot"
-
-# Tally (cleanup runs automatically via trap)
-TOTAL=$((PASS+FAIL))
 echo "=== Haskell: $PASS/$TOTAL PASS ==="
 [ "$FAIL" -eq 0 ] || exit 1

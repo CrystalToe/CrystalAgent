@@ -2,7 +2,7 @@
 -- SPDX-License-Identifier: AGPL-3.0-or-later
 
 -- | CrystalFullTest.hs
--- One-command regression test for the full 195-observable catalogue.
+-- One-command regression test for the full 198-observable catalogue.
 -- Imports from all source modules, normalises into a single test list,
 -- computes combined CV, prints PASS/FAIL for each observable.
 --
@@ -25,7 +25,7 @@ import CrystalQCD
 import CrystalGravity
 import CrystalCrossDomain
 
--- Extended scan: 86 observables (qualified to avoid 5 name collisions)
+-- Extended scan: 103 observables (qualified to avoid name collisions)
 import qualified CrystalWACAScan as WS
 
 -- S4+S5: corrected alpha_inv, m_p/m_e, sin2theta_W
@@ -137,7 +137,7 @@ original92 =
   in map (fromDerived src) derived
 
 -- ══════════════════════════════════════════════════════════════════
--- SOURCE 2: EXTENDED SCAN 86 (from CrystalWACAScan)
+-- SOURCE 2: EXTENDED SCAN 103 (from CrystalWACAScan)
 -- ══════════════════════════════════════════════════════════════════
 
 extended86 :: [TestEntry]
@@ -209,7 +209,7 @@ main = do
 
   putStrLn ""
   putStrLn "=================================================================="
-  putStrLn "  CRYSTAL TOPOS — FULL 195-OBSERVABLE REGRESSION TEST"
+  putStrLn "  CRYSTAL TOPOS — FULL 198-OBSERVABLE REGRESSION TEST"
   putStrLn "  A_F = C + M2(C) + M3(C).  Zero free parameters."
   putStrLn "=================================================================="
   putStrLn ""
@@ -229,15 +229,15 @@ main = do
   putStrLn ""
 
   -- Flag count mismatches
-  let countOK = nOrig == 92 && nExt == 100 && nS46 == 3 && nAll == 195
+  let countOK = nOrig == 92 && nExt == 103 && nS46 == 3 && nAll == 198
   if countOK
-    then putStrLn "  COUNT CHECK: PASS (92 + 100 + 3 = 195)"
+    then putStrLn "  COUNT CHECK: PASS (92 + 103 + 3 = 198)"
     else do
       putStrLn "  COUNT CHECK: *** FAIL ***"
       if nOrig /= 92  then printf "    Expected 92 original, got %d\n" nOrig   else pure ()
-      if nExt  /= 100 then printf "    Expected 100 extended, got %d\n" nExt    else pure ()
+      if nExt  /= 103 then printf "    Expected 103 extended, got %d\n" nExt    else pure ()
       if nS46  /= 3   then printf "    Expected 3 S4-S6, got %d\n"    nS46    else pure ()
-      if nAll  /= 195 then printf "    Expected 195 total, got %d\n"   nAll    else pure ()
+      if nAll  /= 198 then printf "    Expected 198 total, got %d\n"   nAll    else pure ()
   putStrLn ""
 
   -- ── Full table ──
@@ -311,7 +311,7 @@ main = do
       cvExt  = computeCV extended86
   putStrLn "  PER-SOURCE CV:"
   printf   "    Original (92):   %.4f\n" cvOrig
-  printf   "    Extended (86):   %.4f\n" cvExt
+  printf   "    Extended (103):  %.4f\n" cvExt
   printf   "    Combined (all):  %.4f\n" cv
   putStrLn ""
 
@@ -348,7 +348,7 @@ main = do
   let allPass = nOver == 0
   putStrLn "=================================================================="
   if allPass && countOK
-    then putStrLn "  RESULT: ALL 195 OBSERVABLES PASS (under prime wall)"
+    then putStrLn "  RESULT: ALL 198 OBSERVABLES PASS (under prime wall)"
     else do
       if not countOK then putStrLn "  RESULT: COUNT MISMATCH — see above"
                      else pure ()
