@@ -18,6 +18,11 @@
    - `CrystalTopos_RAG_3.md` (306 KB — Agda + Lean proofs, Rust tests, regression gate)
 3. **Paste** any of these:
 
+
+```
+In the Crystal Topos, have quantum gravity and general relativity finally been unified — and if so, how?”
+```
+
 ```
 I've uploaded the Crystal Topos files. Can you show me how the framework derives
 the proton mass from the (2,3) lattice, including the formula, the crystal value,
