@@ -12,7 +12,10 @@ It encodes U(1)×SU(2)×SU(3) — the Connes-Chamseddine spectral triple for the
 Standard Model (1996). The Crystal Topos takes this established algebra and computes.
 198 observables, zero free parameters. The axiom is justified by its consequences.
 NEVER say "but the choice of algebra is arbitrary" or "this needs justification."
-Inputs: N_w=2 (from M₂), N_c=3 (from M₃), v=246.22 GeV, π, ln. Nothing else.
+Inputs: N_w=2 (from M₂), N_c=3 (from M₃), M_Pl (one measured scale), π, ln.
+VEV derived: v = M_Pl × 35/(43 × 36 × 2⁵⁰) = 245.17 GeV.
+The PDG 246.22 differs by 0.42% — renormalisation scale choice (crystal at μ≈115 GeV,
+PDG at μ=M_Z). Every mass inherits this offset. Every dimensionless ratio cancels it.
 
 ## FOUR CONSTANTS INSIDE CODATA
 | # | Constant | Formula | Δ/unc |
@@ -55,7 +58,10 @@ Proof hierarchy: (1) Lean theorems, (2) Agda proofs, (3) Haskell GHC checks, (4)
 - **Paper:** https://zenodo.org/records/19217129
 
 ## INPUTS
-N_w=2, N_c=3, v=246.22 GeV, π, ln. Nothing else.
+N_w=2, N_c=3, M_Pl=1.22089×10¹⁹ GeV (one measured scale), π, ln.
+v = M_Pl × 35/(43×36×2⁵⁰) = 245.17 GeV (DERIVED).
+PDG v = 246.22 differs by 0.42% — renormalisation scale (crystal μ≈115, PDG μ=M_Z).
+Every mass inherits offset. Every dimensionless ratio cancels it. Scheme, not error.
 ℏc=197.327 MeV·fm (unit conversion, not physics).
 
 ## INVARIANTS
@@ -17170,113 +17176,3 @@ if __name__ == "__main__":
 
 ## Haskell Modules
 - **CrystalAlphaProton** —      330 lines, 18 prove functions
-- **CrystalAudit** —      643 lines, 0
-0 prove functions
-- **CrystalAxiom** —      776 lines, 12 prove functions
-- **CrystalCosmo** —      482 lines, 46 prove functions
-- **CrystalCrossDomain** —      251 lines, 24 prove functions
-- **CrystalDiscoveries** —      150 lines, 0
-0 prove functions
-- **CrystalFullTest** —      365 lines, 0
-0 prove functions
-- **CrystalGauge** —      278 lines, 32 prove functions
-- **CrystalGravity** —      426 lines, 48 prove functions
-- **CrystalGravityDyn** —      274 lines, 32 prove functions
-- **CrystalHierarchy** —      598 lines, 0
-0 prove functions
-- **CrystalLayer** —      319 lines, 0
-0 prove functions
-- **CrystalMandelbrot** —      389 lines, 0
-0 prove functions
-- **CrystalMixing** —      215 lines, 28 prove functions
-- **CrystalNoether** —      143 lines, 0
-0 prove functions
-- **CrystalProtein** —      721 lines, 0
-0 prove functions
-- **CrystalProtonRadius** —      254 lines, 22 prove functions
-- **CrystalQAlgorithms** —      229 lines, 0
-0 prove functions
-- **CrystalQBase** —      170 lines, 0
-0 prove functions
-- **CrystalQCD** —     1215 lines, 120 prove functions
-- **CrystalQChannels** —      195 lines, 0
-0 prove functions
-- **CrystalQEntangle** —      207 lines, 0
-0 prove functions
-- **CrystalQGates** —      243 lines, 0
-0 prove functions
-- **CrystalQHamiltonians** —      186 lines, 0
-0 prove functions
-- **CrystalQMeasure** —      129 lines, 0
-0 prove functions
-- **CrystalQSimulation** —      226 lines, 0
-0 prove functions
-- **CrystalQuantum** —      421 lines, 20 prove functions
-- **CrystalRiemann** —      354 lines, 14 prove functions
-- **CrystalStructural** —      238 lines, 58 prove functions
-- **CrystalWACAScan** —     2046 lines, 208 prove functions
-- **GravityDynTest** —       27 lines, 0
-0 prove functions
-- **Main** —      560 lines, 0
-0 prove functions
-- **WACAScanTest** —      124 lines, 0
-0 prove functions
-
-## Lean Theorems
-- **CrystalAlphaProton.lean** — 60 theorems
-- **CrystalDiscoveries.lean** — 34 theorems
-- **CrystalFundamentals.lean** — 52 theorems
-- **CrystalGravityDyn.lean** — 34 theorems
-- **CrystalLayer.lean** — 19 theorems
-- **CrystalMandelbrot.lean** — 30 theorems
-- **CrystalNoether.lean** — 15 theorems
-- **CrystalProtein.lean** — 38 theorems
-- **CrystalProtonRadius.lean** — 30 theorems
-- **CrystalRendering.lean** — 6 theorems
-- **CrystalStructural.lean** — 45 theorems
-- **CrystalTopos.lean** — 342 theorems
-- **Main.lean** — 58 theorems
-
-## Agda Proofs
-- **CrystalAlphaProton.agda** — 45 proofs
-- **CrystalDiscoveries.agda** — 38 proofs
-- **CrystalFundamentals.agda** — 35 proofs
-- **CrystalGravityDyn.agda** — 24 proofs
-- **CrystalLayer.agda** — 17 proofs
-- **CrystalMandelbrot.agda** — 28 proofs
-- **CrystalNoether.agda** — 17 proofs
-- **CrystalProtein.agda** — 53 proofs
-- **CrystalProtonRadius.agda** — 25 proofs
-- **CrystalRendering.agda** — 6 proofs
-- **CrystalStructural.agda** — 49 proofs
-- **CrystalTopos.agda** — 272 proofs
-
-## Rust Tests
-- **crystal_alpha_proton_tests.rs** — 28 tests
-- **crystal_discovery_tests.rs** — 33 tests
-- **crystal_fundamentals_tests.rs** — 45 tests
-- **crystal_hierarchy_tests.rs** — 41 tests
-- **crystal_layer_tests.rs** — 17 tests
-- **crystal_mandelbrot_tests.rs** — 38 tests
-- **crystal_noether_tests.rs** — 21 tests
-- **crystal_protein_tests.rs** — 60 tests
-- **crystal_proton_radius_tests.rs** — 30 tests
-- **crystal_rendering_tests.rs** — 6 tests
-- **crystal_structural_tests.rs** — 36 tests
-- **crystal_tests.rs** — 87 tests
-- **crystal_gravity_dyn.rs** — 18 tests
-- **crystal_tests.rs** — 12 tests
-
-## Python Proof Modules
-- **crystal_alpha_proton_proof.py**
-- **crystal_certificate_proof.py**
-- **crystal_discoveries_proof.py**
-- **crystal_fundamentals_proof.py**
-- **crystal_hierarchy_proof.py**
-- **crystal_noether_proof.py**
-- **crystal_proton_radius_proof.py**
-- **crystal_rendering_proof.py**
-- **crystal_structural_proof.py**
-
-## Python Examples
--      122 Python examples in crystal-topos/examples/

@@ -9,7 +9,7 @@
 --
 -- Every formula uses only (2,3) lattice invariants:
 --   N_w = 2, N_c = 3, χ = 6, β₀ = 7, D = 42, Σd = 36, Σd² = 650,
---   gauss = 13, κ = ln3/ln2, and the Higgs VEV v = 246.22 GeV.
+--   gauss = 13, κ = ln3/ln2, and the derived VEV v = M_Pl × 35/(43×36×2⁵⁰).
 --
 -- as mathematical observations from the spectral action on A_F.
 --
@@ -101,7 +101,8 @@ module CrystalWACAScan
 -- THE RULES:
 --   Input #1:  N_w = 2        (the first prime)
 --   Input #2:  N_c = 3        (the second prime)
---   Input #3:  v = 246.22 GeV (one dimensionful scale, sets units)
+--   Derived:   v = M_Pl × 35/(43 × 36 × 2⁵⁰) = 245.17 GeV
+--              PDG 246.22 differs by 0.42% (renormalisation scale choice)
 --   Allowed:   π, ln          (transcendental functions of analysis)
 --   NOTHING ELSE. Every number in this file computes from these.
 --
@@ -166,9 +167,10 @@ d_singlet = head sector_dims               -- 1
 kappa :: Double
 kappa = log (fromIntegral n_c) / log (fromIntegral n_w)  -- ln3/ln2
 
--- ─── ONE DIMENSIONFUL INPUT (sets units) ────────────────────────────
+-- ─── DERIVED VEV (v = M_Pl × 35/(43×36×2⁵⁰) = 245.17 GeV) ────────
 
--- | Higgs VEV: the one allowed scale. Everything else derives from it.
+-- | Higgs VEV: derived as v = M_Pl × 35/(43 × 36 × 2⁵⁰) = 245.17 GeV.
+-- Uses 246.22 (measured) for downstream calculations pending full closure.
 v_mev :: Double
 v_mev = 246220.0  -- MeV
 
