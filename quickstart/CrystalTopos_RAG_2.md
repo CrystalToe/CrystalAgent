@@ -2206,7 +2206,7 @@ proveSpectralGm2 c =
 
 ```
 
-## §Haskell: CrystalFullTest (     365 lines)
+## §Haskell: CrystalFullTest (     373 lines)
 ```haskell
 
 -- | CrystalFullTest.hs
@@ -6809,7 +6809,7 @@ proveStationarity _ =
 
 ```
 
-## §Haskell: CrystalWACAScan (    2074 lines)
+## §Haskell: CrystalWACAScan (    2080 lines)
 ```haskell
 
 -- ═══════════════════════════════════════════════════════════════════════
@@ -6902,38 +6902,44 @@ d_singlet = head sector_dims               -- 1
 kappa :: Double
 kappa = log (fromIntegral n_c) / log (fromIntegral n_w)  -- ln3/ln2
 
--- ─── DERIVED VEV (v = M_Pl × 35/(43×36×2⁵⁰) = 245.17 GeV) ────────
+-- ─── DERIVED VEV ─────────────────────────────────────────────────────
 --
--- The crystal derives v(crystal) = 245.17 GeV at spectral scale μ ≈ 115 GeV.
--- The PDG quotes v(PDG) = 246.22 GeV at μ = M_Z = 91.2 GeV.
+-- v(crystal) = M_Pl × (Σd−1)/((D+1)·Σd·2^(D+d₃))
+--            = M_Pl × 35/(43·36·2⁵⁰) = 245.17 GeV
 --
--- Conversion: v(PDG) = v(crystal) × 1.004
---   1.004 = 1 + 3·y_t²/(16π²) · ln(115/91.2)
---   where:
---     3   = N_c from M₃(ℂ)
---     y_t = 1 (conformal fixed point at D = 0)
---     16π² = one-loop Feynman integral in 4D (geometry, not parameter)
---     115 GeV = crystal's natural scale (where v(μ) = M_Pl × 35/(43×36×2⁵⁰))
---     91.2 GeV = M_Z (from v and sin²θ = 2/9)
+-- v(PDG) = v(crystal) × (1 + N_c/(16π²) · ln(√N_w · d₃/N_c²))
+--        = 245.17 × 1.00435 = 246.24 GeV  (PDG: 246.22, gap 0.006%)
 --
--- Every mass inherits this 0.42% offset. Every dimensionless ratio cancels it.
--- This is scheme dependence, not error.
+-- μ_H/M_Z = √N_w · d₃/N_c² = √2 · 8/9.  Every digit from (2,3).
 --
--- Downstream: uses v(PDG) = 246.22 for comparison with PDG mass tables,
--- since PDG masses are quoted in the same (μ = M_Z) scheme.
+-- TODO: Switch v_mev to fully computed chain once all 198 implosion
+-- corrections are recalibrated against the derived value.
 
-v_mev :: Double
-v_mev = 246220.0  -- MeV (PDG scheme, μ = M_Z)
+-- | Planck mass — the ONE measured number.
+m_pl_mev :: Double
+m_pl_mev = 1.220890e22                          -- MeV
 
--- | Crystal-derived VEV at spectral scale μ ≈ 115 GeV.
+-- | Crystal VEV at spectral scale μ_H = v·√(N_w/N_c²)
 v_crystal_mev :: Double
-v_crystal_mev = 245170.0  -- MeV (crystal scheme, μ ≈ m_H)
+v_crystal_mev = m_pl_mev
+              * fromIntegral (sigma_d - 1)       -- 35
+              / fromIntegral (d_total + 1)       -- 43
+              / fromIntegral sigma_d             -- 36
+              / fromIntegral ((2::Integer) ^ (d_total + n_c^2 - 1))  -- 2⁵⁰
 
--- | Running factor: v(PDG)/v(crystal) = 1 + N_c·y_t²/(16π²)·ln(115/91.2)
-v_running_factor :: Double
-v_running_factor = 1.0 + fromIntegral n_c * 1.0
-                 / (16.0 * pi * pi)
-                 * log (115.0 / 91.2)              -- ≈ 1.004
+-- | Running factor: 1 + N_c/(16π²) · ln(√N_w · d₃/N_c²)
+v_running :: Double
+v_running = 1.0 + fromIntegral n_c              -- N_c = 3
+          / (16.0 * pi * pi)                     -- 16π²
+          * log (sqrt (fromIntegral n_w)          -- √N_w = √2
+               * fromIntegral (n_c^2 - 1)        -- d₃ = 8
+               / fromIntegral (n_c^2))            -- N_c² = 9
+
+-- | VEV at PDG scheme. Using PDG value until implosion corrections
+-- are recalibrated against the derived chain above.
+-- v_crystal_mev * v_running = 246239 MeV (gap 0.006% to PDG).
+v_mev :: Double
+v_mev = 246220.0                                 -- MeV (PDG scheme)
 
 -- ─── COUPLING CONSTANTS (from invariants + π + ln) ──────────────────
 
@@ -8286,7 +8292,7 @@ wacaScanResults =
     -- Epigenetics (1)
   , proveCodonRedundancy
     -- Dark sector (2)
-  , proveOmegaDM, proveDMBaryonRatio
+  , proveOmegaDMCorrected, proveDMBaryonRatio
     -- Three-body problem (3)
   , proveLagrangePoints, proveThreeBodyPhaseSpace, proveRouthRatio
     -- Proton radius + black holes (2)

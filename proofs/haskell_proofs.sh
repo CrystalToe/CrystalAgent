@@ -63,9 +63,9 @@ for f in *.hs; do
     if ghc -O2 "$f" -o "$bin" 2>/dev/null; then
       if [ "$f" = "Main.hs" ]; then
         # Special: Main.hs writes GHC certificate
-        "$bin" > "$PROOFS/GHC_Certificate.txt" 2>&1 && { echo "PASS"; PASS=$((PASS+1)); } || { echo "FAIL"; FAIL=$((FAIL+1)); }
+        "$bin" 2>&1 | tee "$PROOFS/GHC_Certificate.txt" && { echo "PASS"; PASS=$((PASS+1)); } || { echo "FAIL"; FAIL=$((FAIL+1)); }
       else
-        "$bin" > /dev/null 2>&1 && { echo "PASS"; PASS=$((PASS+1)); } || { echo "FAIL"; FAIL=$((FAIL+1)); }
+        "$bin" 2>&1 && { echo "PASS"; PASS=$((PASS+1)); } || { echo "FAIL"; FAIL=$((FAIL+1)); }
       fi
     else
       echo "COMPILE FAIL"; FAIL=$((FAIL+1))
@@ -75,7 +75,7 @@ for f in *.hs; do
     # Has main but not module Main → compile with -main-is
     printf "  %s (-main-is %s) ... " "$f" "$mod"
     if ghc -O2 -main-is "$mod" "$f" -o "$bin" 2>/dev/null; then
-      "$bin" > /dev/null 2>&1 && { echo "PASS"; PASS=$((PASS+1)); } || { echo "FAIL"; FAIL=$((FAIL+1)); }
+      "$bin" 2>&1 && { echo "PASS"; PASS=$((PASS+1)); } || { echo "FAIL"; FAIL=$((FAIL+1)); }
     else
       echo "COMPILE FAIL"; FAIL=$((FAIL+1))
     fi
