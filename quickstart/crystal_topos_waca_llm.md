@@ -607,9 +607,9 @@ https://raw.githubusercontent.com/CrystalToe/CrystalAgent/main/
 ## STATISTICS
 
 - Haskell modules: 33
-- Lean theorems: 757
-- Agda proofs: 603+
-- Rust tests: 466
+- Lean theorems: 763
+- Agda proofs: 609
+- Rust tests: 472
 - Python proof modules: 13
 - Python examples: 119+
 - Cross-domain bridges: 15+

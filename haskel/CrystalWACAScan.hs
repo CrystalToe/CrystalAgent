@@ -88,6 +88,8 @@ module CrystalWACAScan
   , provePionRadiusSq, proveDeltaAlphaHad
     -- * Fundamentals: Phase 3 — Hard (4 genuinely new)
   , proveSigmaPiN, proveDm21Direct, proveDm32, proveGravCoupling
+    -- * Rendering & Scattering (3)
+  , provePlanckWavelengthExp, proveRayleighSizeExp, proveRayleighWavelengthExp
     -- * Audit
   , wacaScanResults, wacaScanAudit
   ) where
@@ -1540,6 +1542,8 @@ wacaScanResults =
   , provePionRadiusSq, proveDeltaAlphaHad
     -- Fundamentals: Phase 3 — Hard (4)
   , proveSigmaPiN, proveDm21Direct, proveDm32, proveGravCoupling
+    -- Rendering & Scattering (3)
+  , provePlanckWavelengthExp, proveRayleighSizeExp, proveRayleighWavelengthExp
   ]
 
 -- | Audit: count by rating, check for wall breaches.
@@ -1989,3 +1993,54 @@ proveGravCoupling =
       crystal     = mp_over_mpl * mp_over_mpl            -- dimensionless
       pdg         = 5.905e-39
   in mkObs "G_N·m_p²/ℏc (grav coupling)" crystal pdg
+
+-- ═══════════════════════════════════════════════════════════════════
+-- §19  RENDERING & SCATTERING PHYSICS — 3 observables
+-- ═══════════════════════════════════════════════════════════════════
+
+-- | Planck spectral radiance wavelength exponent
+-- B(λ,T) = (2hc²/λ⁵) × 1/(e^(hc/λkT) − 1)
+-- Pre-factor exponent = χ − 1 = N_w·N_c − 1 = 5
+-- Route: DOS ν^(N_c−1) × energy hν × Jacobian |dν/dλ|
+--        = λ^(−(N_c−1)) × λ^(−1) × λ^(−2) = λ^(−5)
+-- More fundamental than Stefan-Boltzmann T⁴ (which derives from
+-- integrating λ⁻⁵: removes one power, 5−1=4=N_w²).
+-- Different formula: χ−1 ≠ N_w².
+-- Ref: Planck (1900), Ann. Phys. 309(3):553–563
+-- Used in: every temperature→colour mapping (fire, stars, lava, forge)
+provePlanckWavelengthExp :: Observable
+provePlanckWavelengthExp =
+  let crystal = fromIntegral (chi - 1)                     -- 5
+      expt    = 5.0
+  in mkObs "Planck λ exponent (χ−1)" crystal expt
+
+-- | Rayleigh scattering particle-size exponent
+-- σ_R ∝ d⁶/λ⁴  (Rayleigh regime, d ≪ λ)
+-- Size exponent = χ = N_w · N_c = 6
+-- Route: induced dipole p ∝ α·E where α ∝ volume ∝ d^N_c
+--        scattered power P ∝ |p|² = (d^N_c)² = d^(N_w·N_c) = d^χ
+-- χ never appears as standalone measured exponent in the 195.
+-- Ref: Strutt (Lord Rayleigh), 1871, Phil. Mag. 41
+-- Used in: fog density, dust, haze, cloud opacity, particle systems
+proveRayleighSizeExp :: Observable
+proveRayleighSizeExp =
+  let crystal = fromIntegral chi                            -- 6
+      expt    = 6.0
+  in mkObs "Rayleigh size exponent (χ)" crystal expt
+
+-- | Rayleigh scattering wavelength exponent
+-- σ_R ∝ d⁶/λ⁴  (Rayleigh regime, d ≪ λ)
+-- Wavelength exponent = N_w² = 4
+-- Route: dipole acceleration a ∝ ω^N_w (second derivative)
+--        radiated power P ∝ |a|² = (ω^N_w)² = ω^(N_w²) = ω⁴
+--        ω ∝ 1/λ → P ∝ λ^(−N_w²) = λ⁻⁴
+-- Same integer N_w²=4 as Stefan-Boltzmann T⁴ and Bekenstein S=A/(4G)
+-- but independent physics: elastic dipole scattering (Rayleigh 1871).
+-- Three derivations, three domains, same crystal atom.
+-- Ref: Strutt (Lord Rayleigh), 1871, Phil. Mag. 41
+-- Used in: skybox (why sky is blue), atmospheric fog, god rays
+proveRayleighWavelengthExp :: Observable
+proveRayleighWavelengthExp =
+  let crystal = fromIntegral (n_w * n_w)                    -- 4
+      expt    = 4.0
+  in mkObs "Rayleigh λ exponent (N_w²)" crystal expt
