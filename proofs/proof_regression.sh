@@ -45,97 +45,69 @@ generate_manifest() {
 
   # ── Lean: every theorem name ──
   echo "# LEAN THEOREMS" >> "$out"
-  for f in CrystalTopos.lean CrystalStructural.lean CrystalNoether.lean \
-           CrystalDiscoveries.lean CrystalAlphaProton.lean \
-           CrystalProtonRadius.lean CrystalLayer.lean Main.lean \
-           CrystalGravityDyn.lean \
-           CrystalProtein.lean \
-           CrystalMandelbrot.lean CrystalFundamentals.lean; do                                     # S14
-    if [ -f "$PROOFS/$f" ]; then
-      grep "^theorem " "$PROOFS/$f" | sed "s/theorem \([^ :]*\).*/LEAN $f \1/" >> "$out"
-    fi
-    # Also check haskel/LeanCert/ for Lean files
-    if [ -f "$HASKEL/LeanCert/$f" ]; then
-      grep "^theorem " "$HASKEL/LeanCert/$f" | sed "s/theorem \([^ :]*\).*/LEAN $f \1/" >> "$out"
-    fi
+  for f in "$PROOFS"/*.lean; do
+    [ -f "$f" ] || continue
+    local fname=$(basename "$f")
+    grep "^theorem " "$f" | sed "s/theorem \([^ :]*\).*/LEAN $fname \1/" >> "$out"
   done
+  if [ -d "$HASKEL/LeanCert" ]; then
+    for f in "$HASKEL"/LeanCert/*.lean; do
+      [ -f "$f" ] || continue
+      local fname=$(basename "$f")
+      grep "^theorem " "$f" | sed "s/theorem \([^ :]*\).*/LEAN $fname \1/" >> "$out"
+    done
+  fi
 
   # ── Lean file count ──
   local lean_files=0
-  for f in CrystalTopos.lean CrystalStructural.lean CrystalNoether.lean \
-           CrystalDiscoveries.lean CrystalAlphaProton.lean \
-           CrystalProtonRadius.lean CrystalLayer.lean Main.lean \
-           CrystalGravityDyn.lean \
-           CrystalProtein.lean \
-           CrystalMandelbrot.lean CrystalFundamentals.lean; do                                     # S14
-    [ -f "$PROOFS/$f" ] && lean_files=$((lean_files + 1))
-    [ -f "$HASKEL/LeanCert/$f" ] && lean_files=$((lean_files + 1))
+  for f in "$PROOFS"/*.lean; do
+    [ -f "$f" ] && lean_files=$((lean_files + 1))
   done
+  if [ -d "$HASKEL/LeanCert" ]; then
+    for f in "$HASKEL"/LeanCert/*.lean; do
+      [ -f "$f" ] && lean_files=$((lean_files + 1))
+    done
+  fi
   echo "LEAN_FILES $lean_files" >> "$out"
 
   # ── Agda: every proof name (line before = refl) ──
   echo "# AGDA PROOFS" >> "$out"
-  for f in CrystalTopos.agda CrystalStructural.agda CrystalNoether.agda \
-           CrystalDiscoveries.agda CrystalAlphaProton.agda \
-           CrystalProtonRadius.agda CrystalLayer.agda \
-           CrystalGravityDyn.agda \
-           CrystalProtein.agda \
-           CrystalMandelbrot.agda CrystalFundamentals.agda; do                                     # S14
-    # Check proofs/ dir
-    if [ -f "$PROOFS/$f" ]; then
-      grep -B1 "= refl" "$PROOFS/$f" | grep -v "= refl" | grep -v "^--" | \
-        sed 's/^ *//' | sed "s/ .*//" | grep -v "^$" | \
-        while read -r name; do
-          echo "AGDA $f $name"
-        done >> "$out"
-    fi
-    # Check haskel/ dir (where agda files also live)
-    if [ -f "$HASKEL/$f" ]; then
-      grep -B1 "= refl" "$HASKEL/$f" | grep -v "= refl" | grep -v "^--" | \
-        sed 's/^ *//' | sed "s/ .*//" | grep -v "^$" | \
-        while read -r name; do
-          echo "AGDA $f $name"
-        done >> "$out"
-    fi
+  for f in "$PROOFS"/*.agda; do
+    [ -f "$f" ] || continue
+    local fname=$(basename "$f")
+    grep -B1 "= refl" "$f" | grep -v "= refl" | grep -v "^--" | \
+      sed 's/^ *//' | sed "s/ .*//" | grep -v "^$" | \
+      while read -r name; do
+        echo "AGDA $fname $name"
+      done >> "$out"
+  done
+  for f in "$HASKEL"/*.agda; do
+    [ -f "$f" ] || continue
+    local fname=$(basename "$f")
+    grep -B1 "= refl" "$f" | grep -v "= refl" | grep -v "^--" | \
+      sed 's/^ *//' | sed "s/ .*//" | grep -v "^$" | \
+      while read -r name; do
+        echo "AGDA $fname $name"
+      done >> "$out"
   done
 
   # ── Agda file count ──
   local agda_files=0
-  for f in CrystalTopos.agda CrystalStructural.agda CrystalNoether.agda \
-           CrystalDiscoveries.agda CrystalAlphaProton.agda \
-           CrystalProtonRadius.agda CrystalLayer.agda \
-           CrystalGravityDyn.agda \
-           CrystalProtein.agda \
-           CrystalMandelbrot.agda CrystalFundamentals.agda; do                                     # S14
-    [ -f "$PROOFS/$f" ] && agda_files=$((agda_files + 1))
-    [ -f "$HASKEL/$f" ] && agda_files=$((agda_files + 1))
+  for f in "$PROOFS"/*.agda; do
+    [ -f "$f" ] && agda_files=$((agda_files + 1))
+  done
+  for f in "$HASKEL"/*.agda; do
+    [ -f "$f" ] && agda_files=$((agda_files + 1))
   done
   echo "AGDA_FILES $agda_files" >> "$out"
 
   # ── Haskell: compilable modules ──
   echo "# HASKELL MODULES" >> "$out"
-  for f in Main.hs CrystalStructural.hs CrystalNoether.hs \
-           CrystalDiscoveries.hs CrystalAlphaProton.hs \
-           CrystalProtonRadius.hs WACAScanTest.hs \
-           CrystalHierarchy.hs CrystalLayer.hs \
-           CrystalAxiom.hs CrystalGauge.hs CrystalMixing.hs \
-           CrystalCosmo.hs CrystalQCD.hs CrystalGravity.hs \
-           CrystalAudit.hs CrystalCrossDomain.hs CrystalRiemann.hs \
-           CrystalWACAScan.hs CrystalQuantum.hs \
-           CrystalQBase.hs CrystalQGates.hs CrystalQChannels.hs \
-           CrystalQHamiltonians.hs CrystalQMeasure.hs \
-           CrystalQEntangle.hs CrystalQAlgorithms.hs \
-           CrystalQSimulation.hs \
-           CrystalGravityDyn.hs GravityDynTest.hs \
-           CrystalProtein.hs \
-           CrystalMandelbrot.hs; do                                       # S14
-    [ -f "$HASKEL/$f" ] && echo "HASKELL $f" >> "$out"
+  for f in "$HASKEL"/*.hs; do
+    [ -f "$f" ] || continue
+    local fname=$(basename "$f")
+    echo "HASKELL $fname" >> "$out"
   done
-
-  # ── Haskell observable count ──
-  if [ -f "$HASKEL/CrystalFullTest.hs" ]; then
-    echo "HASKELL CrystalFullTest.hs" >> "$out"
-  fi
 
   # ── Rust: every #[test] function name ──
   echo "# RUST TESTS" >> "$out"
@@ -179,18 +151,17 @@ generate_manifest() {
   # ── Python proof files ──
   echo "# PYTHON PROOF MODULES" >> "$out"
   for f in "$PROOFS"/crystal_*_proof.py; do
-    if [ -f "$f" ]; then
+    [ -f "$f" ] || continue
+    local fname=$(basename "$f")
+    echo "PYTHON $fname" >> "$out"
+  done
+  if [ -d "$EXAMPLES" ]; then
+    for f in "$EXAMPLES"/*.py; do
+      [ -f "$f" ] || continue
       local fname=$(basename "$f")
       echo "PYTHON $fname" >> "$out"
-    fi
-  done
-  # Session 12: gravity computation files in examples/
-  for f in mera_gravity_closed.py mera_linearized_gravity.py spectral_tower.py qubo_folder.py \
-           crystal_vdw.py; do                                             # S13
-    if [ -f "$EXAMPLES/$f" ]; then
-      echo "PYTHON $f" >> "$out"
-    fi
-  done
+    done
+  fi
 
   # ── Summary counts ──
   echo "# SUMMARY COUNTS" >> "$out"
