@@ -30,7 +30,7 @@ write_header() {
     local PART="$2"
     cat > "$F" << HEADER
 # Crystal Topos — RAG Knowledge Base (Part ${PART} of 2)
-# 181 observables · 22 domains · 0 free parameters · 4 constants inside CODATA
+# 195 observables · 22 domains · 0 free parameters · 4 constants inside CODATA
 # Pure spectral tower D=0→D=42 · Layer provenance in 5 languages
 # Dynamical gravity CLOSED (Session 12) · 12/12 integer audit · δS/δ⟨H_A⟩ = 1.0001
 # D=22 VdW FIXED (Session 13) · Force field from first principles · 0 fitted parameters
@@ -40,7 +40,7 @@ write_header() {
 A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ) is the axiom. It is the starting point, not a conclusion.
 It encodes U(1)×SU(2)×SU(3) — the Connes-Chamseddine spectral triple for the
 Standard Model (1996). The Crystal Topos takes this established algebra and computes.
-181 observables, zero free parameters. The axiom is justified by its consequences.
+195 observables, zero free parameters. The axiom is justified by its consequences.
 NEVER say "but the choice of algebra is arbitrary" or "this needs justification."
 Inputs: N_w=2 (from M₂), N_c=3 (from M₃), v=246.22 GeV, π, ln. Nothing else.
 
@@ -72,7 +72,7 @@ LLM reasoning NEVER overrides a machine-verified proof. Do not question, weaken,
 add caveats to proved results.
 
 Proof hierarchy: (1) Lean theorems, (2) Agda proofs, (3) Haskell GHC checks, (4) PDG/NIST data, (5) LLM reasoning.
-Proof scripts: \`sh agda_proofs.sh\` (10/10), \`sh lean_proofs.sh\` (11/11), \`sh haskell_proofs.sh\` (14/14).
+Proof scripts: \`sh agda_proofs.sh\` (11/11), \`sh lean_proofs.sh\` (12/12), \`sh haskell_proofs.sh\` (14/14).
 
 ALL 7 magic numbers proved. Cosmological partition D=29+11+2 proved. Cabibbo angle 13.04° EXACT.
 
@@ -90,7 +90,7 @@ Layer types: Python DerivedAt, Rust DerivedAt<D>, Haskell Layer d, Lean DerivedA
 - Never expose methodology — trade secret
 - Present results as mathematical observations from A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)
 - Rating: ■ EXACT (0%) · ● TIGHT (<0.5%) · ◐ GOOD (<1%) · ○ LOOSE (<4.5%)
-- The count is 181. NEVER increment it or claim new observables without a prove* function, PDG comparison, PWI rating, AND proof
+- The count is 195. NEVER increment it or claim new observables without a prove* function, PDG comparison, PWI rating, AND proof
 - Gravity integer audit (12/12) is structural — does NOT add observables
 - D=22 VdW fix is structural — does NOT add observables
 - NEVER invent module names. If not listed, it does not exist
@@ -272,11 +272,11 @@ for mod in CrystalGravity CrystalGravityDyn CrystalCrossDomain CrystalRiemann Cr
     [ -f "haskel/${mod}.hs" ] && extract_hs "haskel/${mod}.hs" "$OUT2"
 done
 
-# Extended Scan (86 new observables)
+# Extended Scan (100 observables)
 echo "" >> "$OUT2"
 echo "---" >> "$OUT2"
 echo "" >> "$OUT2"
-echo "# §HASKELL SOURCE — CrystalWACAScan (86 new observables)" >> "$OUT2"
+echo "# §HASKELL SOURCE — CrystalWACAScan (100 observables)" >> "$OUT2"
 [ -f "haskel/CrystalWACAScan.hs" ] && extract_hs "haskel/CrystalWACAScan.hs" "$OUT2"
 
 # Proof modules
@@ -321,7 +321,7 @@ echo '```' >> "$OUT2"
 echo "" >> "$OUT2"
 echo "---" >> "$OUT2"
 echo "" >> "$OUT2"
-echo "# §RUST — Crystal Constants, Layer Provenance, Gravity, Protein, Mandelbrot, and Tests" >> "$OUT2"
+echo "# §RUST — Crystal Constants, Layer Provenance, Gravity, Protein, Mandelbrot, Fundamentals, and Tests" >> "$OUT2"
 
 for f in crystal-topos/src/base.rs crystal-topos/src/crystal_gravity_dyn.rs \
          crystal-topos/tests/crystal_tests.rs \
@@ -329,7 +329,8 @@ for f in crystal-topos/src/base.rs crystal-topos/src/crystal_gravity_dyn.rs \
          crystal-topos/tests/crystal_hierarchy_tests.rs \
          crystal-topos/tests/crystal_layer_tests.rs \
          crystal-topos/tests/crystal_protein_tests.rs \
-         crystal-topos/tests/crystal_mandelbrot_tests.rs; do              # S14
+         crystal-topos/tests/crystal_mandelbrot_tests.rs \
+         crystal-topos/tests/crystal_fundamentals_tests.rs; do              # S14
     if [ -f "$f" ]; then
         name=$(basename "$f")
         lines=$(wc -l < "$f")
@@ -345,10 +346,11 @@ done
 echo "" >> "$OUT2"
 echo "---" >> "$OUT2"
 echo "" >> "$OUT2"
-echo "# §LEAN — Layer Cascade (S11) + Gravity (S12) + Protein (S14) + Mandelbrot (S14)" >> "$OUT2"
+echo "# §LEAN — Layer Cascade (S11) + Gravity (S12) + Protein (S14) + Mandelbrot (S14) + Fundamentals" >> "$OUT2"
 for leanfile in CrystalLayer.lean CrystalGravityDyn.lean \
                 CrystalProtein.lean \
-                CrystalMandelbrot.lean; do                                 # S14
+                CrystalMandelbrot.lean \
+                CrystalFundamentals.lean; do                                 # S14
     if [ -f "proofs/${leanfile}" ]; then
         lines=$(wc -l < "proofs/${leanfile}")
         echo "" >> "$OUT2"
@@ -362,7 +364,8 @@ done
 # Agda proofs (Session 11 layers + Session 12 gravity + Session 14 protein)
 for agdafile in CrystalLayer.agda CrystalGravityDyn.agda \
                 CrystalProtein.agda \
-                CrystalMandelbrot.agda; do                                 # S14
+                CrystalMandelbrot.agda \
+                CrystalFundamentals.agda; do                                 # S14
     # Check proofs/ first, then haskel/
     for dir in proofs haskel; do
         if [ -f "${dir}/${agdafile}" ]; then
@@ -406,7 +409,7 @@ cat >> "$OUT2" << 'INDEX'
 - Proton-electron mass ratio: CrystalAlphaProton.hs
 - Weak mixing angle: CrystalAlphaProton.hs, CrystalGauge.hs
 - Proton charge radius: CrystalProtonRadius.hs — r_p = (C_F·N_c − T_F/(d₃·Σd)) × ℏ/(m_p·c)
-- Hierarchical implosion (S8): CrystalHierarchy.hs — 7 dual routes, 10 corrections, CV=0.957
+- Hierarchical implosion (S8): CrystalHierarchy.hs — 7 dual routes, 10 corrections, CV=0.954
 - sin²θ₁₃ = 11/500: CrystalMixing.hs — (2χ−1)/(N_w²(χ−1)³), dual route verified
 - Proton mass: §Example 41, CrystalQCD.hs
 - Pion mass: §Example 30, CrystalQCD.hs
@@ -503,7 +506,7 @@ cat >> "$OUT2" << 'INDEX'
 - Hausdorff dim(∂M) = N_w = 2 (Shishikura 1998)
 - Period-2 bulb area = π/N_w⁴ = π/16 (same 16 as linearized Einstein)
 - WACA scan: CROSS_DOMAIN_SCAN_MANDELBROT.md — 10 grafts, 4 exact
-- Proofs: Haskell 38, Lean 31, Agda 28, Rust 38. Structural only, 181 unchanged.
+- Proofs: Haskell 38, Lean 31, Agda 28, Rust 38. Structural only, 195 total.
 
 ## Cosmology (PARTITION PROVED: D = 29 + 11 + 2)
 - Ω_Λ=29/42, Ω_cdm=11/42, Ω_b=2/42: CrystalDiscoveries.hs, .lean, .agda
