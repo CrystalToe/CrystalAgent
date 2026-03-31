@@ -59,6 +59,20 @@ For comparison: m_b differs by 14% between pole and MS-bar schemes.
 m_c by 31%. m_s by a factor of 5. The crystal's 0.42% is tiny.
 Scheme dependence is not an error; it is a convention.
 
+### The conversion rule
+
+```
+v(PDG) = v(crystal) × 1.004
+1.004  = 1 + N_c · y_t² / (16π²) · ln(115/91.2)
+```
+
+Every factor traces to the algebra:
+- N_c = 3 from M₃(ℂ)
+- y_t = 1 (conformal fixed point at D = 0)
+- 16π² = one-loop Feynman integral in 4 dimensions (geometry)
+- 115 GeV = crystal's natural scale (where v(μ) = M_Pl × 35/(43×36×2⁵⁰))
+- 91.2 GeV = M_Z (from v and sin²θ = N_w/N_c² = 2/9)
+
 ---
 
 ## DERIVED INVARIANTS
