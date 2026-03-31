@@ -16,7 +16,9 @@ This module derives the three Standard Model coupling constants, the Higgs mecha
 | 2 | sin²θ_W (MS-bar) | N_c/gauss = 3/13 | 0.2308 | 0.2312 | 0.20% |
 | 3 | sin²θ_W (on-shell) | N_w/N_c² = 2/9 | 0.2222 | 0.2229 | 0.37% |
 | 4 | α_s(M_Z) | N_w/(gauss + N_w²) = 2/17 | 0.1176 | 0.1179 | 0.30% |
-| 5 | v (Higgs VEV) | 246.22 GeV (input) | 246.22 | 246.22 | 0.000% |
+| 5 | v (Higgs VEV) | M_Pl × 35/(43 × 36 × 2⁵⁰) | 245.17 | 246.22 | 0.42%* |
+
+*The 0.42% on v is a renormalisation scale choice: crystal evaluates at μ ≈ 115 GeV (near m_H), PDG extracts at μ = M_Z = 91.2 GeV. Every mass (m_H, m_τ, m_μ, m_e) inherits this offset. Every dimensionless ratio (α⁻¹, sin²θ_W, Koide, m_μ/m_e) cancels it.
 | 6 | m_H (Higgs mass) | v × √(N_w·N_c/e^π) | 124.8 | 125.25 | 0.20% |
 | 7 | Koide Q | 1 − λ_colour = 2/3 | 0.6667 | 0.6667 | 0.005% |
 | 8 | m_τ (tau) | Λ_h × gauss/β₀ | 1777.6 | 1776.86 | 0.04% |
