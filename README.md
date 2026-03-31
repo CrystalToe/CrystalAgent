@@ -80,7 +80,6 @@ The deviations between crystal predictions and experiment follow an **exponentia
 | Hardcoded numbers | **0** in crystal formulas |
 | Wall breaches | **0** (prime wall = 4.5%) |
 | CODATA precision | **3** (α⁻¹ Δ/unc=0.12, m_p/m_e=0.04, r_p=0.0013) |
-| Gravity integer audit | **12/12** PASS (Session 12) |
 | First law δS/δ⟨H_A⟩ | **1.0001 ± 0.0004** (χ=6 crystal) |
 | Haskell modules | **31** |
 | Quantum operators | **96** |
