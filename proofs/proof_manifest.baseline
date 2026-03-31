@@ -704,7 +704,59 @@ LEAN CrystalMandelbrot.lean mersenne_2_Nc
 LEAN CrystalMandelbrot.lean mersenne_3_b0
 LEAN CrystalMandelbrot.lean tuning_23_chi
 LEAN CrystalMandelbrot.lean tuning_22_Nwsq
-LEAN_FILES 11
+LEAN CrystalFundamentals.lean neff_denom
+LEAN CrystalFundamentals.lean ob_om_num
+LEAN CrystalFundamentals.lean ob_om_den
+LEAN CrystalFundamentals.lean sw0_base_den
+LEAN CrystalFundamentals.lean sw0_corr_den
+LEAN CrystalFundamentals.lean sw0_corr_simplify
+LEAN CrystalFundamentals.lean yp_corr_den
+LEAN CrystalFundamentals.lean moment_ratio_num
+LEAN CrystalFundamentals.lean moment_ratio_den
+LEAN CrystalFundamentals.lean moment_ratio_reduced_num
+LEAN CrystalFundamentals.lean moment_ratio_reduced_den
+LEAN CrystalFundamentals.lean mcms_base
+LEAN CrystalFundamentals.lean mcms_base_alt
+LEAN CrystalFundamentals.lean mcms_base_alt2
+LEAN CrystalFundamentals.lean mcms_base_alt3
+LEAN CrystalFundamentals.lean mcms_corr_num
+LEAN CrystalFundamentals.lean mcms_corr_den
+LEAN CrystalFundamentals.lean mcms_den_route2
+LEAN CrystalFundamentals.lean mcms_product
+LEAN CrystalFundamentals.lean mbtau_base_num
+LEAN CrystalFundamentals.lean mbtau_base_den
+LEAN CrystalFundamentals.lean mbtau_corr_den
+LEAN CrystalFundamentals.lean mbtau_corr_is_D
+LEAN CrystalFundamentals.lean mbtau_combined_num
+LEAN CrystalFundamentals.lean mbtau_combined_den
+LEAN CrystalFundamentals.lean yt_base_num
+LEAN CrystalFundamentals.lean yt_base_den
+LEAN CrystalFundamentals.lean yt_corr_den
+LEAN CrystalFundamentals.lean rpi_num
+LEAN CrystalFundamentals.lean rpi_den
+LEAN CrystalFundamentals.lean dalpha_den
+LEAN CrystalFundamentals.lean sigma_corr_num
+LEAN CrystalFundamentals.lean sigma_corr_den
+LEAN CrystalFundamentals.lean sigma_same_43
+LEAN CrystalFundamentals.lean dm21_tower
+LEAN CrystalFundamentals.lean dm21_gauss
+LEAN CrystalFundamentals.lean dm32_nu3_num
+LEAN CrystalFundamentals.lean dm32_nu3_den
+LEAN CrystalFundamentals.lean dm32_nu2_num
+LEAN CrystalFundamentals.lean dm32_nu2_den
+LEAN CrystalFundamentals.lean split_ratio_num
+LEAN CrystalFundamentals.lean split_ratio_den
+LEAN CrystalFundamentals.lean grav_hierarchy_den
+LEAN CrystalFundamentals.lean grav_mp_num
+LEAN CrystalFundamentals.lean grav_mp_den
+LEAN CrystalFundamentals.lean grav_fermat
+LEAN CrystalFundamentals.lean partition_19
+LEAN CrystalFundamentals.lean partition_20
+LEAN CrystalFundamentals.lean partition_50
+LEAN CrystalFundamentals.lean the_43
+LEAN CrystalFundamentals.lean chi4
+LEAN CrystalFundamentals.lean fermat_prime
+LEAN_FILES 12
 # AGDA PROOFS
 AGDA CrystalTopos.agda the-one-law
 AGDA CrystalTopos.agda chi-eq
@@ -1274,7 +1326,42 @@ AGDA CrystalMandelbrot.agda div-3
 AGDA CrystalMandelbrot.agda mersenne-2
 AGDA CrystalMandelbrot.agda mersenne-3
 AGDA CrystalMandelbrot.agda tuning-23
-AGDA_FILES 10
+AGDA CrystalFundamentals.agda neff-denom
+AGDA CrystalFundamentals.agda ob-om-num
+AGDA CrystalFundamentals.agda ob-om-den
+AGDA CrystalFundamentals.agda sw0-corr-den
+AGDA CrystalFundamentals.agda yp-corr-den
+AGDA CrystalFundamentals.agda moment-num
+AGDA CrystalFundamentals.agda moment-den
+AGDA CrystalFundamentals.agda mcms-base
+AGDA CrystalFundamentals.agda mcms-base-alt
+AGDA CrystalFundamentals.agda mcms-corr-num
+AGDA CrystalFundamentals.agda mcms-corr-den
+AGDA CrystalFundamentals.agda mcms-den-route2
+AGDA CrystalFundamentals.agda mcms-product
+AGDA CrystalFundamentals.agda mbtau-corr-den
+AGDA CrystalFundamentals.agda mbtau-corr-is-D
+AGDA CrystalFundamentals.agda yt-base-den
+AGDA CrystalFundamentals.agda yt-corr-den
+AGDA CrystalFundamentals.agda rpi-num
+AGDA CrystalFundamentals.agda rpi-den
+AGDA CrystalFundamentals.agda dalpha-den
+AGDA CrystalFundamentals.agda sigma-corr-num
+AGDA CrystalFundamentals.agda sigma-same-43
+AGDA CrystalFundamentals.agda dm21-tower
+AGDA CrystalFundamentals.agda dm21-gauss
+AGDA CrystalFundamentals.agda dm32-nu3-num
+AGDA CrystalFundamentals.agda dm32-nu3-den
+AGDA CrystalFundamentals.agda split-chi4
+AGDA CrystalFundamentals.agda split-chi4-minus1
+AGDA CrystalFundamentals.agda grav-den
+AGDA CrystalFundamentals.agda grav-mp-num
+AGDA CrystalFundamentals.agda grav-mp-den
+AGDA CrystalFundamentals.agda partition-19
+AGDA CrystalFundamentals.agda partition-20
+AGDA CrystalFundamentals.agda the-43
+AGDA CrystalFundamentals.agda fermat-257
+AGDA_FILES 11
 # HASKELL MODULES
 HASKELL Main.hs
 HASKELL CrystalStructural.hs
@@ -1371,6 +1458,51 @@ RUST crystal_discovery_tests.rs nuclear_saturation
 RUST crystal_discovery_tests.rs gauss_decomposition
 RUST crystal_discovery_tests.rs sigma_d_eq_chi_sq
 RUST crystal_discovery_tests.rs tower_decomposition
+RUST crystal_fundamentals_tests.rs neff_denom
+RUST crystal_fundamentals_tests.rs ob_om_den
+RUST crystal_fundamentals_tests.rs sw0_corr_den
+RUST crystal_fundamentals_tests.rs yp_corr_den
+RUST crystal_fundamentals_tests.rs moment_num
+RUST crystal_fundamentals_tests.rs moment_den
+RUST crystal_fundamentals_tests.rs mcms_base
+RUST crystal_fundamentals_tests.rs mcms_base_alt
+RUST crystal_fundamentals_tests.rs mcms_base_alt2
+RUST crystal_fundamentals_tests.rs mcms_corr_num
+RUST crystal_fundamentals_tests.rs mcms_corr_den
+RUST crystal_fundamentals_tests.rs mcms_den_alt
+RUST crystal_fundamentals_tests.rs mcms_product
+RUST crystal_fundamentals_tests.rs mbtau_corr
+RUST crystal_fundamentals_tests.rs yt_base_den
+RUST crystal_fundamentals_tests.rs rpi_num
+RUST crystal_fundamentals_tests.rs rpi_den
+RUST crystal_fundamentals_tests.rs dalpha_den
+RUST crystal_fundamentals_tests.rs sigma_43
+RUST crystal_fundamentals_tests.rs sigma_same_43
+RUST crystal_fundamentals_tests.rs dm32_nu3_num
+RUST crystal_fundamentals_tests.rs dm32_nu3_den
+RUST crystal_fundamentals_tests.rs split_chi4
+RUST crystal_fundamentals_tests.rs split_chi4m1
+RUST crystal_fundamentals_tests.rs grav_den
+RUST crystal_fundamentals_tests.rs grav_mp_num
+RUST crystal_fundamentals_tests.rs grav_mp_den
+RUST crystal_fundamentals_tests.rs fermat_257
+RUST crystal_fundamentals_tests.rs partition_19
+RUST crystal_fundamentals_tests.rs partition_20
+RUST crystal_fundamentals_tests.rs partition_50
+RUST crystal_fundamentals_tests.rs test_neff
+RUST crystal_fundamentals_tests.rs test_ob_om
+RUST crystal_fundamentals_tests.rs test_sw0
+RUST crystal_fundamentals_tests.rs test_yp
+RUST crystal_fundamentals_tests.rs test_moment_ratio
+RUST crystal_fundamentals_tests.rs test_mc_ms
+RUST crystal_fundamentals_tests.rs test_mb_mtau
+RUST crystal_fundamentals_tests.rs test_top_yukawa
+RUST crystal_fundamentals_tests.rs test_pion_radius_sq
+RUST crystal_fundamentals_tests.rs test_delta_alpha_had
+RUST crystal_fundamentals_tests.rs test_sigma_pin
+RUST crystal_fundamentals_tests.rs test_dm21_direct
+RUST crystal_fundamentals_tests.rs test_dm32
+RUST crystal_fundamentals_tests.rs test_grav_coupling
 RUST crystal_hierarchy_tests.rs test_shared_core
 RUST crystal_hierarchy_tests.rs test_level_a0
 RUST crystal_hierarchy_tests.rs test_level_a4
@@ -1733,6 +1865,7 @@ RUST crystal_tests.rs test_max_entangled_entropy
 RUST crystal_tests.rs test_hadamard_is_unitary
 RUST_COUNT crystal_alpha_proton_tests.rs 28
 RUST_COUNT crystal_discovery_tests.rs 33
+RUST_COUNT crystal_fundamentals_tests.rs 45
 RUST_COUNT crystal_hierarchy_tests.rs 41
 RUST_COUNT crystal_layer_tests.rs 17
 RUST_COUNT crystal_mandelbrot_tests.rs 38
@@ -1747,6 +1880,7 @@ RUST_COUNT crystal_tests.rs 12
 PYTHON crystal_alpha_proton_proof.py
 PYTHON crystal_certificate_proof.py
 PYTHON crystal_discoveries_proof.py
+PYTHON crystal_fundamentals_proof.py
 PYTHON crystal_hierarchy_proof.py
 PYTHON crystal_noether_proof.py
 PYTHON crystal_proton_radius_proof.py
@@ -1757,8 +1891,8 @@ PYTHON spectral_tower.py
 PYTHON qubo_folder.py
 PYTHON crystal_vdw.py
 # SUMMARY COUNTS
-TOTAL_LEAN_THEOREMS      705
-TOTAL_AGDA_PROOFS      568
-TOTAL_RUST_TESTS      421
+TOTAL_LEAN_THEOREMS      757
+TOTAL_AGDA_PROOFS      603
+TOTAL_RUST_TESTS      466
 TOTAL_HASKELL_MODULES       33
-TOTAL_PYTHON_MODULES       12
+TOTAL_PYTHON_MODULES       13

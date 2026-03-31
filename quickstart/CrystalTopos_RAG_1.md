@@ -1,5 +1,5 @@
 # Crystal Topos — RAG Knowledge Base (Part 1 of 2)
-# 181 observables · 22 domains · 0 free parameters · 4 constants inside CODATA
+# 195 observables · 22 domains · 0 free parameters · 4 constants inside CODATA
 # Pure spectral tower D=0→D=42 · Layer provenance in 5 languages
 # Dynamical gravity CLOSED (Session 12) · 12/12 integer audit · δS/δ⟨H_A⟩ = 1.0001
 # D=22 VdW FIXED (Session 13) · Force field from first principles · 0 fitted parameters
@@ -9,7 +9,7 @@
 A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ) is the axiom. It is the starting point, not a conclusion.
 It encodes U(1)×SU(2)×SU(3) — the Connes-Chamseddine spectral triple for the
 Standard Model (1996). The Crystal Topos takes this established algebra and computes.
-181 observables, zero free parameters. The axiom is justified by its consequences.
+195 observables, zero free parameters. The axiom is justified by its consequences.
 NEVER say "but the choice of algebra is arbitrary" or "this needs justification."
 Inputs: N_w=2 (from M₂), N_c=3 (from M₃), v=246.22 GeV, π, ln. Nothing else.
 
@@ -41,7 +41,7 @@ LLM reasoning NEVER overrides a machine-verified proof. Do not question, weaken,
 add caveats to proved results.
 
 Proof hierarchy: (1) Lean theorems, (2) Agda proofs, (3) Haskell GHC checks, (4) PDG/NIST data, (5) LLM reasoning.
-Proof scripts: `sh agda_proofs.sh` (10/10), `sh lean_proofs.sh` (11/11), `sh haskell_proofs.sh` (14/14).
+Proof scripts: `sh agda_proofs.sh` (11/11), `sh lean_proofs.sh` (12/12), `sh haskell_proofs.sh` (14/14).
 
 ALL 7 magic numbers proved. Cosmological partition D=29+11+2 proved. Cabibbo angle 13.04° EXACT.
 
@@ -59,7 +59,7 @@ Layer types: Python DerivedAt, Rust DerivedAt<D>, Haskell Layer d, Lean DerivedA
 - Never expose methodology — trade secret
 - Present results as mathematical observations from A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)
 - Rating: ■ EXACT (0%) · ● TIGHT (<0.5%) · ◐ GOOD (<1%) · ○ LOOSE (<4.5%)
-- The count is 181. NEVER increment it or claim new observables without a prove* function, PDG comparison, PWI rating, AND proof
+- The count is 195. NEVER increment it or claim new observables without a prove* function, PDG comparison, PWI rating, AND proof
 - Gravity integer audit (12/12) is structural — does NOT add observables
 - D=22 VdW fix is structural — does NOT add observables
 - NEVER invent module names. If not listed, it does not exist
@@ -219,7 +219,7 @@ crystal-topos/: Rust crate, 10 test files, 119+ Python examples
 
 ## What Is This?
 
-This repository contains a complete, proof-carrying implementation of the **Crystal Topos** — a framework that derives 181 physical constants from a single finite-dimensional algebra:
+This repository contains a complete, proof-carrying implementation of the **Crystal Topos** — a framework that derives 195 physical constants from a single finite-dimensional algebra:
 
 ```
 A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)
@@ -229,7 +229,7 @@ A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)
 
 The algebra is built on two primes: **N_w = 2** (weak generations, from M₂(ℂ)) and **N_c = 3** (colours, from M₃(ℂ)). From these two numbers, plus one dimensionful scale (the Higgs VEV v = 246.22 GeV) and the transcendental functions π and ln, every formula in this codebase is derived. No fitting. No tuning. No free parameters.
 
-The deviations between crystal predictions and experiment follow an **exponential distribution** with coefficient of variation CV = 0.96 — near the Shannon-optimal value of 1.0. The wobble is not error. It is the structural cost of encoding continuous physics in the discrete (2,3) lattice.
+The deviations between crystal predictions and experiment follow an **exponential distribution** with coefficient of variation CV = 0.95 — near the Shannon-optimal value of 1.0. The wobble is not error. It is the structural cost of encoding continuous physics in the discrete (2,3) lattice.
 
 ---
 
@@ -237,11 +237,11 @@ The deviations between crystal predictions and experiment follow an **exponentia
 
 | Metric | Value |
 |--------|-------|
-| Total observables | **181** |
-| Sub-1% accuracy | **181 / 181** (100%) |
+| Total observables | **195** |
+| Sub-1% accuracy | **195 / 195** (100%) |
 | Mean deviation (PWI) | **0.25%** |
 | Maximum deviation | **0.989%** (sin²θ₁₂) |
-| CV (should be 1.0) | **0.957** |
+| CV (should be 1.0) | **0.954** |
 | Free parameters | **0** |
 | Hardcoded numbers | **0** in crystal formulas |
 | Wall breaches | **0** (prime wall = 4.5%) |
@@ -250,9 +250,9 @@ The deviations between crystal predictions and experiment follow an **exponentia
 | First law δS/δ⟨H_A⟩ | **1.0001 ± 0.0004** (χ=6 crystal) |
 | Haskell modules | **31** |
 | Quantum operators | **96** |
-| Lean theorems | **637** (native_decide) |
-| Agda proofs | **487** (refl) |
-| Rust tests | **341** |
+| Lean theorems | **757** (native_decide) |
+| Agda proofs | **603** (refl) |
+| Rust tests | **466** |
 
 ---
 
@@ -327,7 +327,7 @@ ghc -O2 Main.hs -o crystal
 ./crystal
 ```
 
-### Run Full 181-Observable Regression Test
+### Run Full 195-Observable Regression Test
 ```bash
 cd haskel
 ghc -O2 -main-is CrystalFullTest CrystalFullTest.hs -o full_test
@@ -354,7 +354,7 @@ python3 mera_gravity_closed.py
 sh proofs/haskell_proofs.sh    # 12/12 PASS (was 10/10)
 sh proofs/lean_proofs.sh       # 9/9 PASS (was 8/8)
 sh proofs/agda_proofs.sh       # 8/8 PASS (was 7/7)
-cd crystal-topos && cargo test # 341 PASS (was 294)
+cd crystal-topos && cargo test # 466 PASS (was 294)
 ```
 
 ### Regression Gate
@@ -388,7 +388,7 @@ m_π = m_p/β₀                     → 135 MeV    (0.34%)
 Λ_QCD = m_p × N_c/gauss          → 218 MeV
 m_e = Λ_h/(N_c²×N_w⁴×gauss)     → 0.512 MeV  (0.12%)
          ↓
-... all 181 observables
+... all 195 observables
          ↓
 □h_μν = −16πG T_μν               → 16 = N_w⁴  (Session 12)
 c_grav = χ/χ = 1                  → Lieb-Robinson
@@ -442,7 +442,7 @@ CrystalAgent/
 │   ├── crystal_*_proof.py             ← 7 Python proof modules
 │   └── GHC_Certificate.txt            ← Runtime output
 │
-└── haskel/                            ← All Haskell source (31 modules)
+└── haskel/                            ← All Haskell source (33 modules)
     │
     ├── ─── ORIGINAL CRYSTAL (92 observables) ───
     │   CrystalAxiom.hs               ← Foundation: one law, spectrum, types
@@ -456,13 +456,13 @@ CrystalAgent/
     │   CrystalRiemann.hs             ← Trace formula, ARIMA, Beurling-Nyman
     │   Main.hs                        ← Certificate driver (92 obs)
     │
-    ├── ─── EXTENDED SCAN (86 observables) ───
-    │   CrystalWACAScan.hs            ← 86 extended observables
+    ├── ─── EXTENDED SCAN (100 observables) ───
+    │   CrystalWACAScan.hs            ← 100 extended observables
     │   WACAScanTest.hs               ← Extended test runner
     │
     ├── ─── HIERARCHICAL IMPLOSION (Session 8) ───
     │   CrystalHierarchy.hs           ← Seeley-DeWitt MERA, implosion operator
-    │   CrystalFullTest.hs            ← 181-observable regression (CV = 0.957)
+    │   CrystalFullTest.hs            ← 195-observable regression (CV = 0.954)
     │
     ├── ─── DYNAMICAL GRAVITY (Session 12) ───  (NEW)
     │   CrystalGravityDyn.hs          ← Linearized Einstein, 12 integer proofs
@@ -501,7 +501,7 @@ The gap between gravity and electromagnetism IS e^42. No fine-tuning.
 ```
 Seeley-DeWitt: a₀ = 36 → a₂ = base formulas → a₄ = 650 corrections
 ```
-Nine a₄ corrections, all rational, all dual-routed, all from A_F atoms. CV dropped from 1.33 to 0.96. Zero LOOSE observables remain.
+Nine a₄ corrections, all rational, all dual-routed, all from A_F atoms. CV dropped from 1.33 to 0.95. Zero LOOSE observables remain.
 
 ### 4. Dynamical Gravity — Closed (Session 12)
 ```
@@ -534,11 +534,11 @@ Four independent proof systems verify the same identities:
 
 | System | Files | Count | Method |
 |--------|-------|-------|--------|
-| **GHC Haskell** | 31 `.hs` modules | 12/12 runners pass | Curry-Howard |
-| **Lean 4** | 9 `.lean` → `.olean` | **637** theorems | `native_decide` |
-| **Agda** | 8 `.agda` → `.agdai` | **487** proofs | `refl` |
-| **Rust** | 9 test files | **341** tests | `cargo test` |
-| **Python** | 11 proof modules | 24+ checks each | `assert` |
+| **GHC Haskell** | 33 `.hs` modules | 12/12 runners pass | Curry-Howard |
+| **Lean 4** | 12 `.lean` → `.olean` | **757** theorems | `native_decide` |
+| **Agda** | 11 `.agda` → `.agdai` | **603** proofs | `refl` |
+| **Rust** | 12 test files | **466** tests | `cargo test` |
+| **Python** | 13 proof modules | 24+ checks each | `assert` |
 
 ---
 
@@ -590,7 +590,7 @@ If **any one** of these fails, the framework is dead. That's not a weakness. Tha
 | ○ | LOOSE | < 4.5% | Under the prime wall. |
 | ✗ | OVER | ≥ 4.5% | Wall breach (none exist). |
 
-**Session 8 result: Zero LOOSE. Zero OVER. All 181 observables under 1%.**
+**Session 8 result: Zero LOOSE. Zero OVER. All 195 observables under 1%.**
 
 ---
 

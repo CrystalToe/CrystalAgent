@@ -50,7 +50,7 @@ generate_manifest() {
            CrystalProtonRadius.lean CrystalLayer.lean Main.lean \
            CrystalGravityDyn.lean \
            CrystalProtein.lean \
-           CrystalMandelbrot.lean; do                                     # S14
+           CrystalMandelbrot.lean CrystalFundamentals.lean; do                                     # S14
     if [ -f "$PROOFS/$f" ]; then
       grep "^theorem " "$PROOFS/$f" | sed "s/theorem \([^ :]*\).*/LEAN $f \1/" >> "$out"
     fi
@@ -67,7 +67,7 @@ generate_manifest() {
            CrystalProtonRadius.lean CrystalLayer.lean Main.lean \
            CrystalGravityDyn.lean \
            CrystalProtein.lean \
-           CrystalMandelbrot.lean; do                                     # S14
+           CrystalMandelbrot.lean CrystalFundamentals.lean; do                                     # S14
     [ -f "$PROOFS/$f" ] && lean_files=$((lean_files + 1))
     [ -f "$HASKEL/LeanCert/$f" ] && lean_files=$((lean_files + 1))
   done
@@ -80,7 +80,7 @@ generate_manifest() {
            CrystalProtonRadius.agda CrystalLayer.agda \
            CrystalGravityDyn.agda \
            CrystalProtein.agda \
-           CrystalMandelbrot.agda; do                                     # S14
+           CrystalMandelbrot.agda CrystalFundamentals.agda; do                                     # S14
     # Check proofs/ dir
     if [ -f "$PROOFS/$f" ]; then
       grep -B1 "= refl" "$PROOFS/$f" | grep -v "= refl" | grep -v "^--" | \
@@ -106,7 +106,7 @@ generate_manifest() {
            CrystalProtonRadius.agda CrystalLayer.agda \
            CrystalGravityDyn.agda \
            CrystalProtein.agda \
-           CrystalMandelbrot.agda; do                                     # S14
+           CrystalMandelbrot.agda CrystalFundamentals.agda; do                                     # S14
     [ -f "$PROOFS/$f" ] && agda_files=$((agda_files + 1))
     [ -f "$HASKEL/$f" ] && agda_files=$((agda_files + 1))
   done
