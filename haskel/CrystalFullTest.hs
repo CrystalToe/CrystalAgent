@@ -46,6 +46,7 @@ data TestEntry = TestEntry
   , teExpt     :: Double     -- experimental / PDG value
   , tePWI      :: Double     -- prime wobble index (%)
   , teRating   :: String     -- rating symbol
+  , teFormula  :: String     -- crystal formula
   , teSource   :: String     -- which module group (Original/Extended/S4-S6)
   } deriving (Show)
 
@@ -57,28 +58,31 @@ fromDerived src d = TestEntry
   , teExpt    = measValue (dMeas d)
   , tePWI     = gap d
   , teRating  = pwiRating (gap d)
+  , teFormula = dFormula d
   , teSource  = src
   }
 
 -- | Convert a WACAScan Observable (7-tuple) into a TestEntry.
 fromObservable :: String -> (String, Double, Double, Double, String, String, String) -> TestEntry
-fromObservable src (name, crystal, pdgVal, pwi, rating, _formula, _domain) = TestEntry
+fromObservable src (name, crystal, pdgVal, pwi, rating, formula, _domain) = TestEntry
   { teName    = name
   , teCrystal = crystal
   , teExpt    = pdgVal
   , tePWI     = pwi
   , teRating  = rating
+  , teFormula = formula
   , teSource  = src
   }
 
 -- | Build a TestEntry from raw values.
-mkTest :: String -> String -> Double -> Double -> TestEntry
-mkTest src name crystal expt = TestEntry
+mkTest :: String -> String -> String -> Double -> Double -> TestEntry
+mkTest src name formula crystal expt = TestEntry
   { teName    = name
   , teCrystal = crystal
   , teExpt    = expt
   , tePWI     = pwi
   , teRating  = pwiRating pwi
+  , teFormula = formula
   , teSource  = src
   }
   where pwi = abs (crystal - expt) / abs expt * 100.0
@@ -158,17 +162,20 @@ s4s6entries =
       -- S4: alpha_inv with a4 correction
       alphaCorr = mkTest src
         "alpha_inv (a4 corrected)"
+        "2(gauss²+d₄)/π+d₃^κ−1/(χ·d₄·Σd²·D)"
         AP.proveAlphaInvCorrected
         AP.pdg_alpha_inv
       -- S5: m_p/m_e with a4 correction
       mpmeCorr = mkTest src
         "m_p/m_e (a4 corrected)"
+        "2(D²+Σd)/d₃+gauss^Nc/κ+κ/(N_w·χ·Σd²·D)"
         AP.proveMpMeCorrected
         AP.pdg_mp_me
       -- S6: proton charge radius
       (_, _, rpVal, _) = PR.prove_protonRadius
       rpEntry = mkTest src
         "r_p (proton radius)"
+        "(C_F·N_c−T_F/(d₃·Σd))×ℏ/(m_p·c)"
         rpVal
         PR.r_p_muonic
   in [alphaCorr, mpmeCorr, rpEntry]
@@ -244,20 +251,21 @@ main = do
   putStrLn $ printf_pad 4 "#"
           ++ printf_pad 35 "Observable"
           ++ printf_pad 14 "Crystal"
-          ++ printf_pad 14 "Expt"
+          ++ printf_pad 14 "PDG/Exp"
           ++ printf_pad 10 "PWI(%)"
-          ++ printf_pad 12 "Rating"
+          ++ printf_pad 10 "Rating"
+          ++ printf_pad 40 "Formula"
           ++ "Source"
-  putStrLn $ replicate 100 '-'
+  putStrLn $ replicate 135 '-'
 
   let indexed = zip [1::Int ..] allTests
   mapM_ (\(i, e) -> do
     let pass = tePWI e < 4.5
         tag  = if pass then " " else "!"
-    printf "%s%3d  %-33s %13.5g %13.5g %9.3f%%  %-10s  %s\n"
-      tag i (teName e) (teCrystal e) (teExpt e) (tePWI e) (teRating e) (teSource e)
+    printf "%s%3d  %-33s %13.5g %13.5g %9.3f%%  %-8s  %-38s  %s\n"
+      tag i (teName e) (teCrystal e) (teExpt e) (tePWI e) (teRating e) (teFormula e) (teSource e)
     ) indexed
-  putStrLn $ replicate 100 '-'
+  putStrLn $ replicate 135 '-'
   putStrLn ""
 
   -- ── Statistics ──
