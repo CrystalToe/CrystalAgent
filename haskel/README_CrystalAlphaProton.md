@@ -5,8 +5,9 @@
 ## Status: PROVED (Sessions 4-5)
 
 Two of the most precisely measured constants in physics, computed
-from five inputs (N_w=2, N_c=3, v=246.22 GeV, π, ln) with zero
-free parameters. Both land inside CODATA uncertainty.
+from the crystal algebra (N_w=2, N_c=3, π, ln) with zero
+free parameters. Both are dimensionless — no VEV dependence.
+Both land inside CODATA uncertainty.
 
 ---
 
@@ -138,7 +139,8 @@ computes.
   not 0.001). The formula is inside uncertainty, not more precise.
 - Does NOT add sin²θ_W as observable #182 (it's a refinement of
   an existing observable, not a new PDG target).
-- Does NOT derive v = 246.22 GeV (that's an input).
+- Does NOT depend on the Higgs VEV at all (dimensionless ratios only).
+  The VEV is derived elsewhere: v = M_Pl × 35/(43×36×2⁵⁰) = 245.17 GeV.
 
 ---
 

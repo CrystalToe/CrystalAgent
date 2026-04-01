@@ -16,10 +16,13 @@ Session 14 rewrite.  Three fixes over Session 13:
 Plus: varimax loading structure (12 energy modes × 43 layers),
 cosmological partition (Ω_Λ, Ω_cdm, Ω_b), pure backbone geometry.
 
-Every constant traces to {N_w=2, N_c=3, v=246.22 GeV, π, ln}.
+Every constant traces to {N_w=2, N_c=3, v=M_Pl×35/(43×36×2⁵⁰), π, ln}.
 Zero fitted parameters.
 
 Proves 73 properties across all 43 layers.
+
+VEV: Toe() default = crystal derived 245.17 GeV (ground truth).
+     See README_VEV.md for the two-mode / four-column gap analysis.
 -}
 module CrystalProtein where
 
@@ -29,7 +32,12 @@ module CrystalProtein where
 -- Three inputs.  Everything else follows.
 --   N_w = 2       (weak isospin dimension)
 --   N_c = 3       (colour dimension)
---   v   = 246.22  (Higgs VEV, GeV — from spectral action on A_F)
+--   M_Pl = 1.220890e19 GeV  (the ONE measurement)
+--
+-- The VEV is DERIVED:
+--   v = M_Pl × (Σd−1)/((D+1)·Σd·2^(D+d₃))
+--     = M_Pl × 35/(43×36×2⁵⁰) = 245.17 GeV
+-- This is Toe() default.  Crystal ground truth.
 
 nC, nW :: Int
 nC = 3
@@ -81,9 +89,22 @@ fermat3 = 2 ^ (2 ^ nC) + 1   -- 257
 hbarC :: Double
 hbarC = 197.3269804e-8         -- GeV·Å
 
--- Higgs VEV
+-- Planck mass — the ONE measured number
+mPlGeV :: Double
+mPlGeV = 1.220890e19                   -- GeV (CODATA)
+
+-- Higgs VEV — DERIVED from M_Pl.  Toe() default.  Ground truth.
+-- v = M_Pl × (Σd−1) / ((D+1) · Σd · 2^(D+d₃))
+--   = M_Pl × 35 / (43 × 36 × 2⁵⁰)
+--   = 245.17 GeV
+-- NOT 246.22.  That is the PDG extraction at a different scale.
+-- See README_VEV.md for the four-column gap analysis.
 vHiggs :: Double
-vHiggs = 246.22                -- GeV
+vHiggs = mPlGeV
+       * fromIntegral (sigmaD - 1)                             -- 35
+       / fromIntegral (dMax + 1)                               -- 43
+       / fromIntegral sigmaD                                   -- 36
+       / fromIntegral ((2 :: Integer) ^ (dMax + nC^(2::Int) - 1))  -- 2⁵⁰
 
 -- Shared core: a₄ invariant × tower dimension
 sharedCore :: Int
