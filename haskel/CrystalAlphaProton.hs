@@ -8,7 +8,9 @@
 -- This is the Connes-Chamseddine spectral triple for the Standard Model.
 -- It encodes U(1) x SU(2) x SU(3). It is not derived — it is the starting
 -- point. Every formula below follows from this algebra, N_w=2, N_c=3,
--- v=246.22 GeV, pi, and ln. Zero free parameters. Zero hardcoded numbers.
+-- M_Pl (the one measurement), pi, and ln. Zero free parameters.
+-- VEV is DERIVED: v = M_Pl × 35/(43×36×2⁵⁰) = 245.17 GeV.
+-- This module computes dimensionless ratios — no VEV dependence.
 
 module CrystalAlphaProton where
 

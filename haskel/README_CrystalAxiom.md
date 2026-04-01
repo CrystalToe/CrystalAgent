@@ -103,7 +103,7 @@ The module defines Haskell types that carry their proofs:
 - `CrystalTrans` — transcendental expressions (π, ln combinations)
 - `Derived` — a physical observable with crystal prediction + measurement + rating
 - `Measurement` — experimental value with uncertainty
-- `Ruler` — the one dimensionful scale (v = 246.22 GeV)
+- `Ruler` — the one dimensionful measurement (M_Pl = 1.220890 × 10¹⁹ GeV). VEV is derived: v = M_Pl × 35/(43×36×2⁵⁰)
 - `Status` — EXACT / TIGHT / GOOD / LOOSE / OVER rating
 
 ## Key Exports

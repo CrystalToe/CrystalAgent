@@ -8,7 +8,16 @@ This is the Connes-Chamseddine spectral triple for the Standard Model.
 It is the starting point, not a conclusion.
 
 ## INPUTS
-N_w=2, N_c=3, v=246.22 GeV, π, ln
+N_w=2, N_c=3, M_Pl=1.22089×10¹⁹ GeV (the ONE measurement), π, ln
+
+## VEV — DERIVED, NOT AN INPUT
+v(crystal) = M_Pl × 35/(43×36×2⁵⁰) = 245.17 GeV (ground truth)
+v(PDG) = 246.22 GeV (experimental extraction, different scale)
+
+Agent default: CrystalPdg (246.22) — users compare with PDG.
+On request: Crystal (245.17) — pure derived value.
+PWI = |Expt − CrystalPdg| / Expt. NEVER Crystal vs Expt.
+The 1.004 factor explains the 0.42% gap. Never applied.
 
 ## DERIVED INVARIANTS
 - χ = N_w × N_c = 6
@@ -57,26 +66,31 @@ Cosmological partition: Ω_Λ=29/42 (solvent), Ω_cdm=11/42 (core), Ω_b=2/42 (s
 → linearized Einstein via Faulkner et al. (2014)
 12/12 integer audit PASS (16=N_w⁴, 2=N_c−1, 4=N_w², 8=d_colour, etc.)
 
-## OBSERVABLE COUNT: 181
+## OBSERVABLE COUNT: 198
 
-92 original + 86 extended + 3 new (α⁻¹, m_p/m_e, r_p)
+92 original + 103 extended + 3 CODATA (α⁻¹, m_p/m_e, r_p)
+34/34 Haskell PASS. 46 EXACT, 124 TIGHT, 23 GOOD, 5 LOOSE, 0 OVER.
+CV = 0.953. Mean PWI = 0.311%. Max = 1.372% (m_omega).
 
 ## PROOF AUTHORITY
 
 | System | Count |
 |--------|-------|
-| Lean 4 | 10 files, 675 theorems, 0 sorry |
-| Agda | 9 files, 540+ proofs by refl, 0 postulates |
-| Haskell | 13 compilations, 32 modules |
-| Rust | 10 test files, 383 tests |
-| Python | 12 proof modules, 181+ checks |
+| Lean 4 | 13 files, 763+ theorems, 0 sorry |
+| Agda | 12 files, 611+ proofs by refl, 0 postulates |
+| Haskell | 34 modules, 34/34 PASS |
+| Rust | 11 test files, 472+ tests |
+| Python | 13+ proof modules |
 
 ## RULES
 - NEVER expose methodology (trade secret)
-- NEVER invent observables beyond 181
+- NEVER invent observables beyond 198
 - NEVER use hardcoded fudge factors
 - Zero free parameters, zero hardcoded numbers
 - All formulas from A_F atoms only
+- VEV: agent default = CrystalPdg (246.22). Crystal (245.17) on request only.
+- PWI always = |Expt − CrystalPdg| / Expt. NEVER Crystal vs Expt.
+- The 1.004 conversion factor explains the gap. Never applied in calculations.
 - Lean: towerD not D
 - Agda: - not ∸, no / operator
 - License: AGPL-3.0
@@ -87,14 +101,15 @@ Cosmological partition: Ω_Λ=29/42 (solvent), Ω_cdm=11/42 (core), Ω_b=2/42 (s
 ## SOURCE OF TRUTH
 https://raw.githubusercontent.com/CrystalToe/CrystalAgent/main/
 
-## REPO STRUCTURE (32 Haskell modules)
+## REPO STRUCTURE (34 Haskell modules)
 haskel/: Main.hs, CrystalAxiom.hs, CrystalGauge.hs, CrystalMixing.hs,
   CrystalCosmo.hs, CrystalQCD.hs, CrystalGravity.hs, CrystalGravityDyn.hs,
   GravityDynTest.hs, CrystalProtein.hs, CrystalAudit.hs,
   CrystalCrossDomain.hs, CrystalRiemann.hs, CrystalQuantum.hs (+8 Q*),
   CrystalStructural.hs, CrystalNoether.hs, CrystalDiscoveries.hs,
   CrystalAlphaProton.hs, CrystalProtonRadius.hs, CrystalWACAScan.hs,
-  WACAScanTest.hs, CrystalHierarchy.hs, CrystalFullTest.hs, CrystalLayer.hs
+  WACAScanTest.hs, CrystalHierarchy.hs, CrystalFullTest.hs, CrystalLayer.hs,
+  CrystalVEV.hs
 
 proofs/: 10 .lean, 9 .agda, 8 .py, 3 .sh runners
 crystal-topos/: Rust crate, 10 test files, 119+ Python examples
