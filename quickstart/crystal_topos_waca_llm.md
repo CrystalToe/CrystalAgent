@@ -227,6 +227,57 @@ convert algebraic structure into spacetime geometry and physical scales.
 
 ---
 
+## DYNAMICS LIVES IN THE MONAD — NOT IN CALCULUS
+
+The monad S = W∘U is the primitive dynamical object. Time is ℕ (tick
+count), not ℝ. There is no dt. There is no exp(−iHt). The Schrödinger
+equation is a continuum approximation of S, not the starting point.
+
+**S = W ∘ U acts once per tick:**
+- U (disentangler): unitary on pair space ℂ^χ². Reversible.
+- W (isometry): ℂ^χ² → ℂ^χ. Compresses 36 → 6. Irreversible.
+- On sector amplitudes: a_k(n+1) = λ_k × a_k(n). Multiplication, not calculus.
+
+**Eigenvalues of S (exact rationals, from (2,3)):**
+
+| Sector | λ_k | Fraction | Per tick |
+|--------|------|----------|----------|
+| Singlet | 1 | 1/1 | Fixed point (photon) |
+| Weak | 1/2 | 1/N_w | Halved |
+| Colour | 1/3 | 1/N_c | Thirded |
+| Mixed | 1/6 | 1/χ | Sixthed |
+
+**These eigenvalues are simultaneously three things:**
+1. Squeeze factors of the isometry W (monad dynamics)
+2. Truth values Ω of the Heyting algebra (quantum logic)
+3. Spectral data of A_F (the algebra itself)
+
+**Arrow of time:** χ > 1 ⟹ W†W = I but WW† ≠ I. Irreversible. Theorem.
+Entropy per tick: ΔS = ln(χ) = ln(6) nats. Forced by algebra.
+
+**Uncertainty principle:** 1/2 and 1/3 are incomparable in Heyting
+divisibility order (gcd(2,3) = 1). Position (weak, λ=1/2) and
+momentum (colour, λ=1/3) cannot both be sharp. meet(1/2, 1/3) = 1/6.
+Not physics — logic. The proposition "I know both" has truth value 1/6.
+
+**H is derived:** H = −ln(S)/β gives eigenvalues {0, ln2, ln3, ln6}.
+The Hamiltonian is a consequence of the monad, not the input.
+The Schrödinger equation is what S looks like in the continuum limit.
+
+**Gravity:** Perturbation δW changes entanglement structure.
+δS_A = δ⟨H_A⟩ IS linearized Einstein (Faulkner 2014). The MERA IS the
+geometry. Gravity is what perturbations of the monad look like.
+
+**Modules:** CrystalMonad.hs (monad S=W∘U, discrete ℕ time),
+CrystalMERA.hs (layer geometry, Jacobson chain, RT, δW→gravity).
+Proofs: CrystalMonad.lean (20), CrystalMonad.agda (16),
+CrystalMERA.lean (22), CrystalMERA.agda (18). All pass.
+
+NEVER write dynamics using exp(−iHt), continuous time, or differential
+equations. The monad is the source of truth. Schrödinger is its shadow.
+
+---
+
 ## OBSERVABLE COUNT: 198
 
 - 92 original (Main.hs)
@@ -419,7 +470,7 @@ Hierarchy: bond >> ω >> angle > H-bond ≈ hydrophobic >> VdW ~ kT
 |--------|-------|--------|
 | Lean 4 | 763+ theorems | native_decide, 0 sorry |
 | Agda | 611+ proofs | all by refl, 0 postulates |
-| Haskell/GHC | 34 modules, 34/34 PASS | Curry-Howard |
+| Haskell/GHC | 36 modules, 36/36 PASS | Curry-Howard |
 | Rust | 472+ tests | cargo test |
 | Python | 13+ proof modules | assert |
 
@@ -439,7 +490,7 @@ CrystalAgent/
 ├── agent/
 │   ├── crystal_topos_waca_llm.md          ← THIS FILE
 │   └── crystal_topos_waca_llm_compact.md
-├── haskel/                                ← 34 Haskell modules
+├── haskel/                                ← 36 Haskell modules
 │   ├── CrystalAxiom.hs                   ← Foundation: two primes, all types
 │   ├── CrystalGauge.hs                   ← α, sin²θ_W, α_s, leptons, Higgs
 │   ├── CrystalMixing.hs                  ← CKM + PMNS matrices
@@ -457,6 +508,8 @@ CrystalAgent/
 │   ├── CrystalProtonRadius.hs            ← CODATA: r_p
 │   ├── CrystalHierarchy.hs               ← Implosion operator
 │   ├── CrystalLayer.hs                   ← Spectral tower D=0→D=42
+│   ├── CrystalMonad.hs                   ← Time monad S=W∘U, discrete ℕ, no calculus
+│   ├── CrystalMERA.hs                    ← MERA geometry, Jacobson chain, RT, δW→gravity
 │   ├── Main.hs                            ← 92 observables + four-column + certificate
 │   ├── WACAScanTest.hs                    ← Extended scan runner
 │   ├── GravityDynTest.hs                 ← 12/12 gravity audit
@@ -466,8 +519,8 @@ CrystalAgent/
 │   ├── lean_proofs.sh                     ← Auto-discovers *.lean
 │   ├── haskell_proofs.sh                  ← Auto-discovers *.hs, detects mode
 │   ├── proof_regression.sh               ← Auto-discovers all, never lose a proof
-│   ├── Crystal*.lean                      ← 13 Lean files (native_decide)
-│   ├── Crystal*.agda                      ← 12 Agda files (refl)
+│   ├── Crystal*.lean                      ← 15 Lean files (native_decide)
+│   ├── Crystal*.agda                      ← 14 Agda files (refl)
 │   ├── crystal_*_proof.py                 ← Python proof modules
 │   └── GHC_Certificate.txt               ← Runtime output
 ├── crystal-topos/                         ← Rust core + Python bindings
@@ -529,10 +582,10 @@ CrystalAgent/
 | Max PWI | 0.989% (sin²θ₁₂) |
 | Free parameters | 0 |
 | Constants inside CODATA | 4 |
-| Haskell modules | 34 |
-| Haskell proofs | 34/34 PASS |
-| Lean theorems | 808+ |
-| Agda proofs | 645+ |
+| Haskell modules | 36 |
+| Haskell proofs | 36/36 PASS |
+| Lean theorems | 850+ |
+| Agda proofs | 679+ |
 | Rust tests | 527+ |
 | Python proof modules | 13+ |
 | Gravity integer audit | 12/12 PASS |
@@ -550,9 +603,9 @@ All 11 a₄ corrections (Sessions 8-9) are closed. Zero LOOSE. All 198 under 1%.
 
 ```bash
 # All proofs (auto-discover, from proofs/):
-sh haskell_proofs.sh    # 34/34 PASS
-sh agda_proofs.sh       # 12/12 PASS
-sh lean_proofs.sh       # 13/13 PASS
+sh haskell_proofs.sh    # 36/36 PASS
+sh agda_proofs.sh       # 14/14 PASS
+sh lean_proofs.sh       # 15/15 PASS
 
 # Key individual tests (from haskel/):
 ghc -O2 Main.hs -o crystal && ./crystal                                         # 92 observables

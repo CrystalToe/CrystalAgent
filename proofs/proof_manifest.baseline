@@ -273,6 +273,42 @@ LEAN CrystalMandelbrot.lean mersenne_2_Nc
 LEAN CrystalMandelbrot.lean mersenne_3_b0
 LEAN CrystalMandelbrot.lean tuning_23_chi
 LEAN CrystalMandelbrot.lean tuning_22_Nwsq
+LEAN CrystalMERA.lean tower_depth
+LEAN CrystalMERA.lean tower_from_primes
+LEAN CrystalMERA.lean rt_four
+LEAN CrystalMERA.lean efe_eight
+LEAN CrystalMERA.lean efe_from_nc
+LEAN CrystalMERA.lean lr_speed
+LEAN CrystalMERA.lean chi_eq_6
+LEAN CrystalMERA.lean kms_nw
+LEAN CrystalMERA.lean rt_from_nw
+LEAN CrystalMERA.lean efe_from_primes
+LEAN CrystalMERA.lean coeff_16
+LEAN CrystalMERA.lean gw_pol
+LEAN CrystalMERA.lean quad_32
+LEAN CrystalMERA.lean quad_5
+LEAN CrystalMERA.lean pol_eq_schwarzschild
+LEAN CrystalMERA.lean spacetime_dim
+LEAN CrystalMERA.lean spatial_dim
+LEAN CrystalMERA.lean endo_total
+LEAN CrystalMonad.lean lam_singlet_denom
+LEAN CrystalMonad.lean lam_weak_denom
+LEAN CrystalMonad.lean lam_colour_denom
+LEAN CrystalMonad.lean lam_mixed_denom
+LEAN CrystalMonad.lean eigen_product
+LEAN CrystalMonad.lean deg_sum
+LEAN CrystalMonad.lean deg_sum_chi_sq
+LEAN CrystalMonad.lean compression_ratio
+LEAN CrystalMonad.lean arrow_of_time
+LEAN CrystalMonad.lean lost_dof
+LEAN CrystalMonad.lean lost_30_decompose
+LEAN CrystalMonad.lean h_integer_content_w
+LEAN CrystalMonad.lean h_integer_content_c
+LEAN CrystalMonad.lean coprime_2_3
+LEAN CrystalMonad.lean min_uncertainty
+LEAN CrystalMonad.lean tower_depth
+LEAN CrystalMonad.lean endo_count
+LEAN CrystalMonad.lean sigma_d_eq
 LEAN CrystalNoether.lean generators_eq_12
 LEAN CrystalNoether.lean noether_currents
 LEAN CrystalNoether.lean rank_drop_eq
@@ -807,7 +843,7 @@ LEAN Main.lean id_sigma_chi_sq
 LEAN Main.lean id_sigma_d2
 LEAN Main.lean id_D_decomp
 LEAN Main.lean id_algebra_N_c
-LEAN_FILES 14
+LEAN_FILES 16
 # AGDA PROOFS
 AGDA CrystalAlphaProton.agda chi-eq
 AGDA CrystalAlphaProton.agda sigma-d-eq
@@ -1030,6 +1066,36 @@ AGDA CrystalMandelbrot.agda div-3
 AGDA CrystalMandelbrot.agda mersenne-2
 AGDA CrystalMandelbrot.agda mersenne-3
 AGDA CrystalMandelbrot.agda tuning-23
+AGDA CrystalMERA.agda tower-depth
+AGDA CrystalMERA.agda tower-sum
+AGDA CrystalMERA.agda rt-four
+AGDA CrystalMERA.agda efe-eight
+AGDA CrystalMERA.agda efe-from-nc
+AGDA CrystalMERA.agda step1-chi
+AGDA CrystalMERA.agda step2-nw
+AGDA CrystalMERA.agda step3-nw-sq
+AGDA CrystalMERA.agda step4-d-colour
+AGDA CrystalMERA.agda coeff-16
+AGDA CrystalMERA.agda gw-polarizations
+AGDA CrystalMERA.agda quad-32
+AGDA CrystalMERA.agda quad-5
+AGDA CrystalMERA.agda spacetime-dim
+AGDA CrystalMERA.agda spatial-dim
+AGDA CrystalMERA.agda equivalence
+AGDA CrystalMonad.agda lam-singlet
+AGDA CrystalMonad.agda lam-weak
+AGDA CrystalMonad.agda lam-colour
+AGDA CrystalMonad.agda lam-mixed
+AGDA CrystalMonad.agda eigen-product
+AGDA CrystalMonad.agda deg-sum
+AGDA CrystalMonad.agda deg-chi-sq
+AGDA CrystalMonad.agda chi-gt-1
+AGDA CrystalMonad.agda lost-dof
+AGDA CrystalMonad.agda h-content
+AGDA CrystalMonad.agda coprime
+AGDA CrystalMonad.agda tower
+AGDA CrystalMonad.agda sigma
+AGDA CrystalMonad.agda endos
 AGDA CrystalNoether.agda generators-eq-12
 AGDA CrystalNoether.agda lorentz-double
 AGDA CrystalNoether.agda poincare-eq-10
@@ -1452,7 +1518,7 @@ AGDA CrystalTopos.agda bridge-string-den
 AGDA CrystalTopos.agda endomorphisms-bridge
 AGDA CrystalTopos.agda sector-sum-bridge
 AGDA CrystalTopos.agda spectral-dim-bridge
-AGDA_FILES 13
+AGDA_FILES 15
 # HASKELL MODULES
 HASKELL CrystalAlphaProton.hs
 HASKELL CrystalAudit.hs
@@ -1467,7 +1533,9 @@ HASKELL CrystalGravityDyn.hs
 HASKELL CrystalHierarchy.hs
 HASKELL CrystalLayer.hs
 HASKELL CrystalMandelbrot.hs
+HASKELL CrystalMERA.hs
 HASKELL CrystalMixing.hs
+HASKELL CrystalMonad.hs
 HASKELL CrystalNoether.hs
 HASKELL CrystalProtein.hs
 HASKELL CrystalProtonRadius.hs
@@ -1995,6 +2063,7 @@ PYTHON crystal_certificate_proof.py
 PYTHON crystal_discoveries_proof.py
 PYTHON crystal_fundamentals_proof.py
 PYTHON crystal_hierarchy_proof.py
+PYTHON crystal_monad_mera_proof.py
 PYTHON crystal_noether_proof.py
 PYTHON crystal_proton_radius_proof.py
 PYTHON crystal_rendering_proof.py
@@ -2120,10 +2189,11 @@ PYTHON hf_solver.py
 PYTHON mera_gravity_closed.py
 PYTHON mera_linearized_gravity.py
 PYTHON qubo_folder.py
+PYTHON schrodinger_vs_monad.py
 PYTHON spectral_tower.py
 # SUMMARY COUNTS
-TOTAL_LEAN_THEOREMS      808
-TOTAL_AGDA_PROOFS      643
+TOTAL_LEAN_THEOREMS      844
+TOTAL_AGDA_PROOFS      673
 TOTAL_RUST_TESTS      486
-TOTAL_HASKELL_MODULES       34
-TOTAL_PYTHON_MODULES      131
+TOTAL_HASKELL_MODULES       36
+TOTAL_PYTHON_MODULES      133
