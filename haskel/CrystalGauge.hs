@@ -276,3 +276,33 @@ proveElectronMass c r =
       val  = mmu / fromIntegral (chi^3 - (nC^2 - 1))         -- /208
   in Derived "m_e (MeV)" "m_μ/(χ³−d_col)"
      val Nothing (pdg 0.51100) Computed
+
+-- ═══════════════════════════════════════════════════════════════════
+-- Session 9: Muon mass a₄ correction
+-- ═══════════════════════════════════════════════════════════════════
+
+-- | Muon mass corrected.
+--   Base: v/2^(2χ−1) × (N_c²−1)/N_c² = v/2^11 × 8/9
+--   Correction: −1/(d₈·(2χ−1)) = −1/(8×11) = −1/88
+--   Dual route A: 1/(d₈·(2χ−1)) = 1/88
+--   Dual route B: 1/(N_w⁴(χ−1) + d₈) = 1/(16×5+8) = 1/88
+--   Corrected: v/2^11 × 8/9 × 87/88
+--   PWI: 1.14% → 0.005%
+proveMuonMassCorrected :: Crystal Two Three -> Ruler -> Derived
+proveMuonMassCorrected c r =
+  let v    = dCrystal (proveVEV c r) * 1e3                    -- MeV
+      pow  = (2::Integer) ^ (2 * chi - 1)                     -- 2^11 = 2048
+      colr = fromIntegral (nC^2 - 1) / fromIntegral (nC^2)   -- 8/9
+      d8   = nC^2 - 1                                         -- 8
+      corr = 1.0 / fromIntegral (d8 * (2 * chi - 1))          -- 1/88
+      val  = v / fromIntegral pow * colr * (1 - corr)          -- × 87/88
+  in Derived "m_mu (MeV)" "v/2^11*8/9*(1-1/(d8*(2chi-1)))=v/2^11*8/9*87/88"
+     val Nothing (pdg 105.658) Computed
+
+-- | Electron mass from corrected muon: m_μ_corr / 208
+proveElectronMassCorrected :: Crystal Two Three -> Ruler -> Derived
+proveElectronMassCorrected c r =
+  let mmu  = dCrystal (proveMuonMassCorrected c r)
+      val  = mmu / fromIntegral (chi^3 - (nC^2 - 1))         -- /208
+  in Derived "m_e (MeV)" "m_μ_corr/(χ³−d_col)"
+     val Nothing (pdg 0.51100) Computed
