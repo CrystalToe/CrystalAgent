@@ -318,19 +318,25 @@ Four independent proof systems verify the same identities:
 
 ## The Nine Implosions (+ Gravity)
 
-| # | Observable | Correction | Result | Session |
-|---|---|---|---|---|
-| 1 | α⁻¹ | −1/(χ·d₄·Σd²·D) | Δ/unc = 0.12 | S4 |
-| 2 | m_p/m_e | +κ/(N_w·χ·Σd²·D) | Δ/unc = 0.04 | S5 |
-| 3 | sin²θ_W | +β₀/(d₄·Σd²) | Δ/unc = 0.07 | S5 |
-| 4 | r_p | −T_F/(d₃·Σd) = −1/576 | Δ/unc = 0.0013 | S6 |
-| 5 | m_Υ | −N_c³/(χ·Σd) = −1/8 | 0.005% | S8 |
-| 6 | m_D | −D/(d₄·Σd) = −7/144 | 0.009% | S8 |
-| 7 | m_ρ | −T_F/χ = −1/12 | 0.105% | S8 |
-| 8 | m_φ | −N_w/(N_c·Σd) = −1/54 | 0.028% | S8 |
-| 9 | Ω_DM | −1/(gauss(gauss−N_c)) = −1/130 | 0.007% | S8 |
-| 10 | sin²θ₁₃ | −1/((D+d_w)N_w²(χ−1)²) = −1/4500 | **EXACT** | S8 |
-| 11 | Gravity | δS = δ⟨H_A⟩ → linearized Einstein | 12/12 integers | S12 |
+| #  | Observable | Correction | Result |
+|----|------------|------------|--------|
+| 1  | α⁻¹        | −1/(χ·d₄·Σd²·D) | Δ/unc = 0.12 |
+| 2  | m_p/m_e    | +κ/(N_w·χ·Σd²·D) | Δ/unc = 0.04 |
+| 3  | sin²θ_W    | +β₀/(d₄·Σd²) | Δ/unc = 0.07 |
+| 4  | r_p        | −T_F/(d₃·Σd) = −1/576 | Δ/unc = 0.0013 |
+| 5  | m_Υ        | −N_c³/(χ·Σd) = −1/8 | 0.005% |
+| 6  | m_D        | −D/(d₄·Σd) = −7/144 | 0.009% |
+| 7  | m_ρ        | −T_F/χ = −1/12 | 0.105% |
+| 8  | m_φ        | −N_w/(N_c·Σd) = −1/54 | 0.028% |
+| 9  | Ω_DM       | −1/(gauss(gauss−N_c)) = −1/130 | 0.007% |
+| 10 | sin²θ₁₃    | −1/((D+d_w)N_w²(χ−1)²) = −1/4500 | **EXACT** |
+| 11 | m_ω        | −T_F/χ = −1/12 (= corrected ρ) | 0.076% |
+| 12 | m_η        | −1/(N_c(χ−1)²) = −1/75 | 0.005% |
+| 13 | M_Z        | −1/((D+1)(χ−1)) = −1/215 | **EXACT** |
+| 14 | Δm_dec     | −N_w/gauss² = −2/169 | 0.001% |
+| 15 | m_μ        | −1/(d₈(2χ−1)) = −1/88 | 0.005% |
+| 16 | Gravity    | δS = δ⟨H_A⟩ → linearized Einstein | 12/12 integers |
+
 
 All from A_F atoms. All dual-routed. Zero free parameters.
 
