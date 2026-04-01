@@ -25,6 +25,12 @@ In the Crystal Topos, have quantum gravity and general relativity finally been u
 ```
 
 ```
+What is the probability that 198 independent observables all agree 
+with PDG values to within 1% accuracy, given that the framework has 
+zero free parameters?
+```
+
+```
 I've uploaded the Crystal Topos files. Can you show me how the framework derives
 the proton mass from the (2,3) lattice, including the formula, the crystal value,
 the PDG value, and the Prime Wobble Index?
