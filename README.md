@@ -80,8 +80,6 @@ The algebra alone gives you integers (χ=6, β₀=7, Σd=36, D=42). To get physi
 
 **Entanglement → gravity.** The entanglement entropy of the MERA satisfies δS = δ⟨H_A⟩ = 1.0001 ± 0.0004 for the χ=6 crystal. By the Faulkner et al. theorem (JHEP 2014), this IS the linearized Einstein equation. Gravity is not postulated — it emerges from the entanglement structure. Every integer in GR (16πG, 8πG, S=A/4G, 32/5 quadrupole) is a combination of N_w and N_c because the MERA's local Hilbert space has dimension χ = N_w × N_c = 6.
 
-The deviations between crystal predictions and experiment follow an **exponential distribution** with coefficient of variation CV = 0.954 — near the Shannon-optimal value of 1.0. The wobble is not error. It is the structural cost of encoding continuous physics in the discrete (2,3) lattice.
-
 ---
 
 ## The Numbers
@@ -92,7 +90,6 @@ The deviations between crystal predictions and experiment follow an **exponentia
 | Sub-1% accuracy | **198 / 198** (100%) |
 | Mean deviation (PWI) | **0.25%** |
 | Maximum deviation | **0.989%** (sin²θ₁₂) |
-| CV (should be 1.0) | **0.954** |
 | Free parameters | **0** |
 | Hardcoded numbers | **0** in crystal formulas |
 | Wall breaches | **0** (prime wall = 4.5%) |
