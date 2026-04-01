@@ -179,6 +179,51 @@ LEAN CrystalGravityDyn.lean jacobson_step4_EFE
 LEAN CrystalGravityDyn.lean jacobson_chain_complete
 LEAN CrystalGravityDyn.lean linearized_einstein_integers
 LEAN CrystalGravityDyn.lean dynamical_gravity_from_AF
+LEAN CrystalHierarchy.lean chi_eq
+LEAN CrystalHierarchy.lean beta0_eq
+LEAN CrystalHierarchy.lean sigma_d_eq
+LEAN CrystalHierarchy.lean sigma_d2_eq
+LEAN CrystalHierarchy.lean gauss_eq
+LEAN CrystalHierarchy.lean towerD_eq
+LEAN CrystalHierarchy.lean omega_denom_a
+LEAN CrystalHierarchy.lean omega_denom_b
+LEAN CrystalHierarchy.lean omega_dual_route
+LEAN CrystalHierarchy.lean omega_69_eq
+LEAN CrystalHierarchy.lean omega_simplify
+LEAN CrystalHierarchy.lean omega_denom_simplify
+LEAN CrystalHierarchy.lean eta_chi_minus_1
+LEAN CrystalHierarchy.lean eta_chi_minus_1_sq
+LEAN CrystalHierarchy.lean eta_route_a
+LEAN CrystalHierarchy.lean eta_route_b
+LEAN CrystalHierarchy.lean eta_dual_route
+LEAN CrystalHierarchy.lean eta_route_a_expand
+LEAN CrystalHierarchy.lean eta_corr_num
+LEAN CrystalHierarchy.lean mz_d_plus_1
+LEAN CrystalHierarchy.lean mz_route_a
+LEAN CrystalHierarchy.lean mz_route_b
+LEAN CrystalHierarchy.lean mz_dual_route
+LEAN CrystalHierarchy.lean mz_corr_num
+LEAN CrystalHierarchy.lean mz_corr_den
+LEAN CrystalHierarchy.lean mz_43_decompose
+LEAN CrystalHierarchy.lean dec_gauss_sq
+LEAN CrystalHierarchy.lean dec_route_b
+LEAN CrystalHierarchy.lean dec_dual_route
+LEAN CrystalHierarchy.lean dec_corr_num
+LEAN CrystalHierarchy.lean dec_13_sq
+LEAN CrystalHierarchy.lean muon_d8
+LEAN CrystalHierarchy.lean muon_2chi_m1
+LEAN CrystalHierarchy.lean muon_route_a
+LEAN CrystalHierarchy.lean muon_route_b
+LEAN CrystalHierarchy.lean muon_dual_route
+LEAN CrystalHierarchy.lean muon_nw4
+LEAN CrystalHierarchy.lean muon_nw4_times_chi_m1
+LEAN CrystalHierarchy.lean muon_80_plus_8
+LEAN CrystalHierarchy.lean muon_corr_num
+LEAN CrystalHierarchy.lean shared_atom_2chi_m1
+LEAN CrystalHierarchy.lean shared_atom_chi_m1
+LEAN CrystalHierarchy.lean cross_130
+LEAN CrystalHierarchy.lean cross_75
+LEAN CrystalHierarchy.lean denoms_distinct
 LEAN CrystalLayer.lean chi_eq
 LEAN CrystalLayer.lean beta0_eq
 LEAN CrystalLayer.lean towerD_eq
@@ -762,7 +807,7 @@ LEAN Main.lean id_sigma_chi_sq
 LEAN Main.lean id_sigma_d2
 LEAN Main.lean id_D_decomp
 LEAN Main.lean id_algebra_N_c
-LEAN_FILES 13
+LEAN_FILES 14
 # AGDA PROOFS
 AGDA CrystalAlphaProton.agda chi-eq
 AGDA CrystalAlphaProton.agda sigma-d-eq
@@ -906,6 +951,40 @@ AGDA CrystalGravityDyn.agda jacobson-step2
 AGDA CrystalGravityDyn.agda jacobson-step3
 AGDA CrystalGravityDyn.agda jacobson-step4
 AGDA CrystalGravityDyn.agda equiv-principle
+AGDA CrystalHierarchy.agda chi-eq
+AGDA CrystalHierarchy.agda sigma-d-eq
+AGDA CrystalHierarchy.agda gauss-eq
+AGDA CrystalHierarchy.agda towerD-eq
+AGDA CrystalHierarchy.agda omega-denom
+AGDA CrystalHierarchy.agda omega-multiplier-69
+AGDA CrystalHierarchy.agda eta-chi-minus-1
+AGDA CrystalHierarchy.agda eta-chi-minus-1-sq
+AGDA CrystalHierarchy.agda eta-route-a
+AGDA CrystalHierarchy.agda eta-route-b
+AGDA CrystalHierarchy.agda eta-dual-route
+AGDA CrystalHierarchy.agda eta-corr-num
+AGDA CrystalHierarchy.agda mz-d-plus-1
+AGDA CrystalHierarchy.agda mz-route-a
+AGDA CrystalHierarchy.agda mz-route-b
+AGDA CrystalHierarchy.agda mz-dual-route
+AGDA CrystalHierarchy.agda mz-corr-num
+AGDA CrystalHierarchy.agda mz-corr-den
+AGDA CrystalHierarchy.agda mz-43-decompose
+AGDA CrystalHierarchy.agda dec-gauss-sq
+AGDA CrystalHierarchy.agda dec-route-b
+AGDA CrystalHierarchy.agda dec-dual-route
+AGDA CrystalHierarchy.agda dec-corr-num
+AGDA CrystalHierarchy.agda muon-d8
+AGDA CrystalHierarchy.agda muon-2chi-m1
+AGDA CrystalHierarchy.agda muon-route-a
+AGDA CrystalHierarchy.agda muon-route-b
+AGDA CrystalHierarchy.agda muon-dual-route
+AGDA CrystalHierarchy.agda muon-nw4
+AGDA CrystalHierarchy.agda muon-corr-num
+AGDA CrystalHierarchy.agda shared-2chi-m1
+AGDA CrystalHierarchy.agda shared-chi-m1
+AGDA CrystalHierarchy.agda cross-130
+AGDA CrystalHierarchy.agda cross-75
 AGDA CrystalLayer.agda chi-eq
 AGDA CrystalLayer.agda beta0-eq
 AGDA CrystalLayer.agda towerD-eq
@@ -1373,7 +1452,7 @@ AGDA CrystalTopos.agda bridge-string-den
 AGDA CrystalTopos.agda endomorphisms-bridge
 AGDA CrystalTopos.agda sector-sum-bridge
 AGDA CrystalTopos.agda spectral-dim-bridge
-AGDA_FILES 12
+AGDA_FILES 13
 # HASKELL MODULES
 HASKELL CrystalAlphaProton.hs
 HASKELL CrystalAudit.hs
@@ -1557,6 +1636,20 @@ RUST crystal_hierarchy_tests.rs test_sin13_clean_form
 RUST crystal_hierarchy_tests.rs test_sin13_corrected
 RUST crystal_hierarchy_tests.rs test_sin13_multiplier
 RUST crystal_hierarchy_tests.rs test_sin13_shares_2chi_minus_1
+RUST crystal_hierarchy_tests.rs test_omega_meson_inherits_rho
+RUST crystal_hierarchy_tests.rs test_omega_meson_corrected
+RUST crystal_hierarchy_tests.rs test_eta_dual_route
+RUST crystal_hierarchy_tests.rs test_eta_identity
+RUST crystal_hierarchy_tests.rs test_eta_corrected
+RUST crystal_hierarchy_tests.rs test_mz_correction_denominator
+RUST crystal_hierarchy_tests.rs test_mz_corrected_multiplier
+RUST crystal_hierarchy_tests.rs test_mz_corrected
+RUST crystal_hierarchy_tests.rs test_decuplet_dual_route
+RUST crystal_hierarchy_tests.rs test_decuplet_corrected
+RUST crystal_hierarchy_tests.rs test_muon_dual_route
+RUST crystal_hierarchy_tests.rs test_muon_identity
+RUST crystal_hierarchy_tests.rs test_muon_corrected
+RUST crystal_hierarchy_tests.rs test_all_five_loose_closed
 RUST crystal_layer_tests.rs layer0_algebra
 RUST crystal_layer_tests.rs layer0_type_safety
 RUST crystal_layer_tests.rs layer5_alpha_value
@@ -1885,7 +1978,7 @@ RUST crystal_tests.rs test_hadamard_is_unitary
 RUST_COUNT crystal_alpha_proton_tests.rs 28
 RUST_COUNT crystal_discovery_tests.rs 33
 RUST_COUNT crystal_fundamentals_tests.rs 45
-RUST_COUNT crystal_hierarchy_tests.rs 41
+RUST_COUNT crystal_hierarchy_tests.rs 55
 RUST_COUNT crystal_layer_tests.rs 17
 RUST_COUNT crystal_mandelbrot_tests.rs 38
 RUST_COUNT crystal_noether_tests.rs 21
@@ -2029,8 +2122,8 @@ PYTHON mera_linearized_gravity.py
 PYTHON qubo_folder.py
 PYTHON spectral_tower.py
 # SUMMARY COUNTS
-TOTAL_LEAN_THEOREMS      763
-TOTAL_AGDA_PROOFS      609
-TOTAL_RUST_TESTS      472
+TOTAL_LEAN_THEOREMS      808
+TOTAL_AGDA_PROOFS      643
+TOTAL_RUST_TESTS      486
 TOTAL_HASKELL_MODULES       34
 TOTAL_PYTHON_MODULES      131
