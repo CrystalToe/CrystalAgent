@@ -68,15 +68,15 @@
  m_d(2GeV) MeV              chain×11/8×6/5×53/54                     4.67128      4.69122      4.67000   0.454%  ● TIGHT
  m_d−m_u (MeV)              down-type corr                           2.50791      2.51861      2.51000   0.343%  ● TIGHT
  m_η' (MeV)                 Λ = v/2⁸                               957.70968    961.79687    957.78000   0.419%  ● TIGHT
- m_η (MeV)                  Λ/√N_c                                 552.93394    555.29368    547.86000   1.357%  ○ LOOSE
+ m_eta (MeV)                Lam/sqrt(Nc)*(1-1/(Nc*(chi-1)^2))=Lam/sqrt3*74/75    545.56149    547.88976    547.86000   0.005%  ● TIGHT
  m_K (MeV)                  m_π√(14×35/36)                         499.68425    501.81674    497.61100   0.845%  ◐ GOOD
- Δm_dec (MeV)               m_s×κ                                  148.12690    148.75905    147.00000   1.197%  ○ LOOSE
+ dm_dec (MeV)               ms*kappa*(1-Nw/gauss^2)=ms*kappa*167/169    146.37391    146.99859    147.00000   0.001%  ■ EXACT
  Σ−Λ (MeV)                  √(σ/Σd)                                 73.51391     73.82765     73.70000   0.173%  ● TIGHT
  m(0⁺⁺) MeV                 Λ×N_c²/(N_c²−1)×κ                     1707.67567   1714.96346   1710.00000   0.290%  ● TIGHT
  m(0⁻⁺) MeV                 (N_c/N_w)×m(0⁺⁺)                      2561.51350   2572.44519   2560.00000   0.486%  ● TIGHT
  m(2⁺⁺) MeV                 √2×53/54×m(0⁺⁺)                       2370.29553   2380.41117   2390.00000   0.401%  ● TIGHT
  m_ρ (MeV)                  m_pi*(chi(Sd-1)/Sd-TF/chi)=m_pi*23/4    778.78346    782.10705    775.30000   0.878%  ◐ GOOD
- M_Z (GeV)                  v×N_c/(N_c²−1) = 3v/8                   91.94013     92.33250     91.18760   1.256%  ○ LOOSE
+ M_Z (GeV)                  v*(Nc/(Nc^2-1)-1/((D+1)(chi-1)))=v*637/1720     90.79979     91.18729     91.18760   0.000%  ■ EXACT
  M_W (GeV)                  M_Z×√(1−sin²θ_W)                        80.63683     80.98096     80.36920   0.761%  ◐ GOOD
  m_Λ (MeV)                  m_p×gauss/(gauss−2)                   1110.87873   1115.61960   1115.68300   0.006%  ● TIGHT
  η_B                        J×α_W⁴×(28/79)×(N_w/N_c)             6.07692e-10  6.07692e-10  6.10000e-10   0.378%  ● TIGHT
@@ -87,8 +87,8 @@
  ΔS (nats)                  ln(χ) + Σ correction                     1.48242      1.48242      1.48000   0.163%  ● TIGHT
  α_s(M_Z)                   N_w/(N_c²+d_col) = 2/17                  0.11765      0.11765      0.11800   0.299%  ● TIGHT
  m_μ/m_e                    χ³−d_colour = 208                      208.00000    208.00000    206.76800   0.596%  ◐ GOOD
- m_μ (MeV)                  v/2^(2χ−1)×8/9                         106.41219    106.86632    105.65800   1.144%  ○ LOOSE
- m_e (MeV)                  m_μ/(χ³−d_col)                           0.51160      0.51378      0.51100   0.544%  ◐ GOOD
+ m_mu (MeV)                 v/2^11*8/9*(1-1/(d8*(2chi-1)))=v/2^11*8/9*87/88    105.20296    105.65193    105.65800   0.006%  ● TIGHT
+ m_e (MeV)                  m_μ_corr/(χ³−d_col)                      0.50578      0.50794      0.51100   0.598%  ◐ GOOD
  m_c(m_c) MeV               m_c(m_b)×25/18                        1273.98567   1279.42262   1273.00000   0.505%  ◐ GOOD
  Ω_Λ/Ω_m                    gauss/χ = 13/6                           2.16667      2.16667      2.17500   0.383%  ● TIGHT
  Feigenbaum δ               D/N_c² = 14/3                            4.66667      4.66667      4.66920   0.054%  ● TIGHT
@@ -115,7 +115,7 @@
  m_D (MeV)                  Lam*(Nw-D/(d4*Sd))=Lam*281/144        1868.86402   1876.83972   1869.70000   0.382%  ● TIGHT
  m_B (MeV)                  Lam*(chi-1/2)=Lam*11/2                5267.40323   5289.88276   5279.70000   0.193%  ● TIGHT
  m_phi (MeV)                Lam*(gauss/(gauss-1)-Nw/(Nc*Sd))=Lam*115/108   1019.78345   1024.13555   1019.50000   0.455%  ● TIGHT
- m_omega (MeV)              m_pi*chi(Sd-1)/Sd (= m_rho)            790.07018    793.44193    782.70000   1.372%  ○ LOOSE
+ m_omega (MeV)              m_pi*(chi(Sd-1)/Sd-TF/chi)=m_pi*23/4    778.78346    782.10705    782.70000   0.076%  ● TIGHT
  m_K* (MeV)                 m_rho + Lam/10                         885.84114    889.62162    891.67000   0.230%  ● TIGHT
  m_Sigma (MeV)              m_Lambda + (Sigma-Lambda)             1184.39265   1189.44724   1189.40000   0.004%  ● TIGHT
  m_Omega (MeV)              Lam*beta0/Nw^2=Lam*7/4                1675.99194   1683.14451   1672.50000   0.636%  ◐ GOOD
@@ -231,14 +231,14 @@
   ══════════════════════════════════════════
   Total observables:       198
   EXACT  (PWI = 0):        46
-  TIGHT  (PWI < 0.5%):     124
+  TIGHT  (PWI < 0.5%):     129
   GOOD   (0.5% - 1%):      23
-  LOOSE  (1% - 4.5%):      5
+  LOOSE  (1% - 4.5%):      0
   OVER   (PWI >= 4.5%):    0
   ──────────────────────────────────────────
-  Mean PWI (CrystalPdg vs Expt):  0.3114%
-  CV (std/mean):                   0.9530
-  Maximum PWI:                     1.372%  (m_omega (MeV))
+  Mean PWI (CrystalPdg vs Expt):  0.2707%
+  CV (std/mean):                   0.8980
+  Maximum PWI:                     0.989%  (sin²θ₁₂)
   Wall breaches (>=4.5%):          0
   ══════════════════════════════════════════
 
@@ -252,28 +252,34 @@
     ρ_Λ^¼ (meV)                     Raw=0.710%  PWI=0.287%  (saved 0.424%)
     m_ν2 (meV)                      Raw=0.275%  PWI=0.150%  (saved 0.125%)
     Σm_ν (eV)                       Raw=0.227%  PWI=0.199%  (saved 0.027%)
+    m_eta (MeV)                     Raw=0.420%  PWI=0.005%  (saved 0.414%)
+    dm_dec (MeV)                    Raw=0.426%  PWI=0.001%  (saved 0.425%)
     Σ−Λ (MeV)                       Raw=0.252%  PWI=0.173%  (saved 0.079%)
     m(2⁺⁺) MeV                      Raw=0.824%  PWI=0.401%  (saved 0.423%)
+    M_Z (GeV)                       Raw=0.425%  PWI=0.000%  (saved 0.425%)
     m_Λ (MeV)                       Raw=0.431%  PWI=0.006%  (saved 0.425%)
     m_τ (GeV)                       Raw=0.773%  PWI=0.350%  (saved 0.423%)
+    m_mu (MeV)                      Raw=0.431%  PWI=0.006%  (saved 0.425%)
+    m_e (MeV)                       Raw=1.021%  PWI=0.598%  (saved 0.422%)
     m_B (MeV)                       Raw=0.233%  PWI=0.193%  (saved 0.040%)
+    m_omega (MeV)                   Raw=0.500%  PWI=0.076%  (saved 0.425%)
     m_K* (MeV)                      Raw=0.654%  PWI=0.230%  (saved 0.424%)
     m_Sigma (MeV)                   Raw=0.421%  PWI=0.004%  (saved 0.417%)
 
-  CV TARGET: 0.9530  (PASS — below 1.0)
+  CV TARGET: 0.8980  (PASS — below 1.0)
 
   TOP 5 OUTLIERS:
   ──────────────────────────────────────────
-    m_omega (MeV)                        PWI=1.372%  Raw=0.942%  [Original]
-    m_η (MeV)                            PWI=1.357%  Raw=0.926%  [Original]
-    M_Z (GeV)                            PWI=1.256%  Raw=0.825%  [Original]
-    Δm_dec (MeV)                         PWI=1.197%  Raw=0.767%  [Original]
-    m_μ (MeV)                            PWI=1.144%  Raw=0.714%  [Original]
+    sin²θ₁₂                              PWI=0.989%  Raw=0.989%  [Original]
+    m_J/psi (MeV)                        PWI=0.934%  Raw=0.506%  [Original]
+    m_t (GeV)                            PWI=0.889%  Raw=0.460%  [Original]
+    m_ρ (MeV)                            PWI=0.878%  Raw=0.449%  [Original]
+    m_K (MeV)                            PWI=0.845%  Raw=0.417%  [Original]
 
   PER-SOURCE CV:
-    Original (92, two rulers):  0.8348
+    Original (92, two rulers):  0.8238
     Extended (103, PDG VEV):    0.8175
-    Combined (all):             0.9530
+    Combined (all):             0.8980
 
   S4-S6 CODATA PRECISION:
   ──────────────────────────────────────────

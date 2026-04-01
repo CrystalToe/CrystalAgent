@@ -156,16 +156,16 @@ original92 =
         , CrystalQCD.proveTopMass c r, proveFPi c r
         , provePionMass c r, proveAbsMs c r, proveAbsMu c r
         , proveAbsMd c r, proveNPsplitting c r
-        , proveEtaPrimeMass c r, proveEtaMass c r, proveKaonMass c r
-        , proveDecupletSpacing c r, proveSigmaLambda c r
+        , proveEtaPrimeMass c r, proveEtaMassCorrected c r, proveKaonMass c r
+        , proveDecupletSpacingCorrected c r, proveSigmaLambda c r
         , proveGlueball0pp c r, proveGlueball0mp c r, proveGlueball2pp c r
         , proveRhoMassCorrected c r
-        , proveMZ c r, proveMW c r, proveLambdaBaryon c r
+        , proveMZCorrected c r, proveMW c r, proveLambdaBaryon c r
         , proveEtaB c
         , proveImmirzi c, proveBHEntropy c, CrystalGauge.proveTauMass c r
         , proveGenerations c, proveEntropy c
         , proveAlphaS c, proveMuonElectronRatio c
-        , proveMuonMass c r, proveElectronMass c r
+        , proveMuonMassCorrected c r, proveElectronMassCorrected c r
         , CrystalQCD.proveCharmMass c r
         , proveOmegaRatio c, proveFeigenbaum c
         , proveBlasius c, proveKleiber c, CrystalCrossDomain.proveVonKarman c
@@ -177,7 +177,7 @@ original92 =
         , proveMuonQCDRatio c, proveSpectralGm2 c
         , proveHaloSlope c, proveEoS c
         , proveJPsi c r, proveUpsilonCorrected c r, proveDMesonCorrected c r, proveBMeson c r
-        , provePhiMesonCorrected c r, proveOmegaMeson c r, proveKStarMeson c r
+        , provePhiMesonCorrected c r, proveOmegaMesonCorrected c r, proveKStarMeson c r
         , proveSigmaBaryon c r, proveOmegaSSS c r
         ]
 
@@ -200,16 +200,16 @@ original92 =
         , CrystalQCD.proveTopMass c rp, proveFPi c rp
         , provePionMass c rp, proveAbsMs c rp, proveAbsMu c rp
         , proveAbsMd c rp, proveNPsplitting c rp
-        , proveEtaPrimeMass c rp, proveEtaMass c rp, proveKaonMass c rp
-        , proveDecupletSpacing c rp, proveSigmaLambda c rp
+        , proveEtaPrimeMass c rp, proveEtaMassCorrected c rp, proveKaonMass c rp
+        , proveDecupletSpacingCorrected c rp, proveSigmaLambda c rp
         , proveGlueball0pp c rp, proveGlueball0mp c rp, proveGlueball2pp c rp
         , proveRhoMassCorrected c rp
-        , proveMZ c rp, proveMW c rp, proveLambdaBaryon c rp
+        , proveMZCorrected c rp, proveMW c rp, proveLambdaBaryon c rp
         , proveEtaB c
         , proveImmirzi c, proveBHEntropy c, CrystalGauge.proveTauMass c rp
         , proveGenerations c, proveEntropy c
         , proveAlphaS c, proveMuonElectronRatio c
-        , proveMuonMass c rp, proveElectronMass c rp
+        , proveMuonMassCorrected c rp, proveElectronMassCorrected c rp
         , CrystalQCD.proveCharmMass c rp
         , proveOmegaRatio c, proveFeigenbaum c
         , proveBlasius c, proveKleiber c, CrystalCrossDomain.proveVonKarman c
@@ -221,7 +221,7 @@ original92 =
         , proveMuonQCDRatio c, proveSpectralGm2 c
         , proveHaloSlope c, proveEoS c
         , proveJPsi c rp, proveUpsilonCorrected c rp, proveDMesonCorrected c rp, proveBMeson c rp
-        , provePhiMesonCorrected c rp, proveOmegaMeson c rp, proveKStarMeson c rp
+        , provePhiMesonCorrected c rp, proveOmegaMesonCorrected c rp, proveKStarMeson c rp
         , proveSigmaBaryon c rp, proveOmegaSSS c rp
         ]
 

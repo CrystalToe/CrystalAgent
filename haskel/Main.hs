@@ -192,16 +192,16 @@ main = do
   putStrLn $ sd (proveAbsMd c r) (proveAbsMd c rp)
   putStrLn $ sd (proveNPsplitting c r) (proveNPsplitting c rp)
   putStrLn $ sd (proveEtaPrimeMass c r) (proveEtaPrimeMass c rp)
-  putStrLn $ sd (proveEtaMass c r) (proveEtaMass c rp)
+  putStrLn $ sd (proveEtaMassCorrected c r) (proveEtaMassCorrected c rp)
   putStrLn $ sd (proveKaonMass c r) (proveKaonMass c rp)
   putStrLn $ sd (proveCharmMass c r) (proveCharmMass c rp)
-  putStrLn $ sd (proveDecupletSpacing c r) (proveDecupletSpacing c rp)
+  putStrLn $ sd (proveDecupletSpacingCorrected c r) (proveDecupletSpacingCorrected c rp)
   putStrLn $ sd (proveSigmaLambda c r) (proveSigmaLambda c rp)
   putStrLn $ sd (proveGlueball0pp c r) (proveGlueball0pp c rp)
   putStrLn $ sd (proveGlueball0mp c r) (proveGlueball0mp c rp)
   putStrLn $ sd (proveGlueball2pp c r) (proveGlueball2pp c rp)
-  putStrLn $ sd (proveRhoMass c r) (proveRhoMass c rp)
-  putStrLn $ sd (proveMZ c r) (proveMZ c rp)
+  putStrLn $ sd (proveRhoMassCorrected c r) (proveRhoMassCorrected c rp)
+  putStrLn $ sd (proveMZCorrected c r) (proveMZCorrected c rp)
   putStrLn $ sd (proveMW c r) (proveMW c rp)
   putStrLn $ sd (proveAxialCoupling c) (proveAxialCoupling c)
   putStrLn $ sd (proveWWidth c r) (proveWWidth c rp)
@@ -209,8 +209,8 @@ main = do
   putStrLn $ sd (proveLambdaBaryon c r) (proveLambdaBaryon c rp)
   putStrLn $ sd (proveAlphaS c) (proveAlphaS c)
   putStrLn $ sd (proveMuonElectronRatio c) (proveMuonElectronRatio c)
-  putStrLn $ sd (proveMuonMass c r) (proveMuonMass c rp)
-  putStrLn $ sd (proveElectronMass c r) (proveElectronMass c rp)
+  putStrLn $ sd (proveMuonMassCorrected c r) (proveMuonMassCorrected c rp)
+  putStrLn $ sd (proveElectronMassCorrected c r) (proveElectronMassCorrected c rp)
   putStrLn $ sd (proveDarkPhotonMixing c) (proveDarkPhotonMixing c)
   printf "  Mass-mixing duality: m_b/m_s × sin²θ₁₃ = %s = χ/(χ-1)\n"
     (showRat (crVal (proveMassMixingDuality c)))
@@ -260,7 +260,7 @@ main = do
         , CrystalGauge.proveVEV c r, proveHiggsMass c r, proveKoide c
         , CrystalMixing.proveVus c, proveWolfA_Z c, CrystalMixing.proveVcb c
         , proveDeltaCKM c, proveVub c, proveJarlskog c
-        , proveSinSq12 c, proveSinSq23 c, proveSinSq13 c, proveDeltaPMNS c
+        , proveSinSq12 c, proveSinSq23 c, proveSinSq13Corrected c, proveDeltaPMNS c
         , proveDMRatio c, proveLambda c r
         , proveNuMass3 c r, proveNuMass2 c r, proveSumNu c r
         , proveNuMass3_osc c, proveMBetaBeta c r
@@ -272,16 +272,16 @@ main = do
         , proveTopMass c r, proveFPi c r
         , provePionMass c r, proveAbsMs c r, proveAbsMu c r
         , proveAbsMd c r, proveNPsplitting c r
-        , proveEtaPrimeMass c r, proveEtaMass c r, proveKaonMass c r
-        , proveDecupletSpacing c r, proveSigmaLambda c r
+        , proveEtaPrimeMass c r, proveEtaMassCorrected c r, proveKaonMass c r
+        , proveDecupletSpacingCorrected c r, proveSigmaLambda c r
         , proveGlueball0pp c r, proveGlueball0mp c r, proveGlueball2pp c r
-        , proveRhoMass c r
-        , proveMZ c r, proveMW c r, proveLambdaBaryon c r
+        , proveRhoMassCorrected c r
+        , proveMZCorrected c r, proveMW c r, proveLambdaBaryon c r
         , proveEtaB c
         , proveImmirzi c, proveBHEntropy c, proveTauMass c r
         , proveGenerations c, proveEntropy c
         , proveAlphaS c, proveMuonElectronRatio c
-        , proveMuonMass c r, proveElectronMass c r
+        , proveMuonMassCorrected c r, proveElectronMassCorrected c r
         , proveCharmMass c r
         , proveOmegaRatio c, proveFeigenbaum c
         , proveBlasius c, proveKleiber c, proveVonKarman c, proveBenford c
@@ -292,8 +292,8 @@ main = do
         , proveMuonQCDRatio c, proveSpectralGm2 c
         , proveHaloSlope c, proveEoS c
         -- §8 Heavy hadrons (PWI extension)
-        , proveJPsi c r, proveUpsilon c r, proveDMeson c r, proveBMeson c r
-        , provePhiMeson c r, proveOmegaMeson c r, proveKStarMeson c r
+        , proveJPsi c r, proveUpsilonCorrected c r, proveDMesonCorrected c r, proveBMeson c r
+        , provePhiMesonCorrected c r, proveOmegaMesonCorrected c r, proveKStarMeson c r
         , proveSigmaBaryon c r, proveOmegaSSS c r
         ]
 
@@ -303,7 +303,7 @@ main = do
         , CrystalGauge.proveVEV c rp, proveHiggsMass c rp, proveKoide c
         , CrystalMixing.proveVus c, proveWolfA_Z c, CrystalMixing.proveVcb c
         , proveDeltaCKM c, proveVub c, proveJarlskog c
-        , proveSinSq12 c, proveSinSq23 c, proveSinSq13 c, proveDeltaPMNS c
+        , proveSinSq12 c, proveSinSq23 c, proveSinSq13Corrected c, proveDeltaPMNS c
         , proveDMRatio c, proveLambda c rp
         , proveNuMass3 c rp, proveNuMass2 c rp, proveSumNu c rp
         , proveNuMass3_osc c, proveMBetaBeta c rp
@@ -315,16 +315,16 @@ main = do
         , proveTopMass c rp, proveFPi c rp
         , provePionMass c rp, proveAbsMs c rp, proveAbsMu c rp
         , proveAbsMd c rp, proveNPsplitting c rp
-        , proveEtaPrimeMass c rp, proveEtaMass c rp, proveKaonMass c rp
-        , proveDecupletSpacing c rp, proveSigmaLambda c rp
+        , proveEtaPrimeMass c rp, proveEtaMassCorrected c rp, proveKaonMass c rp
+        , proveDecupletSpacingCorrected c rp, proveSigmaLambda c rp
         , proveGlueball0pp c rp, proveGlueball0mp c rp, proveGlueball2pp c rp
-        , proveRhoMass c rp
-        , proveMZ c rp, proveMW c rp, proveLambdaBaryon c rp
+        , proveRhoMassCorrected c rp
+        , proveMZCorrected c rp, proveMW c rp, proveLambdaBaryon c rp
         , proveEtaB c
         , proveImmirzi c, proveBHEntropy c, proveTauMass c rp
         , proveGenerations c, proveEntropy c
         , proveAlphaS c, proveMuonElectronRatio c
-        , proveMuonMass c rp, proveElectronMass c rp
+        , proveMuonMassCorrected c rp, proveElectronMassCorrected c rp
         , proveCharmMass c rp
         , proveOmegaRatio c, proveFeigenbaum c
         , proveBlasius c, proveKleiber c, proveVonKarman c, proveBenford c
@@ -335,8 +335,8 @@ main = do
         , proveMuonQCDRatio c, proveSpectralGm2 c
         , proveHaloSlope c, proveEoS c
         -- §8 Heavy hadrons (PWI extension)
-        , proveJPsi c rp, proveUpsilon c rp, proveDMeson c rp, proveBMeson c rp
-        , provePhiMeson c rp, proveOmegaMeson c rp, proveKStarMeson c rp
+        , proveJPsi c rp, proveUpsilonCorrected c rp, proveDMesonCorrected c rp, proveBMeson c rp
+        , provePhiMesonCorrected c rp, proveOmegaMesonCorrected c rp, proveKStarMeson c rp
         , proveSigmaBaryon c rp, proveOmegaSSS c rp
         ]
 
@@ -541,11 +541,11 @@ main = do
   putStrLn "══ §9c HEAVY HADRONS (PWI extension — every particle gets a score) ══"
   putStrLn "  PWI Rating: ■ EXACT  ● <0.5%  ◐ <1.0%  ○ <4.5%"
   putStrLn $ sd (proveJPsi c r) (proveJPsi c rp)
-  putStrLn $ sd (proveUpsilon c r) (proveUpsilon c rp)
-  putStrLn $ sd (proveDMeson c r) (proveDMeson c rp)
+  putStrLn $ sd (proveUpsilonCorrected c r) (proveUpsilonCorrected c rp)
+  putStrLn $ sd (proveDMesonCorrected c r) (proveDMesonCorrected c rp)
   putStrLn $ sd (proveBMeson c r) (proveBMeson c rp)
-  putStrLn $ sd (provePhiMeson c r) (provePhiMeson c rp)
-  putStrLn $ sd (proveOmegaMeson c r) (proveOmegaMeson c rp)
+  putStrLn $ sd (provePhiMesonCorrected c r) (provePhiMesonCorrected c rp)
+  putStrLn $ sd (proveOmegaMesonCorrected c r) (proveOmegaMesonCorrected c rp)
   putStrLn $ sd (proveKStarMeson c r) (proveKStarMeson c rp)
   putStrLn $ sd (proveSigmaBaryon c r) (proveSigmaBaryon c rp)
   putStrLn $ sd (proveOmegaSSS c r) (proveOmegaSSS c rp)
