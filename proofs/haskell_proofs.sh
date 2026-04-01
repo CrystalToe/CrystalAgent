@@ -7,6 +7,11 @@
 #   module Main + main  → compile & run (output binary)
 #   main :: / main =    → compile & run with -main-is Module
 #   neither             → type-check only (Curry-Howard: compilation = proof)
+#
+# Special outputs:
+#   Main.hs          → writes GHC_Certificate.txt
+#   CrystalVEVTest.hs → writes VEV_GapAnalysis.txt (four-column table)
+#   CrystalFullTest.hs → writes FullTest_Report.txt
 set -e
 
 # Find repo root
@@ -75,7 +80,15 @@ for f in *.hs; do
     # Has main but not module Main → compile with -main-is
     printf "  %s (-main-is %s) ... " "$f" "$mod"
     if ghc -O2 -main-is "$mod" "$f" -o "$bin" 2>/dev/null; then
-      "$bin" 2>&1 && { echo "PASS"; PASS=$((PASS+1)); } || { echo "FAIL"; FAIL=$((FAIL+1)); }
+      if [ "$f" = "CrystalVEVTest.hs" ]; then
+        # Special: VEV test writes four-column gap analysis
+        "$bin" 2>&1 | tee "$PROOFS/VEV_GapAnalysis.txt" && { echo "PASS"; PASS=$((PASS+1)); } || { echo "FAIL"; FAIL=$((FAIL+1)); }
+      elif [ "$f" = "CrystalFullTest.hs" ]; then
+        # Special: Full test writes regression report
+        "$bin" 2>&1 | tee "$PROOFS/FullTest_Report.txt" && { echo "PASS"; PASS=$((PASS+1)); } || { echo "FAIL"; FAIL=$((FAIL+1)); }
+      else
+        "$bin" 2>&1 && { echo "PASS"; PASS=$((PASS+1)); } || { echo "FAIL"; FAIL=$((FAIL+1)); }
+      fi
     else
       echo "COMPILE FAIL"; FAIL=$((FAIL+1))
     fi

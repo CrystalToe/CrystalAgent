@@ -565,7 +565,16 @@ main = do
   putStrLn "§3  Outlier a₄ corrections:"
   putStrLn ""
 
-  let lam = 246220 / 257  -- Λ_h in MeV
+  -- VEV: crystal derived = Toe() default.  PDG for gap analysis.
+  let m_pl_mev   = 1.220890e22                       -- MeV (the ONE measurement)
+      sigma_d_   = 36 :: Double
+      d_total_   = 42 :: Double
+      n_c_       = 3  :: Double
+      v_crystal  = m_pl_mev * 35 / (43 * 36 * 2**(d_total_ + n_c_**2 - 1))
+      v_pdg      = 246220.0                           -- MeV (PDG, for gap analysis only)
+      -- Toe() default: use crystal derived.
+      -- Implosion corrections may need recalibrating — see README_VEV.md.
+      lam = v_crystal / 257                           -- Λ_h in MeV (Fermat prime F₃)
       mpi = 134.977
 
   let showOutlier name imp target oldPWI = do

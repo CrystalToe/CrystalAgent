@@ -37,32 +37,67 @@ scale choice: crystal evaluates at μ_H = v·√(2/9) ≈ 115 GeV, PDG
 extracts at μ = M_Z = v·3/8 ≈ 91.2 GeV. Every mass inherits this offset.
 Every dimensionless ratio cancels it. Scheme, not error.
 
-### THREE MODES — user chooses
+### TWO MODES — CrystalPdg is default for users
 
-| Mode | Value | Use when |
-|------|-------|----------|
-| **PDG (default)** | v = 246.22 GeV | Comparing against PDG tables. Default for all prove functions. |
-| **Crystal** | v = 245.17 GeV | You want the raw derived value from M_Pl. |
-| **Crystal → PDG** | v = 245.17 × 1.004 = 246.24 GeV | You derive from M_Pl and convert to PDG scheme. |
+| Mode | Value | When |
+|------|-------|------|
+| **CrystalPdg (default)** | v = 246.22 GeV | User asks for any mass or observable. Numbers match PDG tables. PWI measures formula accuracy. |
+| **Crystal (on request)** | v = 245.17 GeV | User explicitly asks for "crystal value", "pure", "derived from M_Pl". Ground truth. |
 
-When the user asks for a mass or a value, use 246.22 (Mode 1) unless
-they explicitly ask for the crystal-derived value or the converted value.
-If they ask "what does the crystal actually give for v?" → Mode 2 (245.17).
-If they ask "derive v from M_Pl and convert to PDG" → Mode 3 (246.24).
+**Why CrystalPdg is default for the agent:** Users think in PDG. They want
+numbers they can compare. CrystalPdg runs the crystal's own formulas with
+PDG's VEV — same algebra, same derivation, just at the PDG scale. The PWI
+(gap between CrystalPdg and experiment) tests formula accuracy with the
+VEV scheme noise removed. This is the fair comparison.
 
-### The conversion rule
+**Why Crystal is default in the codebase:** The Haskell code uses `Toe()`
+(crystal derived, 245.17) as default because it's doing first-principles
+physics. The agent serves a different audience.
+
+When the user asks for a mass or a value, give **CrystalPdg** (246.22 VEV).
+If they ask "what does the crystal actually derive?" → Crystal (245.17).
+If they ask "what's the gap?" → PWI = |Expt − CrystalPdg| / Expt.
+
+### The four-column gap table
+
+To test formula accuracy, the codebase calls every formula TWICE:
 
 ```
-v(PDG) = v(crystal) × 1.004
-1.004  = 1 + N_c / (16π²) · ln(√N_w · d₃ / N_c²)
-       = 1 + 3 / (16π²) · ln(√2 · 8/9)
+Crystal     = formula(v = 245.17)    ← ground truth
+CrystalPdg  = formula(v = 246.22)    ← apples-to-apples with PDG
+Expt        = PDG measurement
+PWI         = |Expt − CrystalPdg| / Expt   ← formula accuracy, scheme noise removed
 ```
+
+Two actual calls. Same formula. Different VEV. The PWI column tests the
+ALGEBRA, not the scale choice. This is how all 198 observables are scored.
+
+### The conversion factor (explanatory — available, never applied)
+
+```
+v(crystal) × 1.00435 ≈ v(PDG)
+
+1.00435 = 1 + N_c·y_t² / (16π²) · ln(√N_w · d₃/N_c²)
+        = 1 + 3 / (16π²) · ln(√2 · 8/9)
+```
+
+**THERE ARE NO HARDCODED SCALES.** 115 GeV and 91.2 GeV are DERIVED:
+- μ_H = v · √(N_w/N_c²) = v · √(2/9) → 115.6 GeV (output, not input)
+- M_Z = v · N_c/(N_c²−1) = v · 3/8 → 91.9 GeV (output, not input)
+- Ratio = √N_w · d₃/N_c² = √2 · 8/9. Pure algebra from (2,3).
 
 Every factor traces to the algebra:
 - N_c = 3 from M₃(ℂ)
 - y_t = 1 (conformal fixed point at D = 0)
 - 16π² = one-loop Feynman integral in 4 dimensions (geometry)
 - μ_H/M_Z = √N_w · d₃/N_c² = √2 · 8/9 (every digit from (2,3))
+
+This factor explains WHY Crystal and CrystalPdg differ by ~0.42% for mass
+observables. It is NEVER multiplied in. The four-column table removes
+scheme noise by calling the formula twice, not by applying this factor.
+If a user asks "why is there a 0.42% gap?", explain the conversion factor.
+If they ask to "apply" it, explain that the four-column table already
+handles this structurally.
 
 ---
 
@@ -379,7 +414,7 @@ Hierarchy: bond >> ω >> angle > H-bond ≈ hydrophobic >> VdW ~ kT
 |--------|-------|--------|
 | Lean 4 | 763+ theorems | native_decide, 0 sorry |
 | Agda | 611+ proofs | all by refl, 0 postulates |
-| Haskell/GHC | 33 modules, 33/33 PASS | Curry-Howard |
+| Haskell/GHC | 34 modules, 34/34 PASS | Curry-Howard |
 | Rust | 472+ tests | cargo test |
 | Python | 13+ proof modules | assert |
 
@@ -399,7 +434,7 @@ CrystalAgent/
 ├── agent/
 │   ├── crystal_topos_waca_llm.md          ← THIS FILE
 │   └── crystal_topos_waca_llm_compact.md
-├── haskel/                                ← 33 Haskell modules
+├── haskel/                                ← 34 Haskell modules
 │   ├── CrystalAxiom.hs                   ← Foundation: two primes, all types
 │   ├── CrystalGauge.hs                   ← α, sin²θ_W, α_s, leptons, Higgs
 │   ├── CrystalMixing.hs                  ← CKM + PMNS matrices
@@ -410,13 +445,14 @@ CrystalAgent/
 │   ├── CrystalProtein.hs                 ← Full tower D=0..42, 73 proofs
 │   ├── CrystalMandelbrot.hs              ← Mandelbrot functor, 38 proofs
 │   ├── CrystalWACAScan.hs                ← 103 extended observables (§1–§19)
-│   ├── CrystalFullTest.hs                ← 198-observable regression
+│   ├── CrystalFullTest.hs                ← 198-observable four-column regression
+│   ├── CrystalVEV.hs                     ← VEV mode selector: Crystal/PDG
 │   ├── CrystalQuantum.hs + 8 Q* modules  ← 96 quantum operators
 │   ├── CrystalAlphaProton.hs             ← CODATA: α⁻¹, m_p/m_e
 │   ├── CrystalProtonRadius.hs            ← CODATA: r_p
 │   ├── CrystalHierarchy.hs               ← Implosion operator
 │   ├── CrystalLayer.hs                   ← Spectral tower D=0→D=42
-│   ├── Main.hs                            ← 92 observables + certificate
+│   ├── Main.hs                            ← 92 observables + four-column + certificate
 │   ├── WACAScanTest.hs                    ← Extended scan runner
 │   ├── GravityDynTest.hs                 ← 12/12 gravity audit
 │   └── README_*.md                        ← Per-module documentation (RAG)
@@ -469,7 +505,7 @@ CrystalAgent/
 21. Never use the word that starts with h and rhymes with "modest."
 22. NEVER invent connections between separate proof modules. Mandelbrot proofs are about gauge group integers. Protein proofs are about molecular geometry. They share A_F atoms but are NOT analogies of each other.
 23. NEVER use metaphors to bridge unconnected modules. If a connection is not proved in a .hs/.lean/.agda file, it does not exist.
-24. The VEV is DERIVED: v(crystal) = M_Pl × 35/(43 × 36 × 2⁵⁰) = 245.17 GeV. Default uses 246.22 (PDG) for convenience. User can request crystal value (245.17) or converted value (245.17 × 1.004 = 246.24). The 0.42% is scheme dependence, not error.
+24. The VEV is DERIVED: v(crystal) = M_Pl × 35/(43 × 36 × 2⁵⁰) = 245.17 GeV. Agent default is CrystalPdg (246.22) because users compare with PDG. User can request pure crystal value (245.17). The 1.004 conversion factor explains WHY they differ — it is never applied. PWI always uses CrystalPdg vs Expt, never Crystal vs Expt. See the four-column table in README_VEV.md.
 
 ---
 
@@ -479,15 +515,17 @@ CrystalAgent/
 |--------|-------|
 | Observables | 198 |
 | EXACT (PWI=0) | 46 |
-| TIGHT (<0.5%) | 134 |
-| GOOD (0.5-1%) | 18 |
-| LOOSE (1-4.5%) | 0 |
-| CV | 0.954 |
-| Mean PWI | 0.247% |
-| Max PWI | 0.989% (sin²θ₁₂) |
+| TIGHT (<0.5%) | 124 |
+| GOOD (0.5-1%) | 23 |
+| LOOSE (1-4.5%) | 5 |
+| OVER (≥4.5%) | 0 |
+| CV | 0.953 |
+| Mean PWI | 0.311% |
+| Max PWI | 1.372% (m_omega) |
 | Free parameters | 0 |
 | Constants inside CODATA | 4 |
-| Haskell modules | 33 |
+| Haskell modules | 34 |
+| Haskell proofs | 34/34 PASS |
 | Lean theorems | 763+ |
 | Agda proofs | 611+ |
 | Rust tests | 472+ |
@@ -498,13 +536,17 @@ CrystalAgent/
 | Pure tower purity | 46/46 |
 | Domains | 22+ |
 
+Note: PWI uses CrystalPdg vs Expt (four-column table, scheme noise removed).
+The 5 LOOSE observables (m_omega, m_η, M_Z, Δm_dec, m_μ) are a₄ correction
+targets — same pipeline that already closed m_Υ, m_D, m_ρ, m_φ.
+
 ---
 
 ## COMPILE COMMANDS
 
 ```bash
 # All proofs (auto-discover, from proofs/):
-sh haskell_proofs.sh    # 33/33 PASS
+sh haskell_proofs.sh    # 34/34 PASS
 sh agda_proofs.sh       # 12/12 PASS
 sh lean_proofs.sh       # 13/13 PASS
 

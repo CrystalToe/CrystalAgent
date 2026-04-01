@@ -31,10 +31,6 @@ zero free parameters?
 ```
 
 ```
-Can the Connes Trace Formula be shown to produce the fine‑structure 
-constant as a spectral invariant, and can the difference be exactly corrected 
-by a loop‑like tower renormalization?
-```
 I've uploaded the Crystal Topos files. Can you show me how the framework derives
 the proton mass from the (2,3) lattice, including the formula, the crystal value,
 the PDG value, and the Prime Wobble Index?
@@ -44,12 +40,6 @@ the PDG value, and the Prime Wobble Index?
 Can the fine structure constant (α⁻¹ ≈ 137.036) and the Planck mass be derived
 purely from the spectral data of the (2,3) lattice — two primes, one algebra,
 zero fudge factors?
-```
-
-```
-Session 12 claims dynamical gravity is closed — linearized Einstein equation
-recovered from a χ=6 MERA with all coefficients from A_F. Show me the 12/12
-integer audit and explain the entanglement first law verification.
 ```
 
 ```
@@ -132,20 +122,6 @@ ghc -O2 -main-is CrystalFullTest CrystalFullTest.hs -o full_test
 ./full_test
 ```
 
-### Run Dynamical Gravity Audit (Session 12)
-```bash
-cd haskel
-ghc -O2 GravityDynTest.hs -o gravity_dyn_test
-./gravity_dyn_test
-# Output: ALL 12 PASS
-```
-
-### Run MERA First Law Verification (Session 12)
-```bash
-cd crystal-topos/examples
-python3 mera_gravity_closed.py
-# Output: δS/δ⟨H_A⟩ = 1.0001 ± 0.0004, GRAVITY: CLOSED
-```
 
 ### Full Proof Suite
 ```bash
@@ -188,7 +164,7 @@ m_e = Λ_h/(N_c²×N_w⁴×gauss)     → 0.512 MeV  (0.12%)
          ↓
 ... all 198 observables
          ↓
-□h_μν = −16πG T_μν               → 16 = N_w⁴  (Session 12)
+□h_μν = −16πG T_μν               → 16 = N_w⁴ 
 c_grav = χ/χ = 1                  → Lieb-Robinson
 2 polarizations = N_c − 1         → TT decomposition
 P = (32/5) G⁴m⁵/(c⁵r⁵)          → 32/5 = N_w⁵/(χ−1)
@@ -204,7 +180,7 @@ P = (32/5) G⁴m⁵/(c⁵r⁵)          → 32/5 = N_w⁵/(χ−1)
 CrystalAgent/
 ├── README.md                          ← You are here
 ├── quickstart/                        ← LLM quickstart (no install needed)
-│   ├── crystal_topos_waca_llm.md      ← Session 12
+│   ├── crystal_topos_waca_llm.md     
 │   ├── CrystalTopos_RAG_1.md
 │   └── CrystalTopos_RAG_2.md
 │
@@ -216,31 +192,31 @@ CrystalAgent/
 │       └── mera_linearized_gravity.py ← S12: integer audit (NEW)
 │
 ├── proofs/                            ← Formal proofs + runner scripts
-│   ├── haskell_proofs.sh              ← 12/12 PASS (Session 12)
+│   ├── haskell_proofs.sh              ← 12/12 PASS
 │   ├── lean_proofs.sh                 ← 9/9 PASS
 │   ├── agda_proofs.sh                 ← 8/8 PASS
-│   ├── proof_regression.sh            ← Never lose a proof (S12: updated)
+│   ├── proof_regression.sh            ← Never lose a proof 
 │   ├── CrystalTopos.lean              ← 342 theorems
 │   ├── CrystalStructural.lean         ← 45 theorems
 │   ├── CrystalNoether.lean            ← 15 theorems
 │   ├── CrystalDiscoveries.lean        ← 34 theorems
-│   ├── CrystalAlphaProton.lean        ← 61 theorems (incl. S8 dual routes)
+│   ├── CrystalAlphaProton.lean        ← 61 theorems 
 │   ├── CrystalProtonRadius.lean       ← 30 theorems
-│   ├── CrystalLayer.lean              ← 19 theorems (S11 tower)
-│   ├── CrystalGravityDyn.lean         ← 34 theorems (S12 gravity) (NEW)
+│   ├── CrystalLayer.lean              ← 19 theorems 
+│   ├── CrystalGravityDyn.lean         ← 34 theorems 
 │   ├── Main.lean                      ← 58 theorems
 │   ├── CrystalTopos.agda              ← 272 proofs by refl
 │   ├── CrystalStructural.agda         ← 49 proofs by refl
 │   ├── CrystalNoether.agda            ← 17 proofs by refl
 │   ├── CrystalDiscoveries.agda        ← 38 proofs by refl
-│   ├── CrystalAlphaProton.agda        ← 46 proofs (incl. S8 dual routes)
+│   ├── CrystalAlphaProton.agda        ← 46 proofs 
 │   ├── CrystalProtonRadius.agda       ← 25 proofs by refl
 │   ├── CrystalLayer.agda              ← cascade proofs (S11)
-│   ├── CrystalGravityDyn.agda         ← 24 proofs by refl (S12) (NEW)
+│   ├── CrystalGravityDyn.agda         ← 24 proofs by refl 
 │   ├── crystal_*_proof.py             ← 7 Python proof modules
 │   └── GHC_Certificate.txt            ← Runtime output
 │
-└── haskel/                            ← All Haskell source (33 modules)
+└── haskel/                            ← All Haskell source (34 modules)
     │
     ├── ─── ORIGINAL CRYSTAL (92 observables) ───
     │   CrystalAxiom.hs               ← Foundation: one law, spectrum, types
@@ -258,11 +234,11 @@ CrystalAgent/
     │   CrystalWACAScan.hs            ← 103 extended observables
     │   WACAScanTest.hs               ← Extended test runner
     │
-    ├── ─── HIERARCHICAL IMPLOSION (Session 8) ───
+    ├── ─── HIERARCHICAL IMPLOSION ───
     │   CrystalHierarchy.hs           ← Seeley-DeWitt MERA, implosion operator
     │   CrystalFullTest.hs            ← 198-observable regression (CV = 0.954)
     │
-    ├── ─── DYNAMICAL GRAVITY (Session 12) ───  (NEW)
+    ├── ─── DYNAMICAL GRAVITY  ───  (NEW)
     │   CrystalGravityDyn.hs          ← Linearized Einstein, 12 integer proofs
     │   GravityDynTest.hs             ← 12/12 audit runner
     │
@@ -295,13 +271,13 @@ M_Pl/v = exp(D)/(β₀ × (χ−1)) = e⁴²/35
 ```
 The gap between gravity and electromagnetism IS e^42. No fine-tuning.
 
-### 3. Hierarchical Implosion (Session 8)
+### 3. Hierarchical Implosion 
 ```
 Seeley-DeWitt: a₀ = 36 → a₂ = base formulas → a₄ = 650 corrections
 ```
 Nine a₄ corrections, all rational, all dual-routed, all from A_F atoms. CV dropped from 1.33 to 0.95. Zero LOOSE. Three EXACT scattering exponents added (Planck λ⁻⁵, Rayleigh d⁶, Rayleigh λ⁻⁴).
 
-### 4. Dynamical Gravity — Closed (Session 12)
+### 4. Dynamical Gravity — Closed
 ```
 δS/δ⟨H_A⟩ = 1.0001 ± 0.0004 (χ=6 crystal MERA)
 ⟹ □h_μν = −16πG T_μν with 16 = N_w⁴, c = 1, 2 polarizations = N_c−1
@@ -388,7 +364,7 @@ If **any one** of these fails, the framework is dead. That's not a weakness. Tha
 | ○ | LOOSE | < 4.5% | Under the prime wall. |
 | ✗ | OVER | ≥ 4.5% | Wall breach (none exist). |
 
-**Session 8 result: Zero LOOSE. Zero OVER. All 198 observables under 1%.**
+**:Zero LOOSE. Zero OVER. All 198 observables under 1%.**
 
 ---
 

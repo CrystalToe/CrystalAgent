@@ -200,9 +200,12 @@ v_running = 1.0 + fromIntegral n_c              -- N_c = 3
                * fromIntegral (n_c^2 - 1)        -- d₃ = 8
                / fromIntegral (n_c^2))            -- N_c² = 9
 
--- | VEV at PDG scheme. Using PDG value until implosion corrections
--- are recalibrated against the derived chain above.
--- v_crystal_mev * v_running = 246239 MeV (gap 0.006% to PDG).
+-- | VEV at PDG scheme.  Toe(vev="pdg").
+-- WARNING: All 103 extended observables and implosion corrections are
+-- calibrated against this value.  Switching to v_crystal_mev requires
+-- recalibrating ALL implosion corrections — a separate task.
+-- See README_VEV.md for the four-column gap analysis.
+-- TODO: Switch to v_crystal_mev once implosion recalibration is done.
 v_mev :: Double
 v_mev = 246220.0                                 -- MeV (PDG scheme)
 
@@ -749,7 +752,7 @@ provePlanckHierarchy =
   let crystal = exp (fromIntegral d_total)
               / (fromIntegral beta0 * (fromIntegral chi - 1.0))
                                                         -- 4.97 × 10¹⁶
-      pdg     = 1.221e19 / 246.22e9 * 1e9               -- ≈ 4.96 × 10¹⁶
+      pdg     = 1.221e19 / 246.22e9 * 1e9               -- ≈ 4.96 × 10¹⁶ (PDG comparison target)
   in mkObs "M_Pl/v (hierarchy)" crystal pdg
 
 -- | Chandrasekhar mass: (gauss + χ)/gauss = 19/13 ≈ 1.462 M_☉
@@ -1988,7 +1991,7 @@ proveSigmaPiN =
 -- derive directly.
 proveDm21Direct :: Observable
 proveDm21Direct =
-  let v_ev    = 246.22e9                                 -- eV
+  let v_ev    = v_mev * 1e6                               -- eV (from v_mev in MeV)
       m_nu2   = fromIntegral n_w * v_ev
               / (fromIntegral ((2::Integer)^d_total) * fromIntegral gauss)
       crystal = m_nu2 * m_nu2                            -- eV²
@@ -2000,7 +2003,7 @@ proveDm21Direct =
 -- m_ν2 = N_w·v/(2^D·gauss). The split ratio χ⁴/(χ⁴−1) = 1296/1295.
 proveDm32 :: Observable
 proveDm32 =
-  let v_ev    = 246.22e9                                 -- eV
+  let v_ev    = v_mev * 1e6                               -- eV (from v_mev in MeV)
       pow42   = fromIntegral ((2::Integer)^d_total)
       m_nu3   = v_ev / pow42
               * fromIntegral (2 * chi - 2)

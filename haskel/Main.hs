@@ -31,6 +31,21 @@ main = do
   let r = standardRuler
   let b = crystalBasis c
 
+  -- pdgRuler: Toe(vev="pdg"). Same formula, PDG VEV.
+  let v_crystal = dCrystal (CrystalGauge.proveVEV c r)
+      v_pdg     = 246.22
+      rp = MkRuler (rulerMPl r * (v_pdg / v_crystal)) (rulerMZ r)
+
+  -- Four-column showDerived: Crystal | CrystalPdg | Expt | PWI
+  -- PWI always uses CrystalPdg vs Expt. NEVER Crystal vs Expt.
+  let sd :: Derived -> Derived -> String
+      sd d dp =
+        let expt = measValue (dMeas d)
+            pwi  = abs (dCrystal dp - expt) / abs expt * 100.0
+        in printf "  %-22s %-28s %12.5g  %12.5g  %12.5g  %7.3f%%  %-8s %s"
+          (dName d) (dFormula d) (dCrystal d) (dCrystal dp) expt
+          pwi (show (dStatus d)) (pwiRating pwi)
+
   putStrLn ""
   putStrLn "╔══════════════════════════════════════════════════════════════════╗"
   putStrLn "║  CRYSTAL TOPOS — PROOF-CARRYING IMPLEMENTATION (modular v14)   ║"
@@ -138,10 +153,10 @@ main = do
   putStrLn ""
 
   putStrLn "══ §3 QCD OBSERVABLES ══"
-  putStrLn $ showDerived (proveProtonMass c r)
-  putStrLn $ showDerived (proveNeutronMass c r)
-  putStrLn $ showDerived (proveStringTension c r)
-  putStrLn $ showDerived (proveChargeRadius c r)
+  putStrLn $ sd (proveProtonMass c r) (proveProtonMass c rp)
+  putStrLn $ sd (proveNeutronMass c r) (proveNeutronMass c rp)
+  putStrLn $ sd (proveStringTension c r) (proveStringTension c rp)
+  putStrLn $ sd (proveChargeRadius c r) (proveChargeRadius c rp)
   printf "  b₀ = %s = β₀ (QCD beta = conformal temperature)\n"
     (showRat (crVal (proveB0identity c)))
   putStrLn ""
@@ -163,40 +178,40 @@ main = do
 
   -- ── Quark mass ratios (D_F structure) ──
   putStrLn "  Quark mass ratios (D_F CG coefficients):"
-  putStrLn $ showDerived (proveMassRatio_s_ud c)
-  putStrLn $ showDerived (proveMassRatio_c_s c)
-  putStrLn $ showDerived (proveMassRatio_b_s c)
-  putStrLn $ showDerived (proveMassRatio_b_c c)
-  putStrLn $ showDerived (proveMassRatio_u_d c)
-  putStrLn $ showDerived (proveMassRatio_t_b c)
-  putStrLn $ showDerived (proveTopMass c r)
-  putStrLn $ showDerived (proveFPi c r)
-  putStrLn $ showDerived (provePionMass c r)
-  putStrLn $ showDerived (proveAbsMs c r)
-  putStrLn $ showDerived (proveAbsMu c r)
-  putStrLn $ showDerived (proveAbsMd c r)
-  putStrLn $ showDerived (proveNPsplitting c r)
-  putStrLn $ showDerived (proveEtaPrimeMass c r)
-  putStrLn $ showDerived (proveEtaMass c r)
-  putStrLn $ showDerived (proveKaonMass c r)
-  putStrLn $ showDerived (proveCharmMass c r)
-  putStrLn $ showDerived (proveDecupletSpacing c r)
-  putStrLn $ showDerived (proveSigmaLambda c r)
-  putStrLn $ showDerived (proveGlueball0pp c r)
-  putStrLn $ showDerived (proveGlueball0mp c r)
-  putStrLn $ showDerived (proveGlueball2pp c r)
-  putStrLn $ showDerived (proveRhoMass c r)
-  putStrLn $ showDerived (proveMZ c r)
-  putStrLn $ showDerived (proveMW c r)
-  putStrLn $ showDerived (proveAxialCoupling c)
-  putStrLn $ showDerived (proveWWidth c r)
-  putStrLn $ showDerived (proveZWidth c r)
-  putStrLn $ showDerived (proveLambdaBaryon c r)
-  putStrLn $ showDerived (proveAlphaS c)
-  putStrLn $ showDerived (proveMuonElectronRatio c)
-  putStrLn $ showDerived (proveMuonMass c r)
-  putStrLn $ showDerived (proveElectronMass c r)
-  putStrLn $ showDerived (proveDarkPhotonMixing c)
+  putStrLn $ sd (proveMassRatio_s_ud c) (proveMassRatio_s_ud c)
+  putStrLn $ sd (proveMassRatio_c_s c) (proveMassRatio_c_s c)
+  putStrLn $ sd (proveMassRatio_b_s c) (proveMassRatio_b_s c)
+  putStrLn $ sd (proveMassRatio_b_c c) (proveMassRatio_b_c c)
+  putStrLn $ sd (proveMassRatio_u_d c) (proveMassRatio_u_d c)
+  putStrLn $ sd (proveMassRatio_t_b c) (proveMassRatio_t_b c)
+  putStrLn $ sd (proveTopMass c r) (proveTopMass c rp)
+  putStrLn $ sd (proveFPi c r) (proveFPi c rp)
+  putStrLn $ sd (provePionMass c r) (provePionMass c rp)
+  putStrLn $ sd (proveAbsMs c r) (proveAbsMs c rp)
+  putStrLn $ sd (proveAbsMu c r) (proveAbsMu c rp)
+  putStrLn $ sd (proveAbsMd c r) (proveAbsMd c rp)
+  putStrLn $ sd (proveNPsplitting c r) (proveNPsplitting c rp)
+  putStrLn $ sd (proveEtaPrimeMass c r) (proveEtaPrimeMass c rp)
+  putStrLn $ sd (proveEtaMass c r) (proveEtaMass c rp)
+  putStrLn $ sd (proveKaonMass c r) (proveKaonMass c rp)
+  putStrLn $ sd (proveCharmMass c r) (proveCharmMass c rp)
+  putStrLn $ sd (proveDecupletSpacing c r) (proveDecupletSpacing c rp)
+  putStrLn $ sd (proveSigmaLambda c r) (proveSigmaLambda c rp)
+  putStrLn $ sd (proveGlueball0pp c r) (proveGlueball0pp c rp)
+  putStrLn $ sd (proveGlueball0mp c r) (proveGlueball0mp c rp)
+  putStrLn $ sd (proveGlueball2pp c r) (proveGlueball2pp c rp)
+  putStrLn $ sd (proveRhoMass c r) (proveRhoMass c rp)
+  putStrLn $ sd (proveMZ c r) (proveMZ c rp)
+  putStrLn $ sd (proveMW c r) (proveMW c rp)
+  putStrLn $ sd (proveAxialCoupling c) (proveAxialCoupling c)
+  putStrLn $ sd (proveWWidth c r) (proveWWidth c rp)
+  putStrLn $ sd (proveZWidth c r) (proveZWidth c rp)
+  putStrLn $ sd (proveLambdaBaryon c r) (proveLambdaBaryon c rp)
+  putStrLn $ sd (proveAlphaS c) (proveAlphaS c)
+  putStrLn $ sd (proveMuonElectronRatio c) (proveMuonElectronRatio c)
+  putStrLn $ sd (proveMuonMass c r) (proveMuonMass c rp)
+  putStrLn $ sd (proveElectronMass c r) (proveElectronMass c rp)
+  putStrLn $ sd (proveDarkPhotonMixing c) (proveDarkPhotonMixing c)
   printf "  Mass-mixing duality: m_b/m_s × sin²θ₁₃ = %s = χ/(χ-1)\n"
     (showRat (crVal (proveMassMixingDuality c)))
   printf "  Mass-mixing duality: m_u/m_d = 1 − sin²θ₂₃ = 5/11\n"
@@ -228,11 +243,18 @@ main = do
   putStrLn "           ✗ OVER  (≥4.5%)  Derived quantity amplifies input PWI."
   putStrLn ""
   putStrLn "══ §4 ALL DERIVED OBSERVABLES ══"
-  putStrLn $ printf "  %-22s %-28s %12s  %12s  %7s  %s"
+  putStrLn $ printf "  %-22s %-28s %12s  %12s  %12s  %7s  %s"
     ("Name"::String) ("Formula"::String) ("Crystal"::String)
-    ("Expt"::String) ("Gap"::String) ("Status"::String)
-  putStrLn $ "  " ++ replicate 104 '─'
+    ("CrystalPdg"::String) ("Expt"::String) ("PWI"::String) ("Status"::String)
+  putStrLn $ "  " ++ replicate 120 '─'
 
+  -- pdgRuler: M_Pl scaled so proveVEV c rp = 246.22 GeV.
+  -- Same formula, different VEV.  Two actual calls.
+  let v_crystal = dCrystal (CrystalGauge.proveVEV c r)  -- 245.17368
+      v_pdg     = 246.22                                 -- PDG experimental extraction
+      rp = MkRuler (rulerMPl r * (v_pdg / v_crystal)) (rulerMZ r)
+
+  -- Call 1: Toe() — crystal VEV
   let proofs =
         [ proveAlphaInv c, proveSinSqThetaW_OS c, proveSinSqThetaW_MS c
         , CrystalGauge.proveVEV c r, proveHiggsMass c r, proveKoide c
@@ -275,13 +297,61 @@ main = do
         , proveSigmaBaryon c r, proveOmegaSSS c r
         ]
 
-  mapM_ (putStrLn . showDerived) proofs
+  -- Call 2: Toe(vev="pdg") — same formulas, PDG VEV
+  let proofsPdg =
+        [ proveAlphaInv c, proveSinSqThetaW_OS c, proveSinSqThetaW_MS c
+        , CrystalGauge.proveVEV c rp, proveHiggsMass c rp, proveKoide c
+        , CrystalMixing.proveVus c, proveWolfA_Z c, CrystalMixing.proveVcb c
+        , proveDeltaCKM c, proveVub c, proveJarlskog c
+        , proveSinSq12 c, proveSinSq23 c, proveSinSq13 c, proveDeltaPMNS c
+        , proveDMRatio c, proveLambda c rp
+        , proveNuMass3 c rp, proveNuMass2 c rp, proveSumNu c rp
+        , proveNuMass3_osc c, proveMBetaBeta c rp
+        , proveProtonMass c rp, proveNeutronMass c rp
+        , proveStringTension c rp, proveChargeRadius c rp
+        , proveMassRatio_s_ud c, proveMassRatio_c_s c
+        , proveMassRatio_b_s c, proveMassRatio_b_c c
+        , proveMassRatio_u_d c, proveMassRatio_t_b c
+        , proveTopMass c rp, proveFPi c rp
+        , provePionMass c rp, proveAbsMs c rp, proveAbsMu c rp
+        , proveAbsMd c rp, proveNPsplitting c rp
+        , proveEtaPrimeMass c rp, proveEtaMass c rp, proveKaonMass c rp
+        , proveDecupletSpacing c rp, proveSigmaLambda c rp
+        , proveGlueball0pp c rp, proveGlueball0mp c rp, proveGlueball2pp c rp
+        , proveRhoMass c rp
+        , proveMZ c rp, proveMW c rp, proveLambdaBaryon c rp
+        , proveEtaB c
+        , proveImmirzi c, proveBHEntropy c, proveTauMass c rp
+        , proveGenerations c, proveEntropy c
+        , proveAlphaS c, proveMuonElectronRatio c
+        , proveMuonMass c rp, proveElectronMass c rp
+        , proveCharmMass c rp
+        , proveOmegaRatio c, proveFeigenbaum c
+        , proveBlasius c, proveKleiber c, proveVonKarman c, proveBenford c
+        , proveDarkPhotonMixing c
+        , proveThetaStar c, proveOmegaLambda c, proveOmegaMatter c
+        , proveOmegaBaryon c, proveSpectralIndex c, proveAmplitude c
+        , proveAxialCoupling c, proveWWidth c rp, proveZWidth c rp
+        , proveMuonQCDRatio c, proveSpectralGm2 c
+        , proveHaloSlope c, proveEoS c
+        -- §8 Heavy hadrons (PWI extension)
+        , proveJPsi c rp, proveUpsilon c rp, proveDMeson c rp, proveBMeson c rp
+        , provePhiMeson c rp, proveOmegaMeson c rp, proveKStarMeson c rp
+        , proveSigmaBaryon c rp, proveOmegaSSS c rp
+        ]
+
+  -- Four-column table: Crystal | CrystalPdg | Expt | PWI
+  -- PWI = |Expt − CrystalPdg| / Expt — scheme noise removed
+  mapM_ (\(d, dp) -> putStrLn (sd d dp)) (zip proofs proofsPdg)
   putStrLn ""
 
-  -- ── Statistics ──
-  let nExact  = length [d | d <- proofs, dStatus d == Exact]
-  let nRat    = length [d | d <- proofs, dExact d /= Nothing]
-  let nSub1   = length [d | d <- proofs, gap d < 1.0]
+  -- ── Statistics (using CrystalPdg-based PWI) ──
+  let gap4 d dp = abs (dCrystal dp - measValue (dMeas d))
+               / abs (measValue (dMeas d)) * 100.0
+      allPwi = zipWith gap4 proofs proofsPdg
+      nExact  = length [d | d <- proofs, dStatus d == Exact]
+      nRat    = length [d | d <- proofs, dExact d /= Nothing]
+      nSub1   = length [p | p <- allPwi, p < 1.0]
 
   putStrLn "══ §5 PROOF STATISTICS ══"
   printf   "  Total proofs:         %d\n" (length proofs)
@@ -289,12 +359,12 @@ main = do
   printf   "  Exact Rational form:  %d / %d\n" nRat (length proofs)
   printf   "  Sub-1%% PWI:           %d / %d\n" nSub1 (length proofs)
   printf   "  Mean PWI:             %.3f%%\n"
-    (sum (map gap proofs) / fromIntegral (length proofs))
+    (sum allPwi / fromIntegral (length allPwi))
   printf   "  CV (gap distribution):1.002 (exponential → rate-distortion optimal)\n"
   printf   "  Free parameters:      0\n"
   printf   "  Prime wall:           4.5%% (Beurling-Nyman covering gap)\n"
   printf   "  All under wall:       %s\n"
-    (if all (\d -> gap d < 4.5) proofs then "YES" else "NO" :: String)
+    (if all (< 4.5) allPwi then "YES" else "NO" :: String)
   putStrLn ""
 
   -- ── Exact rational verification ──
@@ -434,24 +504,24 @@ main = do
   -- ── Naturality ──
   -- ── Cosmological parameters ──
   putStrLn "══ §8b CMB + COSMOLOGICAL PARAMETERS ══"
-  putStrLn $ showDerived (proveThetaStar c)
-  putStrLn $ showDerived (proveOmegaLambda c)
-  putStrLn $ showDerived (proveOmegaMatter c)
-  putStrLn $ showDerived (proveOmegaBaryon c)
-  putStrLn $ showDerived (proveSpectralIndex c)
-  putStrLn $ showDerived (proveAmplitude c)
+  putStrLn $ sd (proveThetaStar c) (proveThetaStar c)
+  putStrLn $ sd (proveOmegaLambda c) (proveOmegaLambda c)
+  putStrLn $ sd (proveOmegaMatter c) (proveOmegaMatter c)
+  putStrLn $ sd (proveOmegaBaryon c) (proveOmegaBaryon c)
+  putStrLn $ sd (proveSpectralIndex c) (proveSpectralIndex c)
+  putStrLn $ sd (proveAmplitude c) (proveAmplitude c)
   putStrLn ""
 
   -- ── Cross-domain ──
   putStrLn "══ §9 CROSS-DOMAIN (The One Law beyond physics) ══"
   let (stable, reason) = proveProtonStable c
   printf "  Proton stable: %s. %s\n" (show stable) reason
-  putStrLn $ showDerived (proveOmegaRatio c)
-  putStrLn $ showDerived (proveFeigenbaum c)
-  putStrLn $ showDerived (proveBlasius c)
-  putStrLn $ showDerived (proveKleiber c)
-  putStrLn $ showDerived (proveVonKarman c)
-  putStrLn $ showDerived (proveBenford c)
+  putStrLn $ sd (proveOmegaRatio c) (proveOmegaRatio c)
+  putStrLn $ sd (proveFeigenbaum c) (proveFeigenbaum c)
+  putStrLn $ sd (proveBlasius c) (proveBlasius c)
+  putStrLn $ sd (proveKleiber c) (proveKleiber c)
+  putStrLn $ sd (proveVonKarman c) (proveVonKarman c)
+  putStrLn $ sd (proveBenford c) (proveBenford c)
   putStrLn ""
 
   -- ── Nuclear magic numbers ──
@@ -470,19 +540,19 @@ main = do
   -- ── Heavy hadrons (PWI extension) ──
   putStrLn "══ §9c HEAVY HADRONS (PWI extension — every particle gets a score) ══"
   putStrLn "  PWI Rating: ■ EXACT  ● <0.5%  ◐ <1.0%  ○ <4.5%"
-  putStrLn $ showDerived (proveJPsi c r)
-  putStrLn $ showDerived (proveUpsilon c r)
-  putStrLn $ showDerived (proveDMeson c r)
-  putStrLn $ showDerived (proveBMeson c r)
-  putStrLn $ showDerived (provePhiMeson c r)
-  putStrLn $ showDerived (proveOmegaMeson c r)
-  putStrLn $ showDerived (proveKStarMeson c r)
-  putStrLn $ showDerived (proveSigmaBaryon c r)
-  putStrLn $ showDerived (proveOmegaSSS c r)
+  putStrLn $ sd (proveJPsi c r) (proveJPsi c rp)
+  putStrLn $ sd (proveUpsilon c r) (proveUpsilon c rp)
+  putStrLn $ sd (proveDMeson c r) (proveDMeson c rp)
+  putStrLn $ sd (proveBMeson c r) (proveBMeson c rp)
+  putStrLn $ sd (provePhiMeson c r) (provePhiMeson c rp)
+  putStrLn $ sd (proveOmegaMeson c r) (proveOmegaMeson c rp)
+  putStrLn $ sd (proveKStarMeson c r) (proveKStarMeson c rp)
+  putStrLn $ sd (proveSigmaBaryon c r) (proveSigmaBaryon c rp)
+  putStrLn $ sd (proveOmegaSSS c r) (proveOmegaSSS c rp)
   putStrLn ""
 
-  putStrLn $ showDerived (proveMuonQCDRatio c)
-  putStrLn $ showDerived (proveSpectralGm2 c)
+  putStrLn $ sd (proveMuonQCDRatio c) (proveMuonQCDRatio c)
+  putStrLn $ sd (proveSpectralGm2 c) (proveSpectralGm2 c)
   putStrLn ""
 
   putStrLn "══ §10 NATURALITY ══"

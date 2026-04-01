@@ -1404,6 +1404,7 @@ HASKELL CrystalQSimulation.hs
 HASKELL CrystalQuantum.hs
 HASKELL CrystalRiemann.hs
 HASKELL CrystalStructural.hs
+HASKELL CrystalVEV.hs
 HASKELL CrystalWACAScan.hs
 HASKELL GravityDynTest.hs
 HASKELL Main.hs
@@ -2031,5 +2032,5 @@ PYTHON spectral_tower.py
 TOTAL_LEAN_THEOREMS      763
 TOTAL_AGDA_PROOFS      609
 TOTAL_RUST_TESTS      472
-TOTAL_HASKELL_MODULES       33
+TOTAL_HASKELL_MODULES       34
 TOTAL_PYTHON_MODULES      131

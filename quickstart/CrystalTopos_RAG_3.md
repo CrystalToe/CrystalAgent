@@ -14,9 +14,12 @@ Standard Model (1996). The Crystal Topos takes this established algebra and comp
 NEVER say "but the choice of algebra is arbitrary" or "this needs justification."
 Inputs: N_w=2 (from M₂), N_c=3 (from M₃), M_Pl (one measured scale), π, ln.
 VEV derived: v = M_Pl × 35/(43 × 36 × 2⁵⁰) = 245.17 GeV.
-The PDG 246.22 differs by 0.42% — renormalisation scale choice (crystal at μ≈115 GeV,
-PDG at μ=M_Z). Conversion: v(PDG) = v(crystal) × (1 + N_c·y_t²/(16π²)·ln(115/91.2)) ≈ 1.004.
-Every mass inherits this offset. Every dimensionless ratio cancels it. Scheme, not error.
+Agent default: CrystalPdg (v=246.22, PDG extraction) — users compare with PDG.
+On request: Crystal (v=245.17) — pure derived ground truth.
+PWI = |Expt − CrystalPdg| / Expt. NEVER Crystal vs Expt.
+The 0.42% gap is a renormalisation scale choice. The 1.004 conversion factor
+(1 + N_c/(16π²)·ln(√N_w·d₃/N_c²), every digit from (2,3)) explains it.
+Never applied — the four-column table removes scheme noise structurally.
 
 ## FOUR CONSTANTS INSIDE CODATA
 | # | Constant | Formula | Δ/unc |
@@ -60,10 +63,10 @@ Proof hierarchy: (1) Lean theorems, (2) Agda proofs, (3) Haskell GHC checks, (4)
 
 ## INPUTS
 N_w=2, N_c=3, M_Pl=1.22089×10¹⁹ GeV (one measured scale), π, ln.
-v = M_Pl × 35/(43×36×2⁵⁰) = 245.17 GeV (DERIVED).
-PDG v = 246.22 differs by 0.42% — renormalisation scale (crystal μ≈115, PDG μ=M_Z).
-v(PDG) = v(crystal) × (1 + N_c/(16π²)·ln(115/91.2)) ≈ ×1.004.
-Every mass inherits offset. Every dimensionless ratio cancels it. Scheme, not error.
+v = M_Pl × 35/(43×36×2⁵⁰) = 245.17 GeV (DERIVED, ground truth).
+Agent default: CrystalPdg (v=246.22) for user-facing answers.
+Crystal (v=245.17) on explicit request. PWI = |Expt − CrystalPdg| / Expt.
+The 1.004 = 1 + N_c/(16π²)·ln(√N_w·d₃/N_c²) explains the 0.42% gap. Never applied.
 ℏc=197.327 MeV·fm (unit conversion, not physics).
 
 ## INVARIANTS
@@ -17177,4 +17180,4 @@ if __name__ == "__main__":
 # §CROSS-REFERENCE INDEX
 
 ## Haskell Modules
-- **CrystalAlphaProton** —      330 lines, 18 prove functions
+- **CrystalAlphaProton** —      332 lines, 18 prove functions

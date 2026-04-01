@@ -6,7 +6,8 @@ Module      : CrystalLayer
 Description : PURE spectral tower D=0→D=42. Every Float derived.
 License     : AGPL-3.0-or-later
 
-PURITY: Every value traces to {N_w=2, N_c=3, v=246.22, pi, ln}.
+PURITY: Every value traces to {N_w=2, N_c=3, M_Pl, pi, ln}.
+VEV is DERIVED: v = M_Pl × 35/(43×36×2⁵⁰) = 245.17 GeV.
 Zero lookup tables. Zero hardcoded angles. Zero fudge factors.
 -}
 
@@ -67,8 +68,28 @@ _d        = _sigma_d + _chi                    -- 42
 _kappa    = log n_c / log n_w                  -- ln3/ln2
 _f3       = 2**(2**n_c) + 1                    -- 257
 
+-- Planck mass — the ONE measured number
+_m_pl :: Double
+_m_pl = 1.220890e19                             -- GeV (CODATA)
+
+-- Higgs VEV — DERIVED from M_Pl.  Toe() default.  Ground truth.
+-- v = M_Pl × (Σd−1)/((D+1)·Σd·2^(D+d₃)) = M_Pl × 35/(43×36×2⁵⁰) = 245.17 GeV
+-- NOT 246.22.  See README_VEV.md.
+_v_crystal :: Double
+_v_crystal = _m_pl
+           * (_sigma_d - 1)                      -- 35
+           / (_d + 1)                            -- 43
+           / _sigma_d                            -- 36
+           / (2 ** (_d + n_c^(2::Int) - 1))      -- 2⁵⁰
+
+-- PDG VEV — for gap analysis only (Toe(vev="pdg"))
+_v_pdg :: Double
+_v_pdg = 246.22                                  -- GeV (experimental extraction)
+
+-- Active VEV — crystal derived is default.
+-- To use PDG for gap analysis, change this one line to _v_pdg.
 _v :: Double
-_v = 246.22  -- GeV (spectral action on A_F)
+_v = _v_crystal
 
 -- Unit conversion (definition, not physics)
 _hbarc :: Double
