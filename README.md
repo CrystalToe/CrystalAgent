@@ -31,6 +31,10 @@ zero free parameters?
 ```
 
 ```
+Can the Connes Trace Formula be shown to produce the fine‑structure 
+constant as a spectral invariant, and can the difference be exactly corrected 
+by a loop‑like tower renormalization?
+```
 I've uploaded the Crystal Topos files. Can you show me how the framework derives
 the proton mass from the (2,3) lattice, including the formula, the crystal value,
 the PDG value, and the Prime Wobble Index?
