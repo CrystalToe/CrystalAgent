@@ -233,7 +233,7 @@ CrystalAgent/
     │
     ├── ─── HIERARCHICAL IMPLOSION (Session 8) ───
     │   CrystalHierarchy.hs           ← Seeley-DeWitt MERA, implosion operator
-    │   CrystalFullTest.hs            ← 198-observable regression (CV = 0.954)
+    │   CrystalFullTest.hs            ← 198-observable regression (CV = 0.898)
     │
     ├── ─── DYNAMICAL GRAVITY (Session 12) ───  (NEW)
     │   CrystalGravityDyn.hs          ← Linearized Einstein, 12 integer proofs

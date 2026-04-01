@@ -157,8 +157,8 @@ Cosmological partition: Ω_Λ=29/42 (solvent), Ω_cdm=11/42 (core), Ω_b=2/42 (s
 ## OBSERVABLE COUNT: 198
 
 92 original + 103 extended + 3 CODATA (α⁻¹, m_p/m_e, r_p)
-34/34 Haskell PASS. 46 EXACT, 124 TIGHT, 23 GOOD, 5 LOOSE, 0 OVER.
-CV = 0.953. Mean PWI = 0.311%. Max = 1.372% (m_omega).
+34/34 Haskell PASS. 46 EXACT, 129 TIGHT, 23 GOOD, 0 LOOSE, 0 OVER.
+CV = 0.898. Mean PWI = 0.271%. Max = 0.989% (sin²θ₁₂).
 
 ## PROOF AUTHORITY
 
@@ -2477,7 +2477,7 @@ Tests whether the crystal's error distribution (the Prime Wobble Index values ac
 | 3 | No explosive MA root | Largest root < 1 |
 | 4 | Beurling-Nyman criterion | Satisfied to 95.5% |
 | 5 | Weil positivity | Margin 99.9% |
-| 6 | CV ≈ 1.0 | CV = 0.954 (rate-distortion optimal) |
+| 6 | CV ≈ 1.0 | CV = 0.898 (rate-distortion optimal) |
 
 ## Key Spectral Data
 
@@ -2489,7 +2489,7 @@ Tests whether the crystal's error distribution (the Prime Wobble Index values ac
 
 ## Key Physical Insight
 
-**CV ≈ 1.0 is the Shannon limit.** An exponential distribution has CV = 1.0 exactly. The crystal's CV = 0.954 means the wobble is near-optimal: the minimum possible error for encoding continuous physics in a discrete (2,3) lattice. The wobble is not noise — it is the information-theoretic cost of discretisation. If the Riemann Hypothesis holds, this cost is minimised. The crystal's wobble distribution is consistent with this.
+**CV ≈ 1.0 is the Shannon limit.** An exponential distribution has CV = 1.0 exactly. The crystal's CV = 0.898 means the wobble is near-optimal: the minimum possible error for encoding continuous physics in a discrete (2,3) lattice. The wobble is not noise — it is the information-theoretic cost of discretisation. If the Riemann Hypothesis holds, this cost is minimised. The crystal's wobble distribution is consistent with this.
 
 **This is NOT a proof of RH.** It is a necessary condition check. If the crystal violated these criteria, the crystal would be wrong. It doesn't violate them, which is consistent with both the crystal and RH being correct.
 

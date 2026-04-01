@@ -69,8 +69,8 @@ Cosmological partition: Ω_Λ=29/42 (solvent), Ω_cdm=11/42 (core), Ω_b=2/42 (s
 ## OBSERVABLE COUNT: 198
 
 92 original + 103 extended + 3 CODATA (α⁻¹, m_p/m_e, r_p)
-34/34 Haskell PASS. 46 EXACT, 124 TIGHT, 23 GOOD, 5 LOOSE, 0 OVER.
-CV = 0.953. Mean PWI = 0.311%. Max = 1.372% (m_omega).
+34/34 Haskell PASS. 46 EXACT, 129 TIGHT, 23 GOOD, 0 LOOSE, 0 OVER.
+CV = 0.898. Mean PWI = 0.271%. Max = 0.989% (sin²θ₁₂).
 
 ## PROOF AUTHORITY
 

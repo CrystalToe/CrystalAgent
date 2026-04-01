@@ -218,7 +218,7 @@ A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)
          ↓
    corrections: a₂ (base) + a₄ (Σd² = 650) → CODATA precision
          ↓
-   198 observables, 0 free parameters, CV = 0.954
+   198 observables, 0 free parameters, CV = 0.898
 ```
 
 The algebra is the seed. The MERA is the machine. The thermal
@@ -327,7 +327,7 @@ Structural — does NOT add observables.
 
 ---
 
-## HIERARCHICAL IMPLOSION (CV 1.33 → 0.954)
+## HIERARCHICAL IMPLOSION (CV 1.33 → 0.898)
 
 | Observable | Base (a₂) | Correction | PWI before → after |
 |---|---|---|---|
@@ -337,8 +337,13 @@ Structural — does NOT add observables.
 | m_φ | Λ×13/12 | −N_w/(N_c·Σd) | 1.77% → 0.028% |
 | Ω_DM | 309/1159 | −1/(gauss(gauss−N_c)) = −1/130 | 2.98% → 0.007% |
 | sin²θ₁₃ | 1/45 | −1/4500 → 11/500 | 1.01% → EXACT |
+| m_ω | m_π×35/6 | −T_F/χ = ×23/4 (= corrected ρ) | 1.37% → 0.076% |
+| m_η | Λ/√3 | −1/(N_c(χ−1)²) = −1/75 | 1.36% → 0.005% |
+| M_Z | v×3/8 | −1/((D+1)(χ−1)) = −1/215 | 1.26% → EXACT |
+| Δm_dec | m_s×κ | −N_w/gauss² = −2/169 | 1.20% → 0.001% |
+| m_μ | v/2¹¹×8/9 | −1/(d₈(2χ−1)) = −1/88 | 1.14% → 0.005% |
 
-Result: CV = 0.954. Zero LOOSE. All 198 under 1%.
+Result: CV = 0.898. Zero LOOSE. All 198 under 1%.
 
 ---
 
@@ -515,20 +520,20 @@ CrystalAgent/
 |--------|-------|
 | Observables | 198 |
 | EXACT (PWI=0) | 46 |
-| TIGHT (<0.5%) | 124 |
+| TIGHT (<0.5%) | 129 |
 | GOOD (0.5-1%) | 23 |
-| LOOSE (1-4.5%) | 5 |
+| LOOSE (1-4.5%) | 0 |
 | OVER (≥4.5%) | 0 |
-| CV | 0.953 |
-| Mean PWI | 0.311% |
-| Max PWI | 1.372% (m_omega) |
+| CV | 0.898 |
+| Mean PWI | 0.271% |
+| Max PWI | 0.989% (sin²θ₁₂) |
 | Free parameters | 0 |
 | Constants inside CODATA | 4 |
 | Haskell modules | 34 |
 | Haskell proofs | 34/34 PASS |
-| Lean theorems | 763+ |
-| Agda proofs | 611+ |
-| Rust tests | 472+ |
+| Lean theorems | 808+ |
+| Agda proofs | 645+ |
+| Rust tests | 527+ |
 | Python proof modules | 13+ |
 | Gravity integer audit | 12/12 PASS |
 | First law δS/δ⟨H_A⟩ | 1.0001 ± 0.0004 |
@@ -537,8 +542,7 @@ CrystalAgent/
 | Domains | 22+ |
 
 Note: PWI uses CrystalPdg vs Expt (four-column table, scheme noise removed).
-The 5 LOOSE observables (m_omega, m_η, M_Z, Δm_dec, m_μ) are a₄ correction
-targets — same pipeline that already closed m_Υ, m_D, m_ρ, m_φ.
+All 11 a₄ corrections (Sessions 8-9) are closed. Zero LOOSE. All 198 under 1%.
 
 ---
 
