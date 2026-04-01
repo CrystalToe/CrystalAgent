@@ -224,6 +224,44 @@ LEAN CrystalHierarchy.lean shared_atom_chi_m1
 LEAN CrystalHierarchy.lean cross_130
 LEAN CrystalHierarchy.lean cross_75
 LEAN CrystalHierarchy.lean denoms_distinct
+LEAN CrystalHologron.lean delta_singlet_arg
+LEAN CrystalHologron.lean delta_weak_arg
+LEAN CrystalHologron.lean delta_colour_arg
+LEAN CrystalHologron.lean delta_mixed_arg
+LEAN CrystalHologron.lean delta_mixed_is_one
+LEAN CrystalHologron.lean delta_sum_integers
+LEAN CrystalHologron.lean growth_ratio
+LEAN CrystalHologron.lean chi_squared
+LEAN CrystalHologron.lean chi_sq_is_sigma
+LEAN CrystalHologron.lean chi_cubed
+LEAN CrystalHologron.lean two_point_power
+LEAN CrystalHologron.lean weak_dominates
+LEAN CrystalHologron.lean inverse_square
+LEAN CrystalHologron.lean newton_potential
+LEAN CrystalHologron.lean spatial_dim
+LEAN CrystalHologron.lean spacetime_dim
+LEAN CrystalHologron.lean bertrand
+LEAN CrystalHologron.lean kepler_third
+LEAN CrystalHologron.lean kepler_four
+LEAN CrystalHologron.lean angular_momentum
+LEAN CrystalHologron.lean gw_polarisations
+LEAN CrystalHologron.lean ryu_takayanagi
+LEAN CrystalHologron.lean einstein_16
+LEAN CrystalHologron.lean einstein_16_decompose
+LEAN CrystalHologron.lean schwarzschild
+LEAN CrystalHologron.lean quadrupole_32
+LEAN CrystalHologron.lean quadrupole_5
+LEAN CrystalHologron.lean phase_total
+LEAN CrystalHologron.lean phase_solvable
+LEAN CrystalHologron.lean phase_chaotic
+LEAN CrystalHologron.lean phase_decompose
+LEAN CrystalHologron.lean endo_count
+LEAN CrystalHologron.lean tower
+LEAN CrystalHologron.lean tower_from_primes
+LEAN CrystalHologron.lean beta_zero
+LEAN CrystalHologron.lean four_sectors
+LEAN CrystalHologron.lean deg_sum
+LEAN CrystalHologron.lean type_II
 LEAN CrystalLayer.lean chi_eq
 LEAN CrystalLayer.lean beta0_eq
 LEAN CrystalLayer.lean towerD_eq
@@ -843,7 +881,7 @@ LEAN Main.lean id_sigma_chi_sq
 LEAN Main.lean id_sigma_d2
 LEAN Main.lean id_D_decomp
 LEAN Main.lean id_algebra_N_c
-LEAN_FILES 16
+LEAN_FILES 17
 # AGDA PROOFS
 AGDA CrystalAlphaProton.agda chi-eq
 AGDA CrystalAlphaProton.agda sigma-d-eq
@@ -1021,6 +1059,40 @@ AGDA CrystalHierarchy.agda shared-2chi-m1
 AGDA CrystalHierarchy.agda shared-chi-m1
 AGDA CrystalHierarchy.agda cross-130
 AGDA CrystalHierarchy.agda cross-75
+AGDA CrystalHologron.agda delta-singlet-arg
+AGDA CrystalHologron.agda delta-weak-arg
+AGDA CrystalHologron.agda delta-colour-arg
+AGDA CrystalHologron.agda delta-mixed-arg
+AGDA CrystalHologron.agda delta-sum
+AGDA CrystalHologron.agda growth-ratio
+AGDA CrystalHologron.agda chi-sq
+AGDA CrystalHologron.agda chi-sq-sigma
+AGDA CrystalHologron.agda two-point
+AGDA CrystalHologron.agda inverse-square
+AGDA CrystalHologron.agda newton-potential
+AGDA CrystalHologron.agda spatial-dim
+AGDA CrystalHologron.agda spacetime-dim
+AGDA CrystalHologron.agda bertrand
+AGDA CrystalHologron.agda kepler-third
+AGDA CrystalHologron.agda kepler-four
+AGDA CrystalHologron.agda ang-mom-numerator
+AGDA CrystalHologron.agda gw-pol
+AGDA CrystalHologron.agda rt-four
+AGDA CrystalHologron.agda einstein-16
+AGDA CrystalHologron.agda schwarzschild
+AGDA CrystalHologron.agda quad-32
+AGDA CrystalHologron.agda quad-5
+AGDA CrystalHologron.agda phase-total
+AGDA CrystalHologron.agda phase-solvable
+AGDA CrystalHologron.agda phase-chaotic
+AGDA CrystalHologron.agda phase-decomp
+AGDA CrystalHologron.agda endo-count
+AGDA CrystalHologron.agda tower
+AGDA CrystalHologron.agda beta-zero
+AGDA CrystalHologron.agda four-sectors
+AGDA CrystalHologron.agda deg-sum
+AGDA CrystalHologron.agda type-II-lhs
+AGDA CrystalHologron.agda type-II-rhs
 AGDA CrystalLayer.agda chi-eq
 AGDA CrystalLayer.agda beta0-eq
 AGDA CrystalLayer.agda towerD-eq
@@ -1518,7 +1590,7 @@ AGDA CrystalTopos.agda bridge-string-den
 AGDA CrystalTopos.agda endomorphisms-bridge
 AGDA CrystalTopos.agda sector-sum-bridge
 AGDA CrystalTopos.agda spectral-dim-bridge
-AGDA_FILES 15
+AGDA_FILES 16
 # HASKELL MODULES
 HASKELL CrystalAlphaProton.hs
 HASKELL CrystalAudit.hs
@@ -1531,6 +1603,7 @@ HASKELL CrystalGauge.hs
 HASKELL CrystalGravity.hs
 HASKELL CrystalGravityDyn.hs
 HASKELL CrystalHierarchy.hs
+HASKELL CrystalHologron.hs
 HASKELL CrystalLayer.hs
 HASKELL CrystalMandelbrot.hs
 HASKELL CrystalMERA.hs
@@ -2063,6 +2136,7 @@ PYTHON crystal_certificate_proof.py
 PYTHON crystal_discoveries_proof.py
 PYTHON crystal_fundamentals_proof.py
 PYTHON crystal_hierarchy_proof.py
+PYTHON crystal_hologron_proof.py
 PYTHON crystal_monad_mera_proof.py
 PYTHON crystal_noether_proof.py
 PYTHON crystal_proton_radius_proof.py
@@ -2192,8 +2266,8 @@ PYTHON qubo_folder.py
 PYTHON schrodinger_vs_monad.py
 PYTHON spectral_tower.py
 # SUMMARY COUNTS
-TOTAL_LEAN_THEOREMS      844
-TOTAL_AGDA_PROOFS      673
+TOTAL_LEAN_THEOREMS      882
+TOTAL_AGDA_PROOFS      707
 TOTAL_RUST_TESTS      486
-TOTAL_HASKELL_MODULES       36
-TOTAL_PYTHON_MODULES      133
+TOTAL_HASKELL_MODULES       37
+TOTAL_PYTHON_MODULES      134

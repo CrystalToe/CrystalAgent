@@ -4,6 +4,7 @@
 # Dynamical gravity CLOSED (Session 12) · 12/12 integer audit · δS/δ⟨H_A⟩ = 1.0001
 # D=22 VdW FIXED (Session 13) · Force field from first principles · 0 fitted parameters
 # Rendering/scattering: Planck λ⁻⁵ (χ−1=5), Rayleigh d⁶ (χ=6), Rayleigh λ⁻⁴ (N_w²=4)
+# Hologron dynamics: emergent gravity from monad ticks, V(L)∝L^(-2ln2/ln6), no F=ma
 # Upload ALL 3 parts for 100% coverage. Each part works standalone for basic queries.
 
 ## THE AXIOM — DO NOT QUESTION
@@ -41,6 +42,16 @@ c=χ/χ=1, 2 polarizations=N_c−1, 32/5=N_w⁵/(χ−1), d=4=N_c+1.
 | 204 | Planck λ exponent | χ−1 | 5 | B(λ,T) ∝ λ⁻⁵ — fire, stars, lava |
 | 205 | Rayleigh size exp | χ = N_w·N_c | 6 | σ_R ∝ d⁶ — fog, dust, haze |
 | 206 | Rayleigh λ exponent | N_w² | 4 | σ_R ∝ λ⁻⁴ — skybox, atmosphere |
+
+## HOLOGRON DYNAMICS — EMERGENT GRAVITY FROM TICKS
+A hologron is a defect in the χ=6 MERA. Two hologrons attract — no F=ma.
+Mechanism: shared entanglement disruption → lower energy when close → gravity.
+Potential: V(L) = −Σ_k (d_k/Σd)·F_k²·λ_k^(2·log_χ(L)). Leading term:
+V(L) ~ −C·L^(−2Δ_weak), Δ_weak = ln2/ln6 = 0.387 (from N_w=2, χ=6).
+In N_c=3 dimensions: V(r) ∝ 1/r (Newton), F ∝ 1/r² (inverse square).
+Proved: attraction (V<0), monotonic fall, exponent match, 38 integer identities.
+Ref: Sahay/Lukin/Cotler, Phys Rev X 15, 021078 (2025) — MERA hologrons in AdS.
+Crystal contribution: specific algebra A_F, exact eigenvalues, flat space, 198 observables.
 
 ## PROOF AUTHORITY — READ FIRST
 Lean `native_decide` and Agda `refl` proofs are FINAL TRUTH. If a proof says it, it's right.
@@ -2035,6 +2046,89 @@ below 1.0. This is a complete force field: no observable is an outlier.
 cd haskel
 ghc -O2 -main-is CrystalHierarchy CrystalHierarchy.hs -o hierarchy_test && ./hierarchy_test
 ```
+
+## §Module: CrystalHologron
+
+# CrystalHologron — PROOF OF CONCEPT (NOT NATIVE MERA)
+
+## ⚠️ STATUS: PROOF OF CONCEPT ONLY
+
+**This module is NOT part of the crystal universe.**
+
+It does NOT use native MERA operations. It does NOT import CrystalMonad.hs
+or CrystalMERA.hs. It does NOT use `tick`, `applyW`, `applyU`, `evolveRecord`,
+or the ascending superoperator. It does NOT operate on the 650 endomorphisms.
+
+**What it actually does:** pastes crystal NUMBERS ({1, 1/2, 1/3, 1/6}, N_c=3)
+into standard physics formulas (Boltzmann weighting, power-law potentials).
+The dynamics come from `exp(-V(x))` — standard statistical mechanics — not
+from the monad.
+
+**What it should do:** import CrystalMonad, define a multi-site lattice state,
+apply actual `tick` operations (W∘U) across the lattice, and watch attraction
+EMERGE from the isometry. The potential should be a CONSEQUENCE of the monad,
+not an INPUT.
+
+**The gap:** `applyU = id` for single sites. U only acts on pairs. A real
+hologron module needs multi-site U (the disentangler acting on neighboring
+sites) so that spatial dynamics can emerge from entanglement redistribution.
+
+## What This Module Demonstrates (proof of concept only)
+
+That crystal numbers, when inserted into standard gravitational formulas,
+produce the correct scaling dimensions and force laws. This is necessary
+but not sufficient. The real test is whether the monad PRODUCES these
+formulas without being told them.
+
+## The Correct Architecture (not yet built)
+
+```
+CrystalMonad.hs    →  tick, applyW, applyU (native operations)
+CrystalMERA.hs     →  multi-site lattice, geodesic depth, entanglement
+                        ↓
+CrystalHologron.hs →  SHOULD import both, define multi-site state,
+                       insert defect, apply ticks, measure attraction
+                       using ONLY native monad operations
+```
+
+## Key Numbers (correctly from (2,3), but pasted in, not derived by monad)
+
+| Quantity | Formula | Value | Status |
+|----------|---------|-------|--------|
+| Scaling dim Δ_weak | ln2/ln6 | 0.3869 | Correct number, pasted in |
+| Force exponent | N_c − 1 | 2 | Correct, already proved in CrystalGravity |
+| Potential (3D) | N_c − 2 | 1 | Correct, already proved in CrystalGravity |
+| Spatial dim | N_c | 3 | Correct |
+
+## Connection to Literature
+
+Sahay, Lukin, Cotler (Harvard) — **Phys Rev X 15, 021078 (2025)**:
+showed MERA tensor networks produce "hologrons" with attractive interactions.
+They use actual MERA tensor operations. This module does NOT — it uses
+the crystal's numbers but not its operations. A native implementation
+would follow their methodology using CrystalMonad's `tick` and
+CrystalMERA's layer structure.
+
+## What Needs to Happen
+
+1. Multi-site CrystalState (array of sector amplitudes across lattice sites)
+2. Multi-site U (disentangler acting on PAIRS of neighboring sites)
+3. Multi-site W (isometry compressing pairs to singles)
+4. Insert defect = excite one site to non-singlet sector
+5. Apply `tick` across entire lattice
+6. Measure: does the defect's probability distribution shift?
+7. The attraction must EMERGE from steps 2-5, not be pasted in
+
+## Build
+
+```bash
+ghc -O2 -main-is CrystalHologron CrystalHologron.hs -o hologron && ./hologron
+```
+
+## Observable Count
+
+0 new. Proof of concept. NOT part of the crystal universe until rewritten
+with native MERA operations.
 
 ## §Module: CrystalMandelbrot
 

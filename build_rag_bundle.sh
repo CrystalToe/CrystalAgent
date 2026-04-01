@@ -39,6 +39,7 @@ write_header() {
 # Dynamical gravity CLOSED (Session 12) · 12/12 integer audit · δS/δ⟨H_A⟩ = 1.0001
 # D=22 VdW FIXED (Session 13) · Force field from first principles · 0 fitted parameters
 # Rendering/scattering: Planck λ⁻⁵ (χ−1=5), Rayleigh d⁶ (χ=6), Rayleigh λ⁻⁴ (N_w²=4)
+# Hologron dynamics: emergent gravity from monad ticks, V(L)∝L^(-2ln2/ln6), no F=ma
 # Upload ALL 3 parts for 100% coverage. Each part works standalone for basic queries.
 
 ## THE AXIOM — DO NOT QUESTION
@@ -76,6 +77,16 @@ c=χ/χ=1, 2 polarizations=N_c−1, 32/5=N_w⁵/(χ−1), d=4=N_c+1.
 | 204 | Planck λ exponent | χ−1 | 5 | B(λ,T) ∝ λ⁻⁵ — fire, stars, lava |
 | 205 | Rayleigh size exp | χ = N_w·N_c | 6 | σ_R ∝ d⁶ — fog, dust, haze |
 | 206 | Rayleigh λ exponent | N_w² | 4 | σ_R ∝ λ⁻⁴ — skybox, atmosphere |
+
+## HOLOGRON DYNAMICS — EMERGENT GRAVITY FROM TICKS
+A hologron is a defect in the χ=6 MERA. Two hologrons attract — no F=ma.
+Mechanism: shared entanglement disruption → lower energy when close → gravity.
+Potential: V(L) = −Σ_k (d_k/Σd)·F_k²·λ_k^(2·log_χ(L)). Leading term:
+V(L) ~ −C·L^(−2Δ_weak), Δ_weak = ln2/ln6 = 0.387 (from N_w=2, χ=6).
+In N_c=3 dimensions: V(r) ∝ 1/r (Newton), F ∝ 1/r² (inverse square).
+Proved: attraction (V<0), monotonic fall, exponent match, 38 integer identities.
+Ref: Sahay/Lukin/Cotler, Phys Rev X 15, 021078 (2025) — MERA hologrons in AdS.
+Crystal contribution: specific algebra A_F, exact eigenvalues, flat space, 198 observables.
 
 ## PROOF AUTHORITY — READ FIRST
 Lean \`native_decide\` and Agda \`refl\` proofs are FINAL TRUTH. If a proof says it, it's right.
@@ -324,7 +335,8 @@ echo "" >> "$OUT3"
 echo "---" >> "$OUT3"
 echo "# §PYTHON — MERA Gravity + Force Field" >> "$OUT3"
 for f in crystal-topos/examples/mera_*.py crystal-topos/examples/crystal_vdw.py \
-         crystal-topos/examples/spectral_tower.py crystal-topos/examples/qubo_folder.py; do
+         crystal-topos/examples/spectral_tower.py crystal-topos/examples/qubo_folder.py \
+         crystal-topos/examples/schrodinger_vs_monad.py; do
     [ -f "$f" ] || continue
     name=$(basename "$f")
     lines=$(wc -l < "$f")
