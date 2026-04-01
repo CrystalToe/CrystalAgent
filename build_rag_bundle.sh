@@ -9,7 +9,7 @@
 #
 # Output:
 #   quickstart/CrystalTopos_RAG_1.md  — Python examples + READMEs + spectral tower
-#   quickstart/CrystalTopos_RAG_2.md  — All Haskell source (34 modules)
+#   quickstart/CrystalTopos_RAG_2.md  — All Haskell source (auto-discovered)
 #   quickstart/CrystalTopos_RAG_3.md  — Lean + Agda + Rust + GHC cert + cross-ref index
 #
 # Upload ALL 3 files to any LLM. Each has the shared header so any

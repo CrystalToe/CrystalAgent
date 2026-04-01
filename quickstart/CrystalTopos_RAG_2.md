@@ -3351,6 +3351,36 @@ Proves 38 properties:
 -}
 ```
 
+## §Haskell: CrystalMERA (     292 lines)
+```haskell
+
+{- | Module: CrystalMERA — Multi-scale Entanglement Renormalization Ansatz.
+
+The MERA IS the geometry. Each layer = one tick of S = W∘U.
+The bulk is built layer by layer. Gravity = perturbation of layers.
+
+Structure:
+  Layer 0 (UV):  χ^D sites = 6^42 sites (the boundary)
+  Layer 1:       χ^(D-1) sites (one tick of coarse-graining)
+  Layer d:       χ^(D-d) sites
+  Layer D (IR):  1 site (the bulk point)
+
+At each layer, S = W∘U acts:
+  U removes short-range entanglement (disentangler)
+  W compresses χ sites → 1 site (isometry)
+
+Entanglement entropy: S_A = |∂A| × ln(χ) / (4G)
+  where 4 = N_w² (Ryu-Takayanagi)
+  and G is determined by the 650 endomorphisms.
+
+Perturbation δW → δS_A = δ⟨H_A⟩ → linearized Einstein.
+  16πG = N_w⁴ × π / 2 = 8π (from colour adjoint d=8).
+
+Observable count: 0 new (infrastructure for dynamics).
+-}
+
+```
+
 ## §Haskell: CrystalMixing (     215 lines)
 ```haskell
 
@@ -3556,6 +3586,31 @@ berryPhaseCheck c =
       a_tree   = nW^2 % (nC + nW)                        -- 4/5
       match    = cos2pmns == a_tree                       -- True
   in (cos2pmns, a_tree, match)
+```
+
+## §Haskell: CrystalMonad (     478 lines)
+```haskell
+
+{- | Module: CrystalMonad — The monad S = W∘U over A_F.
+
+Time is ℕ. One tick = one application of S.
+No calculus. No dt. No exp(-iHt). Pure monad.
+
+S = W ∘ U where:
+  U (disentangler): unitary on pair space ℂ^χ². Reversible.
+  W (isometry):     ℂ^χ² → ℂ^χ. Compresses. Irreversible.
+
+Eigenvalues of S:  {1, 1/2, 1/3, 1/6} = {1, 1/N_w, 1/N_c, 1/χ}
+                   EXACT RATIONALS from (2,3).
+
+Arrow of time:     W†W = I, WW† ≠ I. Theorem of χ > 1.
+Second Law:        ΔS = ln(χ) = ln(6) per tick. Forced by algebra.
+Schrödinger:       H = −ln(S)/β. DERIVED from monad. Not assumed.
+Uncertainty:       1/2 ⊥ 1/3 in Heyting order. Theorem of gcd(2,3)=1.
+
+Observable count: 0 new (infrastructure for dynamics).
+-}
+
 ```
 
 ## §Haskell: CrystalNoether (     143 lines)
