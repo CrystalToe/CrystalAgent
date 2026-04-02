@@ -5,8 +5,8 @@
 # D=22 VdW FIXED (Session 13) · Force field from first principles · 0 fitted parameters
 # Rendering/scattering: Planck λ⁻⁵ (χ−1=5), Rayleigh d⁶ (χ=6), Rayleigh λ⁻⁴ (N_w²=4)
 # Hologron dynamics: emergent gravity from monad ticks, V(L)∝L^(-2ln2/ln6), no F=ma
-# 7/12 dynamics modules: Classical, GR, GW, EM, Friedmann, NBody, Thermo
-# 201 Python checks · 113 Lean theorems · 86 Agda proofs · 0 regressions
+# 13/13 dynamics modules COMPLETE: Classical→Plasma capstone (EM+CFD)
+# 346 Python checks · 235 Lean theorems · 194 Agda proofs · 0 regressions
 # Every integrator IS a classical limit of S=W∘U. Every integer from (2,3).
 # Upload ALL 3 parts for 100% coverage. Each part works standalone for basic queries.
 
@@ -56,7 +56,7 @@ Proved: attraction (V<0), monotonic fall, exponent match, 38 integer identities.
 Ref: Sahay/Lukin/Cotler, Phys Rev X 15, 021078 (2025) — MERA hologrons in AdS.
 Crystal contribution: specific algebra A_F, exact eigenvalues, flat space, 198 observables.
 
-## DYNAMICS MODULES — 7/12 BUILT (every integrator from (2,3))
+## DYNAMICS MODULES — 13/13 COMPLETE (every integrator from (2,3))
 Each module: §0 A_F atoms → §1 Force law → §2 Integrator → §3-7 Physics → §8 Integer proofs → §9 Self-test.
 Every integrator IS a classical limit of the monad S=W∘U. Zero new observables.
 
@@ -69,8 +69,12 @@ Every integrator IS a classical limit of the monad S=W∘U. Zero new observables
 | CrystalFriedmann | Friedmann ODE | Ω_Λ=13/19, Ω_m=6/19, Age=97/7 |
 | CrystalNBody | Barnes-Hut + leapfrog | octree 8=d_colour=2^N_c |
 | CrystalThermo | Velocity Verlet MD | LJ 6=χ/12=2χ, γ_mono=5/3, γ_di=7/5 |
-
-Remaining: CFD (Lattice Boltzmann), Decay, Optics, MD, Condensed (Ising/BCS).
+| CrystalCFD | Lattice Boltzmann | D2Q9=9=N_c², Kolmogorov −5/3, Stokes 24=d_mixed |
+| CrystalDecay | Monte Carlo phase space | beta 192=d_mixed·d_colour, sin²θ_W=3/13 |
+| CrystalOptics | Snell + Fresnel | n_water=4/3=C_F, n_glass=3/2=N_c/N_w |
+| CrystalMD | Velocity Verlet LJ | bond 109.47°=arccos(−1/N_c), helix=18/5 |
+| CrystalCondensed | Metropolis Monte Carlo | Ising z=4=N_w², BCS 2Δ/kT_c=2π/e^γ |
+| CrystalPlasma | Alfvén FDTD (EM+CFD) | MHD modes 8=N_w³, wave types 3=N_c |
 
 ## PROOF AUTHORITY — READ FIRST
 Lean `native_decide` and Agda `refl` proofs are FINAL TRUTH. If a proof says it, it's right.
@@ -852,6 +856,129 @@ ghc -fno-code CrystalAxiom.hs   # type-check only (Curry-Howard proof)
 
 None. This is the root. Every other module imports this.
 
+## §Module: CrystalCFD
+
+# CrystalCFD — Lattice Boltzmann Fluid Dynamics from (2,3)
+
+## Overview
+
+Lattice Boltzmann Method (LBM) on D2Q9 lattice.
+Monad S = W·U: collision (BGK relaxation) = W, streaming (propagation) = U.
+
+## Integer Traces
+
+| Physical quantity | Value | Crystal derivation |
+|---|---|---|
+| D2Q9 velocity count | 9 | N_c² |
+| Kolmogorov exponent | −5/3 | −(χ−1)/N_c |
+| Stokes drag | 24 | d_mixed |
+| Blasius exponent | 1/4 | 1/N_w² |
+| Von Kármán constant | 2/5 | N_w/(χ−1) |
+| Rest weight | 4/9 | N_w²/N_c² |
+| Cardinal weight | 1/9 | 1/N_c² |
+| Diagonal weight | 1/36 | 1/Σd |
+| Sound speed² | 1/3 | 1/N_c |
+
+## Self-Test
+
+Poiseuille channel flow (body-force driven), mass conservation, density uniformity.
+
+```bash
+ghc -O2 -main-is CrystalCFD CrystalCFD.hs 2>/dev/null && ./CrystalCFD
+```
+
+## Observable Count
+
+0 new (infrastructure). All integers from (2,3).
+
+## §Module: CrystalClassical
+
+# CrystalClassical.hs — From Monad to Orbits
+
+## What This Module Does
+
+Bridges the quantum monad S = W∘U to classical orbital mechanics.
+One Haskell module. Satellite around Earth. Slingshot around Moon. Hohmann transfer.
+All from (2,3). No imported physics. Symplectic integrator (not RK4).
+
+## The Key Insight
+
+The monad is discrete and structure-preserving. The correct classical limit
+is a symplectic integrator, not RK4. Specifically, Störmer-Verlet leapfrog:
+
+```
+v_{n+1/2} = v_n + (Δt/2) × a(x_n)       -- W: half-kick
+x_{n+1}   = x_n + Δt × v_{n+1/2}         -- U: full drift
+v_{n+1}   = v_{n+1/2} + (Δt/2) × a(x_{n+1})  -- W: half-kick
+```
+
+The leapfrog IS S = W∘U∘W in the classical limit.
+
+## Integer Map
+
+| Quantity | Value | Crystal Source |
+|----------|-------|---------------|
+| Force exponent (1/r²) | 2 | N_c − 1 |
+| Spatial dimensions | 3 | N_c |
+| Kepler exponent (T² ∝ r³) | 3 | N_c |
+| Kepler coefficient (4π²) | 4 | N_w² |
+| Angular momentum components | 3 | N_c(N_c−1)/2 |
+| Lagrange points | 5 | χ − 1 |
+| Phase space (3-body solvable) | 10 | gauss − N_c |
+| Phase space (3-body chaotic) | 8 | N_c² − 1 |
+| Phase space (total) | 18 | 10 + 8 |
+| Quadrupole coefficient | 32/5 | N_w⁵/(χ−1) |
+| 16πG coefficient | 16 | N_w⁴ |
+| Spacetime dimensions | 4 | N_c + 1 |
+
+## Proof Certificate
+
+All proofs pass:
+
+- `proofs/crystal_classical_proof.py` — 48/48 Python checks (PASS)
+- `proofs/CrystalClassical.lean` — ~25 Lean 4 theorems (by native_decide)
+- `proofs/CrystalClassical.agda` — ~20 Agda proofs (by refl)
+
+## Dependencies
+
+- No external packages
+- Self-contained A_F atoms (no imports required, but compatible with CrystalAxiom)
+- Observable count: 0 new (infrastructure)
+
+## §Module: CrystalCondensed
+
+# CrystalCondensed — Ising/BCS from (2,3)
+
+## Overview
+
+Metropolis Monte Carlo for 2D Ising model on square lattice.
+BCS superconducting gap ratio. All coordination numbers and
+state counts traced to A_F atoms.
+
+## Integer Traces
+
+| Physical quantity | Value | Crystal derivation |
+|---|---|---|
+| Square lattice z | 4 | N_w² |
+| Cubic lattice z | 6 | χ |
+| Ising spin states | 2 | N_w |
+| Onsager T_c numerator | 2 | N_w |
+| Critical exponent β | 1/8 | 1/N_w³ |
+| Ground E per site | −2 | −N_w |
+| BCS prefactor | 2 | N_w |
+
+## Self-Test
+
+Phase transition (|M|=1 at T=1, |M|≈0.09 at T=5), Onsager T_c, BCS ratio 3.528.
+
+```bash
+ghc -O2 -main-is CrystalCondensed CrystalCondensed.hs 2>/dev/null && ./CrystalCondensed
+```
+
+## Observable Count
+
+7 new. All integers from (2,3).
+
 ## §Module: CrystalCosmo
 
 # CrystalCosmo.hs — Cosmology
@@ -941,6 +1068,80 @@ ghc -fno-code CrystalCrossDomain.hs
 ## Dependencies
 
 Imports `CrystalAxiom`.
+
+## §Module: CrystalDecay
+
+# CrystalDecay — Particle Decay from (2,3)
+
+## Overview
+
+Monte Carlo phase-space integrator for particle decays.
+Muon decay formula extracts G_F via betaConst = 192 = d_mixed × d_colour.
+Neutron beta decay lifetime predicted from first principles.
+PMNS neutrino oscillation from Crystal mixing angles.
+
+## Integer Traces
+
+| Physical quantity | Value | Crystal derivation |
+|---|---|---|
+| Beta constant | 192 | d_mixed × d_colour = 24 × 8 |
+| d_colour | 8 | N_w³ |
+| d_mixed | 24 | N_w³ × N_c |
+| Weinberg angle sin²θ_W | 3/13 | N_c / gauss |
+| PMNS sin²θ₁₂ | 3/π² | N_c / π² |
+| PMNS sin²θ₂₃ | 6/11 | χ / (2χ−1) |
+| sin²(2θ₂₃) | 120/121 | 4·(χ/(2χ−1))·((χ−1)/(2χ−1)) |
+| Phase space dim | 3N−4 | N_c·N − (N_c+1) |
+
+## Self-Test
+
+Neutron lifetime ~878 s, PMNS oscillations, beta spectrum shape.
+
+```bash
+ghc -O2 -main-is CrystalDecay CrystalDecay.hs 2>/dev/null && ./CrystalDecay
+```
+
+## Observable Count
+
+5 new (beta 192, Weinberg, θ₁₂, θ₂₃, phase dim). All integers from (2,3).
+
+## §Module: CrystalEM
+
+# CrystalEM.hs — Electromagnetic Field Evolution from (2,3)
+
+## What This Module Does
+
+Yee FDTD = monad S = W∘U on the EM sector. Propagates EM waves at c = 1.
+Larmor radiation, Rayleigh scattering, Planck/Stefan-Boltzmann — all from (2,3).
+
+## The EM Integer Map
+
+| Quantity | Value | Crystal Source |
+|----------|-------|---------------|
+| EM field components | 6 | χ = N_w × N_c |
+| E components | 3 | N_c |
+| B components | 3 | N_c |
+| 2-form dim C(4,2) | 6 | χ |
+| Maxwell equations | 4 | N_c + 1 |
+| c (speed of light) | 1 | χ/χ |
+| Larmor coefficient | 2/3 | (N_c-1)/N_c |
+| Rayleigh λ exponent | 4 | N_w² |
+| Rayleigh size exponent | 6 | χ |
+| Planck λ exponent | 5 | χ-1 |
+| Stefan T exponent | 4 | N_w² |
+| Stefan denominator | 15 | N_c(χ-1) |
+| U(1) gauge group | 1 | singlet sector |
+
+## Key Result
+
+Wave propagates at exactly c = 1 (peak displacement = expected c×t to machine precision).
+The Yee FDTD preserves ∇·B = 0 exactly (staggered grid guarantee).
+
+## Proof Certificate
+
+- `proofs/crystal_em_proof.py` — 34/34 PASS
+- `proofs/CrystalEM.lean` — 18 theorems
+- `proofs/CrystalEM.agda` — 11 proofs
 
 ## §Module: CrystalExtendedScan
 
@@ -2390,6 +2591,42 @@ cd haskel
 ghc -O2 -main-is CrystalMandelbrot CrystalMandelbrot.hs -o crystal_mandelbrot && ./crystal_mandelbrot
 ```
 
+## §Module: CrystalMD
+
+# CrystalMD — Molecular Dynamics from (2,3)
+
+## Overview
+
+Velocity Verlet integrator with Lennard-Jones, Coulomb, and H-bond potentials.
+LJ exponents 6,12 traced to χ, 2χ. Force coefficient 24 = d_mixed.
+
+## Integer Traces
+
+| Physical quantity | Value | Crystal derivation |
+|---|---|---|
+| LJ attractive exponent | 6 | χ |
+| LJ repulsive exponent | 12 | 2χ |
+| LJ potential coefficient | 4 | N_w² |
+| LJ force coefficient | 24 | d_mixed |
+| Tetrahedral bond angle | arccos(−1/3) | arccos(−1/N_c) |
+| H-bonds A-T | 2 | N_w |
+| H-bonds G-C | 3 | N_c |
+| Helix residues/turn | 3.6 = 18/5 | (N_c²·N_w)/(χ−1) |
+| Flory exponent ν | 2/5 | N_w/(χ−1) |
+| Coulomb exponent | 2 | N_c−1 |
+
+## Self-Test
+
+Energy conserved to 3×10⁻⁹, bond angle exact, Coulomb inverse-square verified.
+
+```bash
+ghc -O2 -main-is CrystalMD CrystalMD.hs 2>/dev/null && ./CrystalMD
+```
+
+## Observable Count
+
+10 new. All integers from (2,3).
+
 ## §Module: CrystalMERA
 
 # CrystalMERA — Geometry From the Monad
@@ -2752,6 +2989,71 @@ in 3D space IS the dimension of the colour adjoint representation of SU(3).
 - `proofs/crystal_nbody_proof.py` — 12/12 PASS
 - `proofs/CrystalNBody.lean` — 6 theorems
 - `proofs/CrystalNBody.agda` — 5 proofs
+
+## §Module: CrystalOptics
+
+# CrystalOptics — Ray/Wave Optics from (2,3)
+
+## Overview
+
+Snell ray tracing + Fresnel coefficients. Rayleigh scattering and Planck radiance.
+Index of refraction of water traced to Casimir factor C_F = (N_c²−1)/(2N_c) = 4/3.
+
+## Integer Traces
+
+| Physical quantity | Value | Crystal derivation |
+|---|---|---|
+| IOR water | 4/3 | C_F = (N_c²−1)/(2N_c) |
+| IOR glass | 3/2 | N_c / N_w |
+| Rayleigh λ exponent | 4 | N_w² |
+| Rayleigh size exponent | 6 | χ |
+| Planck λ exponent | 5 | χ−1 |
+
+## Self-Test
+
+Snell exact, total internal reflection, Brewster Rp=0, sky blue ratio ~5.8, Wien peak.
+
+```bash
+ghc -O2 -main-is CrystalOptics CrystalOptics.hs 2>/dev/null && ./CrystalOptics
+```
+
+## Observable Count
+
+5 new (n_water, n_glass, Rayleigh 4, Rayleigh 6, Planck 5). All integers from (2,3).
+
+## §Module: CrystalPlasma
+
+# CrystalPlasma — MHD (EM + CFD) from (2,3)
+
+## Overview
+
+Magnetohydrodynamics capstone combining EM and CFD sectors.
+Alfvén wave FDTD integrator. Magnetic pressure and plasma beta.
+
+## Integer Traces
+
+| Physical quantity | Value | Crystal derivation |
+|---|---|---|
+| MHD wave types | 3 | N_c (slow, Alfvén, fast) |
+| MHD state variables | 8 | N_w³ = d_colour |
+| Propagating modes | 6 | χ = 2·N_c |
+| Non-propagating modes | 2 | N_w (entropy + div-B) |
+| Magnetic pressure factor | 2 | N_w |
+| Plasma beta factor | 2 | N_w |
+| EM components | 6 | χ (from CrystalEM) |
+| CFD D2Q9 | 9 | N_c² (from CrystalCFD) |
+
+## Self-Test
+
+Alfvén wave energy conservation, periodicity, magnetic pressure, plasma beta, Alfvén speed.
+
+```bash
+ghc -O2 -main-is CrystalPlasma CrystalPlasma.hs 2>/dev/null && ./CrystalPlasma
+```
+
+## Observable Count
+
+8 new (MHD = EM + CFD capstone). All integers from (2,3).
 
 ## §Module: CrystalProtein
 
