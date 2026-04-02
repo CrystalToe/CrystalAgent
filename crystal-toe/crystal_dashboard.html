@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Crystal Topos — D3 Dashboard</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0a0a1a; color: #e0e0e0; }
+  h1 { text-align: center; padding: 20px; font-size: 1.6em; color: #7ec8e3;
+       letter-spacing: 2px; text-transform: uppercase; }
+  h1 span { color: #e74c3c; }
+  .subtitle { text-align: center; color: #888; font-size: 0.9em; margin-top: -10px; margin-bottom: 20px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 0 20px 20px; max-width: 1400px; margin: auto; }
+  .panel { background: #12122a; border: 1px solid #2a2a4a; border-radius: 12px; padding: 16px; }
+  .panel h2 { font-size: 1em; color: #7ec8e3; margin-bottom: 10px; letter-spacing: 1px; }
+  .panel h2 span { color: #e74c3c; font-weight: normal; }
+  svg { width: 100%; }
+  .axis text { fill: #888; font-size: 11px; }
+  .axis path, .axis line { stroke: #333; }
+  .grid-line { stroke: #1a1a3a; stroke-dasharray: 2,4; }
+  .tooltip { position: absolute; background: #1a1a3a; border: 1px solid #3a3a6a; border-radius: 6px;
+             padding: 8px 12px; font-size: 12px; pointer-events: none; opacity: 0; transition: opacity 0.15s; }
+  #status { text-align: center; padding: 40px; font-size: 1.2em; color: #7ec8e3; }
+  .constants { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px; }
+  .const-chip { background: #1a1a3a; border: 1px solid #2a2a5a; border-radius: 20px; padding: 4px 14px; font-size: 0.85em; }
+  .const-chip b { color: #e74c3c; }
+</style>
+</head>
+<body>
+
+<h1>Crystal <span>Topos</span> — Live from WASM</h1>
+<p class="subtitle">198 observables from A<sub>F</sub> = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ) — zero free parameters</p>
+
+<div class="constants" id="constants"></div>
+
+<div id="status">Loading WASM engine...</div>
+<div class="grid" id="dashboard" style="display:none">
+  <div class="panel" id="panel-binding"><h2>Nuclear Binding Curve <span>— Fe-56 = d_colour·β₀</span></h2></div>
+  <div class="panel" id="panel-le"><h2>Lane-Emden Profiles <span>— polytrope N_c/N_w</span></h2></div>
+  <div class="panel" id="panel-orbitals"><h2>Orbital Shell Capacities <span>— N_w(2l+1)</span></h2></div>
+  <div class="panel" id="panel-lj"><h2>Lennard-Jones Potentials <span>— cutoff N_c·σ</span></h2></div>
+</div>
+
+<div class="tooltip" id="tip"></div>
+
+<script type="module">
+// ── Load WASM ──
+// After: wasm-pack build --target web --features wasm
+// Copy pkg/ next to this HTML, or adjust path:
+import init, { crystal_dump } from '../pkg/crystal_toe.js';
+
+async function main() {
+  try {
+    await init();
+    const D = crystal_dump();
+    document.getElementById('status').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'grid';
+    renderConstants(D);
+    renderBinding(D);
+    renderLaneEmden(D);
+    renderOrbitals(D);
+    renderLJ(D);
+  } catch(e) {
+    // Fallback: if WASM not built yet, show demo with static data
+    console.warn('WASM not loaded, using demo data:', e.message);
+    const D = demoData();
+    document.getElementById('status').innerHTML =
+      '⚠ WASM not found — showing demo data<br><small>Run: wasm-pack build --target web --features wasm</small>';
+    document.getElementById('status').style.color = '#e67e22';
+    document.getElementById('dashboard').style.display = 'grid';
+    renderConstants(D);
+    renderBinding(D);
+    renderLaneEmden(D);
+    renderOrbitals(D);
+    renderLJ(D);
+  }
+}
+
+// ── Constants bar ──
+function renderConstants(D) {
+  const el = document.getElementById('constants');
+  const chips = [
+    ['N_w', D.n_w], ['N_c', D.n_c], ['χ', D.chi], ['β₀', D.beta0],
+    ['Σ_d', D.sigma_d], ['D', D.tower_d],
+    ['E_H', D.hartree_ev.toFixed(2) + ' eV'],
+    ['a₀', D.bohr_radius.toFixed(4) + ' Å'],
+    ['α⁻¹', (1/0.00729735).toFixed(1)],
+  ];
+  el.innerHTML = chips.map(([k,v]) => `<span class="const-chip"><b>${k}</b> = ${v}</span>`).join('');
+}
+
+// ── Binding energy curve ──
+function renderBinding(D) {
+  const W = 580, H = 340, M = {t:20, r:30, b:40, l:50};
+  const w = W-M.l-M.r, h = H-M.t-M.b;
+  const svg = d3.select('#panel-binding').append('svg').attr('viewBox', `0 0 ${W} ${H}`);
+  const g = svg.append('g').attr('transform', `translate(${M.l},${M.t})`);
+
+  const data = D.binding_curve;
+  const x = d3.scaleLinear().domain([0, 260]).range([0, w]);
+  const y = d3.scaleLinear().domain([0, 9.5]).range([h, 0]);
+
+  // Grid
+  y.ticks(5).forEach(t => g.append('line').attr('class','grid-line').attr('x1',0).attr('x2',w).attr('y1',y(t)).attr('y2',y(t)));
+
+  // Axes
+  g.append('g').attr('class','axis').attr('transform',`translate(0,${h})`).call(d3.axisBottom(x).ticks(6));
+  g.append('g').attr('class','axis').call(d3.axisLeft(y).ticks(5));
+  g.append('text').attr('x',w/2).attr('y',h+35).attr('text-anchor','middle').attr('fill','#888').attr('font-size',11).text('Mass number A');
+  g.append('text').attr('transform','rotate(-90)').attr('x',-h/2).attr('y',-38).attr('text-anchor','middle').attr('fill','#888').attr('font-size',11).text('B/A (MeV)');
+
+  // Line
+  const line = d3.line().x(d => x(d[0])).y(d => y(d[1])).curve(d3.curveMonotoneX);
+  g.append('path').datum(data).attr('d', line).attr('stroke','#3498db').attr('stroke-width',2).attr('fill','none');
+
+  // Fe-56 marker
+  const fe = data.find(d => d[0] === 56);
+  if (fe) {
+    g.append('circle').attr('cx',x(56)).attr('cy',y(fe[1])).attr('r',5).attr('fill','#2ecc71');
+    g.append('text').attr('x',x(56)+8).attr('y',y(fe[1])-8).attr('fill','#2ecc71').attr('font-size',11).attr('font-weight','bold').text(`Fe-56 = ${fe[1].toFixed(2)}`);
+  }
+
+  // Magic number lines
+  D.magic_numbers.forEach(m => {
+    if (m <= 250) {
+      g.append('line').attr('x1',x(m)).attr('x2',x(m)).attr('y1',0).attr('y2',h).attr('stroke','#e74c3c').attr('stroke-width',0.5).attr('stroke-dasharray','3,3').attr('opacity',0.5);
+    }
+  });
+}
+
+// ── Lane-Emden profiles ──
+function renderLaneEmden(D) {
+  const W = 580, H = 340, M = {t:20, r:30, b:40, l:50};
+  const w = W-M.l-M.r, h = H-M.t-M.b;
+  const svg = d3.select('#panel-le').append('svg').attr('viewBox', `0 0 ${W} ${H}`);
+  const g = svg.append('g').attr('transform', `translate(${M.l},${M.t})`);
+
+  const x = d3.scaleLinear().domain([0, 10]).range([0, w]);
+  const y = d3.scaleLinear().domain([-0.05, 1.05]).range([h, 0]);
+
+  y.ticks(5).forEach(t => g.append('line').attr('class','grid-line').attr('x1',0).attr('x2',w).attr('y1',y(t)).attr('y2',y(t)));
+  g.append('g').attr('class','axis').attr('transform',`translate(0,${h})`).call(d3.axisBottom(x).ticks(5));
+  g.append('g').attr('class','axis').call(d3.axisLeft(y).ticks(5));
+  g.append('text').attr('x',w/2).attr('y',h+35).attr('text-anchor','middle').attr('fill','#888').attr('font-size',11).text('ξ');
+  g.append('text').attr('transform','rotate(-90)').attr('x',-h/2).attr('y',-38).attr('text-anchor','middle').attr('fill','#888').attr('font-size',11).text('θ(ξ)');
+
+  const line = d3.line().x(d => x(d[0])).y(d => y(d[1])).curve(d3.curveMonotoneX);
+  const profiles = [
+    { data: D.le_nr_profile, color: '#e74c3c', label: 'n=3/2 (WD)' },
+    { data: D.le_rel_profile, color: '#2ecc71', label: 'n=3 (Chandra)' },
+  ];
+  profiles.forEach(({ data: pts, color, label }) => {
+    const filtered = pts.filter(d => d[0] <= 10);
+    g.append('path').datum(filtered).attr('d', line).attr('stroke', color).attr('stroke-width', 2.5).attr('fill', 'none');
+    const last = filtered[filtered.length - 1];
+    g.append('text').attr('x', x(last[0]) - 5).attr('y', y(last[1]) - 10).attr('fill', color).attr('font-size', 11).attr('font-weight', 'bold').text(label);
+  });
+}
+
+// ── Orbital capacities ──
+function renderOrbitals(D) {
+  const W = 580, H = 340, M = {t:20, r:30, b:50, l:50};
+  const w = W-M.l-M.r, h = H-M.t-M.b;
+  const svg = d3.select('#panel-orbitals').append('svg').attr('viewBox', `0 0 ${W} ${H}`);
+  const g = svg.append('g').attr('transform', `translate(${M.l},${M.t})`);
+
+  const labels = ['s (l=0)', 'p (l=1)', 'd (l=2)', 'f (l=3)'];
+  const formulas = ['N_w', 'χ', 'N_w(χ−1)', 'N_w·β₀'];
+  const caps = D.shell_capacities;
+  const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12'];
+
+  const x = d3.scaleBand().domain(labels).range([0, w]).padding(0.3);
+  const y = d3.scaleLinear().domain([0, 18]).range([h, 0]);
+
+  g.append('g').attr('class','axis').attr('transform',`translate(0,${h})`).call(d3.axisBottom(x));
+  g.append('g').attr('class','axis').call(d3.axisLeft(y).ticks(5));
+
+  g.selectAll('rect').data(caps).join('rect')
+    .attr('x', (_, i) => x(labels[i]))
+    .attr('y', d => y(d))
+    .attr('width', x.bandwidth())
+    .attr('height', d => h - y(d))
+    .attr('fill', (_, i) => colors[i])
+    .attr('rx', 4);
+
+  caps.forEach((c, i) => {
+    g.append('text').attr('x', x(labels[i]) + x.bandwidth()/2).attr('y', y(c) - 18)
+      .attr('text-anchor', 'middle').attr('fill', colors[i]).attr('font-size', 14).attr('font-weight', 'bold').text(c);
+    g.append('text').attr('x', x(labels[i]) + x.bandwidth()/2).attr('y', y(c) - 5)
+      .attr('text-anchor', 'middle').attr('fill', '#888').attr('font-size', 10).text(formulas[i]);
+  });
+}
+
+// ── LJ Potentials ──
+function renderLJ(D) {
+  const W = 580, H = 340, M = {t:20, r:30, b:40, l:50};
+  const w = W-M.l-M.r, h = H-M.t-M.b;
+  const svg = d3.select('#panel-lj').append('svg').attr('viewBox', `0 0 ${W} ${H}`);
+  const g = svg.append('g').attr('transform', `translate(${M.l},${M.t})`);
+
+  const data = D.lj_scan;
+  const x = d3.scaleLinear().domain([0.9, 4.0]).range([0, w]);
+  const y = d3.scaleLinear().domain([-1.5, 2.0]).range([h, 0]);
+
+  y.ticks(5).forEach(t => g.append('line').attr('class','grid-line').attr('x1',0).attr('x2',w).attr('y1',y(t)).attr('y2',y(t)));
+  g.append('g').attr('class','axis').attr('transform',`translate(0,${h})`).call(d3.axisBottom(x).ticks(6));
+  g.append('g').attr('class','axis').call(d3.axisLeft(y).ticks(5));
+  g.append('text').attr('x',w/2).attr('y',h+35).attr('text-anchor','middle').attr('fill','#888').attr('font-size',11).text('r / σ');
+  g.append('line').attr('x1',0).attr('x2',w).attr('y1',y(0)).attr('y2',y(0)).attr('stroke','#444').attr('stroke-width',0.5);
+
+  const series = [
+    { col: 1, color: '#3498db', label: 'Exact' },
+    { col: 2, color: '#e74c3c', label: 'Arcade (cut N_c)' },
+    { col: 3, color: '#2ecc71', label: 'WCA (N_w^{1/χ})' },
+  ];
+  series.forEach(({ col, color, label }) => {
+    const line = d3.line().x(d => x(d[0])).y(d => y(Math.max(-1.5, Math.min(2.0, d[col])))).curve(d3.curveMonotoneX);
+    g.append('path').datum(data).attr('d', line).attr('stroke', color).attr('stroke-width', 2).attr('fill', 'none');
+  });
+
+  // Legend
+  series.forEach(({ color, label }, i) => {
+    g.append('rect').attr('x', w-130).attr('y', 10 + i*18).attr('width', 12).attr('height', 3).attr('fill', color);
+    g.append('text').attr('x', w-112).attr('y', 14 + i*18).attr('fill', '#ccc').attr('font-size', 10).text(label);
+  });
+}
+
+// ── Demo data (used when WASM not built yet) ──
+function demoData() {
+  const curve = [];
+  for (let a = 2; a <= 250; a++) {
+    const z = Math.round(a / (2 + 0.714 * Math.pow(a, 2/3) / (2 * 23.2)));
+    const zf = Math.max(1, Math.min(z, a-1));
+    const af = a;
+    const ba = (15.8*af - 18.3*Math.pow(af,2/3) - 0.714*zf*(zf-1)/Math.pow(af,1/3) - 23.2*Math.pow(af-2*zf,2)/af) / af;
+    curve.push([a, Math.max(0, ba)]);
+  }
+  // Lane-Emden (approximate)
+  const le_nr = [], le_rel = [];
+  for (let i = 0; i <= 400; i++) {
+    const xi = i * 0.025;
+    le_nr.push([xi, Math.max(0, 1 - xi*xi/6 + xi*xi*xi*xi/120)]);
+    le_rel.push([xi, Math.max(0, 1 - xi*xi/6 + xi*xi*xi*xi/40)]);
+  }
+  // LJ scan
+  const lj = [];
+  for (let i = 0; i < 300; i++) {
+    const r = 0.95 + i * 0.01;
+    const r6 = Math.pow(r, 6); const r12 = r6 * r6;
+    const v = 4 * (1/r12 - 1/r6);
+    const rmin = Math.pow(2, 1/6);
+    lj.push([r, v, r > 3 ? 0 : v - (4*(1/Math.pow(3,12)-1/Math.pow(3,6))), r > rmin ? 0 : v + 1]);
+  }
+  return {
+    n_w: 2, n_c: 3, chi: 6, beta0: 7, sigma_d: 36, tower_d: 42,
+    hartree_ev: 27.2, bohr_radius: 0.529,
+    magic_numbers: [2, 8, 20, 28, 50, 82, 126],
+    binding_curve: curve,
+    le_nr_profile: le_nr, le_rel_profile: le_rel,
+    shell_capacities: [2, 6, 10, 14],
+    noble_gases: [2, 10, 18, 36],
+    lj_scan: lj,
+  };
+}
+
+main();
+</script>
+</body>
+</html>

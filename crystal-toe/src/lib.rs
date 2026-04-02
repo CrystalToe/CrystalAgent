@@ -48,6 +48,10 @@ pub mod dynamics;
 #[cfg(feature = "python")]
 mod py;
 
+// Wave 6: WebAssembly bindings (feature-gated)
+#[cfg(feature = "wasm")]
+mod wasm;
+
 pub use toe::Toe;
 pub use atoms::{
     N_W, N_C, CHI, BETA0, SIGMA_D, SIGMA_D2, GAUSS, TOWER_D,
