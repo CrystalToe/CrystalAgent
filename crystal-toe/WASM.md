@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
 # Crystal Toe — WebAssembly Build Guide
 
 Run the full Crystal Topos physics engine in any browser. Same Rust code,
