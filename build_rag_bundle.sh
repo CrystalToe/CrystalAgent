@@ -40,8 +40,8 @@ write_header() {
 # D=22 VdW FIXED (Session 13) · Force field from first principles · 0 fitted parameters
 # Rendering/scattering: Planck λ⁻⁵ (χ−1=5), Rayleigh d⁶ (χ=6), Rayleigh λ⁻⁴ (N_w²=4)
 # Hologron dynamics: emergent gravity from monad ticks, V(L)∝L^(-2ln2/ln6), no F=ma
-# 13/13 dynamics modules COMPLETE: Classical→Plasma capstone (EM+CFD)
-# 346 Python checks · 235 Lean theorems · 194 Agda proofs · 0 regressions
+# 21/21 dynamics modules COMPLETE: Classical→Plasma + QFT→Arcade (Phase 2)
+# 559 Python checks · 372 Lean theorems · 291 Agda proofs · 0 regressions
 # Every integrator IS a classical limit of S=W∘U. Every integer from (2,3).
 # Upload ALL 3 parts for 100% coverage. Each part works standalone for basic queries.
 
@@ -91,7 +91,7 @@ Proved: attraction (V<0), monotonic fall, exponent match, 38 integer identities.
 Ref: Sahay/Lukin/Cotler, Phys Rev X 15, 021078 (2025) — MERA hologrons in AdS.
 Crystal contribution: specific algebra A_F, exact eigenvalues, flat space, 198 observables.
 
-## DYNAMICS MODULES — 13/13 COMPLETE (every integrator from (2,3))
+## DYNAMICS MODULES — 21/21 COMPLETE (every integrator from (2,3))
 Each module: §0 A_F atoms → §1 Force law → §2 Integrator → §3-7 Physics → §8 Integer proofs → §9 Self-test.
 Every integrator IS a classical limit of the monad S=W∘U. Zero new observables.
 
@@ -110,6 +110,14 @@ Every integrator IS a classical limit of the monad S=W∘U. Zero new observables
 | CrystalMD | Velocity Verlet LJ | bond 109.47°=arccos(−1/N_c), helix=18/5 |
 | CrystalCondensed | Metropolis Monte Carlo | Ising z=4=N_w², BCS 2Δ/kT_c=2π/e^γ |
 | CrystalPlasma | Alfvén FDTD (EM+CFD) | MHD modes 8=N_w³, wave types 3=N_c |
+| CrystalQFT | S-matrix + running couplings | spacetime 4=N_w², gluons 8=d₃, β₀=7 |
+| CrystalRigid | Quaternion Euler equations | quaternion 4=N_w², I_sphere=2/5=Flory, inertia 6=χ |
+| CrystalChem | LCAO + Arrhenius | f-shell 14=N_w·β₀, Kr Z=36=Σd, pH=7=β₀ |
+| CrystalNuclear | SEMF + shell model | all 7 magic numbers, Fe-56=d_colour·β₀ |
+| CrystalAstro | Lane-Emden + stellar scaling | Chandrasekhar 3/2=N_c/N_w, Hawking 8=N_w³, SB 15=N_c(χ−1) |
+| CrystalQInfo | Heyting algebra + error correction | Steane [7,1,3]=[β₀,d₁,N_c], uncertainty=coprimality |
+| CrystalBio | Allometric scaling + genetic code | amino acids 20=N_w²(χ−1), codons 64=(N_w²)^N_c, Kleiber 3/4 |
+| CrystalArcade | Fixed-point + LOD wrappers | LJ cutoff=N_cσ, BH θ=1/N_w, fixed-point 16.16=N_w⁴.N_w⁴ |
 
 ## PROOF AUTHORITY — READ FIRST
 Lean \`native_decide\` and Agda \`refl\` proofs are FINAL TRUTH. If a proof says it, it's right.

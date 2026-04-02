@@ -1,0 +1,354 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Crystal Inspiral — Binary Black Hole Merger from (2,3)</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;overflow:hidden;font-family:'Courier New',monospace}
+canvas{display:block}
+#hud{position:fixed;top:14px;left:14px;color:#8cf;font-size:11px;text-shadow:0 0 6px #48f;pointer-events:none;line-height:1.7;z-index:10}
+#hud .v{color:#fff}
+#hud .c{color:#fa8;text-shadow:0 0 6px #f64}
+#title{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:26px;text-align:center;pointer-events:none;text-shadow:0 0 40px #f48,0 0 80px #a24;z-index:20;transition:opacity 3s;letter-spacing:5px}
+#title .sub{font-size:13px;color:#fa8;margin-top:8px;letter-spacing:2px}
+#wave{position:fixed;bottom:0;left:0;width:100%;height:120px;z-index:5}
+#controls{position:fixed;bottom:126px;left:50%;transform:translateX(-50%);color:#445;font-size:11px;z-index:10}
+#controls span{color:#68a;cursor:pointer}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<canvas id="wave"></canvas>
+<div id="title">CRYSTAL INSPIRAL<br><div class="sub">binary merger from A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)</div></div>
+<div id="hud"></div>
+<div id="controls">
+  <span onclick="reset()">[ RESET ]</span> &nbsp;
+  <span onclick="togglePause()">[ PAUSE ]</span> &nbsp;
+  <span onclick="speedUp()">[ FASTER ]</span> &nbsp;
+  <span onclick="slowDown()">[ SLOWER ]</span>
+</div>
+<script>
+// ═══════════════════════════════════════════════════════════
+// CRYSTAL ATOMS
+// ═══════════════════════════════════════════════════════════
+const N_W=2,N_C=3,CHI=N_W*N_C,BETA0=7,D_COL=N_C*N_C-1;
+const GAUSS=N_C*N_C+N_W*N_W,TOWER=36+CHI;
+const PETERS=Math.pow(N_W,5)/(CHI-1); // 32/5
+
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+const wv=document.getElementById('wave'),wctx=wv.getContext('2d');
+let W,H;
+
+function resize(){
+  W=cv.width=window.innerWidth;H=cv.height=window.innerHeight-120;
+  wv.width=window.innerWidth;wv.height=120;
+}
+window.addEventListener('resize',resize);resize();
+
+// ═══════════════════════════════════════════════════════════
+// INSPIRAL STATE
+// ═══════════════════════════════════════════════════════════
+let m1,m2,M,mu,mc,a,phi,t,fGW,merged,speed;
+let waveHistory=[],particleTrails=[],ripples=[];
+let paused=false,frame=0;
+
+function chirpMass(m1,m2){
+  const mu=m1*m2/(m1+m2),M=m1+m2;
+  return Math.pow(mu,N_C/(CHI-1))*Math.pow(M,N_W/(CHI-1)); // mu^(3/5)*M^(2/5)
+}
+
+function reset(){
+  m1=30;m2=25;M=m1+m2;mu=m1*m2/M;
+  mc=chirpMass(m1,m2);
+  a=200; // initial separation (natural units scaled for viz)
+  phi=0;t=0;merged=false;speed=1;frame=0;
+  fGW=Math.sqrt(M/(a*a*a))/(Math.PI)*N_W; // f_GW = 2*f_orb
+  waveHistory=[];
+  particleTrails=[];
+  ripples=[];
+  for(let i=0;i<300;i++) particleTrails.push({
+    x:(Math.random()-0.5)*W*1.5,
+    y:(Math.random()-0.5)*H*1.5,
+    vx:(Math.random()-0.5)*0.3,
+    vy:(Math.random()-0.5)*0.3,
+    s:0.5+Math.random()*1.5,
+    b:0.3+Math.random()*0.7
+  });
+
+  ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+  document.getElementById('title').style.opacity='1';
+  setTimeout(()=>document.getElementById('title').style.opacity='0',3000);
+}
+
+// ═══════════════════════════════════════════════════════════
+// PETERS FORMULA — orbital decay from (2,3)
+// da/dt = -(64/5) * mu * M^2 / a^3
+// 64/5 = N_w^6 / (chi-1)
+// ═══════════════════════════════════════════════════════════
+function evolve(dt){
+  if(merged)return;
+
+  const r_isco=CHI*M*0.08; // ISCO = 6GM (6=chi), scaled for viz
+
+  for(let sub=0;sub<speed;sub++){
+    // Peters orbital decay
+    const dadt=-2*PETERS*mu*M*M/(a*a*a)*0.00003; // scaled
+    a+=dadt*dt;
+
+    // Orbital phase: dphi/dt = 2*pi*f_orb
+    const fOrb=Math.sqrt(M/(a*a*a))/(2*Math.PI)*0.15;
+    fGW=N_W*fOrb; // f_GW = N_w * f_orb (quadrupole)
+    phi+=2*Math.PI*fOrb*dt;
+    t+=dt;
+
+    // GW strain: h ~ (M_c)^(5/3) * (pi*f)^(2/3) / dist
+    // 5/3 = (chi-1)/N_c,  2/3 = (N_c-1)/N_c
+    const exp53=(CHI-1)/N_C;
+    const exp23=(N_C-1)/N_C;
+    const hPlus=Math.pow(mc,exp53)*Math.pow(Math.PI*fGW,exp23)*Math.cos(phi*2)*4;
+    const hCross=Math.pow(mc,exp53)*Math.pow(Math.PI*fGW,exp23)*Math.sin(phi*2)*4;
+
+    waveHistory.push({t:t,hp:hPlus,hx:hCross,f:fGW});
+    if(waveHistory.length>800)waveHistory.shift();
+
+    // Emit ripple every ~20 frames
+    if(frame%20===0&&a>r_isco){
+      ripples.push({x:W/2,y:H/2,r:0,amp:Math.min(3,30/a),born:frame});
+    }
+
+    if(a<=r_isco){
+      merged=true;
+      // Merger flash — big ripple burst
+      for(let i=0;i<8;i++)
+        ripples.push({x:W/2,y:H/2,r:i*15,amp:8-i,born:frame});
+      break;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDERING
+// ═══════════════════════════════════════════════════════════
+function render(){
+  // Fade
+  ctx.fillStyle='rgba(0,0,0,0.08)';
+  ctx.fillRect(0,0,W,H);
+
+  const cx=W/2,cy=H/2;
+
+  // Background star field distortion (test particles)
+  for(const p of particleTrails){
+    // Gravitational lensing effect — displace stars near the binary
+    const dx=p.x-cx,dy=p.y-cy;
+    const dist=Math.sqrt(dx*dx+dy*dy)+1;
+    const lensStrength=merged?2000:Math.min(2000,5000/a);
+    const deflection=lensStrength/(dist*dist+500);
+
+    const sx=p.x+deflection*dx*0.02;
+    const sy=p.y+deflection*dy*0.02;
+
+    // Wrap
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<-100)p.x+=W+200;if(p.x>W+100)p.x-=W+200;
+    if(p.y<-100)p.y+=H+200;if(p.y>H+100)p.y-=H+200;
+
+    const alpha=p.b*(1-Math.min(1,deflection*2));
+    ctx.fillStyle=`rgba(200,210,255,${alpha})`;
+    ctx.beginPath();
+    ctx.arc(sx,sy,p.s,0,Math.PI*2);
+    ctx.fill();
+  }
+
+  // Gravitational wave ripples
+  for(let i=ripples.length-1;i>=0;i--){
+    const rp=ripples[i];
+    rp.r+=3;
+    const age=frame-rp.born;
+    const alpha=rp.amp*Math.max(0,1-age/120)*0.15;
+    if(alpha<0.001){ripples.splice(i,1);continue;}
+
+    ctx.strokeStyle=`rgba(100,150,255,${alpha})`;
+    ctx.lineWidth=1.5;
+    ctx.beginPath();
+    ctx.arc(rp.x,rp.y,rp.r,0,Math.PI*2);
+    ctx.stroke();
+
+    // Second ring slightly offset (+ polarization)
+    ctx.strokeStyle=`rgba(255,120,80,${alpha*0.5})`;
+    ctx.beginPath();
+    ctx.ellipse(rp.x,rp.y,rp.r*1.05,rp.r*0.95,phi,0,Math.PI*2);
+    ctx.stroke();
+  }
+
+  if(!merged){
+    // Binary positions
+    const r1=a*m2/M,r2=a*m1/M;
+    const scale=1.5;
+    const x1=cx+r1*Math.cos(phi)*scale;
+    const y1=cy+r1*Math.sin(phi)*scale;
+    const x2=cx-r2*Math.cos(phi)*scale;
+    const y2=cy-r2*Math.sin(phi)*scale;
+
+    // Orbital trail
+    ctx.strokeStyle='rgba(255,160,60,0.15)';
+    ctx.lineWidth=1;
+    ctx.beginPath();ctx.arc(cx+r1*0.03*Math.cos(phi-0.1)*scale,cy+r1*0.03*Math.sin(phi-0.1)*scale,r1*scale,0,Math.PI*2);ctx.stroke();
+    ctx.strokeStyle='rgba(80,160,255,0.15)';
+    ctx.beginPath();ctx.arc(cx-r2*0.03*Math.cos(phi-0.1)*scale,cy-r2*0.03*Math.sin(phi-0.1)*scale,r2*scale,0,Math.PI*2);ctx.stroke();
+
+    // Black hole 1 (orange)
+    const sz1=Math.max(6,m1*0.3);
+    drawBH(x1,y1,sz1,[255,140,40]);
+
+    // Black hole 2 (blue)
+    const sz2=Math.max(5,m2*0.3);
+    drawBH(x2,y2,sz2,[60,140,255]);
+
+  } else {
+    // Merged — single massive BH with ringdown
+    const ringPhase=Math.sin((frame-ripples[0]?.born||0)*0.15)*Math.exp(-(frame-(ripples[0]?.born||frame))*0.03);
+    const sz=Math.max(12,(m1+m2)*0.25);
+    drawBH(cx,cy,sz+ringPhase*3,[200,160,255]);
+
+    // Ringdown label
+    ctx.fillStyle='rgba(200,160,255,0.6)';
+    ctx.font='14px Courier New';
+    ctx.textAlign='center';
+    ctx.fillText('MERGED — ringdown',cx,cy+sz+25);
+  }
+}
+
+function drawBH(x,y,sz,col){
+  // Event horizon (black disk)
+  ctx.fillStyle='#000';
+  ctx.beginPath();ctx.arc(x,y,sz,0,Math.PI*2);ctx.fill();
+
+  // Photon ring (at r = 3GM/c^2 = N_c * GM)
+  ctx.strokeStyle=`rgba(${col[0]},${col[1]},${col[2]},0.8)`;
+  ctx.lineWidth=2;
+  ctx.beginPath();ctx.arc(x,y,sz*1.5,0,Math.PI*2);ctx.stroke();
+
+  // Accretion glow
+  const grad=ctx.createRadialGradient(x,y,sz,x,y,sz*4);
+  grad.addColorStop(0,`rgba(${col[0]},${col[1]},${col[2]},0.4)`);
+  grad.addColorStop(0.5,`rgba(${col[0]},${col[1]},${col[2]},0.1)`);
+  grad.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=grad;
+  ctx.fillRect(x-sz*4,y-sz*4,sz*8,sz*8);
+
+  // ISCO ring (r = 6GM = chi*GM)
+  ctx.strokeStyle=`rgba(${col[0]},${col[1]},${col[2]},0.2)`;
+  ctx.lineWidth=0.5;
+  ctx.setLineDash([3,5]);
+  ctx.beginPath();ctx.arc(x,y,sz*3,0,Math.PI*2);ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+// ═══════════════════════════════════════════════════════════
+// WAVEFORM DISPLAY (chirp)
+// ═══════════════════════════════════════════════════════════
+function renderWaveform(){
+  wctx.fillStyle='rgba(5,5,15,0.95)';
+  wctx.fillRect(0,0,wv.width,120);
+
+  if(waveHistory.length<2)return;
+
+  const ww=wv.width,wh=120;
+  const n=waveHistory.length;
+  const step=ww/800;
+
+  // h+ waveform
+  wctx.strokeStyle='#4af';
+  wctx.lineWidth=1.5;
+  wctx.beginPath();
+  for(let i=0;i<n;i++){
+    const x=i*step;
+    const y=wh/2-waveHistory[i].hp*12;
+    if(i===0)wctx.moveTo(x,y);else wctx.lineTo(x,y);
+  }
+  wctx.stroke();
+
+  // hx waveform
+  wctx.strokeStyle='rgba(255,120,60,0.5)';
+  wctx.lineWidth=1;
+  wctx.beginPath();
+  for(let i=0;i<n;i++){
+    const x=i*step;
+    const y=wh/2-waveHistory[i].hx*12;
+    if(i===0)wctx.moveTo(x,y);else wctx.lineTo(x,y);
+  }
+  wctx.stroke();
+
+  // Labels
+  wctx.fillStyle='#4af';
+  wctx.font='10px Courier New';
+  wctx.textAlign='left';
+  wctx.fillText('h₊(t)',4,14);
+  wctx.fillStyle='#f84';
+  wctx.fillText('h×(t)',4,26);
+  wctx.fillStyle='#456';
+  wctx.textAlign='right';
+  wctx.fillText('N_c−1 = 2 polarizations',ww-8,14);
+  wctx.fillText(`32/5 = N_w⁵/(χ−1) = ${PETERS.toFixed(1)}`,ww-8,26);
+
+  // Merger marker
+  if(merged){
+    wctx.fillStyle='rgba(255,200,100,0.8)';
+    wctx.font='12px Courier New';
+    wctx.textAlign='center';
+    wctx.fillText('▼ MERGER (ISCO = 6GM = χ·GM)',ww*0.85,wh-8);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// HUD
+// ═══════════════════════════════════════════════════════════
+function updateHUD(){
+  if(frame%15!==0)return;
+  const sep=a.toFixed(1);
+  const f=fGW.toFixed(4);
+  const isco=(CHI*M*0.08).toFixed(1);
+  document.getElementById('hud').innerHTML=
+    `<span class="c">A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)</span><br>`+
+    `m₁=<span class="v">${m1}M☉</span> m₂=<span class="v">${m2}M☉</span> `+
+    `M_c=<span class="v">${mc.toFixed(1)}M☉</span><br>`+
+    `Separation: <span class="v">${merged?'MERGED':sep}</span> &nbsp; `+
+    `ISCO: <span class="v">${isco}</span> <span class="c">(${CHI}=χ)GM</span><br>`+
+    `f_GW: <span class="v">${f}</span> = <span class="c">N_w</span>×f_orb `+
+    `<span class="c">(${N_W}=N_w)</span><br>`+
+    `Peters: <span class="v">32/5=${PETERS.toFixed(1)}</span> `+
+    `<span class="c">= N_w⁵/(χ−1)</span><br>`+
+    `Chirp exp: <span class="v">5/3</span> `+
+    `<span class="c">= (χ−1)/N_c = Kolmogorov</span><br>`+
+    `Polarizations: <span class="v">2</span> `+
+    `<span class="c">= N_c−1</span> (h₊, h×)<br>`+
+    `Precession: <span class="v">6πGM</span> `+
+    `<span class="c">(6=χ)</span><br>`+
+    `Speed: <span class="v">${speed}x</span>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// CONTROLS & LOOP
+// ═══════════════════════════════════════════════════════════
+function togglePause(){paused=!paused}
+function speedUp(){speed=Math.min(20,speed+1)}
+function slowDown(){speed=Math.max(1,speed-1)}
+
+function loop(){
+  if(!paused){
+    evolve(1);
+    render();
+    renderWaveform();
+    updateHUD();
+    frame++;
+  }
+  requestAnimationFrame(loop);
+}
+
+reset();loop();
+</script>
+</body>
+</html>

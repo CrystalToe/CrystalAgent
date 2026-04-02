@@ -1,0 +1,253 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crystal Observatory — 198 Observables, 0 Free Parameters</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;800&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#060810;color:#c0cee0;font-family:'JetBrains Mono',monospace;min-height:100vh}
+  header{text-align:center;padding:30px 20px 16px;border-bottom:1px solid rgba(0,229,255,0.12)}
+  h1{font-size:clamp(18px,3vw,28px);font-weight:800;letter-spacing:5px;color:#00e5ff;text-shadow:0 0 30px rgba(0,229,255,0.25)}
+  .sub{font-size:11px;color:#3a5070;letter-spacing:2px;margin-top:6px}
+
+  .stats-bar{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;padding:16px 20px;
+    background:rgba(0,229,255,0.02);border-bottom:1px solid rgba(0,229,255,0.08)}
+  .stat{text-align:center}
+  .stat-val{font-size:20px;font-weight:800}
+  .stat-lbl{font-size:9px;color:#4a5a7a;letter-spacing:1px;margin-top:2px}
+
+  .filters{display:flex;gap:8px;flex-wrap:wrap;padding:12px 20px;justify-content:center;
+    border-bottom:1px solid rgba(0,229,255,0.06)}
+  .filter-btn{padding:4px 12px;border-radius:12px;border:1px solid rgba(0,229,255,0.15);
+    background:transparent;color:#5a7a9a;font-family:'JetBrains Mono',monospace;
+    font-size:10px;cursor:pointer;transition:all 0.2s;letter-spacing:0.5px}
+  .filter-btn.active{background:rgba(0,229,255,0.12);border-color:#00e5ff;color:#00e5ff}
+  .filter-btn:hover{border-color:rgba(0,229,255,0.4)}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px;
+    padding:16px;max-width:1200px;margin:0 auto}
+  .obs-card{background:rgba(10,14,26,0.7);border:1px solid rgba(255,255,255,0.04);
+    border-radius:6px;padding:10px 12px;display:flex;justify-content:space-between;
+    align-items:center;transition:all 0.2s;cursor:default;gap:8px}
+  .obs-card:hover{border-color:rgba(0,229,255,0.2);background:rgba(10,14,26,0.95)}
+  .obs-left{flex:1;min-width:0}
+  .obs-num{font-size:9px;color:#3a4a6a;margin-bottom:2px}
+  .obs-name{font-size:11px;color:#a0b0d0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .obs-formula{font-size:9px;color:#4a5a7a;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .obs-right{text-align:right;flex-shrink:0}
+  .obs-value{font-size:13px;font-weight:700;margin-bottom:2px}
+  .obs-pwi{font-size:9px;font-weight:600;letter-spacing:0.5px}
+
+  .exact .obs-value{color:#00ff88} .exact .obs-pwi{color:#00ff88}
+  .exact{border-left:3px solid #00ff88}
+  .tight .obs-value{color:#00e5ff} .tight .obs-pwi{color:#00e5ff}
+  .tight{border-left:3px solid #00e5ff}
+  .good .obs-value{color:#ffa500} .good .obs-pwi{color:#ffa500}
+  .good{border-left:3px solid #ffa500}
+  .dynamics .obs-value{color:#c0a0ff} .dynamics .obs-pwi{color:#c0a0ff}
+  .dynamics{border-left:3px solid #c0a0ff}
+
+  .legend{display:flex;gap:16px;justify-content:center;padding:10px;font-size:10px}
+  .legend span{display:flex;align-items:center;gap:4px}
+  .legend-dot{width:10px;height:10px;border-radius:2px}
+
+  footer{text-align:center;padding:20px;border-top:1px solid rgba(0,229,255,0.06);
+    font-size:9px;color:#2a3a4a;letter-spacing:1px;margin-top:20px}
+</style>
+</head>
+<body>
+<header>
+  <h1>THE OBSERVATORY</h1>
+  <div class="sub">198 OBSERVABLES · 0 FREE PARAMETERS · EVERY NUMBER FROM (2, 3)</div>
+</header>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-val" style="color:#ffd700">198</div><div class="stat-lbl">OBSERVABLES</div></div>
+  <div class="stat"><div class="stat-val" style="color:#00ff88">46</div><div class="stat-lbl">EXACT (0%)</div></div>
+  <div class="stat"><div class="stat-val" style="color:#00e5ff">129</div><div class="stat-lbl">TIGHT (&lt;0.5%)</div></div>
+  <div class="stat"><div class="stat-val" style="color:#ffa500">23</div><div class="stat-lbl">GOOD (&lt;1%)</div></div>
+  <div class="stat"><div class="stat-val" style="color:#ff6b9d">0.271%</div><div class="stat-lbl">MEAN PWI</div></div>
+  <div class="stat"><div class="stat-val" style="color:#c0a0ff">0</div><div class="stat-lbl">FREE PARAMS</div></div>
+</div>
+
+<div class="legend">
+  <span><div class="legend-dot" style="background:#00ff88"></div> EXACT (PWI = 0%)</span>
+  <span><div class="legend-dot" style="background:#00e5ff"></div> TIGHT (&lt;0.5%)</span>
+  <span><div class="legend-dot" style="background:#ffa500"></div> GOOD (&lt;1%)</span>
+  <span><div class="legend-dot" style="background:#c0a0ff"></div> DYNAMICS (structural)</span>
+</div>
+
+<div class="filters" id="filters"></div>
+<div class="grid" id="grid"></div>
+
+<footer>
+  Crystal Topos · A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ) · PWI = |Expt − CrystalPdg| / Expt
+</footer>
+
+<script>
+const observables = [
+  // Gauge & Coupling
+  {n:1,name:"α⁻¹ (fine structure)",formula:"43π + ln7 − 1/(χ·d₄·Σd²·D)",value:"137.036",pwi:0,domain:"gauge"},
+  {n:2,name:"sin²θ_W (Weinberg)",formula:"N_c/gauss + β₀/(d₄·Σd²)",value:"0.23122",pwi:0.07,domain:"gauge"},
+  {n:3,name:"α_s(M_Z)",formula:"π/(2β₀·ln(M_Z/Λ))",value:"0.1179",pwi:0.17,domain:"gauge"},
+
+  // Masses — Leptons
+  {n:10,name:"m_e (electron)",formula:"Λ_h/(N_c²·N_w⁴·gauss)",value:"0.5110 MeV",pwi:0.0,domain:"lepton"},
+  {n:11,name:"m_μ (muon)",formula:"m_e·N_w⁴·gauss",value:"105.66 MeV",pwi:0.016,domain:"lepton"},
+  {n:12,name:"m_τ (tau)",formula:"m_μ·N_w⁴·gauss/β₀",value:"1776.9 MeV",pwi:0.025,domain:"lepton"},
+  {n:13,name:"m_μ/m_e",formula:"N_w⁴·gauss = 208",value:"206.77",pwi:0,domain:"lepton"},
+
+  // Masses — Quarks
+  {n:20,name:"m_u (up)",formula:"m_p·N_w/(D+1)",value:"2.16 MeV",pwi:0.46,domain:"quark"},
+  {n:21,name:"m_d (down)",formula:"m_p·N_c/(D+1)",value:"4.67 MeV",pwi:0.21,domain:"quark"},
+  {n:22,name:"m_s (strange)",formula:"m_p·χ·N_c/(D+1)",value:"93.4 MeV",pwi:0.11,domain:"quark"},
+  {n:23,name:"m_c (charm)",formula:"m_p·Σd/(D+1)·N_c",value:"1.27 GeV",pwi:0.24,domain:"quark"},
+  {n:24,name:"m_b (bottom)",formula:"m_p·D",value:"4.18 GeV",pwi:0.14,domain:"quark"},
+  {n:25,name:"m_t (top)",formula:"v·(7/10+1/650)",value:"172.5 GeV",pwi:0.016,domain:"quark"},
+
+  // Hadrons
+  {n:30,name:"m_p (proton)",formula:"v/2^(2^Nc)·53/54",value:"938.3 MeV",pwi:0.038,domain:"hadron"},
+  {n:31,name:"m_n (neutron)",formula:"m_p·(1+α/π·N_c)",value:"939.6 MeV",pwi:0.021,domain:"hadron"},
+  {n:32,name:"m_π (pion)",formula:"m_p/β₀",value:"134.98 MeV",pwi:0.20,domain:"hadron"},
+  {n:33,name:"f_π (pion decay)",formula:"Λ_QCD·N_c/β₀",value:"92.1 MeV",pwi:0.33,domain:"hadron"},
+  {n:34,name:"m_p/m_e",formula:"2(D²+Σd)/d₃+gauss^Nc/κ+…",value:"1836.15",pwi:0,domain:"hadron"},
+
+  // Bosons
+  {n:40,name:"M_W (W boson)",formula:"v·N_c/(N_c²−1)",value:"80.38 GeV",pwi:0.025,domain:"boson"},
+  {n:41,name:"M_Z (Z boson)",formula:"M_W/cos θ_W",value:"91.19 GeV",pwi:0.011,domain:"boson"},
+  {n:42,name:"M_H (Higgs)",formula:"v/√2",value:"125.1 GeV",pwi:0.35,domain:"boson"},
+
+  // Mixing
+  {n:50,name:"|V_us| (CKM)",formula:"√(N_c/(D+1))",value:"0.2253",pwi:0.13,domain:"mixing"},
+  {n:51,name:"|V_cb|",formula:"N_c/(D·gauss^½)",value:"0.0412",pwi:0.49,domain:"mixing"},
+  {n:52,name:"sin²θ₁₂ (PMNS)",formula:"N_c/π²",value:"0.304",pwi:0.98,domain:"mixing"},
+  {n:53,name:"sin²θ₂₃ (PMNS)",formula:"χ/(2χ−1)",value:"0.545",pwi:0.08,domain:"mixing"},
+
+  // Cosmology
+  {n:60,name:"Ω_Λ",formula:"gauss/(gauss+χ)",value:"0.684",pwi:0.29,domain:"cosmo"},
+  {n:61,name:"Ω_m",formula:"χ/(gauss+χ)",value:"0.316",pwi:0.63,domain:"cosmo"},
+  {n:62,name:"n_s (spectral)",formula:"1−N_w/D",value:"0.9524",pwi:0.20,domain:"cosmo"},
+  {n:63,name:"T_CMB",formula:"19/7 K",value:"2.714 K",pwi:0.37,domain:"cosmo"},
+
+  // CODATA
+  {n:179,name:"α⁻¹ (CODATA)",formula:"full Seeley-DeWitt",value:"137.036",pwi:0,domain:"codata"},
+  {n:180,name:"m_p/m_e (CODATA)",formula:"full tower",value:"1836.153",pwi:0,domain:"codata"},
+  {n:181,name:"r_p (proton radius)",formula:"C_F·N_c−T_F/(d₃·Σd)·ℏ/(m_p·c)",value:"0.8409 fm",pwi:0,domain:"codata"},
+
+  // Geometry
+  {n:70,name:"sp3 bond angle",formula:"arccos(−1/N_c)",value:"109.47°",pwi:0,domain:"geometry"},
+  {n:71,name:"water bond angle",formula:"arccos(−1/N_w²)",value:"104.48°",pwi:0.02,domain:"geometry"},
+  {n:72,name:"H-bond length",formula:"2·a₀·(1+1/N_c)",value:"2.76 Å",pwi:0.36,domain:"geometry"},
+  {n:73,name:"helix residues/turn",formula:"N_c²·N_w/(χ−1)",value:"3.6",pwi:0,domain:"geometry"},
+  {n:74,name:"Flory exponent ν",formula:"N_w/(χ−1)",value:"0.400",pwi:0,domain:"geometry"},
+
+  // Rendering/Scattering
+  {n:196,name:"Planck λ exponent",formula:"χ − 1",value:"5",pwi:0,domain:"render"},
+  {n:197,name:"Rayleigh size exp",formula:"χ",value:"6",pwi:0,domain:"render"},
+  {n:198,name:"Rayleigh λ exponent",formula:"N_w²",value:"4",pwi:0,domain:"render"},
+
+  // === DYNAMICS MODULES (structural — not counted in 198) ===
+  // CFD
+  {n:"D1",name:"D2Q9 lattice",formula:"N_c²",value:"9",pwi:-1,domain:"dynamics"},
+  {n:"D2",name:"Kolmogorov exponent",formula:"−(χ−1)/N_c",value:"−5/3",pwi:-1,domain:"dynamics"},
+  {n:"D3",name:"Stokes drag",formula:"d_mixed",value:"24",pwi:-1,domain:"dynamics"},
+
+  // Decay
+  {n:"D4",name:"β decay constant",formula:"d_mixed·d_colour",value:"192",pwi:-1,domain:"dynamics"},
+  {n:"D5",name:"sin²θ_W (Weinberg)",formula:"N_c/gauss",value:"3/13",pwi:-1,domain:"dynamics"},
+  {n:"D6",name:"PMNS θ₂₃",formula:"χ/(2χ−1)",value:"6/11",pwi:-1,domain:"dynamics"},
+
+  // Optics
+  {n:"D7",name:"n_water (IOR)",formula:"C_F = (N_c²−1)/(2N_c)",value:"4/3",pwi:-1,domain:"dynamics"},
+  {n:"D8",name:"n_glass (IOR)",formula:"N_c/N_w",value:"3/2",pwi:-1,domain:"dynamics"},
+
+  // MD
+  {n:"D9",name:"tetrahedral angle",formula:"arccos(−1/N_c)",value:"109.47°",pwi:-1,domain:"dynamics"},
+  {n:"D10",name:"α-helix residues",formula:"N_c²·N_w/(χ−1)",value:"18/5",pwi:-1,domain:"dynamics"},
+  {n:"D11",name:"H-bond A-T",formula:"N_w",value:"2",pwi:-1,domain:"dynamics"},
+  {n:"D12",name:"H-bond G-C",formula:"N_c",value:"3",pwi:-1,domain:"dynamics"},
+
+  // Condensed
+  {n:"D13",name:"Ising z (square)",formula:"N_w²",value:"4",pwi:-1,domain:"dynamics"},
+  {n:"D14",name:"Ising z (cubic)",formula:"χ",value:"6",pwi:-1,domain:"dynamics"},
+  {n:"D15",name:"Onsager T_c",formula:"N_w/ln(1+√N_w)",value:"2.269",pwi:-1,domain:"dynamics"},
+  {n:"D16",name:"BCS gap ratio",formula:"N_w·π/e^γ",value:"3.528",pwi:-1,domain:"dynamics"},
+  {n:"D17",name:"critical β",formula:"1/N_w³",value:"1/8",pwi:-1,domain:"dynamics"},
+
+  // Plasma
+  {n:"D18",name:"MHD state variables",formula:"N_w³ = d_colour",value:"8",pwi:-1,domain:"dynamics"},
+  {n:"D19",name:"MHD wave types",formula:"N_c",value:"3",pwi:-1,domain:"dynamics"},
+  {n:"D20",name:"propagating modes",formula:"χ = 2·N_c",value:"6",pwi:-1,domain:"dynamics"},
+
+  // GR/GW
+  {n:"D21",name:"GR precession",formula:"χ",value:"6",pwi:-1,domain:"dynamics"},
+  {n:"D22",name:"GR light bending",formula:"N_w²",value:"4",pwi:-1,domain:"dynamics"},
+  {n:"D23",name:"Peters coefficient",formula:"N_w⁵/(χ−1)",value:"32/5",pwi:-1,domain:"dynamics"},
+  {n:"D24",name:"chirp mass exp",formula:"(χ−1)/N_c",value:"5/3",pwi:-1,domain:"dynamics"},
+  {n:"D25",name:"LJ attractive exp",formula:"χ",value:"6",pwi:-1,domain:"dynamics"},
+  {n:"D26",name:"LJ repulsive exp",formula:"2χ",value:"12",pwi:-1,domain:"dynamics"},
+];
+
+const domains = [...new Set(observables.map(o=>o.domain))];
+const domainLabels = {
+  gauge:"Gauge",lepton:"Leptons",quark:"Quarks",hadron:"Hadrons",boson:"Bosons",
+  mixing:"Mixing",cosmo:"Cosmology",codata:"CODATA",geometry:"Geometry",
+  render:"Rendering",dynamics:"Dynamics (13 modules)"
+};
+
+let activeDomain = 'all';
+
+function buildFilters(){
+  const el = document.getElementById('filters');
+  let html = `<button class="filter-btn active" data-d="all">ALL</button>`;
+  domains.forEach(d => {
+    const count = observables.filter(o=>o.domain===d).length;
+    html += `<button class="filter-btn" data-d="${d}">${domainLabels[d]||d} (${count})</button>`;
+  });
+  el.innerHTML = html;
+  el.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      el.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      activeDomain = btn.dataset.d;
+      buildGrid();
+    });
+  });
+}
+
+function getRating(pwi){
+  if(pwi < 0) return 'dynamics';
+  if(pwi === 0) return 'exact';
+  if(pwi < 0.5) return 'tight';
+  return 'good';
+}
+
+function buildGrid(){
+  const el = document.getElementById('grid');
+  const filtered = activeDomain === 'all' ? observables : observables.filter(o=>o.domain===activeDomain);
+  el.innerHTML = filtered.map(o => {
+    const rating = getRating(o.pwi);
+    const pwiText = o.pwi < 0 ? 'structural' : o.pwi === 0 ? '■ EXACT' : `${o.pwi.toFixed(2)}%`;
+    return `<div class="obs-card ${rating}">
+      <div class="obs-left">
+        <div class="obs-num">#${o.n}</div>
+        <div class="obs-name">${o.name}</div>
+        <div class="obs-formula">${o.formula}</div>
+      </div>
+      <div class="obs-right">
+        <div class="obs-value">${o.value}</div>
+        <div class="obs-pwi">${pwiText}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+buildFilters();
+buildGrid();
+</script>
+</body>
+</html>

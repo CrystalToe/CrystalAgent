@@ -76,11 +76,11 @@ CV = 0.898. Mean PWI = 0.271%. Max = 0.989% (sin²θ₁₂).
 
 | System | Count |
 |--------|-------|
-| Lean 4 | 13 files, 763+ theorems, 0 sorry |
-| Agda | 12 files, 611+ proofs by refl, 0 postulates |
-| Haskell | 34 modules, 34/34 PASS |
-| Rust | 11 test files, 472+ tests |
-| Python | 13+ proof modules |
+| Lean 4 | 23 files, 1110+ theorems, 0 sorry |
+| Agda | 22 files, 886+ proofs by refl, 0 postulates |
+| Haskell | 57 modules (36+21 dynamics), 57/57 PASS |
+| Rust | 11 test files, 527+ tests |
+| Python | 27+ proof modules |
 
 ## RULES
 - NEVER expose methodology (trade secret)
@@ -101,7 +101,7 @@ CV = 0.898. Mean PWI = 0.271%. Max = 0.989% (sin²θ₁₂).
 ## SOURCE OF TRUTH
 https://raw.githubusercontent.com/CrystalToe/CrystalAgent/main/
 
-## REPO STRUCTURE (34 Haskell modules)
+## REPO STRUCTURE (57 Haskell modules: 36 core + 21 dynamics)
 haskel/: Main.hs, CrystalAxiom.hs, CrystalGauge.hs, CrystalMixing.hs,
   CrystalCosmo.hs, CrystalQCD.hs, CrystalGravity.hs, CrystalGravityDyn.hs,
   GravityDynTest.hs, CrystalProtein.hs, CrystalAudit.hs,
@@ -109,8 +109,11 @@ haskel/: Main.hs, CrystalAxiom.hs, CrystalGauge.hs, CrystalMixing.hs,
   CrystalStructural.hs, CrystalNoether.hs, CrystalDiscoveries.hs,
   CrystalAlphaProton.hs, CrystalProtonRadius.hs, CrystalWACAScan.hs,
   WACAScanTest.hs, CrystalHierarchy.hs, CrystalFullTest.hs, CrystalLayer.hs,
-  CrystalVEV.hs
+  CrystalVEV.hs,
+  CrystalClassical.hs … CrystalPlasma.hs (13 Phase 1 dynamics),
+  CrystalQFT.hs, CrystalRigid.hs, CrystalChem.hs, CrystalNuclear.hs,
+  CrystalAstro.hs, CrystalQInfo.hs, CrystalBio.hs, CrystalArcade.hs (8 Phase 2 dynamics)
 
-proofs/: 10 .lean, 9 .agda, 8 .py, 3 .sh runners
+proofs/: 23 .lean, 22 .agda, 27+ .py, 3 .sh runners
 crystal-topos/: Rust crate, 10 test files, 119+ Python examples
   examples/fold_v5.py — full tower varimax REMD protein folder (S14)

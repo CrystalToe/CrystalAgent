@@ -1,0 +1,346 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Crystal Matter — Molecular Dynamics from (2,3)</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a14;overflow:hidden;font-family:'Courier New',monospace}
+canvas{display:block;position:absolute;top:0;left:0}
+#ui{position:fixed;right:14px;top:14px;width:220px;z-index:10}
+#hud{color:#8cf;font-size:11px;text-shadow:0 0 6px #48f;line-height:1.7;margin-bottom:12px}
+#hud .v{color:#fff}
+#hud .c{color:#fa8;text-shadow:0 0 6px #f64}
+.slider-box{margin:6px 0}
+.slider-box label{color:#68a;font-size:10px;display:block;margin-bottom:2px}
+.slider-box input{width:100%;accent-color:#f84}
+#potential{position:fixed;left:14px;bottom:14px;z-index:10;border:1px solid #234;border-radius:4px;background:rgba(5,5,20,0.9)}
+#title{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:26px;text-align:center;pointer-events:none;text-shadow:0 0 30px #f84,0 0 60px #a42;z-index:20;transition:opacity 3s;letter-spacing:4px}
+#title .sub{font-size:13px;color:#fa8;margin-top:8px;letter-spacing:2px}
+#controls{position:fixed;bottom:14px;right:14px;z-index:10}
+#controls span{color:#68a;font-size:11px;cursor:pointer;display:block;margin:4px 0}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="title">CRYSTAL MATTER<br><div class="sub">molecular dynamics from A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)</div></div>
+<canvas id="potential" width="240" height="150"></canvas>
+<div id="ui">
+  <div id="hud"></div>
+  <div class="slider-box">
+    <label>TEMPERATURE <span id="tval">1.0</span></label>
+    <input type="range" id="temp" min="0.01" max="4" step="0.01" value="1.0" oninput="setTemp(this.value)">
+  </div>
+  <div class="slider-box">
+    <label>PARTICLES <span id="nval">120</span></label>
+    <input type="range" id="npart" min="20" max="300" step="10" value="120" oninput="rebuild(this.value)">
+  </div>
+</div>
+<div id="controls">
+  <span onclick="togglePause()">[ PAUSE ]</span>
+  <span onclick="explode()">[ SUPERNOVA ]</span>
+  <span onclick="freeze()">[ FREEZE ]</span>
+  <span onclick="reset()">[ RESET ]</span>
+</div>
+<script>
+// ═══════════════════════════════════════════════════════════
+// CRYSTAL ATOMS
+// ═══════════════════════════════════════════════════════════
+const N_W=2,N_C=3,CHI=N_W*N_C,BETA0=7;
+const D_MIXED=N_W*N_W*N_W*N_C; // 24
+const LJ_ATTRACT=CHI;        // 6
+const LJ_REPULSE=2*CHI;      // 12
+const GAMMA_MONO=(CHI-1)/N_C; // 5/3
+const GAMMA_DI=BETA0/(CHI-1); // 7/5
+const CARNOT=(CHI-1)/CHI;     // 5/6
+
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+const pc=document.getElementById('potential'),pctx=pc.getContext('2d');
+let W,H;
+function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight}
+window.addEventListener('resize',resize);resize();
+
+// ═══════════════════════════════════════════════════════════
+// PARTICLES
+// ═══════════════════════════════════════════════════════════
+let px=[],py=[],vx=[],vy=[],ax_=[],ay_=[];
+let N=120,paused=false,frame=0;
+let targetTemp=1.0;
+const SIGMA=12,EPS=1.0,DT=0.003,CUTOFF=SIGMA*2.5;
+const BOX_PAD=30;
+
+function init(n){
+  N=n;px=[];py=[];vx=[];vy=[];ax_=[];ay_=[];
+  const cols=Math.ceil(Math.sqrt(N));
+  const spacing=SIGMA*1.15;
+  const ox=(W-cols*spacing)/2,oy=(H-cols*spacing)/2;
+  for(let i=0;i<N;i++){
+    const row=Math.floor(i/cols),col=i%cols;
+    px.push(ox+col*spacing+(Math.random()-0.5)*2);
+    py.push(oy+row*spacing+(Math.random()-0.5)*2);
+    const v=Math.sqrt(targetTemp);
+    const ang=Math.random()*Math.PI*2;
+    vx.push(v*Math.cos(ang));
+    vy.push(v*Math.sin(ang));
+    ax_.push(0);ay_.push(0);
+  }
+  // Remove net momentum
+  let mvx=0,mvy=0;
+  for(let i=0;i<N;i++){mvx+=vx[i];mvy+=vy[i]}
+  for(let i=0;i<N;i++){vx[i]-=mvx/N;vy[i]-=mvy/N}
+  frame=0;
+}
+
+// ═══════════════════════════════════════════════════════════
+// LENNARD-JONES FORCE
+// V(r) = 4*eps*[(sigma/r)^12 - (sigma/r)^6]
+// 12 = 2*chi,  6 = chi,  force prefactor 24 = d_mixed
+// F = 24*eps/r * [2*(sigma/r)^12 - (sigma/r)^6]
+// ═══════════════════════════════════════════════════════════
+function computeForces(){
+  for(let i=0;i<N;i++){ax_[i]=0;ay_[i]=0}
+  for(let i=0;i<N;i++){
+    for(let j=i+1;j<N;j++){
+      let dx=px[i]-px[j],dy=py[i]-py[j];
+      // Minimum image (periodic-ish: soft walls)
+      const r2=dx*dx+dy*dy;
+      if(r2>CUTOFF*CUTOFF||r2<0.01)continue;
+      const r=Math.sqrt(r2);
+      const sr=SIGMA/r;
+      const sr6=sr*sr*sr*sr*sr*sr;       // (sigma/r)^chi
+      const sr12=sr6*sr6;                // (sigma/r)^(2*chi)
+      const fOverR=D_MIXED*EPS/(r*r)*(2*sr12-sr6); // 24*eps/r^2 * [2*sr12-sr6]
+      const fx=fOverR*dx,fy=fOverR*dy;
+      ax_[i]+=fx;ay_[i]+=fy;
+      ax_[j]-=fx;ay_[j]-=fy;
+    }
+  }
+  // Soft wall forces
+  for(let i=0;i<N;i++){
+    const wall=200;
+    if(px[i]<BOX_PAD)ax_[i]+=wall*(BOX_PAD-px[i])/SIGMA;
+    if(px[i]>W-BOX_PAD)ax_[i]-=wall*(px[i]-(W-BOX_PAD))/SIGMA;
+    if(py[i]<BOX_PAD)ay_[i]+=wall*(BOX_PAD-py[i])/SIGMA;
+    if(py[i]>H-BOX_PAD)ay_[i]-=wall*(py[i]-(H-BOX_PAD))/SIGMA;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// VELOCITY VERLET (W∘U∘W)
+// ═══════════════════════════════════════════════════════════
+function step(){
+  // W: half-kick
+  for(let i=0;i<N;i++){vx[i]+=DT/2*ax_[i];vy[i]+=DT/2*ay_[i]}
+  // U: drift
+  for(let i=0;i<N;i++){px[i]+=DT*vx[i];py[i]+=DT*vy[i]}
+  // Recompute forces
+  computeForces();
+  // W: half-kick
+  for(let i=0;i<N;i++){vx[i]+=DT/2*ax_[i];vy[i]+=DT/2*ay_[i]}
+
+  // Berendsen thermostat: gently rescale velocities toward target
+  const T=temperature();
+  if(T>0.001){
+    const lambda=Math.sqrt(1+0.02*(targetTemp/T-1));
+    for(let i=0;i<N;i++){vx[i]*=lambda;vy[i]*=lambda}
+  }
+}
+
+function temperature(){
+  let ke=0;
+  for(let i=0;i<N;i++)ke+=vx[i]*vx[i]+vy[i]*vy[i];
+  return ke/(2*N); // 2D: T = KE/N (2 DOF per particle in 2D)
+}
+
+function kineticE(){
+  let ke=0;
+  for(let i=0;i<N;i++)ke+=0.5*(vx[i]*vx[i]+vy[i]*vy[i]);
+  return ke;
+}
+
+function potentialE(){
+  let pe=0;
+  for(let i=0;i<N;i++)for(let j=i+1;j<N;j++){
+    const dx=px[i]-px[j],dy=py[i]-py[j];
+    const r2=dx*dx+dy*dy;if(r2>CUTOFF*CUTOFF)continue;
+    const r=Math.sqrt(r2);
+    const sr=SIGMA/r,sr6=Math.pow(sr,CHI),sr12=Math.pow(sr,2*CHI);
+    pe+=4*EPS*(sr12-sr6);
+  }
+  return pe;
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDERING
+// ═══════════════════════════════════════════════════════════
+function render(){
+  ctx.fillStyle='rgba(10,10,20,0.3)';
+  ctx.fillRect(0,0,W,H);
+
+  // Bonds (draw lines between close particles)
+  const bondCut=SIGMA*1.3;
+  ctx.lineWidth=0.8;
+  for(let i=0;i<N;i++){
+    for(let j=i+1;j<N;j++){
+      const dx=px[i]-px[j],dy=py[i]-py[j];
+      const r2=dx*dx+dy*dy;
+      if(r2<bondCut*bondCut){
+        const r=Math.sqrt(r2);
+        const alpha=Math.max(0,1-r/bondCut)*0.4;
+        ctx.strokeStyle=`rgba(100,180,255,${alpha})`;
+        ctx.beginPath();ctx.moveTo(px[i],py[i]);ctx.lineTo(px[j],py[j]);ctx.stroke();
+      }
+    }
+  }
+
+  // Particles with velocity-based colour
+  for(let i=0;i<N;i++){
+    const v=Math.sqrt(vx[i]*vx[i]+vy[i]*vy[i]);
+    const heat=Math.min(1,v/4);
+
+    // Glow
+    const glowR=6+heat*4;
+    const grad=ctx.createRadialGradient(px[i],py[i],0,px[i],py[i],glowR);
+    const cr=Math.round(80+175*heat);
+    const cg=Math.round(160-60*heat);
+    const cb=Math.round(255-200*heat);
+    grad.addColorStop(0,`rgba(${cr},${cg},${cb},0.9)`);
+    grad.addColorStop(0.5,`rgba(${cr},${cg},${cb},0.2)`);
+    grad.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=grad;
+    ctx.fillRect(px[i]-glowR,py[i]-glowR,glowR*2,glowR*2);
+
+    // Core
+    ctx.fillStyle=`rgb(${cr},${cg},${cb})`;
+    ctx.beginPath();
+    ctx.arc(px[i],py[i],2.5+heat*1.5,0,Math.PI*2);
+    ctx.fill();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// LJ POTENTIAL PLOT
+// ═══════════════════════════════════════════════════════════
+function drawPotential(){
+  const w=240,h=150;
+  pctx.fillStyle='rgba(5,5,20,0.95)';
+  pctx.fillRect(0,0,w,h);
+
+  const rMin=0.85*SIGMA,rMax=2.5*SIGMA;
+  const vMin=-1.2*EPS,vMax=2*EPS;
+
+  // Axes
+  pctx.strokeStyle='#234';pctx.lineWidth=0.5;
+  const zeroY=h*(1-(-vMin)/(vMax-vMin));
+  pctx.beginPath();pctx.moveTo(0,zeroY);pctx.lineTo(w,zeroY);pctx.stroke();
+
+  // LJ curve
+  pctx.strokeStyle='#f84';pctx.lineWidth=2;
+  pctx.beginPath();
+  for(let px_=0;px_<w;px_++){
+    const r=rMin+(rMax-rMin)*px_/w;
+    const sr=SIGMA/r,sr6=Math.pow(sr,CHI),sr12=Math.pow(sr,2*CHI);
+    const v=4*EPS*(sr12-sr6);
+    const clampV=Math.max(vMin,Math.min(vMax,v));
+    const py_=h*(1-(clampV-vMin)/(vMax-vMin));
+    if(px_===0)pctx.moveTo(px_,py_);else pctx.lineTo(px_,py_);
+  }
+  pctx.stroke();
+
+  // Attractive part (r^-6 = r^-chi)
+  pctx.strokeStyle='rgba(80,180,255,0.4)';pctx.lineWidth=1;
+  pctx.setLineDash([3,3]);
+  pctx.beginPath();
+  for(let px_=0;px_<w;px_++){
+    const r=rMin+(rMax-rMin)*px_/w;
+    const sr=SIGMA/r,sr6=Math.pow(sr,CHI);
+    const v=-4*EPS*sr6;
+    const clampV=Math.max(vMin,Math.min(vMax,v));
+    const py_=h*(1-(clampV-vMin)/(vMax-vMin));
+    if(px_===0)pctx.moveTo(px_,py_);else pctx.lineTo(px_,py_);
+  }
+  pctx.stroke();pctx.setLineDash([]);
+
+  // Labels
+  pctx.fillStyle='#f84';pctx.font='10px Courier New';
+  pctx.fillText('V(r) = 4ε[(σ/r)¹² − (σ/r)⁶]',6,14);
+  pctx.fillStyle='#fa8';
+  pctx.fillText(`12 = 2χ  (repulsion)`,6,28);
+  pctx.fillStyle='#4af';
+  pctx.fillText(`6  = χ   (attraction)`,6,40);
+  pctx.fillStyle='#456';
+  pctx.fillText(`24 = d_mixed (force)`,6,52);
+
+  // Current T marker
+  const T=temperature();
+  const tY=h*(1-(T-vMin)/(vMax-vMin));
+  pctx.fillStyle='#ff4';
+  pctx.fillText(`T=${T.toFixed(2)}`,w-60,Math.max(14,Math.min(h-4,tY)));
+  pctx.strokeStyle='rgba(255,255,80,0.3)';pctx.lineWidth=0.5;
+  pctx.beginPath();pctx.moveTo(0,tY);pctx.lineTo(w,tY);pctx.stroke();
+}
+
+// ═══════════════════════════════════════════════════════════
+// HUD
+// ═══════════════════════════════════════════════════════════
+function updateHUD(){
+  if(frame%10!==0)return;
+  const T=temperature();
+  const KE=kineticE();
+  const PE=potentialE();
+  const phase=T<0.3?'SOLID':T<1.2?'LIQUID':'GAS';
+  const phaseCol=T<0.3?'#8af':T<1.2?'#4f8':'#f84';
+  document.getElementById('hud').innerHTML=
+    `<span class="c">A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)</span><br>`+
+    `Phase: <span class="v" style="color:${phaseCol}">${phase}</span><br>`+
+    `T = <span class="v">${T.toFixed(3)}</span><br>`+
+    `KE = <span class="v">${KE.toFixed(1)}</span> &nbsp; `+
+    `PE = <span class="v">${PE.toFixed(1)}</span><br>`+
+    `E = <span class="v">${(KE+PE).toFixed(1)}</span><br>`+
+    `<span class="c">LJ: r⁻¹² + r⁻⁶</span><br>`+
+    `&nbsp; <span class="v">12</span> = 2χ <span class="c">(Pauli)</span><br>`+
+    `&nbsp; <span class="v">6</span> = χ <span class="c">(van der Waals)</span><br>`+
+    `&nbsp; <span class="v">24</span> = d_mixed <span class="c">(force)</span><br>`+
+    `γ_mono = <span class="v">${GAMMA_MONO.toFixed(4)}</span> <span class="c">= (χ−1)/N_c</span><br>`+
+    `γ_di = <span class="v">${GAMMA_DI.toFixed(4)}</span> <span class="c">= β₀/(χ−1)</span><br>`+
+    `Carnot = <span class="v">${CARNOT.toFixed(4)}</span> <span class="c">= (χ−1)/χ</span><br>`+
+    `ΔS/tick = <span class="v">ln(${CHI})</span> <span class="c">= ln(χ)</span>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// CONTROLS
+// ═══════════════════════════════════════════════════════════
+function setTemp(v){targetTemp=parseFloat(v);document.getElementById('tval').textContent=v}
+function rebuild(v){init(parseInt(v));computeForces();document.getElementById('nval').textContent=v}
+function togglePause(){paused=!paused}
+function explode(){targetTemp=4;document.getElementById('temp').value='4';document.getElementById('tval').textContent='4.00'}
+function freeze(){targetTemp=0.05;document.getElementById('temp').value='0.05';document.getElementById('tval').textContent='0.05'}
+function reset(){targetTemp=1.0;document.getElementById('temp').value='1.0';document.getElementById('tval').textContent='1.00';init(N);computeForces();
+  ctx.fillStyle='#0a0a14';ctx.fillRect(0,0,W,H);
+  document.getElementById('title').style.opacity='1';
+  setTimeout(()=>document.getElementById('title').style.opacity='0',3000);
+}
+
+// ═══════════════════════════════════════════════════════════
+// MAIN LOOP
+// ═══════════════════════════════════════════════════════════
+function loop(){
+  if(!paused){
+    for(let s=0;s<8;s++)step();
+    render();
+    drawPotential();
+    updateHUD();
+    frame++;
+  }
+  requestAnimationFrame(loop);
+}
+
+init(N);computeForces();
+document.getElementById('title').style.opacity='1';
+setTimeout(()=>document.getElementById('title').style.opacity='0',3000);
+loop();
+</script>
+</body>
+</html>
