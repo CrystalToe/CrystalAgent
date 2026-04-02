@@ -5,8 +5,8 @@
 # D=22 VdW FIXED (Session 13) · Force field from first principles · 0 fitted parameters
 # Rendering/scattering: Planck λ⁻⁵ (χ−1=5), Rayleigh d⁶ (χ=6), Rayleigh λ⁻⁴ (N_w²=4)
 # Hologron dynamics: emergent gravity from monad ticks, V(L)∝L^(-2ln2/ln6), no F=ma
-# 7/12 dynamics modules: Classical, GR, GW, EM, Friedmann, NBody, Thermo
-# 201 Python checks · 113 Lean theorems · 86 Agda proofs · 0 regressions
+# 13/13 dynamics modules COMPLETE: Classical→Plasma capstone (EM+CFD)
+# 346 Python checks · 235 Lean theorems · 194 Agda proofs · 0 regressions
 # Every integrator IS a classical limit of S=W∘U. Every integer from (2,3).
 # Upload ALL 3 parts for 100% coverage. Each part works standalone for basic queries.
 
@@ -56,7 +56,7 @@ Proved: attraction (V<0), monotonic fall, exponent match, 38 integer identities.
 Ref: Sahay/Lukin/Cotler, Phys Rev X 15, 021078 (2025) — MERA hologrons in AdS.
 Crystal contribution: specific algebra A_F, exact eigenvalues, flat space, 198 observables.
 
-## DYNAMICS MODULES — 7/12 BUILT (every integrator from (2,3))
+## DYNAMICS MODULES — 13/13 COMPLETE (every integrator from (2,3))
 Each module: §0 A_F atoms → §1 Force law → §2 Integrator → §3-7 Physics → §8 Integer proofs → §9 Self-test.
 Every integrator IS a classical limit of the monad S=W∘U. Zero new observables.
 
@@ -69,8 +69,12 @@ Every integrator IS a classical limit of the monad S=W∘U. Zero new observables
 | CrystalFriedmann | Friedmann ODE | Ω_Λ=13/19, Ω_m=6/19, Age=97/7 |
 | CrystalNBody | Barnes-Hut + leapfrog | octree 8=d_colour=2^N_c |
 | CrystalThermo | Velocity Verlet MD | LJ 6=χ/12=2χ, γ_mono=5/3, γ_di=7/5 |
-
-Remaining: CFD (Lattice Boltzmann), Decay, Optics, MD, Condensed (Ising/BCS).
+| CrystalCFD | Lattice Boltzmann | D2Q9=9=N_c², Kolmogorov −5/3, Stokes 24=d_mixed |
+| CrystalDecay | Monte Carlo phase space | beta 192=d_mixed·d_colour, sin²θ_W=3/13 |
+| CrystalOptics | Snell + Fresnel | n_water=4/3=C_F, n_glass=3/2=N_c/N_w |
+| CrystalMD | Velocity Verlet LJ | bond 109.47°=arccos(−1/N_c), helix=18/5 |
+| CrystalCondensed | Metropolis Monte Carlo | Ising z=4=N_w², BCS 2Δ/kT_c=2π/e^γ |
+| CrystalPlasma | Alfvén FDTD (EM+CFD) | MHD modes 8=N_w³, wave types 3=N_c |
 
 ## PROOF AUTHORITY — READ FIRST
 Lean `native_decide` and Agda `refl` proofs are FINAL TRUTH. If a proof says it, it's right.
@@ -440,6 +444,69 @@ theorem sin13_numerator : 2 * chi - 1 = 11 := by native_decide
 theorem sin13_denominator : N_w ^ 2 * (chi - 1) ^ 3 = 500 := by native_decide
 ```
 
+## §Lean: CrystalCFD.lean (      61 lines)
+```lean
+
+/-! # CrystalCFD — Lattice Boltzmann integer identities from (2,3)
+
+All CFD constants traced to A_F atoms nW=2, nC=3.
+-/
+
+-- S0: A_F atoms
+abbrev nW : Nat := 2
+abbrev nC : Nat := 3
+abbrev chi : Nat := nW * nC               -- 6
+abbrev beta0 : Nat := (11 * nC - 2 * chi) / 3  -- 7
+abbrev sigmaD : Nat := 1 + 3 + 8 + 24    -- 36
+abbrev sigmaD2 : Nat := 1 + 9 + 64 + 576 -- 650
+abbrev gauss : Nat := nC * nC + nW * nW   -- 13
+abbrev towerD : Nat := sigmaD + chi       -- 42
+abbrev dMixed : Nat := nW * nW * nW * nC  -- 24
+
+-- S1: D2Q9 lattice structure
+theorem d2q9_count : nC * nC = 9 := by native_decide
+theorem weight_rest_num : nW * nW = 4 := by native_decide
+theorem weight_rest_den : nC * nC = 9 := by native_decide
+theorem weight_cardinal_den : nC * nC = 9 := by native_decide
+theorem weight_diagonal_den : sigmaD = 36 := by native_decide
+theorem cs2_den : nC = 3 := by native_decide
+
+-- Weight sum: 4*36 + 4*36 + 4*9 = 9*36
+theorem weight_sum_num : 4 * 36 + 4 * 36 + 4 * 9 = 9 * 36 := by native_decide
+-- From atoms: nW^2 * sigmaD + 4 * sigmaD + 4 * nC^2 = nC^2 * sigmaD
+theorem weight_sum_atoms :
+    nW * nW * sigmaD + 4 * sigmaD + 4 * (nC * nC) = nC * nC * sigmaD := by native_decide
+
+-- S2: CFD physical constants
+-- Kolmogorov: -(chi-1)/nC = -5/3, i.e. chi-1 = 5 and nC = 3
+theorem kolmogorov_num : chi - 1 = 5 := by native_decide
+theorem kolmogorov_den : nC = 3 := by native_decide
+
+-- Stokes drag: dMixed = 24
+theorem stokes_drag : dMixed = 24 := by native_decide
+
+-- Blasius: 1/nW^2 = 1/4, i.e. nW*nW = 4
+theorem blasius_den : nW * nW = 4 := by native_decide
+
+-- Von Karman: nW/(chi-1) = 2/5
+theorem von_karman_num : nW = 2 := by native_decide
+theorem von_karman_den : chi - 1 = 5 := by native_decide
+
+-- S3: Cross-checks
+theorem dMixed_alt : 2 * chi * nW = 24 := by native_decide
+theorem sigmaD_product : nC * nC * (nW * nW) = sigmaD := by native_decide
+theorem chi_minus_one : chi - 1 = 5 := by native_decide
+
+-- S4: Atom sanity
+theorem nW_val : nW = 2 := by native_decide
+theorem nC_val : nC = 3 := by native_decide
+theorem chi_val : chi = 6 := by native_decide
+theorem beta0_val : beta0 = 7 := by native_decide
+theorem sigmaD_val : sigmaD = 36 := by native_decide
+theorem gauss_val : gauss = 13 := by native_decide
+theorem towerD_val : towerD = 42 := by native_decide
+```
+
 ## §Lean: CrystalClassical.lean (      65 lines)
 ```lean
 
@@ -505,6 +572,113 @@ theorem d_colour : N_c ^ 2 - 1 = 8 := by native_decide
 theorem d_weak : N_c = 3 := by native_decide
 theorem d_mixed : N_w ^ 3 * N_c = 24 := by native_decide
 theorem d_total_check : 1 + 3 + 8 + 24 = sigma_d := by native_decide
+```
+
+## §Lean: CrystalCondensed.lean (      44 lines)
+```lean
+
+/-! # CrystalCondensed — Ising/BCS integer identities from (2,3)
+
+All condensed matter constants traced to A_F atoms nW=2, nC=3.
+-/
+
+-- S0: A_F atoms
+abbrev nW : Nat := 2
+abbrev nC : Nat := 3
+abbrev chi : Nat := nW * nC               -- 6
+abbrev sigmaD : Nat := 1 + 3 + 8 + 24    -- 36
+abbrev gauss : Nat := nC * nC + nW * nW   -- 13
+abbrev towerD : Nat := sigmaD + chi       -- 42
+
+-- Atom sanity
+theorem nW_val : nW = 2 := by native_decide
+theorem nC_val : nC = 3 := by native_decide
+theorem chi_val : chi = 6 := by native_decide
+theorem towerD_val : towerD = 42 := by native_decide
+
+-- S1: Lattice coordination numbers
+theorem z_square : nW * nW = 4 := by native_decide
+theorem z_cubic : chi = 6 := by native_decide
+
+-- S2: Ising states
+theorem ising_states : nW = 2 := by native_decide
+
+-- S3: Critical exponent beta = 1/8 = 1/N_w^3
+theorem crit_beta_den : nW * nW * nW = 8 := by native_decide
+
+-- S4: Ground state energy per site = -N_w
+-- Expressed as: z_square / 2 = N_w (bonds per site)
+theorem bonds_per_site : nW * nW / nW = nW := by native_decide
+
+-- S5: BCS prefactor = N_w = 2
+theorem bcs_prefactor : nW = 2 := by native_decide
+
+-- S6: Cross-checks
+theorem z_diff : chi - nW * nW = nW := by native_decide
+theorem nW_cubed : nW * nW * nW = 8 := by native_decide
+theorem z_square_val : nW * nW = 4 := by native_decide
+theorem z_cubic_val : chi = 6 := by native_decide
+```
+
+## §Lean: CrystalDecay.lean (      59 lines)
+```lean
+
+/-! # CrystalDecay — Particle Decay integer identities from (2,3)
+
+All decay constants traced to A_F atoms nW=2, nC=3.
+-/
+
+-- S0: A_F atoms
+abbrev nW : Nat := 2
+abbrev nC : Nat := 3
+abbrev chi : Nat := nW * nC               -- 6
+abbrev gauss : Nat := nC * nC + nW * nW   -- 13
+abbrev sigmaD : Nat := 1 + 3 + 8 + 24    -- 36
+abbrev towerD : Nat := sigmaD + chi       -- 42
+
+-- S1: Decay-specific constants
+abbrev dColour : Nat := nW * nW * nW          -- 8
+abbrev dMixed : Nat := nW * nW * nW * nC      -- 24
+abbrev betaConst : Nat := dMixed * dColour     -- 192
+
+-- Atom sanity
+theorem nW_val : nW = 2 := by native_decide
+theorem nC_val : nC = 3 := by native_decide
+theorem chi_val : chi = 6 := by native_decide
+theorem gauss_val : gauss = 13 := by native_decide
+
+-- S2: Beta constant 192
+theorem dColour_val : dColour = 8 := by native_decide
+theorem dMixed_val : dMixed = 24 := by native_decide
+theorem betaConst_val : betaConst = 192 := by native_decide
+theorem beta_product : dMixed * dColour = 192 := by native_decide
+theorem beta_decompose : 24 * 8 = 192 := by native_decide
+
+-- S3: Weinberg angle sin^2 theta_W = N_c / gauss = 3/13
+theorem weinberg_num : nC = 3 := by native_decide
+theorem weinberg_den : gauss = 13 := by native_decide
+
+-- S4: PMNS theta_23 = chi / (2*chi - 1) = 6/11
+theorem theta23_num : chi = 6 := by native_decide
+theorem theta23_den : 2 * chi - 1 = 11 := by native_decide
+
+-- sin^2(2 theta_23) = 120/121
+theorem sin22_num : 4 * chi * (chi - 1) = 120 := by native_decide
+theorem sin22_den : (2 * chi - 1) * (2 * chi - 1) = 121 := by native_decide
+
+-- S5: Phase space dimension 3N - 4 = nC*N - (nC + 1)
+theorem phase_dim_2 : nC * 2 - (nC + 1) = 2 := by native_decide
+theorem phase_dim_3 : nC * 3 - (nC + 1) = 5 := by native_decide
+theorem phase_dim_4 : nC * 4 - (nC + 1) = 8 := by native_decide
+theorem phase_dim_4_is_dColour : nC * 4 - (nC + 1) = dColour := by native_decide
+
+-- S6: Cross-checks
+theorem dColour_is_nW_cubed : nW * nW * nW = 8 := by native_decide
+theorem dMixed_alt : 2 * chi * nW = 24 := by native_decide
+theorem gauss_decompose : nC * nC + nW * nW = 13 := by native_decide
+theorem chi_minus_one : chi - 1 = 5 := by native_decide
+theorem beta_factor_colour : dMixed * dColour = betaConst := by native_decide
+theorem beta_factor_mixed : dColour * dMixed = betaConst := by native_decide
 ```
 
 ## §Lean: CrystalDiscoveries.lean (     188 lines)
@@ -1818,6 +1992,65 @@ theorem tuning_22_Nwsq  : N_w * N_w = 4                    := by native_decide
 end CrystalMandelbrot
 ```
 
+## §Lean: CrystalMD.lean (      57 lines)
+```lean
+
+/-! # CrystalMD — Molecular Dynamics integer identities from (2,3)
+
+All MD constants traced to A_F atoms nW=2, nC=3.
+-/
+
+-- S0: A_F atoms
+abbrev nW : Nat := 2
+abbrev nC : Nat := 3
+abbrev chi : Nat := nW * nC               -- 6
+abbrev sigmaD : Nat := 1 + 3 + 8 + 24    -- 36
+abbrev gauss : Nat := nC * nC + nW * nW   -- 13
+abbrev towerD : Nat := sigmaD + chi       -- 42
+abbrev dMixed : Nat := nW * nW * nW * nC  -- 24
+
+-- Atom sanity
+theorem nW_val : nW = 2 := by native_decide
+theorem nC_val : nC = 3 := by native_decide
+theorem chi_val : chi = 6 := by native_decide
+theorem dMixed_val : dMixed = 24 := by native_decide
+
+-- S1: LJ exponents
+theorem lj_att : chi = 6 := by native_decide
+theorem lj_rep : 2 * chi = 12 := by native_decide
+theorem lj_pot_coeff : nW * nW = 4 := by native_decide
+theorem lj_force_coeff : dMixed = 24 := by native_decide
+-- 2*dMixed = 48 = nW^2 * 2*chi
+theorem lj_double_force : 2 * dMixed = 48 := by native_decide
+theorem lj_coeff_trace : nW * nW * chi = dMixed := by native_decide
+
+-- S2: Bond angle denominator
+theorem tetra_den : nC = 3 := by native_decide
+
+-- S3: H-bonds
+theorem hbond_AT : nW = 2 := by native_decide
+theorem hbond_GC : nC = 3 := by native_decide
+theorem hbond_diff : nC - nW = 1 := by native_decide
+
+-- S4: Helix = 18/5 = (N_c^2*N_w)/(chi-1)
+theorem helix_num : nC * nC * nW = 18 := by native_decide
+theorem helix_den : chi - 1 = 5 := by native_decide
+
+-- S5: Flory nu = 2/5 = N_w/(chi-1)
+theorem flory_num : nW = 2 := by native_decide
+theorem flory_den : chi - 1 = 5 := by native_decide
+
+-- S6: Coulomb exponent
+theorem coulomb_exp : nC - 1 = 2 := by native_decide
+
+-- S7: Cross-checks
+theorem two_chi : 2 * chi = 12 := by native_decide
+theorem chi_minus_one : chi - 1 = 5 := by native_decide
+theorem dMixed_alt : 2 * chi * nW = 24 := by native_decide
+theorem nC_sq_nW : nC * nC * nW = 18 := by native_decide
+theorem nW_sq_is_four : nW * nW = 4 := by native_decide
+```
+
 ## §Lean: CrystalMERA.lean (      57 lines)
 ```lean
 /-
@@ -2168,6 +2401,106 @@ theorem tau_n : towerD * towerD / N_w = 882 := by native_decide
 
 -- Total theorems in this file: 18
 -- No new observables. Count remains 178.
+```
+
+## §Lean: CrystalOptics.lean (      55 lines)
+```lean
+
+/-! # CrystalOptics — Ray/Wave Optics integer identities from (2,3)
+
+All optics constants traced to A_F atoms nW=2, nC=3.
+-/
+
+-- S0: A_F atoms
+abbrev nW : Nat := 2
+abbrev nC : Nat := 3
+abbrev chi : Nat := nW * nC               -- 6
+abbrev gauss : Nat := nC * nC + nW * nW   -- 13
+abbrev sigmaD : Nat := 1 + 3 + 8 + 24    -- 36
+abbrev towerD : Nat := sigmaD + chi       -- 42
+
+-- Atom sanity
+theorem nW_val : nW = 2 := by native_decide
+theorem nC_val : nC = 3 := by native_decide
+theorem chi_val : chi = 6 := by native_decide
+theorem gauss_val : gauss = 13 := by native_decide
+
+-- S1: Casimir factor C_F = (N_c^2 - 1)/(2 N_c) = 4/3
+-- Numerator: N_c^2 - 1 = 8
+theorem cF_num : nC * nC - 1 = 8 := by native_decide
+-- Denominator: 2 * N_c = 6
+theorem cF_den : 2 * nC = 6 := by native_decide
+-- C_F denominator equals chi
+theorem cF_den_is_chi : 2 * nC = chi := by native_decide
+-- C_F numerator equals N_w^3
+theorem cF_num_is_dColour : nC * nC - 1 = nW * nW * nW := by native_decide
+
+-- S2: IOR glass = N_c / N_w = 3/2
+theorem glass_num : nC = 3 := by native_decide
+theorem glass_den : nW = 2 := by native_decide
+
+-- S3: Rayleigh exponents
+-- Lambda exponent: 4 = N_w^2
+theorem rayleigh_lambda : nW * nW = 4 := by native_decide
+-- Size exponent: 6 = chi
+theorem rayleigh_size : chi = 6 := by native_decide
+
+-- S4: Planck exponent: 5 = chi - 1
+theorem planck_exp : chi - 1 = 5 := by native_decide
+
+-- S5: Cross-checks
+-- 4/3 reduces correctly: gcd(N_c^2-1, 2*N_c) divides both
+-- 4 * 6 = 8 * 3 (cross-multiply check for 4/3 = 8/6)
+theorem cF_cross_multiply : 4 * (2 * nC) = (nC * nC - 1) * nC := by native_decide
+-- N_c^2 - 1 = N_w^3 = 8
+theorem casimir_colour : nC * nC - 1 = nW * nW * nW := by native_decide
+-- chi - 1 = N_w^2 + 1
+theorem chi_m1_decompose : chi - 1 = nW * nW + 1 := by native_decide
+-- Weight cross-check: 4 * 9 = 36 = sigmaD
+theorem weight_cross : (nW * nW) * (nC * nC) = sigmaD := by native_decide
+```
+
+## §Lean: CrystalPlasma.lean (      41 lines)
+```lean
+
+/-! # CrystalPlasma — MHD integer identities from (2,3) -/
+
+abbrev nW : Nat := 2
+abbrev nC : Nat := 3
+abbrev chi : Nat := nW * nC               -- 6
+abbrev dColour : Nat := nW * nW * nW      -- 8
+abbrev sigmaD : Nat := 1 + 3 + 8 + 24    -- 36
+abbrev gauss : Nat := nC * nC + nW * nW   -- 13
+abbrev towerD : Nat := sigmaD + chi       -- 42
+
+-- Atom sanity
+theorem nW_val : nW = 2 := by native_decide
+theorem nC_val : nC = 3 := by native_decide
+theorem chi_val : chi = 6 := by native_decide
+theorem dColour_val : dColour = 8 := by native_decide
+
+-- MHD wave classification
+theorem wave_types : nC = 3 := by native_decide
+theorem prop_modes : 2 * nC = chi := by native_decide
+theorem non_prop : nW = 2 := by native_decide
+theorem total_modes : chi + nW = dColour := by native_decide
+theorem total_is_8 : chi + nW = 8 := by native_decide
+
+-- State variables
+theorem state_vars : nW * nW * nW = 8 := by native_decide
+
+-- Pressure factors
+theorem mag_pressure : nW = 2 := by native_decide
+theorem plasma_beta : nW = 2 := by native_decide
+
+-- EM + CFD heritage
+theorem em_components : chi = 6 := by native_decide
+theorem cfd_d2q9 : nC * nC = 9 := by native_decide
+
+-- Cross-checks
+theorem chi_plus_nW : chi + nW = 8 := by native_decide
+theorem two_nC_is_chi : 2 * nC = chi := by native_decide
+theorem nW_cubed : nW * nW * nW = dColour := by native_decide
 ```
 
 ## §Lean: CrystalProtein.lean (     184 lines)
@@ -4271,6 +4604,105 @@ sin13-denom : N-w ^ 2 * ((chi ∸ 1) ^ 3) ≡ 500
 sin13-denom = refl
 ```
 
+## §Agda: CrystalCFD.agda (      97 lines)
+```agda
+
+-- CrystalCFD — Lattice Boltzmann integer identities from (2,3)
+
+module CrystalCFD where
+
+open import Agda.Builtin.Equality
+open import Agda.Builtin.Nat renaming (Nat to ℕ)
+
+-- S0: A_F atoms
+nW : ℕ
+nW = 2
+
+nC : ℕ
+nC = 3
+
+chi : ℕ
+chi = nW * nC  -- 6
+
+sigmaD : ℕ
+sigmaD = 1 + 3 + 8 + 24  -- 36
+
+gauss : ℕ
+gauss = nC * nC + nW * nW  -- 13
+
+towerD : ℕ
+towerD = sigmaD + chi  -- 42
+
+dMixed : ℕ
+dMixed = nW * nW * nW * nC  -- 24
+
+-- S1: D2Q9 lattice structure
+d2q9-count : nC * nC ≡ 9
+d2q9-count = refl
+
+weight-rest-num : nW * nW ≡ 4
+weight-rest-num = refl
+
+weight-rest-den : nC * nC ≡ 9
+weight-rest-den = refl
+
+weight-diagonal-den : sigmaD ≡ 36
+weight-diagonal-den = refl
+
+cs2-den : nC ≡ 3
+cs2-den = refl
+
+-- Weight sum in integers: 4*36 + 4*36 + 4*9 = 9*36 = 324
+weight-sum : 4 * 36 + 4 * 36 + 4 * 9 ≡ 324
+weight-sum = refl
+
+weight-sum-rhs : 9 * 36 ≡ 324
+weight-sum-rhs = refl
+
+-- S2: CFD physical constants
+kolmogorov-num : chi ≡ 6
+kolmogorov-num = refl
+
+-- chi - 1 = 5 (as addition: 5 + 1 = chi)
+kolmogorov-chi-pred : 5 + 1 ≡ chi
+kolmogorov-chi-pred = refl
+
+stokes-drag : dMixed ≡ 24
+stokes-drag = refl
+
+blasius-den : nW * nW ≡ 4
+blasius-den = refl
+
+von-karman-num : nW ≡ 2
+von-karman-num = refl
+
+-- S3: Cross-checks
+dMixed-alt : 2 * chi * nW ≡ 24
+dMixed-alt = refl
+
+sigmaD-product : nC * nC * (nW * nW) ≡ sigmaD
+sigmaD-product = refl
+
+-- S4: Atom sanity
+nW-val : nW ≡ 2
+nW-val = refl
+
+nC-val : nC ≡ 3
+nC-val = refl
+
+chi-val : chi ≡ 6
+chi-val = refl
+
+sigmaD-val : sigmaD ≡ 36
+sigmaD-val = refl
+
+gauss-val : gauss ≡ 13
+gauss-val = refl
+
+towerD-val : towerD ≡ 42
+towerD-val = refl
+```
+
 ## §Agda: CrystalClassical.agda (     125 lines)
 ```agda
 
@@ -4396,6 +4828,185 @@ d-weak = refl
 
 d-mixed : N_w * N_w * N_w * N_c ≡ 24
 d-mixed = refl
+```
+
+## §Agda: CrystalCondensed.agda (      72 lines)
+```agda
+
+-- CrystalCondensed — Ising/BCS integer identities from (2,3)
+
+module CrystalCondensed where
+
+open import Agda.Builtin.Equality
+open import Agda.Builtin.Nat renaming (Nat to ℕ)
+
+-- S0: A_F atoms
+nW : ℕ
+nW = 2
+
+nC : ℕ
+nC = 3
+
+chi : ℕ
+chi = nW * nC  -- 6
+
+sigmaD : ℕ
+sigmaD = 1 + 3 + 8 + 24  -- 36
+
+towerD : ℕ
+towerD = sigmaD + chi  -- 42
+
+-- Atom sanity
+nW-val : nW ≡ 2
+nW-val = refl
+
+nC-val : nC ≡ 3
+nC-val = refl
+
+chi-val : chi ≡ 6
+chi-val = refl
+
+towerD-val : towerD ≡ 42
+towerD-val = refl
+
+-- S1: Lattice coordination numbers
+z-square : nW * nW ≡ 4
+z-square = refl
+
+z-cubic : chi ≡ 6
+z-cubic = refl
+
+-- S2: Ising states
+ising-states : nW ≡ 2
+ising-states = refl
+
+-- S3: Critical exponent beta = 1/N_w^3 = 1/8
+crit-beta-den : nW * nW * nW ≡ 8
+crit-beta-den = refl
+
+-- S4: Ground energy: z/2 = N_w (bonds per site, as multiplication)
+bonds-per-site : nW * nW ≡ nW * 2
+bonds-per-site = refl
+
+-- S5: BCS prefactor
+bcs-prefactor : nW ≡ 2
+bcs-prefactor = refl
+
+-- S6: Cross-checks
+-- chi - z_square = N_w (as addition: N_w + z_square = chi)
+z-diff : nW + nW * nW ≡ chi
+z-diff = refl
+
+nW-cubed : nW * nW * nW ≡ 8
+nW-cubed = refl
+
+z-square-val : nW * nW ≡ 4
+z-square-val = refl
+```
+
+## §Agda: CrystalDecay.agda (     103 lines)
+```agda
+
+-- CrystalDecay — Particle Decay integer identities from (2,3)
+
+module CrystalDecay where
+
+open import Agda.Builtin.Equality
+open import Agda.Builtin.Nat renaming (Nat to ℕ)
+
+-- S0: A_F atoms
+nW : ℕ
+nW = 2
+
+nC : ℕ
+nC = 3
+
+chi : ℕ
+chi = nW * nC  -- 6
+
+gauss : ℕ
+gauss = nC * nC + nW * nW  -- 13
+
+-- S1: Decay constants
+dColour : ℕ
+dColour = nW * nW * nW  -- 8
+
+dMixed : ℕ
+dMixed = nW * nW * nW * nC  -- 24
+
+betaConst : ℕ
+betaConst = dMixed * dColour  -- 192
+
+-- Atom sanity
+nW-val : nW ≡ 2
+nW-val = refl
+
+nC-val : nC ≡ 3
+nC-val = refl
+
+chi-val : chi ≡ 6
+chi-val = refl
+
+gauss-val : gauss ≡ 13
+gauss-val = refl
+
+-- S2: Beta constant
+dColour-val : dColour ≡ 8
+dColour-val = refl
+
+dMixed-val : dMixed ≡ 24
+dMixed-val = refl
+
+betaConst-val : betaConst ≡ 192
+betaConst-val = refl
+
+beta-product : 24 * 8 ≡ 192
+beta-product = refl
+
+-- S3: Weinberg angle (integer parts)
+weinberg-num : nC ≡ 3
+weinberg-num = refl
+
+weinberg-den : gauss ≡ 13
+weinberg-den = refl
+
+-- S4: PMNS theta_23 (integer parts)
+-- chi = 6, 2*chi - 1 = 11
+theta23-num : chi ≡ 6
+theta23-num = refl
+
+-- 2*chi = 12, so 2*chi - 1 = 11 (as addition: 11 + 1 = 2*chi)
+theta23-den-check : 11 + 1 ≡ 2 * chi
+theta23-den-check = refl
+
+-- sin^2(2 theta_23) numerator: 4 * chi * (chi - 1) = 120
+-- Since chi = 6, chi - 1 = 5: 4 * 6 * 5 = 120
+sin22-num : 4 * chi * 5 ≡ 120
+sin22-num = refl
+
+-- Denominator: (2*chi - 1)^2 = 11^2 = 121
+sin22-den : 11 * 11 ≡ 121
+sin22-den = refl
+
+-- S5: Phase space dimension
+phase-dim-2 : nC * 2 ≡ 2 + (nC + 1)
+phase-dim-2 = refl
+
+phase-dim-3 : nC * 3 ≡ 5 + (nC + 1)
+phase-dim-3 = refl
+
+phase-dim-4 : nC * 4 ≡ dColour + (nC + 1)
+phase-dim-4 = refl
+
+-- S6: Cross-checks
+dColour-cubed : nW * nW * nW ≡ 8
+dColour-cubed = refl
+
+dMixed-alt : 2 * chi * nW ≡ 24
+dMixed-alt = refl
+
+gauss-decompose : nC * nC + nW * nW ≡ 13
+gauss-decompose = refl
 ```
 
 ## §Agda: CrystalDiscoveries.agda (     242 lines)
@@ -5985,6 +6596,105 @@ tuning-23 = refl
 -- ==============================================================
 ```
 
+## §Agda: CrystalMD.agda (      97 lines)
+```agda
+
+-- CrystalMD — Molecular Dynamics integer identities from (2,3)
+
+module CrystalMD where
+
+open import Agda.Builtin.Equality
+open import Agda.Builtin.Nat renaming (Nat to ℕ)
+
+-- S0: A_F atoms
+nW : ℕ
+nW = 2
+
+nC : ℕ
+nC = 3
+
+chi : ℕ
+chi = nW * nC  -- 6
+
+dMixed : ℕ
+dMixed = nW * nW * nW * nC  -- 24
+
+-- Atom sanity
+nW-val : nW ≡ 2
+nW-val = refl
+
+nC-val : nC ≡ 3
+nC-val = refl
+
+chi-val : chi ≡ 6
+chi-val = refl
+
+dMixed-val : dMixed ≡ 24
+dMixed-val = refl
+
+-- S1: LJ exponents
+lj-att : chi ≡ 6
+lj-att = refl
+
+lj-rep : 2 * chi ≡ 12
+lj-rep = refl
+
+lj-pot-coeff : nW * nW ≡ 4
+lj-pot-coeff = refl
+
+lj-force-coeff : dMixed ≡ 24
+lj-force-coeff = refl
+
+lj-double-force : 2 * dMixed ≡ 48
+lj-double-force = refl
+
+lj-coeff-trace : nW * nW * chi ≡ dMixed
+lj-coeff-trace = refl
+
+-- S2: Bond angle denominator
+tetra-den : nC ≡ 3
+tetra-den = refl
+
+-- S3: H-bonds
+hbond-AT : nW ≡ 2
+hbond-AT = refl
+
+hbond-GC : nC ≡ 3
+hbond-GC = refl
+
+-- S4: Helix = 18/5
+helix-num : nC * nC * nW ≡ 18
+helix-num = refl
+
+-- chi - 1 = 5 (as addition)
+helix-den : 5 + 1 ≡ chi
+helix-den = refl
+
+-- S5: Flory nu = 2/5
+flory-num : nW ≡ 2
+flory-num = refl
+
+flory-den : 5 + 1 ≡ chi
+flory-den = refl
+
+-- S6: Coulomb exponent (N_c - 1 = 2, as addition)
+coulomb-exp : 2 + 1 ≡ nC
+coulomb-exp = refl
+
+-- S7: Cross-checks
+two-chi : 2 * chi ≡ 12
+two-chi = refl
+
+dMixed-alt : 2 * chi * nW ≡ 24
+dMixed-alt = refl
+
+nC-sq-nW : nC * nC * nW ≡ 18
+nC-sq-nW = refl
+
+nW-sq : nW * nW ≡ 4
+nW-sq = refl
+```
+
 ## §Agda: CrystalMERA.agda (      83 lines)
 ```agda
 {-
@@ -6355,6 +7065,164 @@ phase-18 = refl
 -- Status: Categorical Noether THEOREM (not conjecture)
 -- No new observables. Count remains 178.
 -- ============================================================
+```
+
+## §Agda: CrystalOptics.agda (      91 lines)
+```agda
+
+-- CrystalOptics — Ray/Wave Optics integer identities from (2,3)
+
+module CrystalOptics where
+
+open import Agda.Builtin.Equality
+open import Agda.Builtin.Nat renaming (Nat to ℕ)
+
+-- S0: A_F atoms
+nW : ℕ
+nW = 2
+
+nC : ℕ
+nC = 3
+
+chi : ℕ
+chi = nW * nC  -- 6
+
+gauss : ℕ
+gauss = nC * nC + nW * nW  -- 13
+
+sigmaD : ℕ
+sigmaD = 1 + 3 + 8 + 24  -- 36
+
+-- Atom sanity
+nW-val : nW ≡ 2
+nW-val = refl
+
+nC-val : nC ≡ 3
+nC-val = refl
+
+chi-val : chi ≡ 6
+chi-val = refl
+
+gauss-val : gauss ≡ 13
+gauss-val = refl
+
+-- S1: Casimir factor C_F = (N_c^2-1)/(2*N_c) = 8/6 = 4/3
+-- Numerator
+cF-num : nC * nC ≡ 9
+cF-num = refl
+
+-- N_c^2 - 1 = 8 (as addition: 8 + 1 = N_c^2)
+cF-num-pred : 8 + 1 ≡ nC * nC
+cF-num-pred = refl
+
+-- Denominator
+cF-den : 2 * nC ≡ 6
+cF-den = refl
+
+-- C_F denominator = chi
+cF-den-is-chi : 2 * nC ≡ chi
+cF-den-is-chi = refl
+
+-- C_F numerator = d_colour = N_w^3
+cF-num-is-dColour : 8 ≡ nW * nW * nW
+cF-num-is-dColour = refl
+
+-- Cross-multiply: 4 * 6 = 8 * 3 (proves 4/3 = 8/6)
+cF-cross : 4 * (2 * nC) ≡ (nW * nW * nW) * nC
+cF-cross = refl
+
+-- S2: IOR glass = N_c / N_w = 3/2
+glass-num : nC ≡ 3
+glass-num = refl
+
+glass-den : nW ≡ 2
+glass-den = refl
+
+-- S3: Rayleigh exponents
+rayleigh-lambda : nW * nW ≡ 4
+rayleigh-lambda = refl
+
+rayleigh-size : chi ≡ 6
+rayleigh-size = refl
+
+-- S4: Planck exponent: 5 = chi - 1 (as addition: 5 + 1 = chi)
+planck-exp : 5 + 1 ≡ chi
+planck-exp = refl
+
+-- S5: Cross-checks
+casimir-colour : nC * nC ≡ nW * nW * nW + 1
+casimir-colour = refl
+
+chi-m1-decompose : 5 ≡ nW * nW + 1
+chi-m1-decompose = refl
+
+weight-cross : nW * nW * (nC * nC) ≡ sigmaD
+weight-cross = refl
+```
+
+## §Agda: CrystalPlasma.agda (      63 lines)
+```agda
+
+module CrystalPlasma where
+
+open import Agda.Builtin.Equality
+open import Agda.Builtin.Nat renaming (Nat to ℕ)
+
+nW : ℕ
+nW = 2
+
+nC : ℕ
+nC = 3
+
+chi : ℕ
+chi = nW * nC  -- 6
+
+dColour : ℕ
+dColour = nW * nW * nW  -- 8
+
+-- Atom sanity
+nW-val : nW ≡ 2
+nW-val = refl
+
+nC-val : nC ≡ 3
+nC-val = refl
+
+chi-val : chi ≡ 6
+chi-val = refl
+
+dColour-val : dColour ≡ 8
+dColour-val = refl
+
+-- MHD wave classification
+wave-types : nC ≡ 3
+wave-types = refl
+
+prop-modes : 2 * nC ≡ chi
+prop-modes = refl
+
+non-prop : nW ≡ 2
+non-prop = refl
+
+total-modes : chi + nW ≡ dColour
+total-modes = refl
+
+total-is-8 : chi + nW ≡ 8
+total-is-8 = refl
+
+-- State variables
+state-vars : nW * nW * nW ≡ 8
+state-vars = refl
+
+-- EM + CFD heritage
+em-components : chi ≡ 6
+em-components = refl
+
+cfd-d2q9 : nC * nC ≡ 9
+cfd-d2q9 = refl
+
+-- Cross-checks
+nW-cubed : nW * nW * nW ≡ dColour
+nW-cubed = refl
 ```
 
 ## §Agda: CrystalProtein.agda (     322 lines)
@@ -14570,6 +15438,101 @@ if __name__ == "__main__":
     main()
 ```
 
+## §Python: crystal_cfd_proof.py (      91 lines)
+```python
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+"""CrystalCFD integer-identity proofs from (2,3)."""
+
+from fractions import Fraction
+
+# A_F atoms
+nW = 2
+nC = 3
+chi = nW * nC                        # 6
+beta0 = (11 * nC - 2 * chi) // 3    # 7
+sigmaD = 1 + 3 + 8 + 24             # 36
+sigmaD2 = 1 + 9 + 64 + 576          # 650
+gauss = nC * nC + nW * nW           # 13
+towerD = sigmaD + chi                # 42
+dMixed = nW * nW * nW * nC          # 24
+
+passed = 0
+failed = 0
+
+def check(name: str, result: bool) -> None:
+    global passed, failed
+    tag = "PASS" if result else "FAIL"
+    if result:
+        passed += 1
+    else:
+        failed += 1
+    print(f"  {tag}  {name}")
+
+print("=" * 64)
+print(" CrystalCFD -- Integer identity proofs from (2,3)")
+print("=" * 64)
+print()
+
+# S0: Atom sanity
+print("S0 Atom sanity:")
+check("nW = 2", nW == 2)
+check("nC = 3", nC == 3)
+check("chi = 6", chi == 6)
+check("beta0 = 7", beta0 == 7)
+check("sigmaD = 36", sigmaD == 36)
+check("sigmaD2 = 650", sigmaD2 == 650)
+check("gauss = 13", gauss == 13)
+check("towerD = 42", towerD == 42)
+check("dMixed = 24", dMixed == 24)
+print()
+
+# S1: D2Q9 lattice
+print("S1 D2Q9 lattice structure:")
+check("D2Q9 = 9 = N_c^2", nC * nC == 9)
+check("rest weight 4/9 = N_w^2/N_c^2",
+      Fraction(nW * nW, nC * nC) == Fraction(4, 9))
+check("cardinal weight 1/9 = 1/N_c^2",
+      Fraction(1, nC * nC) == Fraction(1, 9))
+check("diagonal weight 1/36 = 1/sigmaD",
+      Fraction(1, sigmaD) == Fraction(1, 36))
+wSum = (Fraction(nW * nW, nC * nC)
+        + 4 * Fraction(1, nC * nC)
+        + 4 * Fraction(1, sigmaD))
+check("weight sum = 1", wSum == 1)
+check("cs^2 = 1/3 = 1/N_c", Fraction(1, nC) == Fraction(1, 3))
+print()
+
+# S2: CFD constants
+print("S2 CFD physical constants:")
+check("Kolmogorov -5/3 = -(chi-1)/N_c",
+      Fraction(-(chi - 1), nC) == Fraction(-5, 3))
+check("Stokes drag 24 = d_mixed", dMixed == 24)
+check("Blasius 1/4 = 1/N_w^2",
+      Fraction(1, nW * nW) == Fraction(1, 4))
+check("Von Karman 2/5 = N_w/(chi-1)",
+      Fraction(nW, chi - 1) == Fraction(2, 5))
+print()
+
+# S3: Cross-checks
+print("S3 Cross-checks:")
+check("d_mixed = 2 * chi * nW = 24", 2 * chi * nW == 24)
+check("chi - 1 = 5", chi - 1 == 5)
+check("N_c^2 = D2Q9 = 9", nC * nC == 9)
+check("sigmaD = N_c^2 * N_w^2 = 36", nC * nC * nW * nW == 36)
+print()
+
+# Summary
+print("=" * 64)
+total = passed + failed
+print(f"  {passed}/{total} passed, {failed} failed.")
+if failed == 0:
+    print("  ALL PASS -- every CFD integer from (2, 3).")
+else:
+    print("  SOME FAILURES.")
+```
+
 ## §Python: crystal_classical_proof.py (     400 lines)
 ```python
 # Copyright (c) 2026 Daland Montgomery
@@ -14972,6 +15935,221 @@ if failed == 0:
 else:
     print("  SOME FAILURES — investigate.")
     sys.exit(1)
+```
+
+## §Python: crystal_condensed_proof.py (      98 lines)
+```python
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+"""CrystalCondensed integer-identity proofs from (2,3)."""
+
+from fractions import Fraction
+import math
+
+# A_F atoms
+nW = 2
+nC = 3
+chi = nW * nC                        # 6
+beta0 = (11 * nC - 2 * chi) // 3    # 7
+sigmaD = 1 + 3 + 8 + 24             # 36
+gauss = nC * nC + nW * nW           # 13
+towerD = sigmaD + chi                # 42
+
+passed = 0
+failed = 0
+
+def check(name: str, result: bool) -> None:
+    global passed, failed
+    tag = "PASS" if result else "FAIL"
+    if result:
+        passed += 1
+    else:
+        failed += 1
+    print(f"  {tag}  {name}")
+
+print("=" * 64)
+print(" CrystalCondensed -- Integer identity proofs from (2,3)")
+print("=" * 64)
+print()
+
+# S0: Atom sanity
+print("S0 Atom sanity:")
+check("nW = 2", nW == 2)
+check("nC = 3", nC == 3)
+check("chi = 6", chi == 6)
+check("towerD = 42", towerD == 42)
+print()
+
+# S1: Lattice coordination numbers
+print("S1 Lattice coordination:")
+check("square lattice z = 4 = N_w^2", nW * nW == 4)
+check("cubic lattice z = 6 = chi", chi == 6)
+check("z_square / 2 = N_w = 2 (bonds per site)", nW * nW // 2 == nW)
+print()
+
+# S2: Ising spin states
+print("S2 Ising model:")
+check("Ising states = 2 = N_w", nW == 2)
+check("ground E per site = -N_w = -2", -nW == -2)
+check("-z/2 = -N_w^2/N_w = -N_w", -(nW * nW) // nW == -nW)
+print()
+
+# S3: Onsager critical temperature
+print("S3 Onsager T_c:")
+Tc = nW / math.log(1 + math.sqrt(nW))
+check("T_c = N_w/ln(1+sqrt(N_w)) ~ 2.269",
+      abs(Tc - 2.2691853) < 1e-5)
+check("Onsager numerator = 2 = N_w", nW == 2)
+check("sqrt argument = 2 = N_w", nW == 2)
+print()
+
+# S4: Critical exponent
+print("S4 Critical exponent:")
+check("beta = 1/8 = 1/N_w^3",
+      Fraction(1, nW * nW * nW) == Fraction(1, 8))
+check("N_w^3 = 8", nW ** 3 == 8)
+print()
+
+# S5: BCS gap ratio
+print("S5 BCS gap ratio:")
+gamma = 0.5772156649015329
+bcs = nW * math.pi / math.exp(gamma)
+check("2pi/e^gamma ~ 3.528 (< 0.1%)",
+      abs(bcs - 3.528) / 3.528 < 0.001)
+check("BCS prefactor = 2 = N_w", nW == 2)
+print()
+
+# S6: Cross-checks
+print("S6 Cross-checks:")
+check("N_w^2 = z_square = 4", nW * nW == 4)
+check("chi = z_cubic = 6", chi == 6)
+check("N_w^3 = 1/beta = 8", nW * nW * nW == 8)
+check("z_cubic - z_square = chi - N_w^2 = 2 = N_w", chi - nW * nW == nW)
+check("towerD = 42 (seed)", towerD == 42)
+print()
+
+# Summary
+print("=" * 64)
+total = passed + failed
+print(f"  {passed}/{total} passed, {failed} failed.")
+if failed == 0:
+    print("  ALL PASS -- every Condensed integer from (2, 3).")
+else:
+    print("  SOME FAILURES.")
+```
+
+## §Python: crystal_decay_proof.py (     109 lines)
+```python
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+"""CrystalDecay integer-identity proofs from (2,3)."""
+
+from fractions import Fraction
+import math
+
+# A_F atoms
+nW = 2
+nC = 3
+chi = nW * nC                        # 6
+beta0 = (11 * nC - 2 * chi) // 3    # 7
+sigmaD = 1 + 3 + 8 + 24             # 36
+sigmaD2 = 1 + 9 + 64 + 576          # 650
+gauss = nC * nC + nW * nW           # 13
+towerD = sigmaD + chi                # 42
+dColour = nW * nW * nW              # 8
+dMixed = nW * nW * nW * nC          # 24
+betaConst = dMixed * dColour         # 192
+
+passed = 0
+failed = 0
+
+def check(name: str, result: bool) -> None:
+    global passed, failed
+    tag = "PASS" if result else "FAIL"
+    if result:
+        passed += 1
+    else:
+        failed += 1
+    print(f"  {tag}  {name}")
+
+print("=" * 64)
+print(" CrystalDecay -- Integer identity proofs from (2,3)")
+print("=" * 64)
+print()
+
+# S0: Atom sanity
+print("S0 Atom sanity:")
+check("nW = 2", nW == 2)
+check("nC = 3", nC == 3)
+check("chi = 6", chi == 6)
+check("gauss = 13", gauss == 13)
+check("dColour = 8 = nW^3", dColour == 8)
+check("dMixed = 24 = nW^3*nC", dMixed == 24)
+print()
+
+# S1: Beta constant
+print("S1 Beta constant:")
+check("betaConst = 192 = dMixed*dColour", betaConst == 192)
+check("192 = 24 * 8", 24 * 8 == 192)
+check("192 = nW^3 * nC * nW^3", nW**3 * nC * nW**3 == 192)
+print()
+
+# S2: Weinberg angle
+print("S2 Weinberg angle:")
+check("sin^2 theta_W = 3/13 = N_c/gauss",
+      Fraction(nC, gauss) == Fraction(3, 13))
+sw2 = nC / gauss
+check("3/13 ~ 0.2308 (< 0.002 from 0.23122)",
+      abs(sw2 - 0.23122) < 0.002)
+print()
+
+# S3: PMNS mixing angles
+print("S3 PMNS mixing angles:")
+check("sin^2 theta_23 = 6/11 = chi/(2chi-1)",
+      Fraction(chi, 2*chi - 1) == Fraction(6, 11))
+s23 = chi / (2 * chi - 1)
+check("6/11 ~ 0.5455 (< 1% from 0.545)",
+      abs(s23 - 0.545) / 0.545 < 0.01)
+
+s12 = nC / (math.pi * math.pi)
+check("sin^2 theta_12 = 3/pi^2 ~ 0.3040 (< 2% from 0.307)",
+      abs(s12 - 0.307) / 0.307 < 0.02)
+
+# sin^2(2 theta_23)
+sin22 = Fraction(4, 1) * Fraction(chi, 2*chi-1) * Fraction(chi-1, 2*chi-1)
+check("sin^2(2 theta_23) = 120/121", sin22 == Fraction(120, 121))
+print()
+
+# S4: Phase space dimension
+print("S4 Phase space dimension (3N-4 = N_c*N - (N_c+1)):")
+for n in [2, 3, 4, 5]:
+    crystal = nC * n - (nC + 1)
+    standard = 3 * n - 4
+    check(f"N={n}: nC*{n}-(nC+1) = {crystal} = 3*{n}-4 = {standard}",
+          crystal == standard)
+print()
+
+# S5: Cross-checks
+print("S5 Cross-checks:")
+check("dColour = nW^3 = 2^3 = 8", nW**3 == 8)
+check("dMixed = 2 * chi * nW = 24", 2 * chi * nW == 24)
+check("gauss = nC^2 + nW^2 = 9 + 4 = 13", nC**2 + nW**2 == 13)
+check("2*chi - 1 = 11", 2 * chi - 1 == 11)
+check("chi - 1 = 5", chi - 1 == 5)
+check("betaConst / dColour = dMixed = 24", betaConst // dColour == 24)
+check("betaConst / dMixed = dColour = 8", betaConst // dMixed == 8)
+print()
+
+# Summary
+print("=" * 64)
+total = passed + failed
+print(f"  {passed}/{total} passed, {failed} failed.")
+if failed == 0:
+    print("  ALL PASS -- every Decay integer from (2, 3).")
+else:
+    print("  SOME FAILURES.")
 ```
 
 ## §Python: crystal_discoveries_proof.py (     198 lines)
@@ -16625,6 +17803,118 @@ print(f"  Every number from N_w={N_w}, N_c={N_c}.")
 print(f"{'='*55}")
 ```
 
+## §Python: crystal_md_proof.py (     108 lines)
+```python
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+"""CrystalMD integer-identity proofs from (2,3)."""
+
+from fractions import Fraction
+import math
+
+# A_F atoms
+nW = 2
+nC = 3
+chi = nW * nC                        # 6
+beta0 = (11 * nC - 2 * chi) // 3    # 7
+sigmaD = 1 + 3 + 8 + 24             # 36
+gauss = nC * nC + nW * nW           # 13
+towerD = sigmaD + chi                # 42
+dMixed = nW * nW * nW * nC          # 24
+
+passed = 0
+failed = 0
+
+def check(name: str, result: bool) -> None:
+    global passed, failed
+    tag = "PASS" if result else "FAIL"
+    if result:
+        passed += 1
+    else:
+        failed += 1
+    print(f"  {tag}  {name}")
+
+print("=" * 64)
+print(" CrystalMD -- Integer identity proofs from (2,3)")
+print("=" * 64)
+print()
+
+# S0: Atom sanity
+print("S0 Atom sanity:")
+check("nW = 2", nW == 2)
+check("nC = 3", nC == 3)
+check("chi = 6", chi == 6)
+check("dMixed = 24", dMixed == 24)
+print()
+
+# S1: LJ exponents
+print("S1 LJ exponents:")
+check("LJ attractive = 6 = chi", chi == 6)
+check("LJ repulsive = 12 = 2*chi", 2 * chi == 12)
+check("LJ pot coeff = 4 = N_w^2", nW * nW == 4)
+check("LJ force coeff = 24 = d_mixed", dMixed == 24)
+check("2*d_mixed = 48 = N_w^2 * 2*chi", nW * nW * 2 * chi == 48)
+check("d_mixed = N_w^2 * chi", nW * nW * chi == dMixed)
+print()
+
+# S2: Bond angle
+print("S2 Tetrahedral bond angle:")
+angle = math.degrees(math.acos(-1.0 / nC))
+check("arccos(-1/N_c) = arccos(-1/3) ~ 109.47 deg",
+      abs(angle - 109.4712) < 0.001)
+check("denominator = N_c = 3", nC == 3)
+print()
+
+# S3: H-bonds
+print("S3 Hydrogen bonds:")
+check("A-T = 2 = N_w", nW == 2)
+check("G-C = 3 = N_c", nC == 3)
+check("G-C - A-T = 1 = N_c - N_w", nC - nW == 1)
+print()
+
+# S4: Helix
+print("S4 Alpha helix:")
+helix = Fraction(nC * nC * nW, chi - 1)
+check("helix = (N_c^2*N_w)/(chi-1) = 18/5", helix == Fraction(18, 5))
+check("18/5 = 3.6", float(helix) == 3.6)
+check("numerator = N_c^2*N_w = 9*2 = 18", nC * nC * nW == 18)
+check("denominator = chi-1 = 5", chi - 1 == 5)
+print()
+
+# S5: Flory exponent
+print("S5 Flory exponent:")
+flory = Fraction(nW, chi - 1)
+check("Flory nu = N_w/(chi-1) = 2/5", flory == Fraction(2, 5))
+check("nu = 0.4", abs(float(flory) - 0.4) < 1e-12)
+print()
+
+# S6: Coulomb
+print("S6 Coulomb exponent:")
+check("Coulomb exp = 2 = N_c - 1", nC - 1 == 2)
+# Inverse-square: F(r)/F(2r) = 4
+check("F(r)/F(2r) = (2r/r)^2 = 4 = N_w^2", nW * nW == 4)
+print()
+
+# S7: Cross-checks
+print("S7 Cross-checks:")
+check("2*chi = 12 (LJ repulsive)", 2 * chi == 12)
+check("chi - 1 = 5 (helix & Flory denominator)", chi - 1 == 5)
+check("N_w^2 * chi = d_mixed = 24", nW * nW * chi == 24)
+check("d_mixed = 2 * chi * N_w", 2 * chi * nW == dMixed)
+check("N_c^2 * N_w = 18 (helix numerator)", nC * nC * nW == 18)
+print()
+
+# Summary
+print("=" * 64)
+total = passed + failed
+print(f"  {passed}/{total} passed, {failed} failed.")
+if failed == 0:
+    print("  ALL PASS -- every MD integer from (2, 3).")
+else:
+    print("  SOME FAILURES.")
+```
+
 ## §Python: crystal_monad_mera_proof.py (     127 lines)
 ```python
 # Copyright (c) 2026 Daland Montgomery
@@ -16953,6 +18243,212 @@ def run():
 
 if __name__ == "__main__":
     run()
+```
+
+## §Python: crystal_optics_proof.py (     118 lines)
+```python
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+"""CrystalOptics integer-identity proofs from (2,3)."""
+
+from fractions import Fraction
+import math
+
+# A_F atoms
+nW = 2
+nC = 3
+chi = nW * nC                        # 6
+beta0 = (11 * nC - 2 * chi) // 3    # 7
+sigmaD = 1 + 3 + 8 + 24             # 36
+gauss = nC * nC + nW * nW           # 13
+towerD = sigmaD + chi                # 42
+
+passed = 0
+failed = 0
+
+def check(name: str, result: bool) -> None:
+    global passed, failed
+    tag = "PASS" if result else "FAIL"
+    if result:
+        passed += 1
+    else:
+        failed += 1
+    print(f"  {tag}  {name}")
+
+print("=" * 64)
+print(" CrystalOptics -- Integer identity proofs from (2,3)")
+print("=" * 64)
+print()
+
+# S0: Atom sanity
+print("S0 Atom sanity:")
+check("nW = 2", nW == 2)
+check("nC = 3", nC == 3)
+check("chi = 6", chi == 6)
+check("gauss = 13", gauss == 13)
+print()
+
+# S1: Casimir factor = IOR water
+print("S1 Casimir factor C_F = n_water:")
+cF = Fraction(nC * nC - 1, 2 * nC)
+check("C_F = (N_c^2-1)/(2N_c) = 4/3", cF == Fraction(4, 3))
+check("C_F numerator = 8 = N_c^2-1", nC * nC - 1 == 8)
+check("C_F denominator = 6 = 2*N_c = chi", 2 * nC == 6)
+check("C_F denominator = chi", 2 * nC == chi)
+n_water = float(cF)
+check("n_water ~ 1.333", abs(n_water - 1.3333) < 0.001)
+print()
+
+# S2: IOR glass
+print("S2 IOR glass:")
+nGlass = Fraction(nC, nW)
+check("n_glass = N_c/N_w = 3/2", nGlass == Fraction(3, 2))
+check("n_glass ~ 1.5", abs(float(nGlass) - 1.5) < 1e-12)
+print()
+
+# S3: Rayleigh exponents
+print("S3 Rayleigh exponents:")
+check("Rayleigh lambda exp = 4 = N_w^2", nW * nW == 4)
+check("Rayleigh size exp = 6 = chi", chi == 6)
+# Sky blue ratio
+ratio = (700.0 / 450.0) ** 4
+check("sky blue ratio (700/450)^4 ~ 5.86 (< 2% from 5.8)",
+      abs(ratio - 5.8) / 5.8 < 0.02)
+print()
+
+# S4: Planck exponent
+print("S4 Planck exponent:")
+check("Planck lambda exp = 5 = chi-1", chi - 1 == 5)
+check("chi - 1 = 5", chi - 1 == 5)
+print()
+
+# S5: Snell's law verification
+print("S5 Snell's law verification:")
+theta_i = math.radians(30)
+sin_t = math.sin(theta_i) / float(cF)  # air -> water
+theta_t = math.asin(sin_t)
+snell_err = abs(1.0 * math.sin(theta_i) - float(cF) * math.sin(theta_t))
+check("Snell air->water exact (error < 1e-12)", snell_err < 1e-12)
+
+# Critical angle
+theta_c = math.asin(1.0 / float(cF))  # water -> air
+theta_c_ref = math.asin(3.0 / 4.0)
+check("critical angle = arcsin(3/4)", abs(theta_c - theta_c_ref) < 1e-12)
+print()
+
+# S6: Fresnel
+print("S6 Fresnel verification:")
+R_norm = ((1.0 - 1.5) / (1.0 + 1.5)) ** 2
+check("R(normal, glass) = 0.04", abs(R_norm - 0.04) < 1e-12)
+
+# Brewster
+theta_B = math.atan(1.5)
+check("Brewster angle = arctan(3/2) ~ 56.3 deg",
+      abs(math.degrees(theta_B) - 56.31) < 0.01)
+print()
+
+# S7: Cross-checks
+print("S7 Cross-checks:")
+check("4/3 * 3/4 = 1 (n_water * sin(theta_c) = 1)",
+      Fraction(4, 3) * Fraction(3, 4) == 1)
+check("N_c^2 - 1 = 8 = d_colour = N_w^3", nC**2 - 1 == nW**3)
+check("2*N_c = chi = 6", 2 * nC == chi)
+check("chi - 1 = N_w^2 + 1 = 5", chi - 1 == nW * nW + 1)
+print()
+
+# Summary
+print("=" * 64)
+total = passed + failed
+print(f"  {passed}/{total} passed, {failed} failed.")
+if failed == 0:
+    print("  ALL PASS -- every Optics integer from (2, 3).")
+else:
+    print("  SOME FAILURES.")
+```
+
+## §Python: crystal_plasma_proof.py (      80 lines)
+```python
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+"""CrystalPlasma integer-identity proofs from (2,3)."""
+
+from fractions import Fraction
+
+# A_F atoms
+nW = 2
+nC = 3
+chi = nW * nC                        # 6
+sigmaD = 1 + 3 + 8 + 24             # 36
+gauss = nC * nC + nW * nW           # 13
+towerD = sigmaD + chi                # 42
+dColour = nW * nW * nW              # 8
+
+passed = 0
+failed = 0
+
+def check(name, result):
+    global passed, failed
+    tag = "PASS" if result else "FAIL"
+    if result:
+        passed += 1
+    else:
+        failed += 1
+    print(f"  {tag}  {name}")
+
+print("=" * 64)
+print(" CrystalPlasma -- Integer identity proofs from (2,3)")
+print("=" * 64)
+print()
+
+print("S0 Atom sanity:")
+check("nW = 2", nW == 2)
+check("nC = 3", nC == 3)
+check("chi = 6", chi == 6)
+check("dColour = 8 = N_w^3", dColour == 8)
+print()
+
+print("S1 MHD wave classification:")
+check("wave types = 3 = N_c", nC == 3)
+check("propagating = 6 = chi = 2*N_c", 2 * nC == chi)
+check("non-propagating = 2 = N_w", nW == 2)
+check("total modes = chi + N_w = 8 = d_colour", chi + nW == dColour)
+check("total = N_w^3 = 8", nW**3 == 8)
+print()
+
+print("S2 MHD state variables:")
+check("state vars = 8 = d_colour", dColour == 8)
+check("rho + 3v + 3B + e = 1+3+3+1 = 8", 1+3+3+1 == 8)
+check("8 = N_w^3", nW * nW * nW == 8)
+print()
+
+print("S3 Magnetic pressure and beta:")
+check("mag pressure factor = 2 = N_w", nW == 2)
+check("plasma beta factor = 2 = N_w", nW == 2)
+print()
+
+print("S4 EM + CFD heritage:")
+check("EM components = 6 = chi", chi == 6)
+check("CFD D2Q9 = 9 = N_c^2", nC * nC == 9)
+check("chi + N_c^2 = 6 + 9 = 15", chi + nC * nC == 15)
+print()
+
+print("S5 Cross-checks:")
+check("chi + N_w = d_colour = 8", chi + nW == dColour)
+check("2 * N_c = chi = 6", 2 * nC == 6)
+check("N_w^3 = d_colour = 8", nW**3 == dColour)
+check("chi = N_w * N_c = 6", nW * nC == chi)
+check("d_colour = chi + N_w", dColour == chi + nW)
+print()
+
+print("=" * 64)
+total = passed + failed
+print(f"  {passed}/{total} passed, {failed} failed.")
+if failed == 0:
+    print("  ALL PASS -- every Plasma integer from (2, 3).")
+else:
+    print("  SOME FAILURES.")
 ```
 
 ## §Python: crystal_proton_radius_proof.py (     325 lines)

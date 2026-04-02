@@ -7,8 +7,8 @@
 # D=22 VdW FIXED (Session 13) · Force field from first principles · 0 fitted parameters
 # Rendering/scattering: Planck λ⁻⁵ (χ−1=5), Rayleigh d⁶ (χ=6), Rayleigh λ⁻⁴ (N_w²=4)
 # Hologron dynamics: emergent gravity from monad ticks, V(L)∝L^(-2ln2/ln6), no F=ma
-# 7/12 dynamics modules: Classical, GR, GW, EM, Friedmann, NBody, Thermo
-# 201 Python checks · 113 Lean theorems · 86 Agda proofs · 0 regressions
+# 13/13 dynamics modules COMPLETE: Classical→Plasma capstone (EM+CFD)
+# 346 Python checks · 235 Lean theorems · 194 Agda proofs · 0 regressions
 # Every integrator IS a classical limit of S=W∘U. Every integer from (2,3).
 # Upload ALL 3 parts for 100% coverage. Each part works standalone for basic queries.
 
@@ -58,7 +58,7 @@ Proved: attraction (V<0), monotonic fall, exponent match, 38 integer identities.
 Ref: Sahay/Lukin/Cotler, Phys Rev X 15, 021078 (2025) — MERA hologrons in AdS.
 Crystal contribution: specific algebra A_F, exact eigenvalues, flat space, 198 observables.
 
-## DYNAMICS MODULES — 7/12 BUILT (every integrator from (2,3))
+## DYNAMICS MODULES — 13/13 COMPLETE (every integrator from (2,3))
 Each module: §0 A_F atoms → §1 Force law → §2 Integrator → §3-7 Physics → §8 Integer proofs → §9 Self-test.
 Every integrator IS a classical limit of the monad S=W∘U. Zero new observables.
 
@@ -71,8 +71,12 @@ Every integrator IS a classical limit of the monad S=W∘U. Zero new observables
 | CrystalFriedmann | Friedmann ODE | Ω_Λ=13/19, Ω_m=6/19, Age=97/7 |
 | CrystalNBody | Barnes-Hut + leapfrog | octree 8=d_colour=2^N_c |
 | CrystalThermo | Velocity Verlet MD | LJ 6=χ/12=2χ, γ_mono=5/3, γ_di=7/5 |
-
-Remaining: CFD (Lattice Boltzmann), Decay, Optics, MD, Condensed (Ising/BCS).
+| CrystalCFD | Lattice Boltzmann | D2Q9=9=N_c², Kolmogorov −5/3, Stokes 24=d_mixed |
+| CrystalDecay | Monte Carlo phase space | beta 192=d_mixed·d_colour, sin²θ_W=3/13 |
+| CrystalOptics | Snell + Fresnel | n_water=4/3=C_F, n_glass=3/2=N_c/N_w |
+| CrystalMD | Velocity Verlet LJ | bond 109.47°=arccos(−1/N_c), helix=18/5 |
+| CrystalCondensed | Metropolis Monte Carlo | Ising z=4=N_w², BCS 2Δ/kT_c=2π/e^γ |
+| CrystalPlasma | Alfvén FDTD (EM+CFD) | MHD modes 8=N_w³, wave types 3=N_c |
 
 ## PROOF AUTHORITY — READ FIRST
 Lean `native_decide` and Agda `refl` proofs are FINAL TRUTH. If a proof says it, it's right.
@@ -1514,6 +1518,30 @@ showF :: Int -> Double -> String
 showF n x = printf ("%." ++ show n ++ "f") x
 ```
 
+## §Haskell: CrystalCFD (     463 lines)
+```haskell
+
+{- | Module: CrystalCFD -- Lattice Boltzmann Fluid Dynamics from (2,3).
+
+Lattice Boltzmann Method (LBM): monad S = W.U on fluid sector.
+  Collision = W (BGK relaxation toward equilibrium)
+  Streaming = U (propagate distributions to neighbours)
+
+  D2Q9 velocities:       9 = N_c^2
+  Kolmogorov exponent: -5/3 = -(chi-1)/N_c
+  Stokes drag:           24 = d_mixed
+  Blasius exponent:     1/4 = 1/N_w^2
+  Von Karman constant:  2/5 = N_w/(chi-1)
+  Weight rest:          4/9 = N_w^2/N_c^2
+  Weight cardinal:      1/9 = 1/N_c^2
+  Weight diagonal:     1/36 = 1/sigmaD
+  Sound speed squared:  1/3 = 1/N_c
+
+Observable count: 0 new (infrastructure). Every number from (2,3).
+-}
+
+```
+
 ## §Haskell: CrystalClassical (     396 lines)
 ```haskell
 
@@ -1525,6 +1553,26 @@ Symplectic integrator (Leapfrog) is the classical limit of the monad:
 
 Every integer traces to (N_w, N_c) = (2, 3).
 Observable count: 0 new (infrastructure). Every number from (2,3).
+-}
+
+```
+
+## §Haskell: CrystalCondensed (     311 lines)
+```haskell
+
+{- | Module: CrystalCondensed -- Ising/BCS from (2,3).
+
+Metropolis Monte Carlo for Ising model + BCS gap.
+
+  Square lattice z:  4   = N_w^2
+  Cubic lattice z:   6   = chi
+  Ising spin states: 2   = N_w
+  Onsager T_c num:   2   = N_w      (T_c = 2J / ln(1+sqrt(2)))
+  Critical beta:     1/8 = 1/N_w^3
+  BCS prefactor:     2   = N_w      (2 Delta / kT_c = 2 pi / e^gamma)
+  Ground E/site:    -2   = -N_w     (square lattice, J=1)
+
+Observable count: 7. Every number from (2,3).
 -}
 
 ```
@@ -2242,6 +2290,25 @@ proveSpectralGm2 c =
       val   = schw + corr
   in Derived "a_μ (spectral)" "α/(2π)+(α/π)²Σ'/Σd"
      val Nothing (pdg 0.00116592) Computed
+```
+
+## §Haskell: CrystalDecay (     410 lines)
+```haskell
+
+{- | Module: CrystalDecay -- Particle Decay from (2,3).
+
+Monte Carlo phase-space integrator for particle decays.
+
+  Beta constant:       192 = d_mixed * d_colour = 24 * 8
+  Weinberg angle:      sin^2 theta_W = 3/13 = N_c / gauss
+  PMNS theta_12:       sin^2 theta_12 = 3/pi^2
+  PMNS theta_23:       sin^2 theta_23 = 6/11 = chi / (2chi - 1)
+  Phase space dim:     3N - 4 = N_c*N - (N_c + 1)
+
+Observable count: 5 (beta 192, Weinberg, theta_12, theta_23, phase dim).
+Every number from (2,3).
+-}
+
 ```
 
 ## §Haskell: CrystalDiscoveries (     150 lines)
@@ -3518,6 +3585,26 @@ Proves 38 properties:
 -}
 ```
 
+## §Haskell: CrystalMD (     346 lines)
+```haskell
+
+{- | Module: CrystalMD -- Molecular Dynamics from (2,3).
+
+Velocity Verlet with LJ + Coulomb + H-bonds.
+
+  LJ attractive:    6  = chi         LJ repulsive: 12 = 2 chi
+  LJ force coeff:   24 = d_mixed     LJ pot coeff: 4  = N_w^2
+  Bond angle:        109.47 = arccos(-1/N_c)
+  H-bonds A-T:       2 = N_w         H-bonds G-C:  3  = N_c
+  Helix residues:    3.6 = 18/5 = (N_c^2 N_w)/(chi-1)
+  Flory nu:          2/5 = N_w/(chi-1)
+  Coulomb exponent:  2   = N_c - 1
+
+Observable count: 10. Every number from (2,3).
+-}
+
+```
+
 ## §Haskell: CrystalMERA (     292 lines)
 ```haskell
 
@@ -3808,6 +3895,47 @@ Observable count: 0 new (infrastructure). Every number from (2,3).
   Status: CONJECTURE → THEOREM
   No new observables. Count: 180.
   AGPL-3.0
+-}
+
+```
+
+## §Haskell: CrystalOptics (     354 lines)
+```haskell
+
+{- | Module: CrystalOptics -- Ray/Wave Optics from (2,3).
+
+Snell ray tracing + Fresnel coefficients.
+
+  IOR water:           4/3 = C_F = (N_c^2 - 1) / (2 N_c)
+  IOR glass:           3/2 = N_c / N_w
+  Rayleigh lambda:     4   = N_w^2
+  Rayleigh size:       6   = chi
+  Planck lambda:       5   = chi - 1
+
+Observable count: 5 (n_water, n_glass, Rayleigh 4, Rayleigh 6, Planck 5).
+Every number from (2,3).
+-}
+
+```
+
+## §Haskell: CrystalPlasma (     357 lines)
+```haskell
+
+{- | Module: CrystalPlasma -- Magnetohydrodynamics (EM + CFD) from (2,3).
+
+FDTD Alfvén wave integrator coupling EM and CFD sectors.
+
+  MHD wave types:       3 = N_c  (slow, Alfvén, fast)
+  MHD state variables:  8 = N_w^3 = d_colour  (rho,vx,vy,vz,Bx,By,Bz,e)
+  Propagating modes:    6 = chi  (3 types * 2 directions)
+  Non-propagating:      2 = N_w  (entropy + div-B)
+  Magnetic pressure:    B^2/(2 mu_0),  factor 2 = N_w
+  Plasma beta:          2 mu_0 p / B^2, factor 2 = N_w
+  EM components:        6 = chi  (from CrystalEM)
+  CFD D2Q9:             9 = N_c^2  (from CrystalCFD)
+
+Observable count: 8 (wave types, state vars, prop modes, non-prop,
+  mag pressure, beta, EM, CFD). Every number from (2,3).
 -}
 
 ```

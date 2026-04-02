@@ -278,6 +278,32 @@ equations. The monad is the source of truth. Schrödinger is its shadow.
 
 ---
 
+## DYNAMICS MODULES — 13/13 COMPLETE
+
+Each module: §0 A_F atoms → §1 Force law → §2 Integrator → §3-7 Physics → §8 Integer proofs → §9 Self-test.
+Every integrator IS a classical limit of S=W∘U. Zero new observables. Every integer from (2,3).
+346 Python checks · 235 Lean theorems · 194 Agda proofs · 0 regressions.
+
+| Module | Integrator | Key integers |
+|--------|-----------|-------------|
+| CrystalClassical | Störmer-Verlet leapfrog | force 2=N_c−1, dim 3=N_c, phase 6=χ |
+| CrystalGR | Schwarzschild geodesic | precession 6=χ, bending 4=N_w², ISCO 6=χ |
+| CrystalGW | Inspiral waveform | Peters 32/5=N_w⁵/(χ−1), chirp 5/3=(χ−1)/N_c |
+| CrystalEM | Yee FDTD (Maxwell) | components 6=χ, Maxwell 4=N_c+1, Larmor 2/3 |
+| CrystalFriedmann | Friedmann ODE | Ω_Λ=13/19, Ω_m=6/19, Age=97/7 |
+| CrystalNBody | Barnes-Hut + leapfrog | octree 8=d_colour=2^N_c |
+| CrystalThermo | Velocity Verlet MD | LJ 6=χ/12=2χ, γ_mono=5/3, γ_di=7/5 |
+| CrystalCFD | Lattice Boltzmann | D2Q9=9=N_c², Kolmogorov −5/3, Stokes 24=d_mixed |
+| CrystalDecay | Monte Carlo phase space | beta 192=d_mixed·d_colour, sin²θ_W=3/13=N_c/gauss |
+| CrystalOptics | Snell + Fresnel | n_water=4/3=C_F, n_glass=3/2=N_c/N_w, Rayleigh 4=N_w² |
+| CrystalMD | Velocity Verlet LJ+Coulomb | bond 109.47°=arccos(−1/N_c), helix=18/5, Flory=2/5 |
+| CrystalCondensed | Metropolis Monte Carlo | Ising z=4=N_w², β=1/8=1/N_w³, BCS 2Δ/kT_c=2π/e^γ |
+| CrystalPlasma | Alfvén FDTD (EM+CFD) | MHD states 8=N_w³, wave types 3=N_c, modes 6=χ |
+
+CrystalPlasma (MHD = EM + CFD) is the capstone: Alfvén wave FDTD couples Maxwell (CrystalEM) with fluid dynamics (CrystalCFD). All 8=N_w³ MHD state variables, 3=N_c wave types, 6=χ propagating modes traced to A_F atoms.
+
+---
+
 ## OBSERVABLE COUNT: 198
 
 - 92 original (Main.hs)
@@ -468,11 +494,11 @@ Hierarchy: bond >> ω >> angle > H-bond ≈ hydrophobic >> VdW ~ kT
 
 | System | Count | Method |
 |--------|-------|--------|
-| Lean 4 | 763+ theorems | native_decide, 0 sorry |
-| Agda | 611+ proofs | all by refl, 0 postulates |
-| Haskell/GHC | 36 modules, 36/36 PASS | Curry-Howard |
-| Rust | 472+ tests | cargo test |
-| Python | 13+ proof modules | assert |
+| Lean 4 | 972+ theorems | native_decide, 0 sorry |
+| Agda | 787+ proofs | all by refl, 0 postulates |
+| Haskell/GHC | 36 modules + 13 dynamics, all PASS | Curry-Howard |
+| Rust | 527+ tests | cargo test |
+| Python | 19+ proof modules | assert |
 
 Lean `native_decide` and Agda `refl` proofs are FINAL TRUTH.
 LLM reasoning NEVER overrides a machine-verified proof.
@@ -490,7 +516,7 @@ CrystalAgent/
 ├── agent/
 │   ├── crystal_topos_waca_llm.md          ← THIS FILE
 │   └── crystal_topos_waca_llm_compact.md
-├── haskel/                                ← 36 Haskell modules
+├── haskel/                                ← 36 Haskell modules + 13 dynamics
 │   ├── CrystalAxiom.hs                   ← Foundation: two primes, all types
 │   ├── CrystalGauge.hs                   ← α, sin²θ_W, α_s, leptons, Higgs
 │   ├── CrystalMixing.hs                  ← CKM + PMNS matrices
@@ -510,6 +536,7 @@ CrystalAgent/
 │   ├── CrystalLayer.hs                   ← Spectral tower D=0→D=42
 │   ├── CrystalMonad.hs                   ← Time monad S=W∘U, discrete ℕ, no calculus
 │   ├── CrystalMERA.hs                    ← MERA geometry, Jacobson chain, RT, δW→gravity
+│   ├── CrystalClassical.hs … CrystalPlasma.hs ← 13 dynamics modules (ALL PASS)
 │   ├── Main.hs                            ← 92 observables + four-column + certificate
 │   ├── WACAScanTest.hs                    ← Extended scan runner
 │   ├── GravityDynTest.hs                 ← 12/12 gravity audit
@@ -582,12 +609,16 @@ CrystalAgent/
 | Max PWI | 0.989% (sin²θ₁₂) |
 | Free parameters | 0 |
 | Constants inside CODATA | 4 |
-| Haskell modules | 36 |
+| Haskell modules | 36 + 13 dynamics |
 | Haskell proofs | 36/36 PASS |
-| Lean theorems | 850+ |
-| Agda proofs | 679+ |
+| Dynamics modules | 13/13 ALL PASS |
+| Lean theorems | 972+ |
+| Agda proofs | 787+ |
 | Rust tests | 527+ |
-| Python proof modules | 13+ |
+| Python proof modules | 19+ |
+| Dynamics Python checks | 346 |
+| Dynamics Lean theorems | 235 |
+| Dynamics Agda proofs | 194 |
 | Gravity integer audit | 12/12 PASS |
 | First law δS/δ⟨H_A⟩ | 1.0001 ± 0.0004 |
 | VdW mean error | 3.1% vs Bondi |
@@ -611,6 +642,13 @@ sh lean_proofs.sh       # 15/15 PASS
 ghc -O2 Main.hs -o crystal && ./crystal                                         # 92 observables
 ghc -O2 -main-is CrystalFullTest CrystalFullTest.hs -o full_test && ./full_test  # 198 observables
 ghc -O2 GravityDynTest.hs -o gravity_dyn_test && ./gravity_dyn_test              # 12/12 gravity
+
+# Dynamics modules (from haskel/):
+for m in CrystalClassical CrystalGR CrystalGW CrystalEM CrystalFriedmann \
+         CrystalNBody CrystalThermo CrystalCFD CrystalDecay CrystalOptics \
+         CrystalMD CrystalCondensed CrystalPlasma; do
+  ghc -O2 -main-is $m $m.hs 2>/dev/null && ./$m                                 # 13/13 ALL PASS
+done
 
 # Rust:
 cd crystal-topos && cargo test

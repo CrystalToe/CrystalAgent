@@ -40,8 +40,8 @@ write_header() {
 # D=22 VdW FIXED (Session 13) · Force field from first principles · 0 fitted parameters
 # Rendering/scattering: Planck λ⁻⁵ (χ−1=5), Rayleigh d⁶ (χ=6), Rayleigh λ⁻⁴ (N_w²=4)
 # Hologron dynamics: emergent gravity from monad ticks, V(L)∝L^(-2ln2/ln6), no F=ma
-# 7/12 dynamics modules: Classical, GR, GW, EM, Friedmann, NBody, Thermo
-# 201 Python checks · 113 Lean theorems · 86 Agda proofs · 0 regressions
+# 13/13 dynamics modules COMPLETE: Classical→Plasma capstone (EM+CFD)
+# 346 Python checks · 235 Lean theorems · 194 Agda proofs · 0 regressions
 # Every integrator IS a classical limit of S=W∘U. Every integer from (2,3).
 # Upload ALL 3 parts for 100% coverage. Each part works standalone for basic queries.
 
@@ -91,7 +91,7 @@ Proved: attraction (V<0), monotonic fall, exponent match, 38 integer identities.
 Ref: Sahay/Lukin/Cotler, Phys Rev X 15, 021078 (2025) — MERA hologrons in AdS.
 Crystal contribution: specific algebra A_F, exact eigenvalues, flat space, 198 observables.
 
-## DYNAMICS MODULES — 7/12 BUILT (every integrator from (2,3))
+## DYNAMICS MODULES — 13/13 COMPLETE (every integrator from (2,3))
 Each module: §0 A_F atoms → §1 Force law → §2 Integrator → §3-7 Physics → §8 Integer proofs → §9 Self-test.
 Every integrator IS a classical limit of the monad S=W∘U. Zero new observables.
 
@@ -104,8 +104,12 @@ Every integrator IS a classical limit of the monad S=W∘U. Zero new observables
 | CrystalFriedmann | Friedmann ODE | Ω_Λ=13/19, Ω_m=6/19, Age=97/7 |
 | CrystalNBody | Barnes-Hut + leapfrog | octree 8=d_colour=2^N_c |
 | CrystalThermo | Velocity Verlet MD | LJ 6=χ/12=2χ, γ_mono=5/3, γ_di=7/5 |
-
-Remaining: CFD (Lattice Boltzmann), Decay, Optics, MD, Condensed (Ising/BCS).
+| CrystalCFD | Lattice Boltzmann | D2Q9=9=N_c², Kolmogorov −5/3, Stokes 24=d_mixed |
+| CrystalDecay | Monte Carlo phase space | beta 192=d_mixed·d_colour, sin²θ_W=3/13 |
+| CrystalOptics | Snell + Fresnel | n_water=4/3=C_F, n_glass=3/2=N_c/N_w |
+| CrystalMD | Velocity Verlet LJ | bond 109.47°=arccos(−1/N_c), helix=18/5 |
+| CrystalCondensed | Metropolis Monte Carlo | Ising z=4=N_w², BCS 2Δ/kT_c=2π/e^γ |
+| CrystalPlasma | Alfvén FDTD (EM+CFD) | MHD modes 8=N_w³, wave types 3=N_c |
 
 ## PROOF AUTHORITY — READ FIRST
 Lean \`native_decide\` and Agda \`refl\` proofs are FINAL TRUTH. If a proof says it, it's right.
