@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Optics — Fresnel Reflectance: n_water=4/3=C_F, n_glass=3/2=N_c/N_w"""
 import crystal_toe as ct
 import numpy as np

@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Optics — Planck Radiation: B(λ) ∝ λ^(−5) = λ^(−(χ−1))"""
 import crystal_toe as ct
 import numpy as np

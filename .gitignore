@@ -6,7 +6,7 @@ INTERNAL_README.md
 sync_check.sh
 
 # Rust
-crystal-topos/target/
+../CrystalToe/crystal-topos/target/
 crystal-toe/target/
 
 # Python
@@ -20,8 +20,8 @@ __pycache__/
 
 # Lean
 haskel/LeanCert/.lake/
-crystal-topos/*
-
+../CrystalToe/crystal-topos/*
+../CrystalToe/crystal-topos
 
 # OS
 .DS_Store

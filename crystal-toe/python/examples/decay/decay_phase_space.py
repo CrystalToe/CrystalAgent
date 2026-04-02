@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Decay — Phase Space Dimensions: 3N−4 = N_c·N−(N_c+1)"""
 import crystal_toe as ct
 import numpy as np

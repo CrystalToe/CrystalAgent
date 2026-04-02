@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Condensed — Phase Transition: M(T) with β=1/8=1/N_w³"""
 import crystal_toe as ct
 import numpy as np

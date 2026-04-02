@@ -2278,664 +2278,759 @@ HASKELL CrystalWACAScan.hs
 HASKELL GravityDynTest.hs
 HASKELL Main.hs
 HASKELL WACAScanTest.hs
-# RUST TESTS
-RUST crystal_alpha_proton_tests.rs test_chi
-RUST crystal_alpha_proton_tests.rs test_beta0
-RUST crystal_alpha_proton_tests.rs test_sigma_d
-RUST crystal_alpha_proton_tests.rs test_sigma_d2
-RUST crystal_alpha_proton_tests.rs test_gauss
-RUST crystal_alpha_proton_tests.rs test_tower_d
-RUST crystal_alpha_proton_tests.rs test_sector_dims
-RUST crystal_alpha_proton_tests.rs test_alpha_inv_sindy
-RUST crystal_alpha_proton_tests.rs test_alpha_inv_hmc_base
-RUST crystal_alpha_proton_tests.rs test_alpha_inv_hmc_refined
-RUST crystal_alpha_proton_tests.rs test_mp_me_sindy
-RUST crystal_alpha_proton_tests.rs test_mp_me_hmc
-RUST crystal_alpha_proton_tests.rs test_cross_domain_gauss_shared
-RUST crystal_alpha_proton_tests.rs test_cross_domain_d3_shared
-RUST crystal_alpha_proton_tests.rs test_mp_me_rational_part
-RUST crystal_alpha_proton_tests.rs test_alpha_rational_numerator
-RUST crystal_alpha_proton_tests.rs test_alpha_corr_denom
-RUST crystal_alpha_proton_tests.rs test_mp_corr_denom
-RUST crystal_alpha_proton_tests.rs test_corr_denom_ratio
-RUST crystal_alpha_proton_tests.rs test_shared_core
-RUST crystal_alpha_proton_tests.rs test_alpha_inv_corrected
-RUST crystal_alpha_proton_tests.rs test_mp_me_corrected
-RUST crystal_alpha_proton_tests.rs test_cross_domain_corrections
-RUST crystal_alpha_proton_tests.rs test_sin2_corr_denom
-RUST crystal_alpha_proton_tests.rs test_sin2tw_base
-RUST crystal_alpha_proton_tests.rs test_sin2tw_corrected
-RUST crystal_alpha_proton_tests.rs test_all_three_share_a4
-RUST crystal_alpha_proton_tests.rs test_gauge_sector_split
-RUST crystal_discovery_tests.rs cosmo_dark_energy
-RUST crystal_discovery_tests.rs cosmo_cdm
-RUST crystal_discovery_tests.rs cosmo_baryons
-RUST crystal_discovery_tests.rs cosmo_partition_exhaustive
-RUST crystal_discovery_tests.rs cosmo_partition_sum
-RUST crystal_discovery_tests.rs cosmo_omega_b_simplified
-RUST crystal_discovery_tests.rs cosmo_dark_baryon_ratio
-RUST crystal_discovery_tests.rs magic_2
-RUST crystal_discovery_tests.rs magic_8
-RUST crystal_discovery_tests.rs magic_20
-RUST crystal_discovery_tests.rs magic_28
-RUST crystal_discovery_tests.rs magic_50
-RUST crystal_discovery_tests.rs magic_126
-RUST crystal_discovery_tests.rs magic_82
-RUST crystal_discovery_tests.rs magic_82_alt
-RUST crystal_discovery_tests.rs magic_82_identity
-RUST crystal_discovery_tests.rs magic_50_alt
-RUST crystal_discovery_tests.rs magic_28_alt_chi_sq
-RUST crystal_discovery_tests.rs magic_28_alt_product
-RUST crystal_discovery_tests.rs magic_126_alt
-RUST crystal_discovery_tests.rs cabibbo_angle
-RUST crystal_discovery_tests.rs vus_rational
-RUST crystal_discovery_tests.rs vcb_denominator
-RUST crystal_discovery_tests.rs vub_denominator
-RUST crystal_discovery_tests.rs ckm_hierarchy_vus_gt_vcb
-RUST crystal_discovery_tests.rs ckm_hierarchy_vcb_gt_vub
-RUST crystal_discovery_tests.rs bell_bound_base
-RUST crystal_discovery_tests.rs steane_code
-RUST crystal_discovery_tests.rs eddington_factor
-RUST crystal_discovery_tests.rs nuclear_saturation
-RUST crystal_discovery_tests.rs gauss_decomposition
-RUST crystal_discovery_tests.rs sigma_d_eq_chi_sq
-RUST crystal_discovery_tests.rs tower_decomposition
-RUST crystal_fundamentals_tests.rs neff_denom
-RUST crystal_fundamentals_tests.rs ob_om_den
-RUST crystal_fundamentals_tests.rs sw0_corr_den
-RUST crystal_fundamentals_tests.rs yp_corr_den
-RUST crystal_fundamentals_tests.rs moment_num
-RUST crystal_fundamentals_tests.rs moment_den
-RUST crystal_fundamentals_tests.rs mcms_base
-RUST crystal_fundamentals_tests.rs mcms_base_alt
-RUST crystal_fundamentals_tests.rs mcms_base_alt2
-RUST crystal_fundamentals_tests.rs mcms_corr_num
-RUST crystal_fundamentals_tests.rs mcms_corr_den
-RUST crystal_fundamentals_tests.rs mcms_den_alt
-RUST crystal_fundamentals_tests.rs mcms_product
-RUST crystal_fundamentals_tests.rs mbtau_corr
-RUST crystal_fundamentals_tests.rs yt_base_den
-RUST crystal_fundamentals_tests.rs rpi_num
-RUST crystal_fundamentals_tests.rs rpi_den
-RUST crystal_fundamentals_tests.rs dalpha_den
-RUST crystal_fundamentals_tests.rs sigma_43
-RUST crystal_fundamentals_tests.rs sigma_same_43
-RUST crystal_fundamentals_tests.rs dm32_nu3_num
-RUST crystal_fundamentals_tests.rs dm32_nu3_den
-RUST crystal_fundamentals_tests.rs split_chi4
-RUST crystal_fundamentals_tests.rs split_chi4m1
-RUST crystal_fundamentals_tests.rs grav_den
-RUST crystal_fundamentals_tests.rs grav_mp_num
-RUST crystal_fundamentals_tests.rs grav_mp_den
-RUST crystal_fundamentals_tests.rs fermat_257
-RUST crystal_fundamentals_tests.rs partition_19
-RUST crystal_fundamentals_tests.rs partition_20
-RUST crystal_fundamentals_tests.rs partition_50
-RUST crystal_fundamentals_tests.rs test_neff
-RUST crystal_fundamentals_tests.rs test_ob_om
-RUST crystal_fundamentals_tests.rs test_sw0
-RUST crystal_fundamentals_tests.rs test_yp
-RUST crystal_fundamentals_tests.rs test_moment_ratio
-RUST crystal_fundamentals_tests.rs test_mc_ms
-RUST crystal_fundamentals_tests.rs test_mb_mtau
-RUST crystal_fundamentals_tests.rs test_top_yukawa
-RUST crystal_fundamentals_tests.rs test_pion_radius_sq
-RUST crystal_fundamentals_tests.rs test_delta_alpha_had
-RUST crystal_fundamentals_tests.rs test_sigma_pin
-RUST crystal_fundamentals_tests.rs test_dm21_direct
-RUST crystal_fundamentals_tests.rs test_dm32
-RUST crystal_fundamentals_tests.rs test_grav_coupling
-RUST crystal_hierarchy_tests.rs test_shared_core
-RUST crystal_hierarchy_tests.rs test_level_a0
-RUST crystal_hierarchy_tests.rs test_level_a4
-RUST crystal_hierarchy_tests.rs test_level_ratio_numerator
-RUST crystal_hierarchy_tests.rs test_upsilon_dual_route
-RUST crystal_hierarchy_tests.rs test_upsilon_corr_value
-RUST crystal_hierarchy_tests.rs test_upsilon_corr_is_eighth
-RUST crystal_hierarchy_tests.rs test_dmeson_dual_route
-RUST crystal_hierarchy_tests.rs test_dmeson_split
-RUST crystal_hierarchy_tests.rs test_dmeson_dual_route_b
-RUST crystal_hierarchy_tests.rs test_rho_dual_route
-RUST crystal_hierarchy_tests.rs test_rho_corr_value
-RUST crystal_hierarchy_tests.rs test_phi_dual_route
-RUST crystal_hierarchy_tests.rs test_phi_d4_minus_d3
-RUST crystal_hierarchy_tests.rs test_phi_d3_nc_eq_d4
-RUST crystal_hierarchy_tests.rs test_phi_corr_value
-RUST crystal_hierarchy_tests.rs test_omega_dm_dual_route
-RUST crystal_hierarchy_tests.rs test_omega_dm_identity
-RUST crystal_hierarchy_tests.rs test_omega_dm_corr_value
-RUST crystal_hierarchy_tests.rs test_rp_dual_route
-RUST crystal_hierarchy_tests.rs test_rp_corr_value
-RUST crystal_hierarchy_tests.rs test_chi_is_nw_nc
-RUST crystal_hierarchy_tests.rs test_all_corrections_negative
-RUST crystal_hierarchy_tests.rs test_all_corrections_perturbative
-RUST crystal_hierarchy_tests.rs test_upsilon_corrected
-RUST crystal_hierarchy_tests.rs test_dmeson_corrected
-RUST crystal_hierarchy_tests.rs test_rho_corrected
-RUST crystal_hierarchy_tests.rs test_phi_corrected
-RUST crystal_hierarchy_tests.rs test_omega_dm_corrected
-RUST crystal_hierarchy_tests.rs test_upsilon_multiplier
-RUST crystal_hierarchy_tests.rs test_dmeson_multiplier
-RUST crystal_hierarchy_tests.rs test_rho_multiplier
-RUST crystal_hierarchy_tests.rs test_phi_multiplier
-RUST crystal_hierarchy_tests.rs test_all_denoms_factor_from_af
-RUST crystal_hierarchy_tests.rs test_sin13_dual_route
-RUST crystal_hierarchy_tests.rs test_sin13_corr_value
-RUST crystal_hierarchy_tests.rs test_sin13_identity
-RUST crystal_hierarchy_tests.rs test_sin13_clean_form
-RUST crystal_hierarchy_tests.rs test_sin13_corrected
-RUST crystal_hierarchy_tests.rs test_sin13_multiplier
-RUST crystal_hierarchy_tests.rs test_sin13_shares_2chi_minus_1
-RUST crystal_hierarchy_tests.rs test_omega_meson_inherits_rho
-RUST crystal_hierarchy_tests.rs test_omega_meson_corrected
-RUST crystal_hierarchy_tests.rs test_eta_dual_route
-RUST crystal_hierarchy_tests.rs test_eta_identity
-RUST crystal_hierarchy_tests.rs test_eta_corrected
-RUST crystal_hierarchy_tests.rs test_mz_correction_denominator
-RUST crystal_hierarchy_tests.rs test_mz_corrected_multiplier
-RUST crystal_hierarchy_tests.rs test_mz_corrected
-RUST crystal_hierarchy_tests.rs test_decuplet_dual_route
-RUST crystal_hierarchy_tests.rs test_decuplet_corrected
-RUST crystal_hierarchy_tests.rs test_muon_dual_route
-RUST crystal_hierarchy_tests.rs test_muon_identity
-RUST crystal_hierarchy_tests.rs test_muon_corrected
-RUST crystal_hierarchy_tests.rs test_all_five_loose_closed
-RUST crystal_layer_tests.rs layer0_algebra
-RUST crystal_layer_tests.rs layer0_type_safety
-RUST crystal_layer_tests.rs layer5_alpha_value
-RUST crystal_layer_tests.rs layer5_alpha_reciprocal
-RUST crystal_layer_tests.rs layer10_proton
-RUST crystal_layer_tests.rs layer18_bohr_radius
-RUST crystal_layer_tests.rs layer20_sp3_exact
-RUST crystal_layer_tests.rs layer25_strand_anti_spacing
-RUST crystal_layer_tests.rs layer25_strand_par_spacing
-RUST crystal_layer_tests.rs layer25_strand_ratio
-RUST crystal_layer_tests.rs layer28_ca_ca_distance
-RUST crystal_layer_tests.rs layer32_helix_exact
-RUST crystal_layer_tests.rs layer32_helix_rise_exact
-RUST crystal_layer_tests.rs layer32_pitch
-RUST crystal_layer_tests.rs layer33_flory
-RUST crystal_layer_tests.rs layer42_energy_scale
-RUST crystal_layer_tests.rs cascade_integer_structure
-RUST crystal_mandelbrot_tests.rs period2_eq_nw
-RUST crystal_mandelbrot_tests.rs period3_eq_nc
-RUST crystal_mandelbrot_tests.rs period6_eq_chi
-RUST crystal_mandelbrot_tests.rs period6_is_lcm
-RUST crystal_mandelbrot_tests.rs depth_43
-RUST crystal_mandelbrot_tests.rs hausdorff_eq_nw
-RUST crystal_mandelbrot_tests.rs cardioid_denom
-RUST crystal_mandelbrot_tests.rs period2_area_16
-RUST crystal_mandelbrot_tests.rs area_16_einstein
-RUST crystal_mandelbrot_tests.rs beta0_eq_7
-RUST crystal_mandelbrot_tests.rs staircase_steps
-RUST crystal_mandelbrot_tests.rs alpha_inv_planck
-RUST crystal_mandelbrot_tests.rs alpha_inv_world
-RUST crystal_mandelbrot_tests.rs step_size_pi
-RUST crystal_mandelbrot_tests.rs monotone_pi
-RUST crystal_mandelbrot_tests.rs cardioid_area
-RUST crystal_mandelbrot_tests.rs period2_area
-RUST crystal_mandelbrot_tests.rs area_order
-RUST crystal_mandelbrot_tests.rs coupling_order
-RUST crystal_mandelbrot_tests.rs area_eq_coupling
-RUST crystal_mandelbrot_tests.rs ext_denom_2_nc
-RUST crystal_mandelbrot_tests.rs ext_denom_3_b0
-RUST crystal_mandelbrot_tests.rs ext_denom_6_fac
-RUST crystal_mandelbrot_tests.rs ext_pattern
-RUST crystal_mandelbrot_tests.rs feig_num
-RUST crystal_mandelbrot_tests.rs feig_den
-RUST crystal_mandelbrot_tests.rs feig_reduced
-RUST crystal_mandelbrot_tests.rs feig_delta
-RUST crystal_mandelbrot_tests.rs divisors_chi
-RUST crystal_mandelbrot_tests.rs gauge_eq_divisors
-RUST crystal_mandelbrot_tests.rs divisors_af
-RUST crystal_mandelbrot_tests.rs mersenne2_nc
-RUST crystal_mandelbrot_tests.rs mersenne3_b0
-RUST crystal_mandelbrot_tests.rs mersenne6_nc2b0
-RUST crystal_mandelbrot_tests.rs functor_unit
-RUST crystal_mandelbrot_tests.rs functor_tau_23
-RUST crystal_mandelbrot_tests.rs functor_tau_22
-RUST crystal_mandelbrot_tests.rs functor_tau_33
-RUST crystal_noether_tests.rs noether_u1_generators
-RUST crystal_noether_tests.rs noether_su2_generators
-RUST crystal_noether_tests.rs noether_su3_generators
-RUST crystal_noether_tests.rs noether_total_gauge
-RUST crystal_noether_tests.rs noether_lorentz_eq_chi
-RUST crystal_noether_tests.rs noether_poincare_eq_solvable
-RUST crystal_noether_tests.rs noether_total_conservation
-RUST crystal_noether_tests.rs noether_overdetermined
-RUST crystal_noether_tests.rs noether_carnot
-RUST crystal_noether_tests.rs noether_stefan_boltzmann
-RUST crystal_noether_tests.rs noether_lattice_lock
-RUST crystal_noether_tests.rs noether_kolmogorov
-RUST crystal_noether_tests.rs noether_tau_n
-RUST crystal_noether_tests.rs noether_von_karman
-RUST crystal_noether_tests.rs noether_rank_drop
-RUST crystal_noether_tests.rs noether_casimir
-RUST crystal_noether_tests.rs noether_codons
-RUST crystal_noether_tests.rs noether_amino
-RUST crystal_noether_tests.rs noether_phase_decomp
-RUST crystal_noether_tests.rs noether_algebra_tower
-RUST crystal_noether_tests.rs noether_sigma_d2
-RUST crystal_protein_tests.rs int_nc
-RUST crystal_protein_tests.rs int_nw
-RUST crystal_protein_tests.rs int_d1
-RUST crystal_protein_tests.rs int_d2
-RUST crystal_protein_tests.rs int_d3
-RUST crystal_protein_tests.rs int_d4
-RUST crystal_protein_tests.rs int_chi
-RUST crystal_protein_tests.rs int_beta0
-RUST crystal_protein_tests.rs int_sigma_d
-RUST crystal_protein_tests.rs int_sigma_d2
-RUST crystal_protein_tests.rs int_gauss
-RUST crystal_protein_tests.rs int_dmax
-RUST crystal_protein_tests.rs int_f3
-RUST crystal_protein_tests.rs int_core
-RUST crystal_protein_tests.rs int_eps_r
-RUST crystal_protein_tests.rs int_43
-RUST crystal_protein_tests.rs int_208
-RUST crystal_protein_tests.rs int_helix
-RUST crystal_protein_tests.rs int_flory
-RUST crystal_protein_tests.rs int_cosmo
-RUST crystal_protein_tests.rs d5_alpha_inv
-RUST crystal_protein_tests.rs d5_alpha_mono
-RUST crystal_protein_tests.rs d5_alpha_span
-RUST crystal_protein_tests.rs d5_alpha_delta
-RUST crystal_protein_tests.rs d5_43_distinct
-RUST crystal_protein_tests.rs d20_sp3
-RUST crystal_protein_tests.rs d21_sp2
-RUST crystal_protein_tests.rs d22_vdw_h
-RUST crystal_protein_tests.rs d22_vdw_c
-RUST crystal_protein_tests.rs d22_vdw_n
-RUST crystal_protein_tests.rs d22_vdw_o
-RUST crystal_protein_tests.rs d22_vdw_s
-RUST crystal_protein_tests.rs d25_hbond
-RUST crystal_protein_tests.rs d25_strand
-RUST crystal_protein_tests.rs d25_para
-RUST crystal_protein_tests.rs d28_caca
-RUST crystal_protein_tests.rs d24_water
-RUST crystal_protein_tests.rs imp_vdw_78
-RUST crystal_protein_tests.rs imp_hbond_1112
-RUST crystal_protein_tests.rs imp_angle_151
-RUST crystal_protein_tests.rs imp_burial_val
-RUST crystal_protein_tests.rs imp_vdist_val
-RUST crystal_protein_tests.rs imp_hbdist_val
-RUST crystal_protein_tests.rs imp_ordering
-RUST crystal_protein_tests.rs e_vdw_impl
-RUST crystal_protein_tests.rs e_hbond_impl
-RUST crystal_protein_tests.rs k_angle_impl
-RUST crystal_protein_tests.rs e_burial_impl
-RUST crystal_protein_tests.rs energy_order
-RUST crystal_protein_tests.rs e_vdw_positive
-RUST crystal_protein_tests.rs e_hb_positive
-RUST crystal_protein_tests.rs e_bur_positive
-RUST crystal_protein_tests.rs cosmo_lambda
-RUST crystal_protein_tests.rs cosmo_cdm
-RUST crystal_protein_tests.rs cosmo_b
-RUST crystal_protein_tests.rs cosmo_total
-RUST crystal_protein_tests.rs d32_helix
-RUST crystal_protein_tests.rs d33_flory
-RUST crystal_protein_tests.rs d42_tau
-RUST crystal_protein_tests.rs d29_rama
-RUST crystal_proton_radius_tests.rs dual_route_identity
-RUST crystal_proton_radius_tests.rs d4_squared_is_576
-RUST crystal_proton_radius_tests.rs two_d3_sigma_d_is_576
-RUST crystal_proton_radius_tests.rs cf_nc_is_four
-RUST crystal_proton_radius_tests.rs nc_sq_minus_one_is_eight
-RUST crystal_proton_radius_tests.rs proton_radius_base_inside_codata
-RUST crystal_proton_radius_tests.rs proton_radius_corrected_inside_muonic
-RUST crystal_proton_radius_tests.rs proton_radius_corrected_inside_codata
-RUST crystal_proton_radius_tests.rs proton_radius_muonic_deep_inside
-RUST crystal_proton_radius_tests.rs dual_route_corrections_match
-RUST crystal_proton_radius_tests.rs r_max_above_measurement
-RUST crystal_proton_radius_tests.rs r_min_below_measurement
-RUST crystal_proton_radius_tests.rs af_floor_denom_is_575
-RUST crystal_proton_radius_tests.rs band_is_narrow
-RUST crystal_proton_radius_tests.rs measurement_inside_band
-RUST crystal_proton_radius_tests.rs correction_is_suppressed
-RUST crystal_proton_radius_tests.rs correction_is_negative
-RUST crystal_proton_radius_tests.rs correction_is_rational
-RUST crystal_proton_radius_tests.rs nc3_tighter_than_nc2
-RUST crystal_proton_radius_tests.rs eps_nc2_value
-RUST crystal_proton_radius_tests.rs eps_nc3_value
-RUST crystal_proton_radius_tests.rs eps_nc4_value
-RUST crystal_proton_radius_tests.rs sigma_d2_value
-RUST crystal_proton_radius_tests.rs tower_d_value
-RUST crystal_proton_radius_tests.rs shared_core
-RUST crystal_proton_radius_tests.rs alpha_channel
-RUST crystal_proton_radius_tests.rs trace_identity
-RUST crystal_proton_radius_tests.rs d3_times_sigma_d
-RUST crystal_proton_radius_tests.rs resummed_also_inside
-RUST crystal_proton_radius_tests.rs band_denom_value
-RUST crystal_rendering_tests.rs prove_planck_wavelength_exp
-RUST crystal_rendering_tests.rs prove_rayleigh_size_exp
-RUST crystal_rendering_tests.rs prove_rayleigh_wavelength_exp
-RUST crystal_rendering_tests.rs planck_ne_stefan_boltzmann
-RUST crystal_rendering_tests.rs rayleigh_size_is_sector_count
-RUST crystal_rendering_tests.rs rayleigh_wave_is_nw_squared
-RUST crystal_structural_tests.rs test_chi
-RUST crystal_structural_tests.rs test_beta_0
-RUST crystal_structural_tests.rs test_sigma_d
-RUST crystal_structural_tests.rs test_tower_d
-RUST crystal_structural_tests.rs test_gauss
-RUST crystal_structural_tests.rs test_sigma_d2
-RUST crystal_structural_tests.rs test_sectors
-RUST crystal_structural_tests.rs test_conservation_count
-RUST crystal_structural_tests.rs test_spin_statistics
-RUST crystal_structural_tests.rs test_cpt_ko_dim
-RUST crystal_structural_tests.rs test_parity_odd
-RUST crystal_structural_tests.rs test_no_cloning
-RUST crystal_structural_tests.rs test_boltzmann_dof
-RUST crystal_structural_tests.rs test_fermion_components
-RUST crystal_structural_tests.rs test_lorentz_eq_chi
-RUST crystal_structural_tests.rs test_poincare_eq_solvable
-RUST crystal_structural_tests.rs bridge_01_casimir
-RUST crystal_structural_tests.rs bridge_02_nfw
-RUST crystal_structural_tests.rs bridge_03_kolmogorov
-RUST crystal_structural_tests.rs bridge_04_phase_18
-RUST crystal_structural_tests.rs bridge_05_codon_43
-RUST crystal_structural_tests.rs bridge_06_lagrange
-RUST crystal_structural_tests.rs bridge_07_lattice_lock
-RUST crystal_structural_tests.rs bridge_08_carnot
-RUST crystal_structural_tests.rs bridge_09_stefan_boltzmann
-RUST crystal_structural_tests.rs bridge_10_h_bonds
-RUST crystal_structural_tests.rs bridge_11_tetrahedral
-RUST crystal_structural_tests.rs bridge_12_amino_acids
-RUST crystal_structural_tests.rs bridge_13_codons
-RUST crystal_structural_tests.rs bridge_14_tau_n
-RUST crystal_structural_tests.rs bridge_15_algebra_dim
-RUST crystal_structural_tests.rs mars_inverse_square
-RUST crystal_structural_tests.rs mars_three_body_phase
-RUST crystal_structural_tests.rs mars_von_karman
-RUST crystal_structural_tests.rs mars_helix_residues
-RUST crystal_structural_tests.rs mars_steane_code
-RUST crystal_tests.rs test_crystal_constants
-RUST crystal_tests.rs test_two_particles_is_algebra
-RUST crystal_tests.rs test_entanglement_is_arrow
-RUST crystal_tests.rs test_fermion_is_su4
-RUST crystal_tests.rs test_ppt_decidable
-RUST crystal_tests.rs test_gate_count
-RUST crystal_tests.rs test_fock_limit
-RUST crystal_tests.rs test_ladder_symmetric
-RUST crystal_tests.rs test_interactions_duality
-RUST crystal_tests.rs test_cnot_neutrino
-RUST crystal_tests.rs test_max_entangled_entropy
-RUST crystal_tests.rs test_hadamard_is_unitary
-RUST crystal_tests.rs test_carnot_efficiency
-RUST crystal_tests.rs test_stefan_boltzmann
-RUST crystal_tests.rs test_thermal_conductivity
-RUST crystal_tests.rs test_kolmogorov_spectrum
-RUST crystal_tests.rs test_kolmogorov_microscale
-RUST crystal_tests.rs test_von_karman
-RUST crystal_tests.rs test_reynolds_critical
-RUST crystal_tests.rs test_casimir
-RUST crystal_tests.rs test_string_tension
-RUST crystal_tests.rs test_asymptotic_freedom
-RUST crystal_tests.rs test_confinement_heyting
-RUST crystal_tests.rs test_dna_bases
-RUST crystal_tests.rs test_codons
-RUST crystal_tests.rs test_amino_acids
-RUST crystal_tests.rs test_codon_signals
-RUST crystal_tests.rs test_codon_redundancy
-RUST crystal_tests.rs test_complexity_threshold
-RUST crystal_tests.rs test_neutron_lifetime_correction
-RUST crystal_tests.rs test_phi_boundary
-RUST crystal_tests.rs test_golden_ratio_corrected
-RUST crystal_tests.rs test_s_orbital
-RUST crystal_tests.rs test_p_orbital
-RUST crystal_tests.rs test_d_orbital
-RUST crystal_tests.rs test_f_orbital
-RUST crystal_tests.rs test_tetrahedral_angle
-RUST crystal_tests.rs test_krypton_is_sigma_d
-RUST crystal_tests.rs test_helix_turn
-RUST crystal_tests.rs test_helix_rise
-RUST crystal_tests.rs test_beta_sheet
-RUST crystal_tests.rs test_at_hydrogen_bonds
-RUST crystal_tests.rs test_gc_hydrogen_bonds
-RUST crystal_tests.rs test_groove_ratio
-RUST crystal_tests.rs test_lattice_lock
-RUST crystal_tests.rs test_bcs_ratio
-RUST crystal_tests.rs test_cooper_pair_singlet
-RUST crystal_tests.rs test_zero_resistance
-RUST crystal_tests.rs test_n_water_is_casimir
-RUST crystal_tests.rs test_n_glass
-RUST crystal_tests.rs test_codon_redundancy_is_d_plus_1
-RUST crystal_tests.rs test_dark_matter_under_wall
-RUST crystal_tests.rs test_diamond_corrected
-RUST crystal_tests.rs audit_derivation_chain
-RUST crystal_tests.rs audit_no_magic_numbers
-RUST crystal_tests.rs test_lagrange_points
-RUST crystal_tests.rs test_three_body_phase_space
-RUST crystal_tests.rs test_three_body_decomposition
-RUST crystal_tests.rs test_routh_ratio
-RUST crystal_tests.rs test_bekenstein_area_quantum
-RUST crystal_tests.rs test_proton_radius
-RUST crystal_tests.rs test_rp_boundary
-RUST crystal_tests.rs test_proton_radius_corrected
-RUST crystal_tests.rs test_dm_baryon_ratio_corrected
-RUST crystal_tests.rs test_dm_is_codons_over_colour
-RUST crystal_tests.rs test_nfw_concentration
-RUST crystal_tests.rs test_nfw_is_beta0
-RUST crystal_tests.rs test_bridge_casimir_equals_water
-RUST crystal_tests.rs test_bridge_beta0_equals_nfw
-RUST crystal_tests.rs test_bridge_kolmogorov_algebraic
-RUST crystal_tests.rs test_bridge_phase_decomposition
-RUST crystal_tests.rs test_bridge_codons_dark_matter
-RUST crystal_tests.rs test_bridge_lagrange_decomp
-RUST crystal_tests.rs test_bridge_routh
-RUST crystal_tests.rs test_bridge_lattice_lock
-RUST crystal_tests.rs test_bridge_carnot
-RUST crystal_tests.rs test_bridge_stefan_boltzmann
-RUST crystal_tests.rs test_bridge_hydrogen_bonds
-RUST crystal_tests.rs test_bridge_amino_acids
-RUST crystal_tests.rs test_bridge_von_karman
-RUST crystal_tests.rs test_bridge_endomorphisms
-RUST crystal_tests.rs test_bridge_bcs_ratio
-RUST crystal_tests.rs test_engineering_superconductor_ratio
-RUST crystal_tests.rs test_engineering_jwst_stability
-RUST crystal_tests.rs test_engineering_protein_geometry
-RUST crystal_tests.rs test_engineering_refractive_indices
-RUST crystal_tests.rs test_engineering_genetic_ecc
-RUST crystal_gravity_dyn.rs test_coeff_16pi_g
-RUST crystal_gravity_dyn.rs test_schwarzschild_2
-RUST crystal_gravity_dyn.rs test_rt_four
-RUST crystal_gravity_dyn.rs test_efe_eight
-RUST crystal_gravity_dyn.rs test_gw_speed
-RUST crystal_gravity_dyn.rs test_gw_polarizations
-RUST crystal_gravity_dyn.rs test_quadrupole_32
-RUST crystal_gravity_dyn.rs test_quadrupole_5
-RUST crystal_gravity_dyn.rs test_quadrupole_ratio
-RUST crystal_gravity_dyn.rs test_spacetime_dim
-RUST crystal_gravity_dyn.rs test_clifford_dim
-RUST crystal_gravity_dyn.rs test_spinor_dim
-RUST crystal_gravity_dyn.rs test_equiv_principle
-RUST crystal_gravity_dyn.rs test_kolmogorov_five_thirds
-RUST crystal_gravity_dyn.rs test_cross_checks
-RUST crystal_gravity_dyn.rs test_all_12_pass
-RUST crystal_gravity_dyn.rs test_jacobson_chain_kinematic
-RUST crystal_gravity_dyn.rs test_jacobson_chain_dynamical
-RUST crystal_tests.rs test_crystal_constants
-RUST crystal_tests.rs test_two_particles_is_algebra
-RUST crystal_tests.rs test_entanglement_is_arrow
-RUST crystal_tests.rs test_fermion_is_su4
-RUST crystal_tests.rs test_ppt_decidable
-RUST crystal_tests.rs test_gate_count
-RUST crystal_tests.rs test_fock_limit
-RUST crystal_tests.rs test_ladder_symmetric
-RUST crystal_tests.rs test_interactions_duality
-RUST crystal_tests.rs test_cnot_neutrino
-RUST crystal_tests.rs test_max_entangled_entropy
-RUST crystal_tests.rs test_hadamard_is_unitary
-RUST_COUNT crystal_alpha_proton_tests.rs 28
-RUST_COUNT crystal_discovery_tests.rs 33
-RUST_COUNT crystal_fundamentals_tests.rs 45
-RUST_COUNT crystal_hierarchy_tests.rs 55
-RUST_COUNT crystal_layer_tests.rs 17
-RUST_COUNT crystal_mandelbrot_tests.rs 38
-RUST_COUNT crystal_noether_tests.rs 21
-RUST_COUNT crystal_protein_tests.rs 60
-RUST_COUNT crystal_proton_radius_tests.rs 30
-RUST_COUNT crystal_rendering_tests.rs 6
-RUST_COUNT crystal_structural_tests.rs 36
-RUST_COUNT crystal_tests.rs 87
-RUST_COUNT crystal_gravity_dyn.rs 18
-RUST_COUNT crystal_tests.rs 12
+# RUST TESTS (crystal-topos)
+# RUST TESTS (crystal-toe)
+RUST toe/src/discoveries.rs discoveries_non_empty
+RUST toe/src/discoveries.rs total_198
+RUST toe/src/dynamics/arcade.rs lj_cut_3
+RUST toe/src/dynamics/arcade.rs bh_den_2
+RUST toe/src/dynamics/arcade.rs octree_8
+RUST toe/src/dynamics/arcade.rs euler_1
+RUST toe/src/dynamics/arcade.rs verlet_2
+RUST toe/src/dynamics/arcade.rs fixed_16
+RUST toe/src/dynamics/arcade.rs hash_3
+RUST toe/src/dynamics/arcade.rs lod_3
+RUST toe/src/dynamics/arcade.rs mf_tc_4
+RUST toe/src/dynamics/arcade.rs newton_2
+RUST toe/src/dynamics/arcade.rs alpha_137
+RUST toe/src/dynamics/arcade.rs wca_value
+RUST toe/src/dynamics/arcade.rs bh_half
+RUST toe/src/dynamics/arcade.rs lj_cutoff_small
+RUST toe/src/dynamics/arcade.rs lj_arcade_zero_beyond
+RUST toe/src/dynamics/arcade.rs lj_arcade_shifted
+RUST toe/src/dynamics/arcade.rs wca_smooth_cutoff
+RUST toe/src/dynamics/arcade.rs verlet_beats_euler
+RUST toe/src/dynamics/arcade.rs fixed_precision
+RUST toe/src/dynamics/arcade.rs mf_over
+RUST toe/src/dynamics/arcade.rs fast_isqrt_converges
+RUST toe/src/dynamics/arcade.rs full_self_test
+RUST toe/src/dynamics/astro.rs polytrope_nr_3_2
+RUST toe/src/dynamics/astro.rs polytrope_rel_3
+RUST toe/src/dynamics/astro.rs schwarz_2
+RUST toe/src/dynamics/astro.rs hawking_8
+RUST toe/src/dynamics/astro.rs sb_15
+RUST toe/src/dynamics/astro.rs eddington_4
+RUST toe/src/dynamics/astro.rs ms_lum_7_2
+RUST toe/src/dynamics/astro.rs ms_life_5_2
+RUST toe/src/dynamics/astro.rs virial_2
+RUST toe/src/dynamics/astro.rs grav_pe_3_5
+RUST toe/src/dynamics/astro.rs chandra_2
+RUST toe/src/dynamics/astro.rs jeans_t_3_2
+RUST toe/src/dynamics/astro.rs jeans_rho_1_2
+RUST toe/src/dynamics/astro.rs le_nr_surface
+RUST toe/src/dynamics/astro.rs le_rel_surface
+RUST toe/src/dynamics/astro.rs le_rel_mass
+RUST toe/src/dynamics/astro.rs le_n1_exact
+RUST toe/src/dynamics/astro.rs ms_identity
+RUST toe/src/dynamics/astro.rs hawking_edd_32
+RUST toe/src/dynamics/astro.rs ms_lum_solar
+RUST toe/src/dynamics/astro.rs ms_life_solar
+RUST toe/src/dynamics/astro.rs ms_lum_10x
+RUST toe/src/dynamics/astro.rs profile_not_empty
+RUST toe/src/dynamics/astro.rs full_self_test
+RUST toe/src/dynamics/bio.rs bases_4
+RUST toe/src/dynamics/bio.rs codon_3
+RUST toe/src/dynamics/bio.rs codons_64
+RUST toe/src/dynamics/bio.rs amino_20
+RUST toe/src/dynamics/bio.rs stops_3
+RUST toe/src/dynamics/bio.rs start_1
+RUST toe/src/dynamics/bio.rs sense_61
+RUST toe/src/dynamics/bio.rs strands_2
+RUST toe/src/dynamics/bio.rs hbond_at_2
+RUST toe/src/dynamics/bio.rs hbond_gc_3
+RUST toe/src/dynamics/bio.rs bp_turn_10
+RUST toe/src/dynamics/bio.rs lipid_2
+RUST toe/src/dynamics/bio.rs helix_3_6
+RUST toe/src/dynamics/bio.rs flory_0_4
+RUST toe/src/dynamics/bio.rs kleiber_3_4
+RUST toe/src/dynamics/bio.rs heart_1_4
+RUST toe/src/dynamics/bio.rs life_1_4
+RUST toe/src/dynamics/bio.rs surface_2_3
+RUST toe/src/dynamics/bio.rs heartbeats
+RUST toe/src/dynamics/bio.rs redundancy_near_3
+RUST toe/src/dynamics/bio.rs kleiber_scaling
+RUST toe/src/dynamics/bio.rs cross_checks
+RUST toe/src/dynamics/bio.rs full_self_test
+RUST toe/src/dynamics/cfd.rs d2q9_is_9
+RUST toe/src/dynamics/cfd.rs kolmogorov_5_3
+RUST toe/src/dynamics/cfd.rs stokes_24
+RUST toe/src/dynamics/cfd.rs blasius_1_4
+RUST toe/src/dynamics/cfd.rs von_karman_2_5
+RUST toe/src/dynamics/cfd.rs weights_sum_1
+RUST toe/src/dynamics/cfd.rs mass_conserved
+RUST toe/src/dynamics/cfd.rs poiseuille_parabolic
+RUST toe/src/dynamics/chem.rs s_cap_2
+RUST toe/src/dynamics/chem.rs p_cap_6
+RUST toe/src/dynamics/chem.rs d_cap_10
+RUST toe/src/dynamics/chem.rs f_cap_14
+RUST toe/src/dynamics/chem.rs he_2
+RUST toe/src/dynamics/chem.rs ne_10
+RUST toe/src/dynamics/chem.rs ar_18
+RUST toe/src/dynamics/chem.rs kr_36
+RUST toe/src/dynamics/chem.rs ph_7
+RUST toe/src/dynamics/chem.rs diel_16
+RUST toe/src/dynamics/chem.rs subshell_formula
+RUST toe/src/dynamics/chem.rs shell_cap
+RUST toe/src/dynamics/chem.rs sp3_109
+RUST toe/src/dynamics/chem.rs sp2_120
+RUST toe/src/dynamics/chem.rs water_104
+RUST toe/src/dynamics/chem.rs hartree_27
+RUST toe/src/dynamics/chem.rs bohr_0529
+RUST toe/src/dynamics/chem.rs vdw_matches_kt
+RUST toe/src/dynamics/chem.rs arrhenius_monotone
+RUST toe/src/dynamics/chem.rs arrhenius_zero_barrier
+RUST toe/src/dynamics/chem.rs full_self_test
+RUST toe/src/dynamics/classical.rs integer_identities
+RUST toe/src/dynamics/classical.rs circular_orbit_energy_conserved
+RUST toe/src/dynamics/classical.rs circular_orbit_angular_momentum_conserved
+RUST toe/src/dynamics/classical.rs kepler_period_matches
+RUST toe/src/dynamics/classical.rs vis_viva_consistency
+RUST toe/src/dynamics/classical.rs hohmann_earth_mars
+RUST toe/src/dynamics/classical.rs elliptical_orbit_conserves_energy
+RUST toe/src/dynamics/classical.rs escape_velocity_formula
+RUST toe/src/dynamics/condensed.rs z_square_4
+RUST toe/src/dynamics/condensed.rs z_cubic_6
+RUST toe/src/dynamics/condensed.rs states_2
+RUST toe/src/dynamics/condensed.rs onsager_tc_correct
+RUST toe/src/dynamics/condensed.rs bcs_ratio_3528
+RUST toe/src/dynamics/condensed.rs ground_energy_all_up
+RUST toe/src/dynamics/condensed.rs magnetization_all_up
+RUST toe/src/dynamics/condensed.rs low_t_ordered
+RUST toe/src/dynamics/condensed.rs high_t_disordered
+RUST toe/src/dynamics/condensed.rs crit_beta_1_8
+RUST toe/src/dynamics/decay.rs beta_192
+RUST toe/src/dynamics/decay.rs weinberg_3_13
+RUST toe/src/dynamics/decay.rs theta23_6_11
+RUST toe/src/dynamics/decay.rs sin2_2theta23_120_121
+RUST toe/src/dynamics/decay.rs theta12_3_pi2
+RUST toe/src/dynamics/decay.rs phase_dims
+RUST toe/src/dynamics/decay.rs g_fermi_value
+RUST toe/src/dynamics/decay.rs neutron_lifetime_reasonable
+RUST toe/src/dynamics/decay.rs oscill_in_range
+RUST toe/src/dynamics/decay.rs beta_spectrum_shape
+RUST toe/src/dynamics/em.rs em_components_6
+RUST toe/src/dynamics/em.rs two_form_chi
+RUST toe/src/dynamics/em.rs maxwell_4
+RUST toe/src/dynamics/em.rs polarizations_2
+RUST toe/src/dynamics/em.rs planck_5
+RUST toe/src/dynamics/em.rs stefan_4
+RUST toe/src/dynamics/em.rs stefan_denom_15
+RUST toe/src/dynamics/em.rs rayleigh_wave_4
+RUST toe/src/dynamics/em.rs rayleigh_size_6
+RUST toe/src/dynamics/em.rs larmor_2_3
+RUST toe/src/dynamics/em.rs larmor_scales
+RUST toe/src/dynamics/em.rs rayleigh_inverse_fourth
+RUST toe/src/dynamics/em.rs yee_energy_conserved
+RUST toe/src/dynamics/em.rs yee_pulse_propagates
+RUST toe/src/dynamics/em.rs impedance_120pi
+RUST toe/src/dynamics/friedmann.rs omega_sum_flat
+RUST toe/src/dynamics/friedmann.rs omega_l_13_19
+RUST toe/src/dynamics/friedmann.rs omega_m_6_19
+RUST toe/src/dynamics/friedmann.rs dm_baryon_ratio_12pi_7
+RUST toe/src/dynamics/friedmann.rs cmb_temp_19_7
+RUST toe/src/dynamics/friedmann.rs spectral_ns
+RUST toe/src/dynamics/friedmann.rs age_97_7
+RUST toe/src/dynamics/friedmann.rs friedmann_expands
+RUST toe/src/dynamics/friedmann.rs acceleration_at_z_06
+RUST toe/src/dynamics/friedmann.rs integer_proofs
+RUST toe/src/dynamics/gr.rs integer_identities
+RUST toe/src/dynamics/gr.rs isco_is_3rs
+RUST toe/src/dynamics/gr.rs isco_energy_sqrt89
+RUST toe/src/dynamics/gr.rs mercury_precession
+RUST toe/src/dynamics/gr.rs sun_light_bending
+RUST toe/src/dynamics/gr.rs redshift_at_isco
+RUST toe/src/dynamics/gw.rs peters_32_5
+RUST toe/src/dynamics/gw.rs chirp_exp_5_3
+RUST toe/src/dynamics/gw.rs chirp_mass_equal
+RUST toe/src/dynamics/gw.rs isco_freq_positive
+RUST toe/src/dynamics/gw.rs time_to_merger_positive
+RUST toe/src/dynamics/gw.rs waveform_chirps
+RUST toe/src/dynamics/gw.rs inspiral_reaches_isco
+RUST toe/src/dynamics/gw.rs integer_proofs
+RUST toe/src/dynamics/md.rs tetra_angle_109
+RUST toe/src/dynamics/md.rs water_angle_104
+RUST toe/src/dynamics/md.rs helix_3_6
+RUST toe/src/dynamics/md.rs flory_2_5
+RUST toe/src/dynamics/md.rs amino_20
+RUST toe/src/dynamics/md.rs dna_4
+RUST toe/src/dynamics/md.rs bp_turn_10
+RUST toe/src/dynamics/md.rs lj_min_at_minus_eps
+RUST toe/src/dynamics/md.rs lj_zero_at_sigma
+RUST toe/src/dynamics/md.rs md2_energy_conserved
+RUST toe/src/dynamics/md.rs integer_proofs
+RUST toe/src/dynamics/nbody.rs octree_children_8
+RUST toe/src/dynamics/nbody.rs force_exp_2
+RUST toe/src/dynamics/nbody.rs phase_per_body_6
+RUST toe/src/dynamics/nbody.rs two_body_energy_conserved
+RUST toe/src/dynamics/nbody.rs two_body_momentum_conserved
+RUST toe/src/dynamics/nbody.rs inverse_square_scaling
+RUST toe/src/dynamics/nbody.rs plummer_nonzero_force
+RUST toe/src/dynamics/nuclear.rs magic_all_7
+RUST toe/src/dynamics/nuclear.rs iron_56
+RUST toe/src/dynamics/nuclear.rs isospin_2
+RUST toe/src/dynamics/nuclear.rs alpha_4
+RUST toe/src/dynamics/nuclear.rs deuteron_2
+RUST toe/src/dynamics/nuclear.rs he4_crystal
+RUST toe/src/dynamics/nuclear.rs surface_exp
+RUST toe/src/dynamics/nuclear.rs coulomb_exp
+RUST toe/src/dynamics/nuclear.rs pairing_exp
+RUST toe/src/dynamics/nuclear.rs coulomb_pre
+RUST toe/src/dynamics/nuclear.rs he4_binding_close
+RUST toe/src/dynamics/nuclear.rs fe56_is_peak
+RUST toe/src/dynamics/nuclear.rs radius_scales
+RUST toe/src/dynamics/nuclear.rs binding_positive_fe
+RUST toe/src/dynamics/nuclear.rs volume_extensive
+RUST toe/src/dynamics/nuclear.rs optimal_z_fe
+RUST toe/src/dynamics/nuclear.rs full_self_test
+RUST toe/src/dynamics/optics.rs n_water_4_3
+RUST toe/src/dynamics/optics.rs n_glass_3_2
+RUST toe/src/dynamics/optics.rs n_diamond_13_5
+RUST toe/src/dynamics/optics.rs snell_normal
+RUST toe/src/dynamics/optics.rs tir_water_air
+RUST toe/src/dynamics/optics.rs brewster_glass
+RUST toe/src/dynamics/optics.rs normal_reflectance_glass
+RUST toe/src/dynamics/optics.rs rayleigh_4_3
+RUST toe/src/dynamics/optics.rs sky_blue
+RUST toe/src/dynamics/optics.rs wien_5778k
+RUST toe/src/dynamics/optics.rs planck_positive
+RUST toe/src/dynamics/plasma.rs mhd_states_8
+RUST toe/src/dynamics/plasma.rs wave_types_3
+RUST toe/src/dynamics/plasma.rs prop_modes_6
+RUST toe/src/dynamics/plasma.rs non_prop_2
+RUST toe/src/dynamics/plasma.rs total_8
+RUST toe/src/dynamics/plasma.rs alfven_energy_conserved
+RUST toe/src/dynamics/plasma.rs plasma_beta_unity
+RUST toe/src/dynamics/plasma.rs pressure_balance
+RUST toe/src/dynamics/qft.rs spacetime_4
+RUST toe/src/dynamics/qft.rs lorentz_6
+RUST toe/src/dynamics/qft.rs lorentz_is_chi
+RUST toe/src/dynamics/qft.rs dirac_4
+RUST toe/src/dynamics/qft.rs gluons_8
+RUST toe/src/dynamics/qft.rs gluons_is_d3
+RUST toe/src/dynamics/qft.rs beta0_7
+RUST toe/src/dynamics/qft.rs one_loop_16
+RUST toe/src/dynamics/qft.rs thomson_8_3
+RUST toe/src/dynamics/qft.rs alpha_inv_137
+RUST toe/src/dynamics/qft.rs sigma_ee_positive
+RUST toe/src/dynamics/qft.rs sigma_falls_with_s
+RUST toe/src/dynamics/qft.rs thomson_positive
+RUST toe/src/dynamics/qft.rs alpha_s_reasonable
+RUST toe/src/dynamics/qft.rs pair_threshold_2m
+RUST toe/src/dynamics/qinfo.rs qubit_2
+RUST toe/src/dynamics/qinfo.rs pauli_3
+RUST toe/src/dynamics/qinfo.rs pauli_grp_4
+RUST toe/src/dynamics/qinfo.rs bell_4
+RUST toe/src/dynamics/qinfo.rs toffoli_3
+RUST toe/src/dynamics/qinfo.rs steane_7_1_3
+RUST toe/src/dynamics/qinfo.rs shor_9
+RUST toe/src/dynamics/qinfo.rs mera_bond_6
+RUST toe/src/dynamics/qinfo.rs mera_depth_42
+RUST toe/src/dynamics/qinfo.rs teleport_2
+RUST toe/src/dynamics/qinfo.rs superdense_2
+RUST toe/src/dynamics/qinfo.rs hamming
+RUST toe/src/dynamics/qinfo.rs steane_corr
+RUST toe/src/dynamics/qinfo.rs coprime
+RUST toe/src/dynamics/qinfo.rs bell_ent
+RUST toe/src/dynamics/qinfo.rs mera_ent
+RUST toe/src/dynamics/qinfo.rs entropy_sum
+RUST toe/src/dynamics/qinfo.rs heyting_meet_test
+RUST toe/src/dynamics/qinfo.rs heyting_join_test
+RUST toe/src/dynamics/qinfo.rs heyting_identity
+RUST toe/src/dynamics/qinfo.rs tomography_7
+RUST toe/src/dynamics/qinfo.rs full_self_test
+RUST toe/src/dynamics/rigid.rs quat_4
+RUST toe/src/dynamics/rigid.rs inertia_6
+RUST toe/src/dynamics/rigid.rs dof_6
+RUST toe/src/dynamics/rigid.rs rot_mat_9
+RUST toe/src/dynamics/rigid.rs i_sphere_2_5
+RUST toe/src/dynamics/rigid.rs i_rod_1_12
+RUST toe/src/dynamics/rigid.rs i_disk_1_2
+RUST toe/src/dynamics/rigid.rs i_shell_2_3
+RUST toe/src/dynamics/rigid.rs quat_mul_identity
+RUST toe/src/dynamics/rigid.rs quat_norm_preserved
+RUST toe/src/dynamics/rigid.rs energy_conserved_torque_free
+RUST toe/src/dynamics/rigid.rs ang_mom_conserved
+RUST toe/src/dynamics/thermo.rs lj_attract_6
+RUST toe/src/dynamics/thermo.rs lj_repel_12
+RUST toe/src/dynamics/thermo.rs lj_force_24
+RUST toe/src/dynamics/thermo.rs dof_mono_3
+RUST toe/src/dynamics/thermo.rs dof_di_5
+RUST toe/src/dynamics/thermo.rs gamma_mono_5_3
+RUST toe/src/dynamics/thermo.rs gamma_di_7_5
+RUST toe/src/dynamics/thermo.rs lj_minimum_at_minus_eps
+RUST toe/src/dynamics/thermo.rs lj_zero_at_sigma
+RUST toe/src/dynamics/thermo.rs md_energy_conserved
+RUST toe/src/dynamics/thermo.rs temperature_positive
+RUST toe/src/dynamics/thermo.rs carnot_5_6
+RUST toe/src/gravity_dyn.rs all_gravity_dyn_pass
+RUST toe/src/gravity_dyn.rs coeff_16
+RUST toe/src/gravity_dyn.rs schwarzschild
+RUST toe/src/gravity_dyn.rs gw_pol_2
+RUST toe/src/gravity_dyn.rs quadrupole_32_5
+RUST toe/src/gravity_dyn.rs spacetime_4
+RUST toe/src/hologron.rs all_hologron_pass
+RUST toe/src/hologron.rs inverse_square
+RUST toe/src/hologron.rs metric_is_chi
+RUST toe/src/layer.rs tower_43_layers
+RUST toe/src/layer.rs boundary_layer
+RUST toe/src/layer.rs bulk_layer
+RUST toe/src/layer.rs alpha_inv_monotone
+RUST toe/src/layer.rs alpha_inv_42_is_137
+RUST toe/src/layer.rs entropy_decreases
+RUST toe/src/lib.rs atoms_correct
+RUST toe/src/lib.rs sector_dims_sum
+RUST toe/src/lib.rs all_from_two_primes
+RUST toe/src/lib.rs toe_default_is_crystal
+RUST toe/src/lib.rs conversion_factor_is_1_004
+RUST toe/src/lib.rs to_pdg_gives_246
+RUST toe/src/lib.rs dimensionless_same_both_modes
+RUST toe/src/lib.rs masses_differ_by_conversion
+RUST toe/src/lib.rs mp_me_ratio_same_both
+RUST toe/src/lib.rs monad_tick_eigenvalues
+RUST toe/src/lib.rs monad_42_hierarchy
+RUST toe/src/lib.rs hologron_attractive
+RUST toe/src/lib.rs tower_43_layers
+RUST toe/src/lib.rs tower_top_137
+RUST toe/src/lib.rs seeley_dewitt
+RUST toe/src/lib.rs implosion_fractions
+RUST toe/src/lib.rs cosmo_partition_sums
+RUST toe/src/lib.rs uncertainty_coprimality
+RUST toe/src/lib.rs complementarity
+RUST toe/src/lib.rs gauge_alpha_inv
+RUST toe/src/lib.rs gauge_sin2_theta_w
+RUST toe/src/lib.rs gauge_alpha_s
+RUST toe/src/lib.rs gauge_w_mass
+RUST toe/src/lib.rs gauge_z_mass
+RUST toe/src/lib.rs gauge_electron_mass
+RUST toe/src/lib.rs gauge_mu_e_ratio
+RUST toe/src/lib.rs gauge_higgs_mass
+RUST toe/src/lib.rs qcd_proton_mass
+RUST toe/src/lib.rs qcd_pion_mass
+RUST toe/src/lib.rs qcd_top_mass
+RUST toe/src/lib.rs qcd_mp_me_ratio
+RUST toe/src/lib.rs qcd_mpi_mp_ratio
+RUST toe/src/lib.rs cosmo_omega_lambda
+RUST toe/src/lib.rs cosmo_omega_b
+RUST toe/src/lib.rs cosmo_omega_total
+RUST toe/src/lib.rs cosmo_spectral_index
+RUST toe/src/lib.rs cosmo_n_generations
+RUST toe/src/lib.rs mixing_cabibbo
+RUST toe/src/lib.rs mixing_theta23_maximal
+RUST toe/src/lib.rs mixing_n_angles
+RUST toe/src/lib.rs mixing_n_cp_phases
+RUST toe/src/lib.rs codata_alpha_inv_full
+RUST toe/src/lib.rs codata_mp_me_full
+RUST toe/src/lib.rs codata_proton_radius
+RUST toe/src/lib.rs codata_three_comparisons
+RUST toe/src/lib.rs gravity_einstein_16
+RUST toe/src/lib.rs gravity_graviton_pol
+RUST toe/src/lib.rs gravity_peters
+RUST toe/src/lib.rs gravity_isco
+RUST toe/src/lib.rs gravity_12_audit
+RUST toe/src/lib.rs gravity_first_law
+RUST toe/src/lib.rs protein_sp3_angle
+RUST toe/src/lib.rs protein_water_angle
+RUST toe/src/lib.rs protein_helix
+RUST toe/src/lib.rs protein_flory
+RUST toe/src/lib.rs protein_dielectric
+RUST toe/src/lib.rs protein_bp_per_turn
+RUST toe/src/lib.rs protein_energy_hierarchy
+RUST toe/src/lib.rs cross_domain_count
+RUST toe/src/lib.rs cross_domain_links
+RUST toe/src/lib.rs waca_scan_198
+RUST toe/src/lib.rs quantum_hilbert_dim
+RUST toe/src/lib.rs mandelbrot_proofs
+RUST toe/src/lib.rs dyn_classical_phase_space
+RUST toe/src/lib.rs dyn_gr_integers
+RUST toe/src/lib.rs dyn_gw_peters
+RUST toe/src/lib.rs dyn_em_components
+RUST toe/src/lib.rs dyn_friedmann_flat
+RUST toe/src/lib.rs dyn_nbody_octree
+RUST toe/src/lib.rs dyn_thermo_lj
+RUST toe/src/lib.rs dyn_cfd_d2q9
+RUST toe/src/lib.rs dyn_decay_beta
+RUST toe/src/lib.rs dyn_optics_indices
+RUST toe/src/lib.rs dyn_md_angles
+RUST toe/src/lib.rs dyn_condensed_ising
+RUST toe/src/lib.rs dyn_plasma_mhd
+RUST toe/src/lib.rs dyn_qft_integers
+RUST toe/src/lib.rs dyn_qft_thomson
+RUST toe/src/lib.rs dyn_qft_ee_mumu
+RUST toe/src/lib.rs dyn_rigid_inertia
+RUST toe/src/lib.rs dyn_chem_shells
+RUST toe/src/lib.rs dyn_nuclear_magic
+RUST toe/src/lib.rs dyn_nuclear_fe56_peak
+RUST toe/src/lib.rs dyn_astro_lane_emden
+RUST toe/src/lib.rs dyn_astro_integers
+RUST toe/src/lib.rs dyn_qinfo_steane
+RUST toe/src/lib.rs dyn_bio_genetic_code
+RUST toe/src/lib.rs dyn_bio_redundancy
+RUST toe/src/lib.rs dyn_arcade_params
+RUST toe/src/mandelbrot.rs proof_01_period_2_is_n_w
+RUST toe/src/mandelbrot.rs proof_02_period_3_is_n_c
+RUST toe/src/mandelbrot.rs proof_03_period_6_is_chi
+RUST toe/src/mandelbrot.rs proof_04_period_6_is_lcm
+RUST toe/src/mandelbrot.rs gcd
+RUST toe/src/mandelbrot.rs proof_05_iteration_depth
+RUST toe/src/mandelbrot.rs proof_06_hausdorff_dim
+RUST toe/src/mandelbrot.rs proof_07_cardioid_denom
+RUST toe/src/mandelbrot.rs proof_08_p2_area_denom_16
+RUST toe/src/mandelbrot.rs proof_09_p2_area_denom_nw4
+RUST toe/src/mandelbrot.rs proof_10_beta0_is_7
+RUST toe/src/mandelbrot.rs proof_11_staircase_43
+RUST toe/src/mandelbrot.rs proof_12_alpha_inv_planck
+RUST toe/src/mandelbrot.rs proof_13_alpha_inv_our_world
+RUST toe/src/mandelbrot.rs proof_14_step_size_pi
+RUST toe/src/mandelbrot.rs proof_15_monotone_all_pi
+RUST toe/src/mandelbrot.rs proof_16_cardioid_area
+RUST toe/src/mandelbrot.rs proof_17_period_2_area
+RUST toe/src/mandelbrot.rs proof_18_area_ordering
+RUST toe/src/mandelbrot.rs proof_19_coupling_ordering
+RUST toe/src/mandelbrot.rs proof_20_area_eq_coupling
+RUST toe/src/mandelbrot.rs proof_21_ext_denom_2
+RUST toe/src/mandelbrot.rs proof_22_ext_denom_3
+RUST toe/src/mandelbrot.rs proof_23_ext_denom_6
+RUST toe/src/mandelbrot.rs proof_24_mersenne_pattern
+RUST toe/src/mandelbrot.rs proof_25_feig_num
+RUST toe/src/mandelbrot.rs proof_26_feig_den
+RUST toe/src/mandelbrot.rs proof_27_feig_reduced
+RUST toe/src/mandelbrot.rs proof_28_feig_value
+RUST toe/src/mandelbrot.rs proof_29_divisors_of_chi
+RUST toe/src/mandelbrot.rs proof_30_gauge_eq_divisors
+RUST toe/src/mandelbrot.rs proof_31_divisors_are_atoms
+RUST toe/src/mandelbrot.rs proof_32_mersenne_2_nc
+RUST toe/src/mandelbrot.rs proof_33_mersenne_3_beta0
+RUST toe/src/mandelbrot.rs proof_34_mersenne_6_nc2b0
+RUST toe/src/mandelbrot.rs proof_35_functor_unit
+RUST toe/src/mandelbrot.rs proof_36_functor_2x3
+RUST toe/src/mandelbrot.rs proof_37_functor_2x2
+RUST toe/src/mandelbrot.rs proof_38_functor_3x3
+RUST toe/src/mera.rs all_mera_pass
+RUST toe/src/mera.rs depth_42
+RUST toe/src/mera.rs bond_6
+RUST toe/src/noether.rs all_verifications_pass
+RUST toe/src/noether.rs generators_12
+RUST toe/src/noether.rs lorentz_is_chi
+RUST toe/src/noether.rs poincare_eq_solvable
+RUST toe/src/noether.rs algebra_times_nc_eq_tower
+RUST toe/src/proton_radius.rs r_p_matches_codata
+RUST toe/src/proton_radius.rs dual_route_matches
+RUST toe/src/proton_radius.rs r_p_in_band
+RUST toe/src/proton_radius.rs d4_squared_is_576
+RUST toe/src/proton_radius.rs correction_is_2_over_91
+RUST toe/src/qlib/algorithms.rs grover_oracle_flips
+RUST toe/src/qlib/algorithms.rs qft_preserves_norm
+RUST toe/src/qlib/algorithms.rs qft_iqft_roundtrip
+RUST toe/src/qlib/algorithms.rs vqe_ground_state_energy_zero
+RUST toe/src/qlib/algorithms.rs grover_iterations_value
+RUST toe/src/qlib/base.rs cx_arithmetic
+RUST toe/src/qlib/base.rs v_basis_orthonormal
+RUST toe/src/qlib/base.rs v_equal_normalized
+RUST toe/src/qlib/base.rs m_identity_works
+RUST toe/src/qlib/base.rs dm_pure_is_rank_1
+RUST toe/src/qlib/base.rs dm_mixed_purity
+RUST toe/src/qlib/base.rs energies_correct
+RUST toe/src/qlib/channels.rs depolarise_preserves_trace
+RUST toe/src/qlib/channels.rs full_depolarise_is_mixed
+RUST toe/src/qlib/channels.rs phase_damp_preserves_diagonal
+RUST toe/src/qlib/entangle.rs product_state_is_separable
+RUST toe/src/qlib/entangle.rs product_state_entropy_zero
+RUST toe/src/qlib/entangle.rs max_entropy_is_ln2
+RUST toe/src/qlib/entangle.rs entanglement_fraction_5_6
+RUST toe/src/qlib/entangle.rs ppt_exact_for_2x3
+RUST toe/src/qlib/gates.rs identity_preserves
+RUST toe/src/qlib/gates.rs hadamard_unitary
+RUST toe/src/qlib/gates.rs gate_counts
+RUST toe/src/qlib/hamiltonians.rs free_ham_ground_energy_zero
+RUST toe/src/qlib/hamiltonians.rs free_ham_gap_ln2
+RUST toe/src/qlib/hamiltonians.rs crystal_ham_is_free
+RUST toe/src/qlib/hamiltonians.rs ising_hermitian
+RUST toe/src/qlib/measure.rs projective_probability_sum
+RUST toe/src/qlib/measure.rs povm_probabilities_sum
+RUST toe/src/qlib/measure.rs povm_four_sectors
+RUST toe/src/qlib/measure.rs collapse_is_normalized
+RUST toe/src/qlib/measure.rs tomography_36
+RUST toe/src/qlib/simulation.rs state_dim_1_particle
+RUST toe/src/qlib/simulation.rs state_dim_2_particles
+RUST toe/src/qlib/simulation.rs evolve_preserves_norm
+RUST toe/src/qlib/simulation.rs ground_energy_zero
+RUST toe/src/qlib/simulation.rs partition_function_positive
+RUST toe/src/qlib/simulation.rs partition_function_kms
+RUST toe/src/qlib/simulation.rs exact_diag_count
+RUST toe/src/qlib/simulation.rs mera_depth_42
+RUST toe/src/qlib/simulation.rs mps_bond_6
+RUST toe/src/quantum.rs hilbert_dim_is_chi
+RUST toe/src/quantum.rs operator_dim_is_chi_sq
+RUST toe/src/quantum.rs n_operators_is_sigma_d2
+RUST toe/src/quantum.rs energy_ground_is_zero
+RUST toe/src/quantum.rs mass_gap_is_ln2
+RUST toe/src/quantum.rs max_energy_is_ln6
+RUST toe/src/quantum.rs creation_symmetric
+RUST toe/src/quantum.rs tensor_dim_2_is_36
+RUST toe/src/quantum.rs symmetric_dim_is_21
+RUST toe/src/quantum.rs antisymmetric_dim_is_15
+RUST toe/src/quantum.rs symmetric_plus_antisymmetric
+RUST toe/src/quantum.rs fock_limit_approx
+RUST toe/src/quantum.rs entanglement_entropy_is_ln_chi
+RUST toe/src/quantum.rs product_states_is_chi
+RUST toe/src/quantum.rs entangled_states_is_30
+RUST toe/src/quantum.rs entanglement_fraction_5_6
+RUST toe/src/quantum.rs ppt_is_exact
+RUST toe/src/quantum.rs total_gates_is_36
+RUST toe/src/quantum.rs sector_preserving_is_6
+RUST toe/src/quantum.rs sector_mixing_is_30
+RUST toe/src/quantum.rs cnot_dim_is_1296
+RUST toe/src/quantum.rs sector_probs_sum_to_1
+RUST toe/src/quantum.rs purity_is_1_over_chi
+RUST toe/src/quantum.rs thm_01_two_particle
+RUST toe/src/quantum.rs thm_02_entanglement_arrow
+RUST toe/src/quantum.rs thm_03_fermion_su4
+RUST toe/src/quantum.rs thm_04_ppt_decidable
+RUST toe/src/quantum.rs thm_05_gate_count
+RUST toe/src/quantum.rs thm_06_fock_limit
+RUST toe/src/quantum.rs thm_07_ladder_symmetric
+RUST toe/src/quantum.rs thm_08_interaction_duality
+RUST toe/src/quantum.rs thm_09_pauli_heyting
+RUST toe/src/quantum.rs thm_10_cnot_neutrino
+RUST toe/src/quantum.rs all_10_theorems_pass
+RUST toe/src/riemann.rs all_riemann_pass
+RUST toe/src/riemann.rs symmetry_36
+RUST toe/src/riemann.rs li_threshold
+RUST toe/src/structural.rs all_structural_pass
+RUST toe/src/structural.rs gauge_bosons_12
+RUST toe/src/structural.rs dof_eff_41
+RUST toe/src/waca_scan.rs fermat3_is_257
+RUST toe/src/waca_scan.rs v_mev_is_pdg
+RUST toe/src/waca_scan.rs kappa_value
+RUST toe/src/waca_scan.rs all_under_wall
+RUST toe/src/waca_scan.rs observable_count
+RUST toe/src/waca_scan.rs all_bridges_hold
+RUST toe/src/waca_scan.rs eta_prime_is_lambda_h
+RUST toe/src/waca_scan.rs casimir_exact
+RUST toe/src/waca_scan.rs kolmogorov_exact
+RUST toe/src/waca_scan.rs dna_bases_exact
+RUST toe/src/waca_scan.rs amino_acids_exact
+RUST toe/src/waca_scan.rs bond_angle_exact
+RUST toe/src/waca_scan.rs lattice_lock_exact
+RUST toe/src/waca_scan.rs lagrange_exact
+RUST toe/src/waca_scan.rs bekenstein_exact
+RUST toe/src/waca_scan.rs codon_redundancy_exact
+RUST toe/src/waca_scan.rs proton_radius_tight
+RUST toe/src/waca_scan.rs top_yukawa_tight
+RUST toe/src/waca_scan.rs bcs_ratio_tight
+RUST toe/src/waca_scan.rs dm_baryon_tight
+RUST toe/tests/integration.rs pdg_alpha_inv
+RUST toe/tests/integration.rs pdg_sin2_theta_w
+RUST toe/tests/integration.rs pdg_proton_mass
+RUST toe/tests/integration.rs pdg_z_mass
+RUST toe/tests/integration.rs pdg_top_mass
+RUST toe/tests/integration.rs pdg_mp_me_ratio
+RUST toe/tests/integration.rs pdg_mu_e_ratio
+RUST toe/tests/integration.rs pdg_omega_lambda
+RUST toe/tests/integration.rs pdg_spectral_index
+RUST toe/tests/integration.rs pdg_proton_radius
+RUST toe/tests/integration.rs conversion_round_trip
+RUST toe/tests/integration.rs dimensionless_invariant
+RUST toe/tests/integration.rs ratio_2_5_everywhere
+RUST toe/tests/integration.rs ratio_4_is_n_w_squared
+RUST toe/tests/integration.rs ratio_8_is_d_colour
+RUST toe/tests/integration.rs ratio_7_is_beta0
+RUST toe/tests/integration.rs magic_numbers_from_two_primes
+RUST toe/tests/integration.rs hierarchy_from_monad
+RUST toe/tests/integration.rs tower_alpha_monotone
+RUST toe/tests/integration.rs entropy_decreases_with_ticks
+RUST toe/tests/integration.rs implosion_corrections_are_small
+RUST toe/tests/integration.rs cosmo_partition_exact
+RUST toe/tests/integration.rs energy_ordering
+RUST toe/tests/integration.rs molecular_angles_from_algebra
+RUST toe/tests/integration.rs lane_emden_wd_and_chandrasekhar
+RUST toe/tests/integration.rs thomson_cross_section
+RUST toe/tests/integration.rs onsager_tc
+RUST toe/tests/integration.rs genetic_code_arithmetic
+RUST toe/tests/integration.rs iron_is_where_stars_die
+RUST_COUNT toe/src/discoveries.rs 2
+RUST_COUNT toe/src/dynamics/arcade.rs 22
+RUST_COUNT toe/src/dynamics/astro.rs 24
+RUST_COUNT toe/src/dynamics/bio.rs 23
+RUST_COUNT toe/src/dynamics/cfd.rs 8
+RUST_COUNT toe/src/dynamics/chem.rs 21
+RUST_COUNT toe/src/dynamics/classical.rs 8
+RUST_COUNT toe/src/dynamics/condensed.rs 10
+RUST_COUNT toe/src/dynamics/decay.rs 10
+RUST_COUNT toe/src/dynamics/em.rs 15
+RUST_COUNT toe/src/dynamics/friedmann.rs 10
+RUST_COUNT toe/src/dynamics/gr.rs 6
+RUST_COUNT toe/src/dynamics/gw.rs 8
+RUST_COUNT toe/src/dynamics/md.rs 11
+RUST_COUNT toe/src/dynamics/nbody.rs 7
+RUST_COUNT toe/src/dynamics/nuclear.rs 17
+RUST_COUNT toe/src/dynamics/optics.rs 11
+RUST_COUNT toe/src/dynamics/plasma.rs 8
+RUST_COUNT toe/src/dynamics/qft.rs 15
+RUST_COUNT toe/src/dynamics/qinfo.rs 22
+RUST_COUNT toe/src/dynamics/rigid.rs 12
+RUST_COUNT toe/src/dynamics/thermo.rs 12
+RUST_COUNT toe/src/gravity_dyn.rs 6
+RUST_COUNT toe/src/hologron.rs 3
+RUST_COUNT toe/src/layer.rs 6
+RUST_COUNT toe/src/lib.rs 89
+RUST_COUNT toe/src/mandelbrot.rs 38
+RUST_COUNT toe/src/mera.rs 3
+RUST_COUNT toe/src/noether.rs 5
+RUST_COUNT toe/src/proton_radius.rs 5
+RUST_COUNT toe/src/qlib/algorithms.rs 5
+RUST_COUNT toe/src/qlib/base.rs 7
+RUST_COUNT toe/src/qlib/channels.rs 3
+RUST_COUNT toe/src/qlib/entangle.rs 5
+RUST_COUNT toe/src/qlib/gates.rs 3
+RUST_COUNT toe/src/qlib/hamiltonians.rs 4
+RUST_COUNT toe/src/qlib/measure.rs 5
+RUST_COUNT toe/src/qlib/simulation.rs 9
+RUST_COUNT toe/src/quantum.rs 34
+RUST_COUNT toe/src/riemann.rs 3
+RUST_COUNT toe/src/structural.rs 3
+RUST_COUNT toe/src/waca_scan.rs 20
+RUST_COUNT toe/tests/integration.rs 29
 # PYTHON PROOF MODULES
-PYTHON crystal_alpha_proton_proof.py
-PYTHON crystal_arcade_proof.py
-PYTHON crystal_astro_proof.py
-PYTHON crystal_bio_proof.py
-PYTHON crystal_certificate_proof.py
-PYTHON crystal_cfd_proof.py
-PYTHON crystal_chem_proof.py
-PYTHON crystal_classical_proof.py
-PYTHON crystal_condensed_proof.py
-PYTHON crystal_decay_proof.py
-PYTHON crystal_discoveries_proof.py
-PYTHON crystal_em_proof.py
-PYTHON crystal_friedmann_proof.py
-PYTHON crystal_fundamentals_proof.py
-PYTHON crystal_gr_proof.py
-PYTHON crystal_gw_proof.py
-PYTHON crystal_hierarchy_proof.py
-PYTHON crystal_hologron_proof.py
-PYTHON crystal_md_proof.py
-PYTHON crystal_monad_mera_proof.py
-PYTHON crystal_noether_proof.py
-PYTHON crystal_nuclear_proof.py
-PYTHON crystal_optics_proof.py
-PYTHON crystal_plasma_proof.py
-PYTHON crystal_proton_radius_proof.py
-PYTHON crystal_qft_proof.py
-PYTHON crystal_qinfo_proof.py
-PYTHON crystal_rendering_proof.py
-PYTHON crystal_rigid_proof.py
-PYTHON crystal_structural_proof.py
-PYTHON 01_hello_crystal.py
-PYTHON 02_sector_spectrum.py
-PYTHON 03_time_evolution.py
-PYTHON 04_creation_annihilation.py
-PYTHON 05_two_particles.py
-PYTHON 06_entanglement.py
-PYTHON 07_grover_search.py
-PYTHON 08_qft_phases.py
-PYTHON 09_decoherence.py
-PYTHON 10_full_simulation.py
-PYTHON 100_genetic_code_ecc.py
-PYTHON 101_nfw_navigation.py
-PYTHON 102_metamaterial_design.py
-PYTHON 103_drug_docking.py
-PYTHON 104_casimir_water_bridge.py
-PYTHON 105_beta0_nfw_bridge.py
-PYTHON 106_turbulence_algebra.py
-PYTHON 107_codons_dark_matter.py
-PYTHON 108_hohmann_transfer.py
-PYTHON 109_gravitational_slingshot.py
-PYTHON 11_newton_laws.py
-PYTHON 110_atmospheric_drag.py
-PYTHON 111_radiation_dose.py
-PYTHON 112_solar_panel_efficiency.py
-PYTHON 113_rtg_power.py
-PYTHON 114_signal_delay.py
-PYTHON 115_117_qec_thermal_propellant.py
-PYTHON 12_kepler_orbits.py
-PYTHON 13_maxwell_equations.py
-PYTHON 14_schwarzschild.py
-PYTHON 15_special_relativity.py
-PYTHON 16_general_relativity.py
-PYTHON 17_neutrino_masses.py
-PYTHON 18_ckm_matrix.py
-PYTHON 19_pmns_matrix.py
-PYTHON 20_weak_mixing.py
-PYTHON 21_higgs_mass.py
-PYTHON 22_w_boson.py
-PYTHON 23_z_boson.py
-PYTHON 24_electron_mass.py
-PYTHON 25_neutron_star.py
-PYTHON 26_black_hole_thermo.py
-PYTHON 27_gravitational_waves.py
-PYTHON 28_muon_mass.py
-PYTHON 29_muon_g2.py
-PYTHON 30_pion_mass.py
-PYTHON 31_rho_meson.py
-PYTHON 32_kaon.py
-PYTHON 33_eta_mesons.py
-PYTHON 34_jpsi.py
-PYTHON 35_upsilon.py
-PYTHON 36_qcd_scale.py
-PYTHON 37_quark_ratios.py
-PYTHON 38_strange_quark.py
-PYTHON 39_charm_quark.py
-PYTHON 40_bottom_quark.py
-PYTHON 41_proton_mass.py
-PYTHON 42_top_quark.py
-PYTHON 43_tau_lepton.py
-PYTHON 44_hadron_spectrum.py
-PYTHON 45_fine_structure.py
-PYTHON 46_mass_splittings.py
-PYTHON 47_nuclear_binding.py
-PYTHON 48_magnetic_moments.py
-PYTHON 49_cosmo_constants.py
-PYTHON 50_complete_catalogue.py
-PYTHON 51_carnot_engine.py
-PYTHON 52_stefan_boltzmann.py
-PYTHON 53_fourier_heat.py
-PYTHON 54_kolmogorov.py
-PYTHON 55_prandtl.py
-PYTHON 56_confinement.py
-PYTHON 57_dna_code.py
-PYTHON 58_complexity_42.py
-PYTHON 59_chirality.py
-PYTHON 60_simulate_life.py
-PYTHON 61_helix_folding.py
-PYTHON 62_beta_sheet.py
-PYTHON 63_hydrogen_bonds.py
-PYTHON 64_dna_groove.py
-PYTHON 65_error_correction.py
-PYTHON 66_protein_space.py
-PYTHON 67_disease_decoherence.py
-PYTHON 68_crispr_vs_lattice.py
-PYTHON 69_periodic_table.py
-PYTHON 70_simulate_cell.py
-PYTHON 71_drug_discovery.py
-PYTHON 72_superconductors.py
-PYTHON 73_synthetic_life.py
-PYTHON 74_catalyst_design.py
-PYTHON 75_metallic_hydrogen.py
-PYTHON 76_material_design.py
-PYTHON 77_cross_domain_table.py
-PYTHON 78_verify_all.py
-PYTHON 79_superconductor.py
-PYTHON 80_type_safe_flow.py
-PYTHON 81_arrow_of_time.py
-PYTHON 82_second_law_proof.py
-PYTHON 83_kms_equilibrium.py
-PYTHON 84_entropy_budget.py
-PYTHON 85_io_monad_time.py
-PYTHON 86_refractive_index.py
-PYTHON 87_dark_matter.py
-PYTHON 88_epigenetic_clock.py
-PYTHON 89_metamaterial.py
-PYTHON 90_hardcode_audit.py
-PYTHON 91_cosmic_audit.py
-PYTHON 92_derivation_chain.py
-PYTHON 93_why_42.py
-PYTHON 94_everything_table.py
-PYTHON 95_three_body.py
-PYTHON 96_superconductor_screen.py
-PYTHON 97_alphafold_constraints.py
-PYTHON 98_mission_planning.py
-PYTHON 99_turbulence_cfd.py
-PYTHON crystal_constants.py
-PYTHON crystal_vdw.py
-PYTHON hf_solver.py
-PYTHON mera_gravity_closed.py
-PYTHON mera_linearized_gravity.py
-PYTHON qubo_folder.py
-PYTHON schrodinger_vs_monad.py
-PYTHON spectral_tower.py
+PYTHON proofs/crystal_alpha_proton_proof.py
+PYTHON proofs/crystal_arcade_proof.py
+PYTHON proofs/crystal_astro_proof.py
+PYTHON proofs/crystal_bio_proof.py
+PYTHON proofs/crystal_certificate_proof.py
+PYTHON proofs/crystal_cfd_proof.py
+PYTHON proofs/crystal_chem_proof.py
+PYTHON proofs/crystal_classical_proof.py
+PYTHON proofs/crystal_condensed_proof.py
+PYTHON proofs/crystal_decay_proof.py
+PYTHON proofs/crystal_discoveries_proof.py
+PYTHON proofs/crystal_em_proof.py
+PYTHON proofs/crystal_friedmann_proof.py
+PYTHON proofs/crystal_fundamentals_proof.py
+PYTHON proofs/crystal_gr_proof.py
+PYTHON proofs/crystal_gw_proof.py
+PYTHON proofs/crystal_hierarchy_proof.py
+PYTHON proofs/crystal_hologron_proof.py
+PYTHON proofs/crystal_md_proof.py
+PYTHON proofs/crystal_monad_mera_proof.py
+PYTHON proofs/crystal_noether_proof.py
+PYTHON proofs/crystal_nuclear_proof.py
+PYTHON proofs/crystal_optics_proof.py
+PYTHON proofs/crystal_plasma_proof.py
+PYTHON proofs/crystal_proton_radius_proof.py
+PYTHON proofs/crystal_qft_proof.py
+PYTHON proofs/crystal_qinfo_proof.py
+PYTHON proofs/crystal_rendering_proof.py
+PYTHON proofs/crystal_rigid_proof.py
+PYTHON proofs/crystal_structural_proof.py
+# PYTHON EXAMPLES (crystal-toe)
+PYTHON toe/python/examples/arcade/arcade_fixed_point.py
+PYTHON toe/python/examples/arcade/arcade_integers.py
+PYTHON toe/python/examples/arcade/arcade_integrators.py
+PYTHON toe/python/examples/arcade/arcade_lj_potentials.py
+PYTHON toe/python/examples/arcade/arcade_mean_field.py
+PYTHON toe/python/examples/astro/astro_black_holes.py
+PYTHON toe/python/examples/astro/astro_cross_checks.py
+PYTHON toe/python/examples/astro/astro_integers.py
+PYTHON toe/python/examples/astro/astro_lane_emden.py
+PYTHON toe/python/examples/astro/astro_scaling.py
+PYTHON toe/python/examples/bio/bio_allometric.py
+PYTHON toe/python/examples/bio/bio_cross_module.py
+PYTHON toe/python/examples/bio/bio_genetic_code.py
+PYTHON toe/python/examples/bio/bio_integers.py
+PYTHON toe/python/examples/bio/bio_protein.py
+PYTHON toe/python/examples/CFD/cfd_flow_field.py
+PYTHON toe/python/examples/CFD/cfd_integers.py
+PYTHON toe/python/examples/CFD/cfd_kolmogorov.py
+PYTHON toe/python/examples/CFD/cfd_poiseuille.py
+PYTHON toe/python/examples/CFD/cfd_stokes.py
+PYTHON toe/python/examples/chem/chem_arrhenius.py
+PYTHON toe/python/examples/chem/chem_energy_scales.py
+PYTHON toe/python/examples/chem/chem_hybridization.py
+PYTHON toe/python/examples/chem/chem_integers.py
+PYTHON toe/python/examples/chem/chem_orbitals.py
+PYTHON toe/python/examples/classical/01_leo_orbit.py
+PYTHON toe/python/examples/classical/02_elliptical_orbits.py
+PYTHON toe/python/examples/classical/03_hohmann_transfer.py
+PYTHON toe/python/examples/classical/04_slingshot.py
+PYTHON toe/python/examples/classical/05_conservation_dashboard.py
+PYTHON toe/python/examples/condensed/condensed_bcs.py
+PYTHON toe/python/examples/condensed/condensed_integers.py
+PYTHON toe/python/examples/condensed/condensed_ising_mc.py
+PYTHON toe/python/examples/condensed/condensed_lattice_snapshot.py
+PYTHON toe/python/examples/condensed/condensed_phase_transition.py
+PYTHON toe/python/examples/decay/decay_beta_spectrum.py
+PYTHON toe/python/examples/decay/decay_integers.py
+PYTHON toe/python/examples/decay/decay_muon.py
+PYTHON toe/python/examples/decay/decay_oscillations.py
+PYTHON toe/python/examples/decay/decay_phase_space.py
+PYTHON toe/python/examples/em/em_integers.py
+PYTHON toe/python/examples/em/em_larmor.py
+PYTHON toe/python/examples/em/em_planck_stefan.py
+PYTHON toe/python/examples/em/em_rayleigh.py
+PYTHON toe/python/examples/em/em_yee_fdtd.py
+PYTHON toe/python/examples/friedmann/friedmann_cmb.py
+PYTHON toe/python/examples/friedmann/friedmann_densities.py
+PYTHON toe/python/examples/friedmann/friedmann_distances.py
+PYTHON toe/python/examples/friedmann/friedmann_expansion.py
+PYTHON toe/python/examples/friedmann/friedmann_integers.py
+PYTHON toe/python/examples/gr/gr_dashboard.py
+PYTHON toe/python/examples/gr/gr_isco.py
+PYTHON toe/python/examples/gr/gr_light_bending.py
+PYTHON toe/python/examples/gr/gr_precession.py
+PYTHON toe/python/examples/gr/gr_shapiro.py
+PYTHON toe/python/examples/gw/gw_chirp_mass.py
+PYTHON toe/python/examples/gw/gw_crystal_integers.py
+PYTHON toe/python/examples/gw/gw_frequency_evolution.py
+PYTHON toe/python/examples/gw/gw_inspiral.py
+PYTHON toe/python/examples/gw/gw_orbital_decay.py
+PYTHON toe/python/examples/md/md_bond_angles.py
+PYTHON toe/python/examples/md/md_dna.py
+PYTHON toe/python/examples/md/md_integers.py
+PYTHON toe/python/examples/md/md_lj_vibration.py
+PYTHON toe/python/examples/md/md_polymer.py
+PYTHON toe/python/examples/nbody/nbody_figure_eight.py
+PYTHON toe/python/examples/nbody/nbody_mass_ratio.py
+PYTHON toe/python/examples/nbody/nbody_plummer.py
+PYTHON toe/python/examples/nbody/nbody_solar_system.py
+PYTHON toe/python/examples/nbody/nbody_two_body.py
+PYTHON toe/python/examples/nuclear/nuclear_binding.py
+PYTHON toe/python/examples/nuclear/nuclear_integers.py
+PYTHON toe/python/examples/nuclear/nuclear_magic.py
+PYTHON toe/python/examples/nuclear/nuclear_radii.py
+PYTHON toe/python/examples/nuclear/nuclear_semf.py
+PYTHON toe/python/examples/optics/optics_fresnel.py
+PYTHON toe/python/examples/optics/optics_integers.py
+PYTHON toe/python/examples/optics/optics_planck.py
+PYTHON toe/python/examples/optics/optics_rayleigh.py
+PYTHON toe/python/examples/optics/optics_snell.py
+PYTHON toe/python/examples/plasma/plasma_alfven.py
+PYTHON toe/python/examples/plasma/plasma_beta.py
+PYTHON toe/python/examples/plasma/plasma_integers.py
+PYTHON toe/python/examples/plasma/plasma_pulse.py
+PYTHON toe/python/examples/plasma/plasma_scales.py
+PYTHON toe/python/examples/QFT/qft_cross_section.py
+PYTHON toe/python/examples/QFT/qft_feynman_rules.py
+PYTHON toe/python/examples/QFT/qft_integers.py
+PYTHON toe/python/examples/QFT/qft_phase_space.py
+PYTHON toe/python/examples/QFT/qft_running_couplings.py
+PYTHON toe/python/examples/qinfo/qinfo_entropy.py
+PYTHON toe/python/examples/qinfo/qinfo_error_codes.py
+PYTHON toe/python/examples/qinfo/qinfo_heyting.py
+PYTHON toe/python/examples/qinfo/qinfo_integers.py
+PYTHON toe/python/examples/qinfo/qinfo_mera.py
+PYTHON toe/python/examples/rigid/rigid_asymmetric.py
+PYTHON toe/python/examples/rigid/rigid_gyroscope.py
+PYTHON toe/python/examples/rigid/rigid_inertia.py
+PYTHON toe/python/examples/rigid/rigid_integers.py
+PYTHON toe/python/examples/rigid/rigid_tumbling.py
+PYTHON toe/python/examples/thermo/thermo_gamma.py
+PYTHON toe/python/examples/thermo/thermo_integers.py
+PYTHON toe/python/examples/thermo/thermo_lattice.py
+PYTHON toe/python/examples/thermo/thermo_lj_potential.py
+PYTHON toe/python/examples/thermo/thermo_md_simulation.py
 # SUMMARY COUNTS
 TOTAL_LEAN_THEOREMS     1226
 TOTAL_AGDA_PROOFS      991
-TOTAL_RUST_TESTS      486
+TOTAL_RUST_TESTS      568
 TOTAL_HASKELL_MODULES       58
-TOTAL_PYTHON_MODULES      153
+TOTAL_PYTHON_MODULES      135
