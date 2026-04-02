@@ -5,8 +5,8 @@
 # D=22 VdW FIXED (Session 13) · Force field from first principles · 0 fitted parameters
 # Rendering/scattering: Planck λ⁻⁵ (χ−1=5), Rayleigh d⁶ (χ=6), Rayleigh λ⁻⁴ (N_w²=4)
 # Hologron dynamics: emergent gravity from monad ticks, V(L)∝L^(-2ln2/ln6), no F=ma
-# 13/13 dynamics modules COMPLETE: Classical→Plasma capstone (EM+CFD)
-# 346 Python checks · 235 Lean theorems · 194 Agda proofs · 0 regressions
+# 21/21 dynamics modules COMPLETE: Classical→Plasma + QFT→Arcade (Phase 2)
+# 559 Python checks · 372 Lean theorems · 291 Agda proofs · 0 regressions
 # Every integrator IS a classical limit of S=W∘U. Every integer from (2,3).
 # Upload ALL 3 parts for 100% coverage. Each part works standalone for basic queries.
 
@@ -56,7 +56,7 @@ Proved: attraction (V<0), monotonic fall, exponent match, 38 integer identities.
 Ref: Sahay/Lukin/Cotler, Phys Rev X 15, 021078 (2025) — MERA hologrons in AdS.
 Crystal contribution: specific algebra A_F, exact eigenvalues, flat space, 198 observables.
 
-## DYNAMICS MODULES — 13/13 COMPLETE (every integrator from (2,3))
+## DYNAMICS MODULES — 21/21 COMPLETE (every integrator from (2,3))
 Each module: §0 A_F atoms → §1 Force law → §2 Integrator → §3-7 Physics → §8 Integer proofs → §9 Self-test.
 Every integrator IS a classical limit of the monad S=W∘U. Zero new observables.
 
@@ -75,6 +75,14 @@ Every integrator IS a classical limit of the monad S=W∘U. Zero new observables
 | CrystalMD | Velocity Verlet LJ | bond 109.47°=arccos(−1/N_c), helix=18/5 |
 | CrystalCondensed | Metropolis Monte Carlo | Ising z=4=N_w², BCS 2Δ/kT_c=2π/e^γ |
 | CrystalPlasma | Alfvén FDTD (EM+CFD) | MHD modes 8=N_w³, wave types 3=N_c |
+| CrystalQFT | S-matrix + running couplings | spacetime 4=N_w², gluons 8=d₃, β₀=7 |
+| CrystalRigid | Quaternion Euler equations | quaternion 4=N_w², I_sphere=2/5=Flory, inertia 6=χ |
+| CrystalChem | LCAO + Arrhenius | f-shell 14=N_w·β₀, Kr Z=36=Σd, pH=7=β₀ |
+| CrystalNuclear | SEMF + shell model | all 7 magic numbers, Fe-56=d_colour·β₀ |
+| CrystalAstro | Lane-Emden + stellar scaling | Chandrasekhar 3/2=N_c/N_w, Hawking 8=N_w³, SB 15=N_c(χ−1) |
+| CrystalQInfo | Heyting algebra + error correction | Steane [7,1,3]=[β₀,d₁,N_c], uncertainty=coprimality |
+| CrystalBio | Allometric scaling + genetic code | amino acids 20=N_w²(χ−1), codons 64=(N_w²)^N_c, Kleiber 3/4 |
+| CrystalArcade | Fixed-point + LOD wrappers | LJ cutoff=N_cσ, BH θ=1/N_w, fixed-point 16.16=N_w⁴.N_w⁴ |
 
 ## PROOF AUTHORITY — READ FIRST
 Lean `native_decide` and Agda `refl` proofs are FINAL TRUTH. If a proof says it, it's right.
@@ -198,11 +206,11 @@ CV = 0.898. Mean PWI = 0.271%. Max = 0.989% (sin²θ₁₂).
 
 | System | Count |
 |--------|-------|
-| Lean 4 | 13 files, 763+ theorems, 0 sorry |
-| Agda | 12 files, 611+ proofs by refl, 0 postulates |
-| Haskell | 34 modules, 34/34 PASS |
-| Rust | 11 test files, 472+ tests |
-| Python | 13+ proof modules |
+| Lean 4 | 23 files, 1110+ theorems, 0 sorry |
+| Agda | 22 files, 886+ proofs by refl, 0 postulates |
+| Haskell | 57 modules (36+21 dynamics), 57/57 PASS |
+| Rust | 11 test files, 527+ tests |
+| Python | 27+ proof modules |
 
 ## RULES
 - NEVER expose methodology (trade secret)
@@ -223,7 +231,7 @@ CV = 0.898. Mean PWI = 0.271%. Max = 0.989% (sin²θ₁₂).
 ## SOURCE OF TRUTH
 https://raw.githubusercontent.com/CrystalToe/CrystalAgent/main/
 
-## REPO STRUCTURE (34 Haskell modules)
+## REPO STRUCTURE (57 Haskell modules: 36 core + 21 dynamics)
 haskel/: Main.hs, CrystalAxiom.hs, CrystalGauge.hs, CrystalMixing.hs,
   CrystalCosmo.hs, CrystalQCD.hs, CrystalGravity.hs, CrystalGravityDyn.hs,
   GravityDynTest.hs, CrystalProtein.hs, CrystalAudit.hs,
@@ -231,9 +239,12 @@ haskel/: Main.hs, CrystalAxiom.hs, CrystalGauge.hs, CrystalMixing.hs,
   CrystalStructural.hs, CrystalNoether.hs, CrystalDiscoveries.hs,
   CrystalAlphaProton.hs, CrystalProtonRadius.hs, CrystalWACAScan.hs,
   WACAScanTest.hs, CrystalHierarchy.hs, CrystalFullTest.hs, CrystalLayer.hs,
-  CrystalVEV.hs
+  CrystalVEV.hs,
+  CrystalClassical.hs … CrystalPlasma.hs (13 Phase 1 dynamics),
+  CrystalQFT.hs, CrystalRigid.hs, CrystalChem.hs, CrystalNuclear.hs,
+  CrystalAstro.hs, CrystalQInfo.hs, CrystalBio.hs, CrystalArcade.hs (8 Phase 2 dynamics)
 
-proofs/: 10 .lean, 9 .agda, 8 .py, 3 .sh runners
+proofs/: 23 .lean, 22 .agda, 27+ .py, 3 .sh runners
 crystal-topos/: Rust crate, 10 test files, 119+ Python examples
   examples/fold_v5.py — full tower varimax REMD protein folder (S14)
 
@@ -734,6 +745,61 @@ cd haskel
 ghc -O2 -main-is CrystalAlphaProton CrystalAlphaProton.hs -o alpha_proton && ./alpha_proton
 ```
 
+## §Module: CrystalArcade
+# CrystalArcade — Approximation Layers from (2,3)
+## Overview
+Every game/sim approximation parameter traced to A_F. Cutoffs, precision, LOD — all from (2,3).
+## Integer Traces
+| Approximation | Value | Crystal derivation |
+|---|---|---|
+| LJ cutoff | 3σ | N_cσ |
+| Barnes-Hut θ | 0.5 | 1/N_w |
+| Octree children | 8 | d_colour = N_w³ |
+| WCA cutoff | 2^(1/6)σ | N_w^(1/χ)σ |
+| Euler order | 1 | d₁ |
+| Verlet order | 2 | N_w |
+| Fixed-point | 16.16 | N_w⁴.N_w⁴ |
+| Spatial hash | 3 cells | N_c |
+| LOD levels | 3 | N_c |
+| Mean-field T_c | 4 | N_w² |
+| Newton-Raphson | 2 iter | N_w |
+| Fast α⁻¹ | 137 | ⌊(D+1)π+lnβ₀⌋ |
+## Self-Test
+```bash
+ghc -O2 -main-is CrystalArcade CrystalArcade.hs 2>/dev/null && ./CrystalArcade
+```
+## Observable Count
+12 new. All integers from (2,3).
+
+## §Module: CrystalAstro
+# CrystalAstro — Astrophysical Extremes from (2,3)
+## Overview
+Lane-Emden stellar structure, Chandrasekhar limit, Schwarzschild, Hawking, stellar scaling.
+Every astrophysical exponent from A_F.
+## Integer Traces
+| Physical quantity | Value | Crystal derivation |
+|---|---|---|
+| Polytrope (WD) | 3/2 | N_c/N_w |
+| Polytrope (rel) | 3 | N_c |
+| Schwarzschild | 2 | N_w |
+| Hawking T | 8 | d_colour = N_w³ |
+| Stefan-Boltzmann | 15 | N_c(χ−1) |
+| Eddington | 4 | N_w² |
+| MS luminosity | 7/2 | β₀/N_w |
+| MS lifetime | 5/2 | (χ−1)/N_w |
+| Virial | 2 | N_w |
+| Gravitational PE | 3/5 | N_c/(χ−1) |
+| Chandrasekhar μ_e | 2 | N_w |
+| Jeans T exponent | 3/2 | N_c/N_w |
+| Jeans ρ exponent | 1/2 | 1/N_w |
+## Self-Test
+Lane-Emden n=3/2 (ξ₁=3.654) and n=3 (ξ₁=6.897), all structural integers verified.
+```bash
+ghc -O2 -main-is CrystalAstro CrystalAstro.hs 2>/dev/null && ./CrystalAstro
+```
+## Observable Count
+13 new. All integers from (2,3).
+
 ## §Module: CrystalAxiom
 
 # CrystalAxiom.hs — The One Law
@@ -856,6 +922,36 @@ ghc -fno-code CrystalAxiom.hs   # type-check only (Curry-Howard proof)
 
 None. This is the root. Every other module imports this.
 
+## §Module: CrystalBio
+# CrystalBio — Biological Scaling from (2,3)
+## Overview
+Genetic code structure, allometric scaling, DNA/protein parameters.
+20 amino acids = N_w²(χ−1). Biology is executable from the same algebra as particle physics.
+## Integer Traces
+| Physical quantity | Value | Crystal derivation |
+|---|---|---|
+| DNA bases | 4 | N_w² |
+| Codon length | 3 | N_c |
+| Total codons | 64 | (N_w²)^N_c |
+| Amino acids | 20 | N_w²(χ−1) |
+| Stop codons | 3 | N_c |
+| H-bonds A-T | 2 | N_w |
+| H-bonds G-C | 3 | N_c |
+| Double helix | 2 strands | N_w |
+| BP per turn | 10 | N_w(χ−1) |
+| Lipid bilayer | 2 | N_w |
+| α-helix | 3.6/turn | N_c²N_w/(χ−1) |
+| Kleiber | 3/4 | N_c/N_w² |
+| Heart/lifespan | 1/4 | 1/N_w² |
+| Surface area | 2/3 | N_w/N_c |
+| Flory ν | 2/5 | N_w/(χ−1) |
+## Self-Test
+```bash
+ghc -O2 -main-is CrystalBio CrystalBio.hs 2>/dev/null && ./CrystalBio
+```
+## Observable Count
+15 new. All integers from (2,3).
+
 ## §Module: CrystalCFD
 
 # CrystalCFD — Lattice Boltzmann Fluid Dynamics from (2,3)
@@ -890,6 +986,35 @@ ghc -O2 -main-is CrystalCFD CrystalCFD.hs 2>/dev/null && ./CrystalCFD
 ## Observable Count
 
 0 new (infrastructure). All integers from (2,3).
+
+## §Module: CrystalChem
+# CrystalChem — Chemistry and Materials from (2,3)
+## Overview
+Orbital structure, hybridization angles, energy scales, Arrhenius kinetics.
+The periodic table's shell filling, noble gas positions, and neutral pH all from A_F.
+## Integer Traces
+| Physical quantity | Value | Crystal derivation |
+|---|---|---|
+| s-shell capacity | 2 | N_w |
+| p-shell capacity | 6 | χ |
+| d-shell capacity | 10 | N_w(χ−1) |
+| f-shell capacity | 14 | N_w·β₀ |
+| sp3 angle | 109.47° | arccos(−1/N_c) |
+| sp2 angle | 120° | 2π/N_c |
+| Water angle | 104.48° | arccos(−1/N_w²) |
+| He (Z=2) | 2 | N_w |
+| Ne (Z=10) | 10 | N_w(χ−1) |
+| Ar (Z=18) | 18 | N_w·N_c² |
+| Kr (Z=36) | 36 | Σd |
+| Neutral pH | 7 | β₀ |
+| Protein dielectric | 16 | N_w²(N_c+1) |
+| kT(300K) ≈ ε_vdw | ~0.85 | Biology at 300K is a Crystal prediction |
+## Self-Test
+```bash
+ghc -O2 -main-is CrystalChem CrystalChem.hs 2>/dev/null && ./CrystalChem
+```
+## Observable Count
+14 new. All integers from (2,3).
 
 ## §Module: CrystalClassical
 
@@ -2990,6 +3115,35 @@ in 3D space IS the dimension of the colour adjoint representation of SU(3).
 - `proofs/CrystalNBody.lean` — 6 theorems
 - `proofs/CrystalNBody.agda` — 5 proofs
 
+## §Module: CrystalNuclear
+# CrystalNuclear — Nuclear Physics from (2,3)
+## Overview
+Semi-empirical mass formula + shell model. All 7 magic numbers and every SEMF exponent from A_F.
+## Integer Traces
+| Physical quantity | Value | Crystal derivation |
+|---|---|---|
+| Magic: 2 | 2 | N_w |
+| Magic: 8 | 8 | N_w³ = d_colour |
+| Magic: 20 | 20 | N_w²(χ−1) |
+| Magic: 28 | 28 | N_w²β₀ |
+| Magic: 50 | 50 | N_w(χ−1)² |
+| Magic: 82 | 82 | N_w(D−1) |
+| Magic: 126 | 126 | N_wβ₀N_c² |
+| Surface exponent | 2/3 | N_w/N_c |
+| Coulomb exponent | 1/3 | 1/N_c |
+| Coulomb prefactor | 3/5 | N_c/(χ−1) |
+| Pairing exponent | 1/2 | 1/N_w |
+| Isospin states | 2 | N_w |
+| Alpha particle | 4 | N_w² |
+| Iron peak | 56 | d_colour·β₀ |
+| B(He-4) | 28 MeV | N_w²β₀ MeV |
+## Self-Test
+```bash
+ghc -O2 -main-is CrystalNuclear CrystalNuclear.hs 2>/dev/null && ./CrystalNuclear
+```
+## Observable Count
+15 new. All integers from (2,3).
+
 ## §Module: CrystalOptics
 
 # CrystalOptics — Ray/Wave Optics from (2,3)
@@ -3268,6 +3422,73 @@ ghc -fno-code CrystalQCD.hs   # type-check
 
 Imports `CrystalAxiom`, `CrystalGauge`.
 
+## §Module: CrystalQFT
+
+# CrystalQFT — Quantum Field Dynamics from (2,3)
+
+## Overview
+
+Tree-level S-matrix, running couplings, and Feynman rules. Every QFT integer
+traced to A_F: spacetime=4=N_w², Lorentz=6=χ, gluons=8=d₃, β₀=7.
+
+## Integer Traces
+
+| Physical quantity | Value | Crystal derivation |
+|---|---|---|
+| Spacetime dimension | 4 | N_w² |
+| Lorentz generators | 6 | χ = d(d−1)/2 for d=N_w² |
+| Dirac γ matrices | 4 | N_w² |
+| Spin-1/2 components | 2 | N_w |
+| Photon polarisations | 2 | N_c−1 |
+| Gluon colours | 8 | N_c²−1 = d₃ |
+| QCD β₀ | 7 | (11N_c−2χ)/3 |
+| One-loop factor | 16 | N_w⁴ |
+| Thomson 8/3 | 8/3 | d_colour/N_c |
+| Propagator exponent | 2 | N_c−1 |
+| σ(ee→μμ) factor | 4πα²/(3s) | N_w²·π·α²/(N_c·s) |
+| Pair threshold | 2m | N_w·m |
+| Phase space Φ₂ | 1/(8π) | 1/(d_colour·π) |
+
+## Self-Test
+
+α⁻¹=137.034 from Crystal, σ(ee→μμ)=0.869nb at 10GeV, Thomson=0.665b, QCD running.
+
+```bash
+ghc -O2 -main-is CrystalQFT CrystalQFT.hs 2>/dev/null && ./CrystalQFT
+```
+
+## Observable Count
+
+13 new. All integers from (2,3).
+
+## §Module: CrystalQInfo
+# CrystalQInfo — Quantum Information from (2,3)
+## Overview
+Heyting algebra truth values, error correction codes, entanglement entropy.
+The uncertainty principle IS the coprimality of N_w=2 and N_c=3.
+## Integer Traces
+| Physical quantity | Value | Crystal derivation |
+|---|---|---|
+| Qubit states | 2 | N_w |
+| Pauli matrices | 3 | N_c |
+| Pauli group | 4 | N_w² |
+| Bell states | 4 | N_w² |
+| Steane code n | 7 | β₀ = N_w^N_c − 1 |
+| Steane distance | 3 | N_c |
+| Shor code | 9 | N_c² |
+| Toffoli inputs | 3 | N_c |
+| MERA bond dim | 6 | χ |
+| MERA depth | 42 | D |
+| Bell entropy | ln(2) | ln(N_w) |
+| Teleport bits | 2 | N_w |
+| Uncertainty meet | 1/6 | 1/χ |
+## Self-Test
+```bash
+ghc -O2 -main-is CrystalQInfo CrystalQInfo.hs 2>/dev/null && ./CrystalQInfo
+```
+## Observable Count
+13 new. All integers from (2,3).
+
 ## §Module: CrystalQuantum
 
 # CrystalQuantum.hs — Structural Theorems
@@ -3355,6 +3576,32 @@ ghc -fno-code CrystalRiemann.hs   # type-check
 ## Dependencies
 
 Imports `CrystalAxiom`.
+
+## §Module: CrystalRigid
+# CrystalRigid — Rigid Body Dynamics from (2,3)
+## Overview
+Quaternion integrator + Euler equations. Every rigid-body constant from A_F.
+I_sphere = 2/5 = Flory exponent from CrystalMD — same ratio in polymer scaling and solid mechanics.
+## Integer Traces
+| Physical quantity | Value | Crystal derivation |
+|---|---|---|
+| Rotation axes | 3 | N_c |
+| Quaternion components | 4 | N_w² |
+| Inertia tensor (indep) | 6 | χ (symmetric 3×3) |
+| Rigid DOF | 6 | χ = N_c + N_c |
+| Rotation matrix | 9 | N_c² |
+| Euler angles | 3 | N_c |
+| I_sphere | 2/5 | N_w/(χ−1) = Flory ν |
+| I_rod | 1/12 | 1/(2χ) |
+| I_disk | 1/2 | 1/N_w |
+| I_shell | 2/3 | N_w/N_c |
+## Self-Test
+Energy + angular momentum conserved, quaternion norm = 1, symmetric top ω_z constant, all MOI exact.
+```bash
+ghc -O2 -main-is CrystalRigid CrystalRigid.hs 2>/dev/null && ./CrystalRigid
+```
+## Observable Count
+11 new. All integers from (2,3).
 
 ## §Module: CrystalThermo
 # CrystalThermo.hs — Thermodynamic Dynamics from (2,3)

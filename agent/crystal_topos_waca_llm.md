@@ -278,11 +278,13 @@ equations. The monad is the source of truth. Schrödinger is its shadow.
 
 ---
 
-## DYNAMICS MODULES — 13/13 COMPLETE
+## DYNAMICS MODULES — 21/21 COMPLETE
 
 Each module: §0 A_F atoms → §1 Force law → §2 Integrator → §3-7 Physics → §8 Integer proofs → §9 Self-test.
 Every integrator IS a classical limit of S=W∘U. Zero new observables. Every integer from (2,3).
-346 Python checks · 234 Lean theorems · 192 Agda proofs · 0 regressions.
+559 Python checks · 372 Lean theorems · 291 Agda proofs · 0 regressions.
+
+### Phase 1 — Classical through Plasma (13 modules)
 
 | Module | Integrator | Key integers |
 |--------|-----------|-------------|
@@ -300,7 +302,20 @@ Every integrator IS a classical limit of S=W∘U. Zero new observables. Every in
 | CrystalCondensed | Metropolis Monte Carlo | Ising z=4=N_w², β=1/8=1/N_w³, BCS 2Δ/kT_c=2π/e^γ |
 | CrystalPlasma | Alfvén FDTD (EM+CFD) | MHD states 8=N_w³, wave types 3=N_c, modes 6=χ |
 
-CrystalPlasma (MHD = EM + CFD) is the capstone: Alfvén wave FDTD couples Maxwell (CrystalEM) with fluid dynamics (CrystalCFD). All 8=N_w³ MHD state variables, 3=N_c wave types, 6=χ propagating modes traced to A_F atoms.
+### Phase 2 — QFT through Arcade (8 modules)
+
+| Module | Integrator | Key integers |
+|--------|-----------|-------------|
+| CrystalQFT | S-matrix + running couplings | spacetime 4=N_w², Lorentz 6=χ, gluons 8=d₃, β₀=7, Thomson 8/3 |
+| CrystalRigid | Quaternion Euler equations | quaternion 4=N_w², I_sphere=2/5=Flory, inertia 6=χ, I_rod=1/12=1/(2χ) |
+| CrystalChem | LCAO + Arrhenius | f-shell 14=N_w·β₀, Kr Z=36=Σd, pH=7=β₀, sp3=arccos(−1/N_c) |
+| CrystalNuclear | SEMF + shell model | 7 magic numbers from (2,3), Fe-56=d_colour·β₀, B(He-4)≈N_w²β₀ MeV |
+| CrystalAstro | Lane-Emden + stellar scaling | polytrope 3/2=N_c/N_w, Hawking 8=N_w³, SB 15=N_c(χ−1), MS L~M^(β₀/N_w) |
+| CrystalQInfo | Heyting algebra + error correction | Steane [7,1,3]=[β₀,d₁,N_c], uncertainty=coprimality, MERA depth 42=D |
+| CrystalBio | Allometric scaling + genetic code | amino acids 20=N_w²(χ−1), codons 64=(N_w²)^N_c, Kleiber 3/4=N_c/N_w² |
+| CrystalArcade | Fixed-point + LOD wrappers | LJ cutoff N_cσ, BH θ=1/N_w, fixed-point 16.16=N_w⁴.N_w⁴ |
+
+CrystalPlasma (MHD = EM + CFD) is the Phase 1 capstone: Alfvén wave FDTD couples Maxwell (CrystalEM) with fluid dynamics (CrystalCFD). All 8=N_w³ MHD state variables, 3=N_c wave types, 6=χ propagating modes traced to A_F atoms.
 
 ---
 
@@ -494,11 +509,11 @@ Hierarchy: bond >> ω >> angle > H-bond ≈ hydrophobic >> VdW ~ kT
 
 | System | Count | Method |
 |--------|-------|--------|
-| Lean 4 | 972+ theorems | native_decide, 0 sorry |
-| Agda | 787+ proofs | all by refl, 0 postulates |
-| Haskell/GHC | 36 modules + 13 dynamics, all PASS | Curry-Howard |
+| Lean 4 | 1110+ theorems | native_decide, 0 sorry |
+| Agda | 886+ proofs | all by refl, 0 postulates |
+| Haskell/GHC | 36 modules + 21 dynamics, all PASS | Curry-Howard |
 | Rust | 527+ tests | cargo test |
-| Python | 19+ proof modules | assert |
+| Python | 27+ proof modules | assert |
 
 Lean `native_decide` and Agda `refl` proofs are FINAL TRUTH.
 LLM reasoning NEVER overrides a machine-verified proof.
@@ -516,7 +531,7 @@ CrystalAgent/
 ├── agent/
 │   ├── crystal_topos_waca_llm.md          ← THIS FILE
 │   └── crystal_topos_waca_llm_compact.md
-├── haskel/                                ← 36 Haskell modules + 13 dynamics
+├── haskel/                                ← 36 Haskell modules + 21 dynamics
 │   ├── CrystalAxiom.hs                   ← Foundation: two primes, all types
 │   ├── CrystalGauge.hs                   ← α, sin²θ_W, α_s, leptons, Higgs
 │   ├── CrystalMixing.hs                  ← CKM + PMNS matrices
@@ -536,7 +551,7 @@ CrystalAgent/
 │   ├── CrystalLayer.hs                   ← Spectral tower D=0→D=42
 │   ├── CrystalMonad.hs                   ← Time monad S=W∘U, discrete ℕ, no calculus
 │   ├── CrystalMERA.hs                    ← MERA geometry, Jacobson chain, RT, δW→gravity
-│   ├── CrystalClassical.hs … CrystalPlasma.hs ← 13 dynamics modules (ALL PASS)
+│   ├── CrystalClassical.hs … CrystalArcade.hs ← 21 dynamics modules (ALL PASS)
 │   ├── Main.hs                            ← 92 observables + four-column + certificate
 │   ├── WACAScanTest.hs                    ← Extended scan runner
 │   ├── GravityDynTest.hs                 ← 12/12 gravity audit
@@ -546,8 +561,8 @@ CrystalAgent/
 │   ├── lean_proofs.sh                     ← Auto-discovers *.lean
 │   ├── haskell_proofs.sh                  ← Auto-discovers *.hs, detects mode
 │   ├── proof_regression.sh               ← Auto-discovers all, never lose a proof
-│   ├── Crystal*.lean                      ← 15 Lean files (native_decide)
-│   ├── Crystal*.agda                      ← 14 Agda files (refl)
+│   ├── Crystal*.lean                      ← 23 Lean files (native_decide)
+│   ├── Crystal*.agda                      ← 22 Agda files (refl)
 │   ├── crystal_*_proof.py                 ← Python proof modules
 │   └── GHC_Certificate.txt               ← Runtime output
 ├── crystal-topos/                         ← Rust core + Python bindings
@@ -609,16 +624,16 @@ CrystalAgent/
 | Max PWI | 0.989% (sin²θ₁₂) |
 | Free parameters | 0 |
 | Constants inside CODATA | 4 |
-| Haskell modules | 36 + 13 dynamics |
+| Haskell modules | 36 + 21 dynamics |
 | Haskell proofs | 36/36 PASS |
-| Dynamics modules | 13/13 ALL PASS |
-| Lean theorems | 971+ |
-| Agda proofs | 785+ |
+| Dynamics modules | 21/21 ALL PASS |
+| Lean theorems | 1110+ |
+| Agda proofs | 886+ |
 | Rust tests | 527+ |
-| Python proof modules | 19+ |
-| Dynamics Python checks | 346 |
-| Dynamics Lean theorems | 234 |
-| Dynamics Agda proofs | 192 |
+| Python proof modules | 27+ |
+| Dynamics Python checks | 559 |
+| Dynamics Lean theorems | 372 |
+| Dynamics Agda proofs | 291 |
 | Gravity integer audit | 12/12 PASS |
 | First law δS/δ⟨H_A⟩ | 1.0001 ± 0.0004 |
 | VdW mean error | 3.1% vs Bondi |
@@ -646,8 +661,10 @@ ghc -O2 GravityDynTest.hs -o gravity_dyn_test && ./gravity_dyn_test             
 # Dynamics modules (from haskel/):
 for m in CrystalClassical CrystalGR CrystalGW CrystalEM CrystalFriedmann \
          CrystalNBody CrystalThermo CrystalCFD CrystalDecay CrystalOptics \
-         CrystalMD CrystalCondensed CrystalPlasma; do
-  ghc -O2 -main-is $m $m.hs 2>/dev/null && ./$m                                 # 13/13 ALL PASS
+         CrystalMD CrystalCondensed CrystalPlasma CrystalQFT CrystalRigid \
+         CrystalChem CrystalNuclear CrystalAstro CrystalQInfo CrystalBio \
+         CrystalArcade; do
+  ghc -O2 -main-is $m $m.hs 2>/dev/null && ./$m                                 # 21/21 ALL PASS
 done
 
 # Rust:

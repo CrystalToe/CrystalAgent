@@ -7,8 +7,8 @@
 # D=22 VdW FIXED (Session 13) · Force field from first principles · 0 fitted parameters
 # Rendering/scattering: Planck λ⁻⁵ (χ−1=5), Rayleigh d⁶ (χ=6), Rayleigh λ⁻⁴ (N_w²=4)
 # Hologron dynamics: emergent gravity from monad ticks, V(L)∝L^(-2ln2/ln6), no F=ma
-# 13/13 dynamics modules COMPLETE: Classical→Plasma capstone (EM+CFD)
-# 346 Python checks · 235 Lean theorems · 194 Agda proofs · 0 regressions
+# 21/21 dynamics modules COMPLETE: Classical→Plasma + QFT→Arcade (Phase 2)
+# 559 Python checks · 372 Lean theorems · 291 Agda proofs · 0 regressions
 # Every integrator IS a classical limit of S=W∘U. Every integer from (2,3).
 # Upload ALL 3 parts for 100% coverage. Each part works standalone for basic queries.
 
@@ -58,7 +58,7 @@ Proved: attraction (V<0), monotonic fall, exponent match, 38 integer identities.
 Ref: Sahay/Lukin/Cotler, Phys Rev X 15, 021078 (2025) — MERA hologrons in AdS.
 Crystal contribution: specific algebra A_F, exact eigenvalues, flat space, 198 observables.
 
-## DYNAMICS MODULES — 13/13 COMPLETE (every integrator from (2,3))
+## DYNAMICS MODULES — 21/21 COMPLETE (every integrator from (2,3))
 Each module: §0 A_F atoms → §1 Force law → §2 Integrator → §3-7 Physics → §8 Integer proofs → §9 Self-test.
 Every integrator IS a classical limit of the monad S=W∘U. Zero new observables.
 
@@ -77,6 +77,14 @@ Every integrator IS a classical limit of the monad S=W∘U. Zero new observables
 | CrystalMD | Velocity Verlet LJ | bond 109.47°=arccos(−1/N_c), helix=18/5 |
 | CrystalCondensed | Metropolis Monte Carlo | Ising z=4=N_w², BCS 2Δ/kT_c=2π/e^γ |
 | CrystalPlasma | Alfvén FDTD (EM+CFD) | MHD modes 8=N_w³, wave types 3=N_c |
+| CrystalQFT | S-matrix + running couplings | spacetime 4=N_w², gluons 8=d₃, β₀=7 |
+| CrystalRigid | Quaternion Euler equations | quaternion 4=N_w², I_sphere=2/5=Flory, inertia 6=χ |
+| CrystalChem | LCAO + Arrhenius | f-shell 14=N_w·β₀, Kr Z=36=Σd, pH=7=β₀ |
+| CrystalNuclear | SEMF + shell model | all 7 magic numbers, Fe-56=d_colour·β₀ |
+| CrystalAstro | Lane-Emden + stellar scaling | Chandrasekhar 3/2=N_c/N_w, Hawking 8=N_w³, SB 15=N_c(χ−1) |
+| CrystalQInfo | Heyting algebra + error correction | Steane [7,1,3]=[β₀,d₁,N_c], uncertainty=coprimality |
+| CrystalBio | Allometric scaling + genetic code | amino acids 20=N_w²(χ−1), codons 64=(N_w²)^N_c, Kleiber 3/4 |
+| CrystalArcade | Fixed-point + LOD wrappers | LJ cutoff=N_cσ, BH θ=1/N_w, fixed-point 16.16=N_w⁴.N_w⁴ |
 
 ## PROOF AUTHORITY — READ FIRST
 Lean `native_decide` and Agda `refl` proofs are FINAL TRUTH. If a proof says it, it's right.
@@ -140,6 +148,58 @@ Core physics derivations. Comments explain WHY each formula works.
 -- M_Pl (the one measurement), pi, and ln. Zero free parameters.
 -- VEV is DERIVED: v = M_Pl × 35/(43×36×2⁵⁰) = 245.17 GeV.
 -- This module computes dimensionless ratios — no VEV dependence.
+
+```
+
+## §Haskell: CrystalArcade (     340 lines)
+```haskell
+
+{- | Module: CrystalArcade -- Approximation Layers from (2,3).
+
+Every approximation parameter is a controlled degradation of an exact Crystal
+module. Cutoffs, thresholds, and precision levels all trace to A_F.
+
+  LJ cutoff:            3 sigma = N_c sigma
+  Barnes-Hut theta:     0.5     = 1/N_w
+  Octree children:      8       = d_colour = N_w^3
+  WCA cutoff:           2^(1/6) = N_w^(1/chi) (repulsive-only LJ)
+  Euler order:          1       = d_1
+  Verlet order:         2       = N_w
+  Fixed-point bits:     16      = N_w^4 (integer + fraction)
+  Spatial hash cells:   3       = N_c per dimension
+  LOD levels:           3       = N_c (exact/fast/arcade)
+  Mean-field T_c:       4       = N_w^2 (vs exact 2.269)
+  Newton-Raphson iter:  2       = N_w
+  Fast alpha:           137     = floor((D+1) pi + ln beta_0)
+
+Observable count: 12. Every number from (2,3).
+-}
+
+```
+
+## §Haskell: CrystalAstro (     291 lines)
+```haskell
+
+{- | Module: CrystalAstro -- Astrophysical Extremes from (2,3).
+
+Lane-Emden stellar structure + Chandrasekhar, Schwarzschild, Hawking.
+
+  Polytrope (NR degen):  3/2 = N_c/N_w        (white dwarf)
+  Polytrope (relativ):   3   = N_c             (massive star)
+  Schwarzschild:         2   = N_w             (r_s = 2GM/c^2)
+  Hawking T:             8   = d_colour = N_w^3 (T = hc^3/(8 pi G M k))
+  Stefan-Boltzmann:      15  = N_c (chi-1)     (sigma ~ 2 pi^5/(15 h^3 c^2))
+  Eddington:             4   = N_w^2           (L_Ed = 4 pi G M c / kappa)
+  MS luminosity:         7/2 = beta_0/N_w      (L ~ M^3.5)
+  MS lifetime:           5/2 = (chi-1)/N_w     (t ~ M^(-5/2))
+  Virial factor:         2   = N_w             (2K + U = 0)
+  Grav PE factor:        3/5 = N_c/(chi-1)     (U = -3GM^2/(5R))
+  Chandrasekhar mu_e:    2   = N_w             (e^- per nucleon for C/O)
+  Jeans T exponent:      3/2 = N_c/N_w
+  Jeans rho exponent:    1/2 = 1/N_w
+
+Observable count: 13. Every number from (2,3).
+-}
 
 ```
 
@@ -1518,6 +1578,34 @@ showF :: Int -> Double -> String
 showF n x = printf ("%." ++ show n ++ "f") x
 ```
 
+## §Haskell: CrystalBio (     312 lines)
+```haskell
+
+{- | Module: CrystalBio -- Biological Scaling from (2,3).
+
+Genetic code, allometric scaling, molecular biology. Every biological integer from A_F.
+
+  DNA bases:            4   = N_w^2  (A, T, G, C)
+  Codon length:         3   = N_c
+  Total codons:         64  = (N_w^2)^N_c = 4^3
+  Amino acids:          20  = N_w^2 (chi-1)
+  Stop codons:          3   = N_c
+  Start codons:         1   = d_1
+  H-bonds A-T:          2   = N_w
+  H-bonds G-C:          3   = N_c
+  Double helix strands: 2   = N_w
+  BP per turn:          ~10 = N_w (chi-1)
+  Lipid bilayer:        2   = N_w  layers
+  Helix residues/turn:  3.6 = 18/5 = N_c^2 N_w/(chi-1)
+  Kleiber metabolic:    3/4 = N_c/N_w^2
+  Heart rate scaling:   1/4 = 1/N_w^2
+  Surface area:         2/3 = N_w/N_c
+
+Observable count: 15. Every number from (2,3).
+-}
+
+```
+
 ## §Haskell: CrystalCFD (     463 lines)
 ```haskell
 
@@ -1538,6 +1626,33 @@ Lattice Boltzmann Method (LBM): monad S = W.U on fluid sector.
   Sound speed squared:  1/3 = 1/N_c
 
 Observable count: 0 new (infrastructure). Every number from (2,3).
+-}
+
+```
+
+## §Haskell: CrystalChem (     354 lines)
+```haskell
+
+{- | Module: CrystalChem -- Chemistry and Materials from (2,3).
+
+Orbital structure, hybridization, Arrhenius kinetics. Every chemical constant from A_F.
+
+  s-shell capacity:     2   = N_w
+  p-shell capacity:     6   = chi
+  d-shell capacity:     10  = N_w (chi-1)
+  f-shell capacity:     14  = N_w beta_0
+  sp3 bond angle:       109.47 = arccos(-1/N_c)
+  sp2 bond angle:       120    = 360/N_c
+  Water bond angle:     104.48 = arccos(-1/N_w^2)
+  Noble gas He:         Z=2  = N_w
+  Noble gas Ne:         Z=10 = N_w (chi-1)
+  Noble gas Ar:         Z=18 = N_w N_c^2
+  Noble gas Kr:         Z=36 = Sigma_d
+  Neutral pH:           7    = beta_0
+  Bohr energy factor:   2    = N_w
+  kT(300K) ~ eps_vdw:   alpha E_H / N_c^2
+
+Observable count: 14. Every number from (2,3).
 -}
 
 ```
@@ -3899,6 +4014,39 @@ Observable count: 0 new (infrastructure). Every number from (2,3).
 
 ```
 
+## §Haskell: CrystalNuclear (     324 lines)
+```haskell
+
+{- | Module: CrystalNuclear -- Nuclear Physics from (2,3).
+
+Semi-empirical mass formula + shell model. Every nuclear integer from A_F.
+
+  Magic numbers (all 7 traced):
+    2   = N_w             8   = N_w^3 = d_colour
+    20  = N_w^2 (chi-1)   28  = N_w^2 beta_0
+    50  = N_w (chi-1)^2   82  = N_w (D-1)
+    126 = N_w beta_0 N_c^2
+
+  SEMF exponents:
+    Surface:    A^(2/3),     2/3 = N_w/N_c
+    Coulomb:    A^(-1/3),    1/3 = 1/N_c
+    Asymmetry:  (A-2Z)^2/A,  2   = N_w
+    Pairing:    A^(-1/2),    1/2 = 1/N_w
+    Coulomb coefficient: 3/5 = N_c/(chi-1)
+
+  Nuclear structure:
+    Isospin states:    2 = N_w (proton/neutron)
+    Radius exponent:   1/3 = 1/N_c
+    Deuteron:          2 nucleons = N_w
+    Alpha particle:    4 nucleons = N_w^2
+    Iron peak:         A=56 = N_w^3 beta_0 = d_colour beta_0
+    B(He-4):           ~28 MeV = N_w^2 beta_0 MeV
+
+Observable count: 15. Every number from (2,3).
+-}
+
+```
+
 ## §Haskell: CrystalOptics (     354 lines)
 ```haskell
 
@@ -5988,6 +6136,31 @@ entanglementSwap psi12 psi34 =
   in vNormalize psi14
 ```
 
+## §Haskell: CrystalQFT (     380 lines)
+```haskell
+
+{- | Module: CrystalQFT -- Quantum Field Dynamics from (2,3).
+
+Tree-level S-matrix + running couplings. Every Feynman rule from A_F.
+
+  Spacetime dimension:    4   = N_w^2
+  Lorentz generators:     6   = chi = d(d-1)/2 for d=N_w^2
+  Dirac gamma matrices:   4   = N_w^2
+  Spin-1/2 components:    2   = N_w
+  Photon polarisations:   2   = N_c - 1
+  Gluon colours:          8   = N_c^2 - 1 = d_3
+  QCD beta_0:             7   = (11 N_c - 2 chi)/3
+  One-loop prefactor:     16  = N_w^4
+  Thomson 8/3:            d_colour / N_c
+  e+e->mu+mu:             4 pi alpha^2 / (3 s)  [4=N_w^2, 3=N_c]
+  Propagator exponent:    2   = N_c - 1
+  Pair threshold:         2 m = N_w m
+
+Observable count: 13. Every number from (2,3).
+-}
+
+```
+
 ## §Haskell: CrystalQGates (     243 lines)
 ```haskell
 
@@ -6393,6 +6566,32 @@ groundStateEnergy :: Mat -> Double
 groundStateEnergy h =
   let diag = [let (Cx r _) = h!!i!!i in r | i <- [0..length h - 1]]
   in minimum diag
+```
+
+## §Haskell: CrystalQInfo (     349 lines)
+```haskell
+
+{- | Module: CrystalQInfo -- Quantum Information from (2,3).
+
+Heyting algebra truth values + error correction + entanglement.
+
+  Qubit states:         2  = N_w
+  Pauli matrices:       3  = N_c  (sigma_x, sigma_y, sigma_z)
+  Pauli + identity:     4  = N_w^2
+  Bell states:          4  = N_w^2
+  Steane code:          [7,1,3] = [beta_0, d_1, N_c]
+  Shor code:            9 qubits = N_c^2
+  Toffoli inputs:       3  = N_c
+  MERA bond dim:        6  = chi
+  MERA layers:          42 = D
+  Entropy per tick:     ln(6) = ln(chi)
+  Bell entropy:         ln(2) = ln(N_w)
+  Teleportation bits:   2  = N_w
+  Heyting meet(1/2,1/3) = 1/6 = 1/chi  (uncertainty principle)
+
+Observable count: 13. Every number from (2,3).
+-}
+
 ```
 
 ## §Haskell: CrystalQMeasure (     129 lines)
@@ -7439,6 +7638,30 @@ proveStationarity _ =
 -- All consistent with the Riemann Hypothesis.
 -- The crystal doesn't prove RH. It provides 71 data points for it.
 -- ═══════════════════════════════════════════════════════════════════
+```
+
+## §Haskell: CrystalRigid (     396 lines)
+```haskell
+
+{- | Module: CrystalRigid -- Rigid Body Dynamics from (2,3).
+
+Quaternion integrator + Euler equations. Every rigid-body constant from A_F.
+
+  Rotation axes:          3   = N_c
+  Quaternion components:  4   = N_w^2
+  Inertia tensor (indep): 6   = chi  (symmetric 3x3)
+  Rigid DOF (3D):         6   = chi  (3 translate + 3 rotate)
+  Rotation matrix:        9   = N_c^2 entries
+  I_sphere factor:        2/5 = N_w/(chi-1)  [= Flory exponent!]
+  I_rod factor:           1/12 = 1/(2 chi)
+  I_disk factor:          1/2 = 1/N_w
+  I_shell factor:         2/3 = N_w/N_c
+  Cross product dim:      3   = N_c
+  Euler angles:           3   = N_c
+
+Observable count: 11. Every number from (2,3).
+-}
+
 ```
 
 ## §Haskell: CrystalStructural (     238 lines)
