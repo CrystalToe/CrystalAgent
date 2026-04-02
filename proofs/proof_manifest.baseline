@@ -59,6 +59,33 @@ LEAN CrystalAlphaProton.lean sin13_corr_val
 LEAN CrystalAlphaProton.lean sin13_identity
 LEAN CrystalAlphaProton.lean sin13_numerator
 LEAN CrystalAlphaProton.lean sin13_denominator
+LEAN CrystalClassical.lean force_exponent
+LEAN CrystalClassical.lean spatial_dim
+LEAN CrystalClassical.lean bertrand_closed_orbits
+LEAN CrystalClassical.lean kepler_exponent
+LEAN CrystalClassical.lean kepler_coeff
+LEAN CrystalClassical.lean spacetime_dim
+LEAN CrystalClassical.lean ang_mom_components
+LEAN CrystalClassical.lean phase_solvable
+LEAN CrystalClassical.lean phase_chaotic
+LEAN CrystalClassical.lean phase_total
+LEAN CrystalClassical.lean lagrange_points
+LEAN CrystalClassical.lean gw_polarizations
+LEAN CrystalClassical.lean einstein_coeff
+LEAN CrystalClassical.lean schwarzschild_2
+LEAN CrystalClassical.lean rt_4
+LEAN CrystalClassical.lean quadrupole_num
+LEAN CrystalClassical.lean quadrupole_den
+LEAN CrystalClassical.lean chi_val
+LEAN CrystalClassical.lean beta0_val
+LEAN CrystalClassical.lean sigma_d_val
+LEAN CrystalClassical.lean sigma_d2_val
+LEAN CrystalClassical.lean gauss_val
+LEAN CrystalClassical.lean tower_val
+LEAN CrystalClassical.lean d_colour
+LEAN CrystalClassical.lean d_weak
+LEAN CrystalClassical.lean d_mixed
+LEAN CrystalClassical.lean d_total_check
 LEAN CrystalDiscoveries.lean dark_energy_eq
 LEAN CrystalDiscoveries.lean cdm_eq
 LEAN CrystalDiscoveries.lean baryons_eq
@@ -93,6 +120,35 @@ LEAN CrystalDiscoveries.lean bell_base
 LEAN CrystalDiscoveries.lean bell_power
 LEAN CrystalDiscoveries.lean eddington_int
 LEAN CrystalDiscoveries.lean saturation_cross
+LEAN CrystalEM.lean em_components
+LEAN CrystalEM.lean e_components
+LEAN CrystalEM.lean b_components
+LEAN CrystalEM.lean two_form_dim
+LEAN CrystalEM.lean maxwell_eqs
+LEAN CrystalEM.lean larmor_num
+LEAN CrystalEM.lean larmor_den
+LEAN CrystalEM.lean rayleigh_wave
+LEAN CrystalEM.lean rayleigh_size
+LEAN CrystalEM.lean planck_exp
+LEAN CrystalEM.lean stefan_exp
+LEAN CrystalEM.lean stefan_denom
+LEAN CrystalEM.lean gauge_u1
+LEAN CrystalEM.lean gauss_e_sector
+LEAN CrystalEM.lean gauss_b_sector
+LEAN CrystalEM.lean faraday_sector
+LEAN CrystalEM.lean ampere_sector
+LEAN CrystalFriedmann.lean omega_L_num
+LEAN CrystalFriedmann.lean omega_L_den
+LEAN CrystalFriedmann.lean omega_m_num
+LEAN CrystalFriedmann.lean omega_ratio
+LEAN CrystalFriedmann.lean theta_100_den
+LEAN CrystalFriedmann.lean tcmb_num
+LEAN CrystalFriedmann.lean tcmb_den
+LEAN CrystalFriedmann.lean age_num
+LEAN CrystalFriedmann.lean amplitude
+LEAN CrystalFriedmann.lean matter_exp
+LEAN CrystalFriedmann.lean radiation_exp
+LEAN CrystalFriedmann.lean spectral_D
 LEAN CrystalFundamentals.lean neff_denom
 LEAN CrystalFundamentals.lean ob_om_num
 LEAN CrystalFundamentals.lean ob_om_den
@@ -145,6 +201,23 @@ LEAN CrystalFundamentals.lean partition_50
 LEAN CrystalFundamentals.lean the_43
 LEAN CrystalFundamentals.lean chi4
 LEAN CrystalFundamentals.lean fermat_prime
+LEAN CrystalGR.lean schwarzschild_2
+LEAN CrystalGR.lean precession_6
+LEAN CrystalGR.lean precession_6_decomp
+LEAN CrystalGR.lean light_bending_4
+LEAN CrystalGR.lean isco_6
+LEAN CrystalGR.lean isco_3
+LEAN CrystalGR.lean isco_energy_num
+LEAN CrystalGR.lean isco_energy_den
+LEAN CrystalGR.lean shapiro_coeff
+LEAN CrystalGR.lean shapiro_log
+LEAN CrystalGR.lean spacetime_dim
+LEAN CrystalGR.lean einstein_16piG
+LEAN CrystalGR.lean einstein_8piG
+LEAN CrystalGR.lean gw_polarizations
+LEAN CrystalGR.lean quadrupole_num
+LEAN CrystalGR.lean quadrupole_den
+LEAN CrystalGR.lean equiv_principle
 LEAN CrystalGravityDyn.lean coeff_16piG
 LEAN CrystalGravityDyn.lean coeff_16_from_primes
 LEAN CrystalGravityDyn.lean coeff_16_decompose
@@ -179,6 +252,26 @@ LEAN CrystalGravityDyn.lean jacobson_step4_EFE
 LEAN CrystalGravityDyn.lean jacobson_chain_complete
 LEAN CrystalGravityDyn.lean linearized_einstein_integers
 LEAN CrystalGravityDyn.lean dynamical_gravity_from_AF
+LEAN CrystalGW.lean quadrupole_num
+LEAN CrystalGW.lean quadrupole_den
+LEAN CrystalGW.lean decay_num
+LEAN CrystalGW.lean decay_den
+LEAN CrystalGW.lean chirp_coeff_num
+LEAN CrystalGW.lean merger_num
+LEAN CrystalGW.lean merger_den
+LEAN CrystalGW.lean chirp_mass_3
+LEAN CrystalGW.lean chirp_mass_5
+LEAN CrystalGW.lean freq_exp_num
+LEAN CrystalGW.lean freq_exp_den
+LEAN CrystalGW.lean amplitude_4
+LEAN CrystalGW.lean polarizations_2
+LEAN CrystalGW.lean gw_doubling
+LEAN CrystalGW.lean isco_6
+LEAN CrystalGW.lean kolmogorov_num
+LEAN CrystalGW.lean kolmogorov_den
+LEAN CrystalGW.lean chirp_83_num
+LEAN CrystalGW.lean chirp_83_den
+LEAN CrystalGW.lean chirp_113_num
 LEAN CrystalHierarchy.lean chi_eq
 LEAN CrystalHierarchy.lean beta0_eq
 LEAN CrystalHierarchy.lean sigma_d_eq
@@ -881,7 +974,7 @@ LEAN Main.lean id_sigma_chi_sq
 LEAN Main.lean id_sigma_d2
 LEAN Main.lean id_D_decomp
 LEAN Main.lean id_algebra_N_c
-LEAN_FILES 17
+LEAN_FILES 22
 # AGDA PROOFS
 AGDA CrystalAlphaProton.agda chi-eq
 AGDA CrystalAlphaProton.agda sigma-d-eq
@@ -928,6 +1021,32 @@ AGDA CrystalAlphaProton.agda sin13-corr
 AGDA CrystalAlphaProton.agda sin13-identity
 AGDA CrystalAlphaProton.agda sin13-num
 AGDA CrystalAlphaProton.agda sin13-denom
+AGDA CrystalClassical.agda force-exponent
+AGDA CrystalClassical.agda spatial-dim
+AGDA CrystalClassical.agda bertrand
+AGDA CrystalClassical.agda kepler-exp
+AGDA CrystalClassical.agda kepler-coeff
+AGDA CrystalClassical.agda spacetime-dim
+AGDA CrystalClassical.agda ang-mom-components
+AGDA CrystalClassical.agda phase-solvable
+AGDA CrystalClassical.agda phase-chaotic
+AGDA CrystalClassical.agda phase-total
+AGDA CrystalClassical.agda lagrange-points
+AGDA CrystalClassical.agda gw-polarizations
+AGDA CrystalClassical.agda einstein-16
+AGDA CrystalClassical.agda schwarzschild
+AGDA CrystalClassical.agda rt-4
+AGDA CrystalClassical.agda quadrupole-num
+AGDA CrystalClassical.agda quadrupole-den
+AGDA CrystalClassical.agda chi-val
+AGDA CrystalClassical.agda beta0-val
+AGDA CrystalClassical.agda sigma-d-val
+AGDA CrystalClassical.agda sigma-d2-val
+AGDA CrystalClassical.agda gauss-val
+AGDA CrystalClassical.agda tower-val
+AGDA CrystalClassical.agda d-colour
+AGDA CrystalClassical.agda d-weak
+AGDA CrystalClassical.agda d-mixed
 AGDA CrystalDiscoveries.agda dark-energy-eq
 AGDA CrystalDiscoveries.agda cdm-eq
 AGDA CrystalDiscoveries.agda baryons-eq
@@ -966,6 +1085,27 @@ AGDA CrystalDiscoveries.agda non-gauge
 AGDA CrystalDiscoveries.agda gauge-dark
 AGDA CrystalDiscoveries.agda sigma-chi-sq
 AGDA CrystalDiscoveries.agda tower-decomp
+AGDA CrystalEM.agda em-components
+AGDA CrystalEM.agda maxwell-eqs
+AGDA CrystalEM.agda larmor-num
+AGDA CrystalEM.agda rayleigh-wave
+AGDA CrystalEM.agda rayleigh-size
+AGDA CrystalEM.agda planck-exp
+AGDA CrystalEM.agda stefan-exp
+AGDA CrystalEM.agda stefan-denom
+AGDA CrystalEM.agda faraday-sector
+AGDA CrystalEM.agda ampere-sector
+AGDA CrystalFriedmann.agda omega-L-num
+AGDA CrystalFriedmann.agda omega-den
+AGDA CrystalFriedmann.agda omega-m-num
+AGDA CrystalFriedmann.agda theta-den
+AGDA CrystalFriedmann.agda tcmb-num
+AGDA CrystalFriedmann.agda tcmb-den
+AGDA CrystalFriedmann.agda age-num
+AGDA CrystalFriedmann.agda amplitude
+AGDA CrystalFriedmann.agda matter-exp
+AGDA CrystalFriedmann.agda rad-exp
+AGDA CrystalFriedmann.agda tower
 AGDA CrystalFundamentals.agda neff-denom
 AGDA CrystalFundamentals.agda ob-om-num
 AGDA CrystalFundamentals.agda ob-om-den
@@ -1001,6 +1141,18 @@ AGDA CrystalFundamentals.agda partition-19
 AGDA CrystalFundamentals.agda partition-20
 AGDA CrystalFundamentals.agda the-43
 AGDA CrystalFundamentals.agda fermat-257
+AGDA CrystalGR.agda schwarzschild
+AGDA CrystalGR.agda precession-6
+AGDA CrystalGR.agda light-bending
+AGDA CrystalGR.agda isco-6
+AGDA CrystalGR.agda isco-3
+AGDA CrystalGR.agda isco-energy-num
+AGDA CrystalGR.agda isco-energy-den
+AGDA CrystalGR.agda spacetime
+AGDA CrystalGR.agda einstein-16
+AGDA CrystalGR.agda gw-polar
+AGDA CrystalGR.agda quad-32
+AGDA CrystalGR.agda quad-5
 AGDA CrystalGravityDyn.agda chi-eq
 AGDA CrystalGravityDyn.agda beta0-eq
 AGDA CrystalGravityDyn.agda sigma-d-eq
@@ -1025,6 +1177,19 @@ AGDA CrystalGravityDyn.agda jacobson-step2
 AGDA CrystalGravityDyn.agda jacobson-step3
 AGDA CrystalGravityDyn.agda jacobson-step4
 AGDA CrystalGravityDyn.agda equiv-principle
+AGDA CrystalGW.agda quad-32
+AGDA CrystalGW.agda quad-5
+AGDA CrystalGW.agda decay-64
+AGDA CrystalGW.agda chirp-96
+AGDA CrystalGW.agda merger-256
+AGDA CrystalGW.agda amplitude
+AGDA CrystalGW.agda polar
+AGDA CrystalGW.agda doubling
+AGDA CrystalGW.agda isco
+AGDA CrystalGW.agda kolm-5
+AGDA CrystalGW.agda kolm-3
+AGDA CrystalGW.agda dcol
+AGDA CrystalGW.agda chirp-11
 AGDA CrystalHierarchy.agda chi-eq
 AGDA CrystalHierarchy.agda sigma-d-eq
 AGDA CrystalHierarchy.agda gauss-eq
@@ -1590,18 +1755,38 @@ AGDA CrystalTopos.agda bridge-string-den
 AGDA CrystalTopos.agda endomorphisms-bridge
 AGDA CrystalTopos.agda sector-sum-bridge
 AGDA CrystalTopos.agda spectral-dim-bridge
-AGDA_FILES 16
+AGDA CrystalNBody.agda oct
+AGDA CrystalNBody.agda dcolour
+AGDA CrystalNBody.agda force
+AGDA CrystalNBody.agda dim
+AGDA CrystalNBody.agda phase
+AGDA CrystalThermo.agda lj-attract
+AGDA CrystalThermo.agda lj-repulse
+AGDA CrystalThermo.agda lj-force
+AGDA CrystalThermo.agda gamma-mono-num
+AGDA CrystalThermo.agda dof-mono
+AGDA CrystalThermo.agda dof-di
+AGDA CrystalThermo.agda carnot-num
+AGDA CrystalThermo.agda carnot-den
+AGDA CrystalThermo.agda stokes
+AGDA CrystalThermo.agda beta0-val
+AGDA_FILES 23
 # HASKELL MODULES
 HASKELL CrystalAlphaProton.hs
 HASKELL CrystalAudit.hs
 HASKELL CrystalAxiom.hs
+HASKELL CrystalClassical.hs
 HASKELL CrystalCosmo.hs
 HASKELL CrystalCrossDomain.hs
 HASKELL CrystalDiscoveries.hs
+HASKELL CrystalEM.hs
+HASKELL CrystalFriedmann.hs
 HASKELL CrystalFullTest.hs
 HASKELL CrystalGauge.hs
+HASKELL CrystalGR.hs
 HASKELL CrystalGravity.hs
 HASKELL CrystalGravityDyn.hs
+HASKELL CrystalGW.hs
 HASKELL CrystalHierarchy.hs
 HASKELL CrystalHologron.hs
 HASKELL CrystalLayer.hs
@@ -1609,6 +1794,7 @@ HASKELL CrystalMandelbrot.hs
 HASKELL CrystalMERA.hs
 HASKELL CrystalMixing.hs
 HASKELL CrystalMonad.hs
+HASKELL CrystalNBody.hs
 HASKELL CrystalNoether.hs
 HASKELL CrystalProtein.hs
 HASKELL CrystalProtonRadius.hs
@@ -1624,6 +1810,7 @@ HASKELL CrystalQSimulation.hs
 HASKELL CrystalQuantum.hs
 HASKELL CrystalRiemann.hs
 HASKELL CrystalStructural.hs
+HASKELL CrystalThermo.hs
 HASKELL CrystalVEV.hs
 HASKELL CrystalWACAScan.hs
 HASKELL GravityDynTest.hs
@@ -2133,8 +2320,13 @@ RUST_COUNT crystal_tests.rs 12
 # PYTHON PROOF MODULES
 PYTHON crystal_alpha_proton_proof.py
 PYTHON crystal_certificate_proof.py
+PYTHON crystal_classical_proof.py
 PYTHON crystal_discoveries_proof.py
+PYTHON crystal_em_proof.py
+PYTHON crystal_friedmann_proof.py
 PYTHON crystal_fundamentals_proof.py
+PYTHON crystal_gr_proof.py
+PYTHON crystal_gw_proof.py
 PYTHON crystal_hierarchy_proof.py
 PYTHON crystal_hologron_proof.py
 PYTHON crystal_monad_mera_proof.py
@@ -2266,8 +2458,8 @@ PYTHON qubo_folder.py
 PYTHON schrodinger_vs_monad.py
 PYTHON spectral_tower.py
 # SUMMARY COUNTS
-TOTAL_LEAN_THEOREMS      882
-TOTAL_AGDA_PROOFS      707
+TOTAL_LEAN_THEOREMS      975
+TOTAL_AGDA_PROOFS      794
 TOTAL_RUST_TESTS      486
-TOTAL_HASKELL_MODULES       37
-TOTAL_PYTHON_MODULES      134
+TOTAL_HASKELL_MODULES       44
+TOTAL_PYTHON_MODULES      139

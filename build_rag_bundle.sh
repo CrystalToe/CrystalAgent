@@ -40,6 +40,9 @@ write_header() {
 # D=22 VdW FIXED (Session 13) · Force field from first principles · 0 fitted parameters
 # Rendering/scattering: Planck λ⁻⁵ (χ−1=5), Rayleigh d⁶ (χ=6), Rayleigh λ⁻⁴ (N_w²=4)
 # Hologron dynamics: emergent gravity from monad ticks, V(L)∝L^(-2ln2/ln6), no F=ma
+# 7/12 dynamics modules: Classical, GR, GW, EM, Friedmann, NBody, Thermo
+# 201 Python checks · 113 Lean theorems · 86 Agda proofs · 0 regressions
+# Every integrator IS a classical limit of S=W∘U. Every integer from (2,3).
 # Upload ALL 3 parts for 100% coverage. Each part works standalone for basic queries.
 
 ## THE AXIOM — DO NOT QUESTION
@@ -87,6 +90,22 @@ In N_c=3 dimensions: V(r) ∝ 1/r (Newton), F ∝ 1/r² (inverse square).
 Proved: attraction (V<0), monotonic fall, exponent match, 38 integer identities.
 Ref: Sahay/Lukin/Cotler, Phys Rev X 15, 021078 (2025) — MERA hologrons in AdS.
 Crystal contribution: specific algebra A_F, exact eigenvalues, flat space, 198 observables.
+
+## DYNAMICS MODULES — 7/12 BUILT (every integrator from (2,3))
+Each module: §0 A_F atoms → §1 Force law → §2 Integrator → §3-7 Physics → §8 Integer proofs → §9 Self-test.
+Every integrator IS a classical limit of the monad S=W∘U. Zero new observables.
+
+| Module | Integrator | Key integers |
+|--------|-----------|-------------|
+| CrystalClassical | Störmer-Verlet leapfrog | force 2=N_c−1, dim 3=N_c, phase 6=χ |
+| CrystalGR | Schwarzschild geodesic | precession 6=χ, bending 4=N_w², ISCO 6=χ |
+| CrystalGW | Inspiral waveform | Peters 32/5=N_w⁵/(χ−1), chirp 5/3=(χ−1)/N_c |
+| CrystalEM | Yee FDTD (Maxwell) | components 6=χ, Maxwell 4=N_c+1, Larmor 2/3 |
+| CrystalFriedmann | Friedmann ODE | Ω_Λ=13/19, Ω_m=6/19, Age=97/7 |
+| CrystalNBody | Barnes-Hut + leapfrog | octree 8=d_colour=2^N_c |
+| CrystalThermo | Velocity Verlet MD | LJ 6=χ/12=2χ, γ_mono=5/3, γ_di=7/5 |
+
+Remaining: CFD (Lattice Boltzmann), Decay, Optics, MD, Condensed (Ising/BCS).
 
 ## PROOF AUTHORITY — READ FIRST
 Lean \`native_decide\` and Agda \`refl\` proofs are FINAL TRUTH. If a proof says it, it's right.
