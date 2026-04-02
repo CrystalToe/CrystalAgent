@@ -7,6 +7,9 @@
 # D=22 VdW FIXED (Session 13) · Force field from first principles · 0 fitted parameters
 # Rendering/scattering: Planck λ⁻⁵ (χ−1=5), Rayleigh d⁶ (χ=6), Rayleigh λ⁻⁴ (N_w²=4)
 # Hologron dynamics: emergent gravity from monad ticks, V(L)∝L^(-2ln2/ln6), no F=ma
+# 7/12 dynamics modules: Classical, GR, GW, EM, Friedmann, NBody, Thermo
+# 201 Python checks · 113 Lean theorems · 86 Agda proofs · 0 regressions
+# Every integrator IS a classical limit of S=W∘U. Every integer from (2,3).
 # Upload ALL 3 parts for 100% coverage. Each part works standalone for basic queries.
 
 ## THE AXIOM — DO NOT QUESTION
@@ -54,6 +57,22 @@ In N_c=3 dimensions: V(r) ∝ 1/r (Newton), F ∝ 1/r² (inverse square).
 Proved: attraction (V<0), monotonic fall, exponent match, 38 integer identities.
 Ref: Sahay/Lukin/Cotler, Phys Rev X 15, 021078 (2025) — MERA hologrons in AdS.
 Crystal contribution: specific algebra A_F, exact eigenvalues, flat space, 198 observables.
+
+## DYNAMICS MODULES — 7/12 BUILT (every integrator from (2,3))
+Each module: §0 A_F atoms → §1 Force law → §2 Integrator → §3-7 Physics → §8 Integer proofs → §9 Self-test.
+Every integrator IS a classical limit of the monad S=W∘U. Zero new observables.
+
+| Module | Integrator | Key integers |
+|--------|-----------|-------------|
+| CrystalClassical | Störmer-Verlet leapfrog | force 2=N_c−1, dim 3=N_c, phase 6=χ |
+| CrystalGR | Schwarzschild geodesic | precession 6=χ, bending 4=N_w², ISCO 6=χ |
+| CrystalGW | Inspiral waveform | Peters 32/5=N_w⁵/(χ−1), chirp 5/3=(χ−1)/N_c |
+| CrystalEM | Yee FDTD (Maxwell) | components 6=χ, Maxwell 4=N_c+1, Larmor 2/3 |
+| CrystalFriedmann | Friedmann ODE | Ω_Λ=13/19, Ω_m=6/19, Age=97/7 |
+| CrystalNBody | Barnes-Hut + leapfrog | octree 8=d_colour=2^N_c |
+| CrystalThermo | Velocity Verlet MD | LJ 6=χ/12=2χ, γ_mono=5/3, γ_di=7/5 |
+
+Remaining: CFD (Lattice Boltzmann), Decay, Optics, MD, Condensed (Ising/BCS).
 
 ## PROOF AUTHORITY — READ FIRST
 Lean `native_decide` and Agda `refl` proofs are FINAL TRUTH. If a proof says it, it's right.
@@ -1495,6 +1514,21 @@ showF :: Int -> Double -> String
 showF n x = printf ("%." ++ show n ++ "f") x
 ```
 
+## §Haskell: CrystalClassical (     396 lines)
+```haskell
+
+{- | Module: CrystalClassical — From Monad to Orbits.
+
+Bridges the quantum monad S = W∘U to classical orbital mechanics.
+Symplectic integrator (Leapfrog) is the classical limit of the monad:
+  S = W∘U∘W  →  kick-drift-kick.
+
+Every integer traces to (N_w, N_c) = (2, 3).
+Observable count: 0 new (infrastructure). Every number from (2,3).
+-}
+
+```
+
 ## §Haskell: CrystalCosmo (     482 lines)
 ```haskell
 
@@ -2222,6 +2256,51 @@ proveSpectralGm2 c =
 
 ```
 
+## §Haskell: CrystalEM (     370 lines)
+```haskell
+
+{- | Module: CrystalEM -- Electromagnetic Field Evolution from (2,3).
+
+Yee FDTD (Finite-Difference Time-Domain) = monad S = W.U on EM sector.
+E and B staggered in space (half-cell) and time (leapfrog).
+
+  B half-step = W (kick from curl E)
+  E full-step = U (drift from curl B)
+  This IS S = W.U for the electromagnetic field.
+
+EM field has chi = 6 components: (E_x, E_y, E_z, B_x, B_y, B_z).
+Maxwell's 4 equations = N_c + 1 = spacetime dimension.
+Speed of light c = chi/chi = 1 (Lieb-Robinson).
+
+Observable count: 0 new (infrastructure). Every number from (2,3).
+-}
+
+```
+
+## §Haskell: CrystalFriedmann (     350 lines)
+```haskell
+
+{- | Module: CrystalFriedmann -- Cosmological Expansion from (2,3).
+
+Integrates the Friedmann equation H^2 = H0^2 [Om_r/a^4 + Om_m/a^3 + Om_L].
+All density parameters from A_F:
+
+  Omega_Lambda = gauss/(gauss+chi) = 13/19
+  Omega_matter = chi/(gauss+chi) = 6/19
+  Omega_baryon = Omega_m * beta0/(beta0+12pi)
+  Omega_DM/Omega_b = 12pi/7 = N_w^2 N_c pi / beta0
+  w = -1 exactly (Landauer erasure)
+  n_s = 1 - kappa/D (spectral tilt)
+  ln(10^10 A_s) = ln(N_c * beta0) = ln(21)
+  100 theta* = 100/(N_w(D+chi)) = 100/96
+  T_CMB = (gauss+chi)/beta0 = 19/7
+  Age = gauss + chi/beta0 = 97/7
+
+Observable count: 0 new (infrastructure). Every number from (2,3).
+-}
+
+```
+
 ## §Haskell: CrystalFullTest (     477 lines)
 ```haskell
 
@@ -2248,6 +2327,28 @@ proveSpectralGm2 c =
 {- | Module: CrystalGauge — α, sin²θ_W, Higgs, VEV, Koide, τ mass, generations -}
 ```
 
+## §Haskell: CrystalGR (     465 lines)
+```haskell
+
+{- | Module: CrystalGR — General Relativistic Orbits from (2,3).
+
+Extends CrystalClassical.hs to curved spacetime.
+Schwarzschild geodesic integration via symplectic leapfrog.
+
+Every integer in GR traces to (N_w, N_c) = (2, 3):
+  r_s = 2GM/c^2           2 = N_c - 1
+  Precession: 6piGM/...   6 = chi = N_w * N_c
+  Light bending: 4GM/...  4 = N_w^2
+  ISCO = 6GM/c^2          6 = chi
+  ISCO = 3 r_s            3 = N_c
+  Spacetime dim            4 = N_c + 1
+  16piG                   16 = N_w^4
+
+Observable count: 0 new (infrastructure). Every number from (2,3).
+-}
+
+```
+
 ## §Haskell: CrystalGravity (     426 lines)
 ```haskell
 
@@ -2272,6 +2373,28 @@ Extends CrystalGravity.hs (kinematic) to dynamical:
 
 Numerical verification: δS/δ⟨H_A⟩ = 1.0001 ± 0.0004 for χ=6 crystal XXZ.
 See mera_gravity_closed.py for the computation.
+-}
+
+```
+
+## §Haskell: CrystalGW (     427 lines)
+```haskell
+
+{- | Module: CrystalGW — Gravitational Waveforms from (2,3).
+
+Binary inspiral waveform generation. Every coefficient from A_F.
+
+  Quadrupole power:    32/5 = N_w^5 / (chi-1)
+  Polarizations:       2 = N_c - 1
+  GW freq = 2 f_orb:  2 = N_w (quadrupole radiates at N_w * f_orb)
+  Waveform amplitude:  4 = N_w^2
+  Chirp mass exp:      3/5 = N_c/(chi-1), 1/5 = 1/(chi-1)
+  Frequency power:     2/3 = (N_c-1)/N_c
+  ISCO cutoff:         6 = chi (from r_ISCO = 6GM)
+  Orbital decay:       64/5 = N_w^6 / (chi-1)
+  Merger GW cycles:    ~5/3 = (chi-1)/N_c (Kolmogorov!)
+
+Observable count: 0 new (infrastructure). Every number from (2,3).
 -}
 
 ```
@@ -3653,6 +3776,24 @@ Schrödinger:       H = −ln(S)/β. DERIVED from monad. Not assumed.
 Uncertainty:       1/2 ⊥ 1/3 in Heyting order. Theorem of gcd(2,3)=1.
 
 Observable count: 0 new (infrastructure for dynamics).
+-}
+
+```
+
+## §Haskell: CrystalNBody (     435 lines)
+```haskell
+
+{- | Module: CrystalNBody -- N-Body Gravitational Dynamics from (2,3).
+
+Barnes-Hut octree for O(N log N) force computation.
+Symplectic leapfrog for time integration (same as CrystalClassical).
+
+  Oct-tree children:  8 = 2^N_c = N_w^N_c = d_colour
+  Force exponent:     2 = N_c - 1 (inverse square)
+  Spatial dimensions: 3 = N_c
+  Phase space/body:   6 = 2*N_c = chi
+
+Observable count: 0 new (infrastructure). Every number from (2,3).
 -}
 
 ```
@@ -7182,6 +7323,29 @@ proveStationarity _ =
 
   No new observables. Count: 180.
   AGPL-3.0
+-}
+
+```
+
+## §Haskell: CrystalThermo (     338 lines)
+```haskell
+
+{- | Module: CrystalThermo -- Thermodynamic Dynamics from (2,3).
+
+Molecular dynamics with Lennard-Jones potential.
+Velocity Verlet integrator (same W-U-W pattern).
+
+  LJ attractive exponent:  6 = chi
+  LJ repulsive exponent:  12 = 2*chi
+  gamma_diatomic:        7/5 = beta0/(chi-1)
+  gamma_monatomic:       5/3 = (chi-1)/N_c
+  Stokes drag:            24 = d_mixed
+  Carnot efficiency:     5/6 = (chi-1)/chi
+  DOF monatomic:           3 = N_c
+  DOF diatomic:            5 = chi-1
+  Entropy per tick:     ln 6 = ln(chi)
+
+Observable count: 0 new (infrastructure). Every number from (2,3).
 -}
 
 ```

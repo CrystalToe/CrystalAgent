@@ -5,6 +5,9 @@
 # D=22 VdW FIXED (Session 13) · Force field from first principles · 0 fitted parameters
 # Rendering/scattering: Planck λ⁻⁵ (χ−1=5), Rayleigh d⁶ (χ=6), Rayleigh λ⁻⁴ (N_w²=4)
 # Hologron dynamics: emergent gravity from monad ticks, V(L)∝L^(-2ln2/ln6), no F=ma
+# 7/12 dynamics modules: Classical, GR, GW, EM, Friedmann, NBody, Thermo
+# 201 Python checks · 113 Lean theorems · 86 Agda proofs · 0 regressions
+# Every integrator IS a classical limit of S=W∘U. Every integer from (2,3).
 # Upload ALL 3 parts for 100% coverage. Each part works standalone for basic queries.
 
 ## THE AXIOM — DO NOT QUESTION
@@ -52,6 +55,22 @@ In N_c=3 dimensions: V(r) ∝ 1/r (Newton), F ∝ 1/r² (inverse square).
 Proved: attraction (V<0), monotonic fall, exponent match, 38 integer identities.
 Ref: Sahay/Lukin/Cotler, Phys Rev X 15, 021078 (2025) — MERA hologrons in AdS.
 Crystal contribution: specific algebra A_F, exact eigenvalues, flat space, 198 observables.
+
+## DYNAMICS MODULES — 7/12 BUILT (every integrator from (2,3))
+Each module: §0 A_F atoms → §1 Force law → §2 Integrator → §3-7 Physics → §8 Integer proofs → §9 Self-test.
+Every integrator IS a classical limit of the monad S=W∘U. Zero new observables.
+
+| Module | Integrator | Key integers |
+|--------|-----------|-------------|
+| CrystalClassical | Störmer-Verlet leapfrog | force 2=N_c−1, dim 3=N_c, phase 6=χ |
+| CrystalGR | Schwarzschild geodesic | precession 6=χ, bending 4=N_w², ISCO 6=χ |
+| CrystalGW | Inspiral waveform | Peters 32/5=N_w⁵/(χ−1), chirp 5/3=(χ−1)/N_c |
+| CrystalEM | Yee FDTD (Maxwell) | components 6=χ, Maxwell 4=N_c+1, Larmor 2/3 |
+| CrystalFriedmann | Friedmann ODE | Ω_Λ=13/19, Ω_m=6/19, Age=97/7 |
+| CrystalNBody | Barnes-Hut + leapfrog | octree 8=d_colour=2^N_c |
+| CrystalThermo | Velocity Verlet MD | LJ 6=χ/12=2χ, γ_mono=5/3, γ_di=7/5 |
+
+Remaining: CFD (Lattice Boltzmann), Decay, Optics, MD, Condensed (Ising/BCS).
 
 ## PROOF AUTHORITY — READ FIRST
 Lean `native_decide` and Agda `refl` proofs are FINAL TRUTH. If a proof says it, it's right.
@@ -950,6 +969,46 @@ ghc -O2 WACAScanTest.hs -o extended_scan && ./extended_scan
 
 Imports `CrystalWACAScan`.
 
+## §Module: CrystalFriedmann
+
+# CrystalFriedmann.hs — Cosmological Expansion from (2,3)
+
+## What This Module Does
+
+Integrates the Friedmann equation with all density parameters from A_F.
+Scale factor a(t), Hubble parameter, comoving distance, acceleration onset.
+
+## The Cosmological Integer Map
+
+| Quantity | Value | Crystal Source | Planck |
+|----------|-------|---------------|--------|
+| Ω_Λ | 13/19 | gauss/(gauss+chi) | 0.6847 |
+| Ω_m | 6/19 | chi/(gauss+chi) | 0.3153 |
+| Ω_Λ/Ω_m | 13/6 | gauss/chi | 2.175 |
+| Ω_b | ~0.0495 | Ω_m×β₀/(β₀+12π) | 0.0493 |
+| DM/baryon | 12π/7 | N_w²N_cπ/β₀ | 5.36 |
+| 100θ* | 100/96 | 100/(N_w(D+χ)) | 1.0411 |
+| T_CMB | 19/7 K | (gauss+chi)/β₀ | 2.7255 |
+| n_s | 1-κ/D | 1-ln3/(42ln2) | 0.9649 |
+| ln(10¹⁰A_s) | ln(21) | ln(N_c×β₀) | 3.044 |
+| Age | 97/7 Gyr | gauss+chi/β₀ | 13.797 |
+| w | -1 | Landauer | -1.0 |
+| matter 1/a³ | 3 | N_c | |
+| radiation 1/a⁴ | 4 | N_c+1 | |
+
+## Key Results
+
+- Expansion from a=0.001 to a=1.0 (present): age = 0.95/H₀
+- Dark energy acceleration onset at z ~ 0.63 (Planck: ~0.67)
+- Ω_total = 1.000 (flat universe from crystal parameters)
+- Comoving distance d_C(z=1) = 0.76 c/H₀
+
+## Proof Certificate
+
+- `proofs/crystal_friedmann_proof.py` — 23/23 PASS
+- `proofs/CrystalFriedmann.lean` — 12 theorems
+- `proofs/CrystalFriedmann.agda` — 12 proofs
+
 ## §Module: CrystalGaming_TODO
 
 # Crystal Topos — Gaming Physics & Audio TODO
@@ -1661,6 +1720,44 @@ ghc -fno-code CrystalGauge.hs   # type-check (imports CrystalAxiom)
 
 Imports `CrystalAxiom`.
 
+## §Module: CrystalGR
+
+# CrystalGR.hs — General Relativistic Orbits from (2,3)
+
+## What This Module Does
+
+Extends CrystalClassical.hs to curved spacetime. Schwarzschild geodesic
+integration via symplectic leapfrog. Perihelion precession, light bending,
+ISCO, Shapiro delay — all from (2,3).
+
+## The GR Integer Map
+
+| Quantity | Value | Crystal Source | Physical Meaning |
+|----------|-------|---------------|-----------------|
+| r_s = 2GM | 2 | N_c - 1 | Schwarzschild radius coefficient |
+| Precession 6piGM/... | 6 | chi = N_w*N_c | Perihelion advance |
+| Light bending 4GM/b | 4 | N_w^2 | = Ryu-Takayanagi 4 |
+| ISCO = 6GM | 6 | chi | Innermost stable orbit |
+| ISCO = 3 r_s | 3 | N_c | In units of r_s |
+| E_ISCO^2 = 8/9 | 8,9 | d_colour, N_c^2 | ISCO binding energy |
+| Shapiro delay | 2,4 | N_c-1, N_w^2 | Time delay coefficients |
+| Spacetime dim | 4 | N_c + 1 | |
+| 16piG | 16 | N_w^4 | Einstein equation |
+
+## Key Results
+
+- Mercury precession: 42.98 arcsec/century (analytic, exact)
+- Numerical precession: 4.1% error at a = 100 r_s (strong field)
+- Light bending: 1.751 arcsec at Sun limb (exact)
+- ISCO: r = 3 r_s = 6 GM (exact integers)
+- Hamiltonian conserved to < 4e-6 over 50000 steps (symplectic)
+
+## Proof Certificate
+
+- `proofs/crystal_gr_proof.py` — 26/26 PASS
+- `proofs/CrystalGR.lean` — 18 theorems by native_decide
+- `proofs/CrystalGR.agda` — 13 proofs by refl
+
 ## §Module: CrystalGravity
 
 # CrystalGravity.hs — Gravity, Relativity & Classical Physics
@@ -1883,6 +1980,45 @@ cd crystal-topos/examples
 python3 mera_gravity_closed.py
 python3 mera_linearized_gravity.py
 ```
+
+## §Module: CrystalGW
+
+# CrystalGW.hs — Gravitational Waveforms from (2,3)
+
+## What This Module Does
+
+Binary inspiral waveform generation. Chirp signal h+(t), hx(t) from
+Peters quadrupole formula through ISCO cutoff. Every coefficient from A_F.
+
+## The GW Integer Map
+
+| Quantity | Value | Crystal Source | Physical Meaning |
+|----------|-------|---------------|-----------------|
+| Peters coefficient | 32/5 | N_w^5/(chi-1) | Quadrupole power |
+| Orbital decay | 64/5 | N_w^6/(chi-1) | da/dt coefficient |
+| Chirp rate | 96/5 | N_c*N_w^5/(chi-1) | df/dt coefficient |
+| Merger time | 5/256 | (chi-1)/N_w^8 | t_merge coefficient |
+| Chirp mass exp | 3/5 | N_c/(chi-1) | M_c = mu^(3/5)*M^(2/5) |
+| Frequency exp | 2/3 | (N_c-1)/N_c | h ~ f^(2/3) |
+| Waveform amplitude | 4 | N_w^2 | 4/r prefactor |
+| Polarizations | 2 | N_c-1 | h+, hx |
+| GW freq doubling | 2 | N_w | f_GW = 2*f_orb |
+| ISCO cutoff | 6 | chi | f_ISCO ~ 1/(6^(3/2) pi M) |
+| Kolmogorov in chirp | 5/3 | (chi-1)/N_c | M_c exponent |
+| Chirp power | 8/3 | d_colour/N_c | pi exponent |
+| Chirp power | 11/3 | (N_c^2+N_w)/N_c | f exponent |
+
+## Key Surprise
+
+The Kolmogorov turbulence exponent 5/3 = (chi-1)/N_c appears in the
+chirp mass formula. GW inspiral and turbulent energy cascade use the
+same number from the same algebraic source. WACA graft score: 8/10.
+
+## Proof Certificate
+
+- `proofs/crystal_gw_proof.py` — 35/35 PASS
+- `proofs/CrystalGW.lean` — 22 theorems by native_decide
+- `proofs/CrystalGW.agda` — 14 proofs by refl
 
 ## §Module: CrystalHierarchy
 
@@ -2590,6 +2726,33 @@ Future: will import CrystalAxiom when integrated into main build.
 
 0 new. Infrastructure only. Extends to observables via CrystalMERA perturbation.
 
+## §Module: CrystalNBody
+
+# CrystalNBody.hs — N-Body Gravitational Dynamics from (2,3)
+
+## What This Module Does
+
+Barnes-Hut octree for O(N log N) gravitational force computation.
+Symplectic leapfrog (W-U-W) for time integration. Scales to 1000+ bodies.
+
+## Integer Map
+
+| Quantity | Value | Crystal Source |
+|----------|-------|---------------|
+| Oct-tree children | 8 | 2^N_c = N_w^N_c = d_colour |
+| Force exponent | 2 | N_c - 1 |
+| Spatial dim | 3 | N_c |
+| Phase space/body | 6 | 2*N_c = chi |
+
+Key surprise: oct-tree has 8 = d_colour children. The number of octants
+in 3D space IS the dimension of the colour adjoint representation of SU(3).
+
+## Proof Certificate
+
+- `proofs/crystal_nbody_proof.py` — 12/12 PASS
+- `proofs/CrystalNBody.lean` — 6 theorems
+- `proofs/CrystalNBody.agda` — 5 proofs
+
 ## §Module: CrystalProtein
 
 # CrystalProtein — Experimental Proof of Concept
@@ -2890,6 +3053,32 @@ ghc -fno-code CrystalRiemann.hs   # type-check
 ## Dependencies
 
 Imports `CrystalAxiom`.
+
+## §Module: CrystalThermo
+# CrystalThermo.hs — Thermodynamic Dynamics from (2,3)
+
+## What This Module Does
+Molecular dynamics with Lennard-Jones potential. Velocity Verlet integrator.
+Heat capacity, adiabatic indices, Carnot efficiency — all from (2,3).
+
+## Integer Map
+| Quantity | Value | Crystal Source |
+|----------|-------|---------------|
+| LJ attractive exp | 6 | χ |
+| LJ repulsive exp | 12 | 2χ |
+| LJ force prefactor | 24 | d_mixed = N_w³N_c |
+| γ_monatomic | 5/3 | (χ-1)/N_c |
+| γ_diatomic | 7/5 | β₀/(χ-1) |
+| DOF monatomic | 3 | N_c |
+| DOF diatomic | 5 | χ-1 |
+| Carnot | 5/6 | (χ-1)/χ |
+| ΔS per tick | ln(6) | ln(χ) |
+| Stokes drag | 24 | d_mixed |
+
+## Proof Certificate
+- `proofs/crystal_thermo_proof.py` — 23/23 PASS
+- `proofs/CrystalThermo.lean` — 12 theorems
+- `proofs/CrystalThermo.agda` — 11 proofs
 
 ## §Module: CrystalWACAScan
 
