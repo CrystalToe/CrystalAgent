@@ -7,8 +7,10 @@ sync_check.sh
 
 # Rust
 crystal-topos/target/
+crystal-toe/target/
 
 # Python
+crystal-toe/__pycache__/
 __pycache__/
 *.pyc
 *.egg-info/
