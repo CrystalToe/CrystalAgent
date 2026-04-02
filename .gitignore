@@ -21,7 +21,7 @@ __pycache__/
 # Lean
 haskel/LeanCert/.lake/
 crystal-topos/*
-
+crystal-topos
 
 # OS
 .DS_Store

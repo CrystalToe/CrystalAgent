@@ -55,6 +55,8 @@ impl PyToe {
     fn qft(&self) -> PyQFT { PyQFT { toe: self.inner.clone() } }
     fn rigid(&self) -> PyRigid { PyRigid { toe: self.inner.clone() } }
     fn gw(&self) -> PyGW { PyGW { toe: self.inner.clone() } }
+    fn chem(&self) -> PyChem { PyChem { toe: self.inner.clone() } }
+    fn nuclear(&self) -> PyNuclear { PyNuclear { toe: self.inner.clone() } }
 
     // Crystal constants
     fn n_w(&self) -> u64 { crate::atoms::N_W }
@@ -1125,34 +1127,123 @@ impl PyRigid {
     }
 }
 
-#[pyclass(name = "Chem")] struct PyChem;
-#[pymethods] impl PyChem {
-    #[new] fn new() -> Self { PyChem }
+#[pyclass(name = "Chem")]
+#[derive(Clone)]
+struct PyChem { toe: crate::toe::Toe }
+#[pymethods]
+impl PyChem {
+    #[new] #[pyo3(signature = (vev=None))]
+    fn new(vev: Option<f64>) -> Self {
+        PyChem { toe: match vev { Some(v) => crate::toe::Toe::with_vev(v), None => crate::toe::Toe::new() } }
+    }
+    fn vev(&self) -> f64 { self.toe.vev() }
+    fn alpha(&self) -> f64 { self.toe.alpha() }
+    fn n_w(&self) -> u64 { crate::atoms::N_W }
+    fn n_c(&self) -> u64 { crate::atoms::N_C }
+    fn chi(&self) -> u64 { crate::atoms::CHI }
+    fn beta0(&self) -> u64 { crate::atoms::BETA0 }
+
+    // §1 Orbital quantum numbers
+    fn max_orbital_l(&self) -> u64 { crate::dynamics::chem::MAX_ORBITAL_L }
     fn s_capacity(&self) -> u64 { crate::dynamics::chem::S_CAPACITY }
     fn p_capacity(&self) -> u64 { crate::dynamics::chem::P_CAPACITY }
     fn d_capacity(&self) -> u64 { crate::dynamics::chem::D_CAPACITY }
     fn f_capacity(&self) -> u64 { crate::dynamics::chem::F_CAPACITY }
+    fn subshell_capacity(&self, l: u64) -> u64 { crate::dynamics::chem::subshell_capacity(l) }
+    fn shell_capacity(&self, n: u64) -> u64 { crate::dynamics::chem::shell_capacity(n) }
+
+    // §2 Hybridization angles (radians)
+    fn sp3_angle(&self) -> f64 { crate::dynamics::chem::sp3_angle() }
+    fn sp2_angle(&self) -> f64 { crate::dynamics::chem::sp2_angle() }
+    fn sp_angle(&self) -> f64 { crate::dynamics::chem::sp_angle() }
+    fn water_angle(&self) -> f64 { crate::dynamics::chem::water_angle() }
+    // Degrees
+    fn sp3_angle_deg(&self) -> f64 { crate::dynamics::chem::sp3_angle_deg() }
+    fn sp2_angle_deg(&self) -> f64 { crate::dynamics::chem::sp2_angle_deg() }
+    fn water_angle_deg(&self) -> f64 { crate::dynamics::chem::water_angle_deg() }
+
+    // §3 Energy scales
+    fn alpha_em(&self) -> f64 { crate::dynamics::chem::alpha_em() }
+    fn hartree_ev(&self) -> f64 { crate::dynamics::chem::hartree_ev() }
+    fn bohr_radius(&self) -> f64 { crate::dynamics::chem::bohr_radius() }
+    fn rydberg_ev(&self) -> f64 { crate::dynamics::chem::rydberg_ev() }
+    fn eps_vdw(&self) -> f64 { crate::dynamics::chem::eps_vdw() }
+    fn e_hbond(&self) -> f64 { crate::dynamics::chem::e_hbond() }
+    fn kt_300(&self) -> f64 { crate::dynamics::chem::kt_300() }
+    fn dielectric_protein(&self) -> u64 { crate::dynamics::chem::DIELECTRIC_PROTEIN }
+
+    // §4 Arrhenius
+    fn arrhenius(&self, ea: f64, kt: f64) -> f64 { crate::dynamics::chem::arrhenius(ea, kt) }
+    fn arrhenius_bio(&self, ea: f64) -> f64 { crate::dynamics::chem::arrhenius_bio(ea) }
+
+    // §5 Noble gases
     fn noble_he(&self) -> u64 { crate::dynamics::chem::NOBLE_HE }
     fn noble_ne(&self) -> u64 { crate::dynamics::chem::NOBLE_NE }
     fn noble_ar(&self) -> u64 { crate::dynamics::chem::NOBLE_AR }
     fn noble_kr(&self) -> u64 { crate::dynamics::chem::NOBLE_KR }
+    fn noble_gases(&self) -> Vec<u64> { crate::dynamics::chem::noble_gases().to_vec() }
     fn neutral_ph(&self) -> u64 { crate::dynamics::chem::NEUTRAL_PH }
-    fn sp3_angle_deg(&self) -> f64 { crate::dynamics::chem::sp3_angle().to_degrees() }
-    fn sp2_angle_deg(&self) -> f64 { crate::dynamics::chem::sp2_angle().to_degrees() }
-    fn water_angle_deg(&self) -> f64 { crate::dynamics::chem::water_angle().to_degrees() }
-    fn shell_capacity(&self, n: u64) -> u64 { crate::dynamics::chem::shell_capacity(n) }
-    fn arrhenius(&self, ea: f64, kt: f64) -> f64 { crate::dynamics::chem::arrhenius(ea, kt) }
+    fn bohr_factor(&self) -> u64 { crate::dynamics::chem::BOHR_FACTOR }
+
+    // §6 Shell filling
+    fn period_lengths(&self) -> Vec<u64> { crate::dynamics::chem::period_lengths().to_vec() }
+    fn cumulative_shells(&self, n: usize) -> Vec<u64> { crate::dynamics::chem::cumulative_shells(n) }
+
+    // §8 Thermal-VdW
+    fn vdw_kt_ratio(&self) -> f64 { crate::dynamics::chem::vdw_kt_ratio() }
+
+    // §9 Self-test
+    fn observable_count(&self) -> u64 { crate::dynamics::chem::OBSERVABLE_COUNT }
+    fn self_test(&self) -> (usize, usize, Vec<String>) { crate::dynamics::chem::self_test() }
 }
 
-#[pyclass(name = "Nuclear")] struct PyNuclear;
-#[pymethods] impl PyNuclear {
-    #[new] fn new() -> Self { PyNuclear }
+#[pyclass(name = "Nuclear")]
+#[derive(Clone)]
+struct PyNuclear { toe: crate::toe::Toe }
+#[pymethods]
+impl PyNuclear {
+    #[new] #[pyo3(signature = (vev=None))]
+    fn new(vev: Option<f64>) -> Self {
+        PyNuclear { toe: match vev { Some(v) => crate::toe::Toe::with_vev(v), None => crate::toe::Toe::new() } }
+    }
+    fn vev(&self) -> f64 { self.toe.vev() }
+    fn n_w(&self) -> u64 { crate::atoms::N_W }
+    fn n_c(&self) -> u64 { crate::atoms::N_C }
+    fn chi(&self) -> u64 { crate::atoms::CHI }
+    fn beta0(&self) -> u64 { crate::atoms::BETA0 }
+
+    // §1 Magic numbers
     fn magic_numbers(&self) -> Vec<u64> { crate::dynamics::nuclear::magic_numbers().to_vec() }
-    fn iron_peak(&self) -> u64 { crate::dynamics::nuclear::IRON_PEAK_A }
-    fn isospin_states(&self) -> u64 { crate::dynamics::nuclear::ISOSPIN_STATES }
-    fn alpha_particle(&self) -> u64 { crate::dynamics::nuclear::ALPHA_PARTICLE }
+    fn magic_labels(&self) -> Vec<String> { crate::dynamics::nuclear::MAGIC_LABELS.iter().map(|s| s.to_string()).collect() }
+
+    // §2 SEMF
+    fn surface_exp(&self) -> (u64, u64) { crate::dynamics::nuclear::SURFACE_EXP }
+    fn coulomb_exp(&self) -> (u64, u64) { crate::dynamics::nuclear::COULOMB_EXP }
+    fn pairing_exp(&self) -> (u64, u64) { crate::dynamics::nuclear::PAIRING_EXP }
+    fn coulomb_prefactor(&self) -> (u64, u64) { crate::dynamics::nuclear::COULOMB_PREFACTOR }
+    fn asymmetry_factor(&self) -> u64 { crate::dynamics::nuclear::ASYMMETRY_FACTOR }
     fn binding_energy(&self, a: u32, z: u32) -> f64 { crate::dynamics::nuclear::binding_energy(a, z) }
     fn binding_per_nucleon(&self, a: u32, z: u32) -> f64 { crate::dynamics::nuclear::binding_per_nucleon(a, z) }
+    fn optimal_z(&self, a: u32) -> u32 { crate::dynamics::nuclear::optimal_z(a) }
+
+    // §3 Nuclear radii
+    fn nuclear_radius(&self, a: u32) -> f64 { crate::dynamics::nuclear::nuclear_radius(a) }
+    fn nuclear_volume(&self, a: u32) -> f64 { crate::dynamics::nuclear::nuclear_volume(a) }
+
+    // §4 Specific nuclei
+    fn iron_peak(&self) -> u64 { crate::dynamics::nuclear::IRON_PEAK_A }
+    fn isospin_states(&self) -> u64 { crate::dynamics::nuclear::ISOSPIN_STATES }
+    fn deuteron_a(&self) -> u64 { crate::dynamics::nuclear::DEUTERON_A }
+    fn alpha_particle(&self) -> u64 { crate::dynamics::nuclear::ALPHA_PARTICLE }
+    fn he4_binding_crystal(&self) -> u64 { crate::dynamics::nuclear::HE4_BINDING_CRYSTAL }
+
+    // §5 Binding curve
+    fn binding_curve(&self, max_a: u32) -> Vec<(u32, f64)> { crate::dynamics::nuclear::binding_curve(max_a) }
+    fn peak_nucleus(&self, max_a: u32) -> (u32, f64) { crate::dynamics::nuclear::peak_nucleus(max_a) }
+
+    // §6 Self-test
+    fn observable_count(&self) -> u64 { crate::dynamics::nuclear::OBSERVABLE_COUNT }
+    fn self_test(&self) -> (usize, usize, Vec<String>) { crate::dynamics::nuclear::self_test() }
 }
 
 #[pyclass(name = "Astro")] struct PyAstro;
