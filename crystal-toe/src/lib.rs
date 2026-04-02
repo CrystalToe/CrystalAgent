@@ -27,6 +27,20 @@ pub mod waca_scan;
 pub mod quantum;
 pub mod mandelbrot;
 
+// Wave 2b: Structural & Theoretical (ported from Haskell)
+pub mod noether;
+pub mod structural;
+pub mod gravity_dyn;
+pub mod mera;
+pub mod hologron;
+pub mod layer;
+pub mod proton_radius;
+pub mod riemann;
+pub mod discoveries;
+
+// Wave 2c: Quantum Computing Library (8 Q* modules from Haskell)
+pub mod qlib;
+
 // Wave 3: Dynamics Phase 1
 pub mod dynamics;
 
