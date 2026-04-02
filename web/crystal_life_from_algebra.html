@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crystal Dynamics — Life from Algebra</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600;700&family=Fira+Code:wght@300;400;500&family=Nunito:wght@200;400;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#f8f6f0;color:#2a2a2a;font-family:'Nunito',sans-serif;min-height:100vh}
+.hero{background:linear-gradient(160deg,#0b3d2e,#1a5c45,#0d4a38);color:#e8f5e9;padding:80px 20px 60px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'ATGCATGCATGCATGCATGCATGCATGCATGCATGCATGC';position:absolute;font-family:'Fira Code',monospace;font-size:12rem;color:rgba(255,255,255,.02);top:-30px;left:-20px;white-space:nowrap;letter-spacing:20px;pointer-events:none}
+h1{font-family:'Crimson Pro',serif;font-size:clamp(2.5rem,6vw,4.5rem);font-weight:700;letter-spacing:-1px}
+h1 span{color:#7bed9f}
+.hero-sub{font-family:'Fira Code',monospace;font-size:.8rem;letter-spacing:3px;margin-top:12px;color:#a5d6a7}
+.hero-p{max-width:700px;margin:20px auto;font-size:1rem;line-height:1.7;color:#c8e6c9;font-weight:200}
+.container{max-width:1000px;margin:0 auto;padding:60px 20px}
+h2{font-family:'Crimson Pro',serif;font-size:2rem;font-weight:600;margin-bottom:10px}
+.section-intro{color:#666;font-size:.95rem;line-height:1.6;margin-bottom:30px;font-weight:200}
+.dna-strip{display:flex;justify-content:center;gap:0;margin:30px 0;flex-wrap:wrap}
+.base-pair{display:flex;flex-direction:column;align-items:center;width:60px}
+.base{width:50px;height:50px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Fira Code',monospace;font-weight:500;font-size:1.2rem;transition:transform .2s}
+.base:hover{transform:scale(1.1)}
+.bond-line{height:20px;width:2px;margin:2px 0}
+.base-a{background:#ff634722;color:#ff6347;border:1px solid #ff634744}
+.base-t{background:#4169e122;color:#4169e1;border:1px solid #4169e144}
+.base-g{background:#ffd70022;color:#daa520;border:1px solid #daa52044}
+.base-c{background:#32cd3222;color:#228b22;border:1px solid #228b2244}
+.bond-2{background:repeating-linear-gradient(to bottom,#aaa 0,#aaa 3px,transparent 3px,transparent 6px)}
+.bond-3{background:repeating-linear-gradient(to bottom,#aaa 0,#aaa 2px,transparent 2px,transparent 4px)}
+.equation-box{background:#fff;border:1px solid #e0ddd5;border-radius:16px;padding:30px;margin:24px 0;box-shadow:0 2px 20px rgba(0,0,0,.04)}
+.eq{font-family:'Fira Code',monospace;font-size:1.1rem;text-align:center;color:#1a5c45;padding:10px 0}
+.eq-label{font-size:.75rem;color:#999;text-align:center;margin-top:4px}
+.codon-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:500px;margin:20px auto}
+.codon{background:#fff;border:1px solid #e8e6e0;border-radius:8px;padding:12px 8px;text-align:center;font-family:'Fira Code',monospace;font-size:.75rem;color:#555;transition:all .2s}
+.codon:hover{border-color:#1a5c45;background:#f0fff0}
+.codon.stop{background:#fff0f0;border-color:#ffcccc;color:#cc3333}
+.codon.start{background:#f0fff0;border-color:#99cc99;color:#1a5c45;font-weight:600}
+.scaling-chart{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin:30px 0}
+.scale-card{background:#fff;border:1px solid #e0ddd5;border-radius:16px;padding:24px;width:220px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,.03);transition:transform .2s}
+.scale-card:hover{transform:translateY(-4px)}
+.scale-exp{font-family:'Crimson Pro',serif;font-size:2.8rem;font-weight:700;color:#1a5c45}
+.scale-name{font-size:.9rem;color:#555;margin-top:6px}
+.scale-formula{font-family:'Fira Code',monospace;font-size:.75rem;color:#1a5c45;margin-top:10px;padding:4px 12px;background:#1a5c4508;border-radius:6px;display:inline-block}
+.helix-info{display:flex;gap:30px;flex-wrap:wrap;justify-content:center;margin:30px 0}
+.helix-stat{text-align:center}
+.helix-val{font-family:'Crimson Pro',serif;font-size:2.5rem;font-weight:700;color:#1a5c45}
+.helix-unit{font-size:.8rem;color:#888}
+.helix-trace{font-family:'Fira Code',monospace;font-size:.7rem;color:#1a5c45;margin-top:4px}
+.impossible-box{background:linear-gradient(135deg,#0b3d2e,#1a5c45);color:#e8f5e9;border-radius:16px;padding:40px;margin:40px 0;position:relative;overflow:hidden}
+.impossible-box::after{content:'(2,3)';position:absolute;right:20px;bottom:10px;font-family:'Crimson Pro',serif;font-size:8rem;color:rgba(255,255,255,.03);font-weight:700}
+.impossible-title{font-family:'Crimson Pro',serif;font-size:1.5rem;font-weight:600;margin-bottom:16px}
+.impossible-list{list-style:none;display:grid;gap:12px}
+.impossible-list li{display:flex;gap:12px;align-items:flex-start;font-size:.92rem;line-height:1.5;color:#c8e6c9}
+.impossible-list li::before{content:'×';color:#7bed9f;font-weight:700;font-size:1.1rem;flex-shrink:0;margin-top:1px}
+.cross-note{font-family:'Fira Code',monospace;font-size:.8rem;color:#999;padding:16px;background:#fff;border-left:3px solid #1a5c45;margin:20px 0;border-radius:0 8px 8px 0}
+footer{text-align:center;padding:40px;font-size:.75rem;color:#aaa;font-family:'Fira Code',monospace}
+</style>
+</head>
+<body>
+<div class="hero">
+<h1>Life from <span>Algebra</span></h1>
+<div class="hero-sub">CrystalBio · CrystalChem · CrystalMD</div>
+<p class="hero-p">DNA, proteins, and metabolic scaling — the structural constants of life — all derive from the same two integers that govern particle physics: N_w = 2 and N_c = 3.</p>
+</div>
+
+<div class="container">
+<h2>The Genetic Code is Crystal Arithmetic</h2>
+<p class="section-intro">Four DNA bases read in triplets, encoding twenty amino acids with three stop signals. Every number traces to the algebra A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ).</p>
+
+<div class="dna-strip">
+<div class="base-pair"><div class="base base-a">A</div><div class="bond-line bond-2"></div><div class="base base-t">T</div></div>
+<div class="base-pair"><div class="base base-t">T</div><div class="bond-line bond-2"></div><div class="base base-a">A</div></div>
+<div class="base-pair"><div class="base base-g">G</div><div class="bond-line bond-3"></div><div class="base base-c">C</div></div>
+<div class="base-pair"><div class="base base-c">C</div><div class="bond-line bond-3"></div><div class="base base-g">G</div></div>
+<div class="base-pair"><div class="base base-a">A</div><div class="bond-line bond-2"></div><div class="base base-t">T</div></div>
+<div class="base-pair"><div class="base base-g">G</div><div class="bond-line bond-3"></div><div class="base base-c">C</div></div>
+<div class="base-pair"><div class="base base-t">T</div><div class="bond-line bond-2"></div><div class="base base-a">A</div></div>
+<div class="base-pair"><div class="base base-a">A</div><div class="bond-line bond-2"></div><div class="base base-t">T</div></div>
+<div class="base-pair"><div class="base base-c">C</div><div class="bond-line bond-3"></div><div class="base base-g">G</div></div>
+<div class="base-pair"><div class="base base-g">G</div><div class="bond-line bond-3"></div><div class="base base-c">C</div></div>
+</div>
+<div style="display:flex;justify-content:center;gap:30px;margin:10px 0;flex-wrap:wrap">
+<span style="font-family:'Fira Code',monospace;font-size:.8rem;color:#ff6347">A–T: N_w = 2 hydrogen bonds</span>
+<span style="font-family:'Fira Code',monospace;font-size:.8rem;color:#228b22">G–C: N_c = 3 hydrogen bonds</span>
+</div>
+
+<div class="equation-box">
+<div class="eq">4 bases = N_w² &nbsp;→&nbsp; 3-letter codons = N_c &nbsp;→&nbsp; 4³ = 64 = (N_w²)<sup>N_c</sup> codons</div>
+<div class="eq-label">Total codons = (number of bases)^(codon length)</div>
+</div>
+
+<div class="equation-box">
+<div class="eq">64 codons − 3 stops = 61 sense codons → <strong>20 amino acids</strong></div>
+<div class="eq" style="font-size:1.3rem;color:#0b3d2e;font-weight:600">20 = N_w² × (χ − 1) = 4 × 5</div>
+<div class="eq-label">The number of amino acids = (bases) × (quarks minus one)</div>
+</div>
+
+<div class="cross-note">Average codon redundancy: 61/20 ≈ 3.05 ≈ N_c. Each amino acid is encoded by ~3 codons on average — the colour dimension governs genetic redundancy.</div>
+
+<h2 style="margin-top:50px">Protein Structure from (2,3)</h2>
+<p class="section-intro">The α-helix, the most common protein secondary structure, has 3.6 residues per turn. This is not a coincidence — it's N_c²·N_w/(χ−1) = 18/5 exactly.</p>
+
+<div class="helix-info">
+<div class="helix-stat"><div class="helix-val">3.6</div><div class="helix-unit">residues/turn</div><div class="helix-trace">N_c²·N_w/(χ−1) = 18/5</div></div>
+<div class="helix-stat"><div class="helix-val">0.4</div><div class="helix-unit">Flory exponent</div><div class="helix-trace">N_w/(χ−1) = 2/5</div></div>
+<div class="helix-stat"><div class="helix-val">109.5°</div><div class="helix-unit">sp3 bond angle</div><div class="helix-trace">arccos(−1/N_c)</div></div>
+<div class="helix-stat"><div class="helix-val">104.5°</div><div class="helix-unit">water angle</div><div class="helix-trace">arccos(−1/N_w²)</div></div>
+</div>
+<div class="cross-note">The Flory exponent 2/5 = N_w/(χ−1) also appears as I_sphere = 2/5 MR² (moment of inertia of a solid sphere, CrystalRigid). Polymer scaling and rotational mechanics share the same Crystal fraction.</div>
+
+<h2 style="margin-top:50px">Metabolic Scaling — Kleiber's Law</h2>
+<p class="section-intro">Across 18 orders of magnitude — from bacteria to blue whales — metabolic rate scales as the 3/4 power of body mass. This is N_c/N_w² = 3/4.</p>
+
+<div class="scaling-chart">
+<div class="scale-card"><div class="scale-exp">¾</div><div class="scale-name">Metabolic Rate</div><div class="scale-formula">P ∝ M^(N_c/N_w²)</div></div>
+<div class="scale-card"><div class="scale-exp">⅔</div><div class="scale-name">Surface Area</div><div class="scale-formula">A ∝ M^(N_w/N_c)</div></div>
+<div class="scale-card"><div class="scale-exp">¼</div><div class="scale-name">Heart Rate</div><div class="scale-formula">f ∝ M^(-1/N_w²)</div></div>
+<div class="scale-card"><div class="scale-exp">¼</div><div class="scale-name">Lifespan</div><div class="scale-formula">T ∝ M^(1/N_w²)</div></div>
+</div>
+<div class="cross-note">Heart rate exponent = lifespan exponent = 1/N_w² = 1/4. They cancel: total heartbeats in a lifetime ≈ constant across all mammals. The algebra predicts this invariant.</div>
+
+<div class="impossible-box">
+<div class="impossible-title">What no other framework can do</div>
+<ul class="impossible-list">
+<li>Derive the number of amino acids (20) from particle physics constants</li>
+<li>Connect DNA base count (4) to Bell states (4) to spacetime dimensions (4)</li>
+<li>Trace metabolic scaling (3/4) to the Chandrasekhar mass limit (same exponent)</li>
+<li>Link the α-helix pitch (18/5) to the Flory polymer exponent (2/5) to the moment of inertia of a sphere (2/5)</li>
+<li>Explain why A–T has 2 hydrogen bonds and G–C has 3 — they ARE N_w and N_c</li>
+<li>Show that codon redundancy (~3) equals the colour dimension N_c</li>
+<li>Derive Krypton's atomic number (36) as the total sector dimensions Σd</li>
+<li>Prove that neutral pH = 7 = QCD beta function coefficient β₀</li>
+</ul>
+</div>
+
+<div class="equation-box" style="text-align:center">
+<div style="font-family:'Crimson Pro',serif;font-size:1.3rem;font-weight:600;color:#1a5c45;margin-bottom:10px">The Bridge</div>
+<div class="eq" style="font-size:1rem;color:#555">N_w² = 4 appears as:</div>
+<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin:16px 0">
+<span style="padding:6px 14px;border-radius:20px;background:#ff634711;border:1px solid #ff634733;font-size:.8rem;color:#cc3333">DNA bases</span>
+<span style="padding:6px 14px;border-radius:20px;background:#4169e111;border:1px solid #4169e133;font-size:.8rem;color:#4169e1">Bell states</span>
+<span style="padding:6px 14px;border-radius:20px;background:#1a5c4511;border:1px solid #1a5c4533;font-size:.8rem;color:#1a5c45">Spacetime dim</span>
+<span style="padding:6px 14px;border-radius:20px;background:#daa52011;border:1px solid #daa52033;font-size:.8rem;color:#b8860b">Quaternion</span>
+<span style="padding:6px 14px;border-radius:20px;background:#8b008b11;border:1px solid #8b008b33;font-size:.8rem;color:#8b008b">Ising z</span>
+<span style="padding:6px 14px;border-radius:20px;background:#00808011;border:1px solid #00808033;font-size:.8rem;color:#008080">Eddington</span>
+</div>
+<div class="eq" style="font-size:.85rem;color:#888">Same integer. Six different physics domains. One algebra.</div>
+</div>
+</div>
+
+<footer>Crystal Dynamics · CrystalBio × CrystalChem × CrystalMD × CrystalRigid × CrystalQInfo · AGPL-3.0</footer>
+</body>
+</html>

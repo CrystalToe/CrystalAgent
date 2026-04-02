@@ -18,7 +18,7 @@ __pycache__/
 
 # Lean
 haskel/LeanCert/.lake/
-
+crystal-topos/*
 
 
 # OS

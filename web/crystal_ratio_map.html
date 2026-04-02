@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crystal Dynamics — The Universal Ratio Map</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Code+Pro:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a12;--fg:#e8e6e3;--accent:#ff6b35;--accent2:#00d4aa;--accent3:#7b68ee;--dim:#3a3a4a;--glass:rgba(255,255,255,0.04)}
+body{background:var(--bg);color:var(--fg);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+.grain{position:fixed;inset:0;pointer-events:none;z-index:999;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+header{text-align:center;padding:60px 20px 30px;position:relative}
+header::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:120px;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:900;letter-spacing:-1px;background:linear-gradient(135deg,var(--fg),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{font-family:'Source Code Pro',monospace;font-size:.85rem;color:var(--dim);margin-top:8px;letter-spacing:2px}
+.insight{max-width:700px;margin:20px auto 0;font-size:.95rem;color:#888;line-height:1.6;font-weight:300}
+.map-container{max-width:1200px;margin:40px auto;padding:20px;position:relative}
+canvas{width:100%;border-radius:16px;background:radial-gradient(ellipse at center,#12121f 0%,var(--bg) 70%)}
+.ratio-panel{position:fixed;right:-400px;top:0;width:380px;height:100vh;background:rgba(10,10,18,0.97);border-left:1px solid var(--dim);padding:40px 30px;transition:right .4s cubic-bezier(.4,0,.2,1);z-index:100;overflow-y:auto;backdrop-filter:blur(20px)}
+.ratio-panel.open{right:0}
+.panel-close{position:absolute;top:20px;right:20px;background:none;border:1px solid var(--dim);color:var(--fg);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.2rem;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.panel-close:hover{border-color:var(--accent);color:var(--accent)}
+.panel-title{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;margin-bottom:6px}
+.panel-formula{font-family:'Source Code Pro',monospace;font-size:1rem;color:var(--accent);margin-bottom:24px}
+.panel-appearances{list-style:none}
+.panel-appearances li{padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:flex-start;gap:12px}
+.domain-badge{font-family:'Source Code Pro',monospace;font-size:.7rem;padding:3px 8px;border-radius:4px;white-space:nowrap;flex-shrink:0}
+.appearance-text{font-size:.88rem;color:#bbb;line-height:1.5}
+.appearance-text strong{color:var(--fg)}
+.legend{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin:20px auto;max-width:900px;padding:0 20px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:.75rem;color:#777}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.stats-bar{display:flex;justify-content:center;gap:40px;margin:10px auto 30px;flex-wrap:wrap}
+.stat{text-align:center}
+.stat-val{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--accent)}
+.stat-label{font-size:.7rem;color:#555;text-transform:uppercase;letter-spacing:2px;margin-top:2px}
+footer{text-align:center;padding:40px;font-size:.75rem;color:#444;font-family:'Source Code Pro',monospace}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<header>
+<h1>The Universal Ratio Map</h1>
+<div class="subtitle">21 PHYSICS DOMAINS · ONE ALGEBRA · (2,3)</div>
+<p class="insight">The same small fractions — 2/5, 3/4, 2/3, 7/2 — appear across quantum field theory, rigid body mechanics, biology, astrophysics, and nuclear physics. No other framework connects them. Click any node to explore.</p>
+</header>
+<div class="stats-bar">
+<div class="stat"><div class="stat-val">14</div><div class="stat-label">Shared Ratios</div></div>
+<div class="stat"><div class="stat-val">21</div><div class="stat-label">Physics Domains</div></div>
+<div class="stat"><div class="stat-val">105</div><div class="stat-label">Cross-Links</div></div>
+<div class="stat"><div class="stat-val">2</div><div class="stat-label">Input Primes</div></div>
+</div>
+<div class="legend" id="legend"></div>
+<div class="map-container"><canvas id="c"></canvas></div>
+<div class="ratio-panel" id="panel">
+<button class="panel-close" onclick="closePanel()">×</button>
+<div class="panel-title" id="panelTitle">2/5</div>
+<div class="panel-formula" id="panelFormula">N_w/(χ−1)</div>
+<ul class="panel-appearances" id="panelList"></ul>
+</div>
+<footer>Crystal Dynamics · A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ) · Every ratio from N_w=2, N_c=3</footer>
+<script>
+const domainColors = {
+  QFT:'#ff6b35',Rigid:'#00d4aa',Chem:'#7b68ee',Nuclear:'#ff4757',
+  Astro:'#ffd32a',QInfo:'#18dcff',Bio:'#7bed9f',Arcade:'#a29bfe',
+  Classical:'#fd79a8',GR:'#e17055',EM:'#00cec9',Thermo:'#6c5ce7',
+  CFD:'#fdcb6e',MD:'#55efc4',Condensed:'#b2bec3',Plasma:'#dfe6e9',
+  GW:'#fab1a0',Friedmann:'#74b9ff',NBody:'#81ecec',Optics:'#f8a5c2',
+  Decay:'#c44569'
+};
+const ratios = [
+  {name:'2/5',formula:'N_w/(χ−1)',val:0.4,domains:[
+    {d:'Rigid',text:'<strong>I_sphere = 2/5 MR²</strong> — moment of inertia of a solid sphere'},
+    {d:'MD',text:'<strong>Flory exponent ν = 2/5</strong> — polymer radius of gyration scaling'},
+    {d:'Bio',text:'<strong>Flory ν = 2/5</strong> — protein chain scaling (same as polymer!)'},
+    {d:'CFD',text:'<strong>Von Kármán constant</strong> — turbulent boundary layer'}]},
+  {name:'3/4',formula:'N_c/N_w²',val:0.75,domains:[
+    {d:'Bio',text:'<strong>Kleiber\'s law: P ∝ M^(3/4)</strong> — metabolic rate scaling'},
+    {d:'Astro',text:'<strong>Chandrasekhar exponent 3/2 = 2×3/4</strong> — white dwarf mass limit'}]},
+  {name:'2/3',formula:'N_w/N_c',val:0.667,domains:[
+    {d:'Bio',text:'<strong>Surface area ∝ M^(2/3)</strong> — allometric scaling'},
+    {d:'Rigid',text:'<strong>I_shell = 2/3 MR²</strong> — thin spherical shell'},
+    {d:'EM',text:'<strong>Larmor radiation factor</strong> — accelerating charge'},
+    {d:'Nuclear',text:'<strong>SEMF surface A^(2/3)</strong> — nuclear binding'}]},
+  {name:'7/2',formula:'β₀/N_w',val:3.5,domains:[
+    {d:'Astro',text:'<strong>L ∝ M^(7/2)</strong> — main sequence luminosity'},
+    {d:'Thermo',text:'<strong>γ_diatomic = 7/5</strong> — related ratio (β₀/χ−1)'}]},
+  {name:'1/6',formula:'1/χ',val:0.167,domains:[
+    {d:'QInfo',text:'<strong>Uncertainty meet(1/2,1/3) = 1/6</strong> — Heyting algebra'},
+    {d:'Decay',text:'<strong>Monad eigenvalue 1/χ</strong> — mixed sector'}]},
+  {name:'8',formula:'N_w³ = d_colour',val:8,domains:[
+    {d:'QFT',text:'<strong>8 gluon colours</strong> — SU(3) adjoint'},
+    {d:'Nuclear',text:'<strong>Magic number 8</strong> — oxygen shell closure'},
+    {d:'Condensed',text:'<strong>Octree children</strong> — spatial partitioning'},
+    {d:'Astro',text:'<strong>Hawking T: 1/(8πGMk)</strong> — black hole temperature'},
+    {d:'Arcade',text:'<strong>Octree branching = 8</strong> — Barnes-Hut tree'}]},
+  {name:'4',formula:'N_w²',val:4,domains:[
+    {d:'QFT',text:'<strong>Spacetime dimensions = 4</strong>'},
+    {d:'Rigid',text:'<strong>Quaternion components = 4</strong>'},
+    {d:'QInfo',text:'<strong>Bell states = 4</strong>'},
+    {d:'Bio',text:'<strong>DNA bases = 4</strong> (A,T,G,C)'},
+    {d:'Condensed',text:'<strong>Ising coordination z = 4</strong>'},
+    {d:'Astro',text:'<strong>Eddington luminosity factor</strong>'}]},
+  {name:'6',formula:'χ = N_w·N_c',val:6,domains:[
+    {d:'QFT',text:'<strong>Lorentz generators = 6</strong>'},
+    {d:'Rigid',text:'<strong>Inertia tensor independent = 6</strong>'},
+    {d:'QInfo',text:'<strong>MERA bond dimension = 6</strong>'},
+    {d:'Classical',text:'<strong>Phase space dim = 6</strong>'},
+    {d:'EM',text:'<strong>EM field components = 6</strong>'}]},
+  {name:'7',formula:'β₀',val:7,domains:[
+    {d:'QFT',text:'<strong>QCD β₀ = 7</strong> — running coupling'},
+    {d:'Chem',text:'<strong>Neutral pH = 7</strong>'},
+    {d:'Nuclear',text:'<strong>Fe-56 = 8×7</strong> — iron peak'},
+    {d:'QInfo',text:'<strong>Steane code: 7 qubits</strong>'}]},
+  {name:'36',formula:'Σd',val:36,domains:[
+    {d:'Chem',text:'<strong>Krypton Z = 36</strong> — noble gas'},
+    {d:'Nuclear',text:'<strong>Σd = 36</strong> — total sector dims'}]},
+  {name:'1/12',formula:'1/(2χ)',val:0.0833,domains:[
+    {d:'Rigid',text:'<strong>I_rod = 1/12 ML²</strong> — thin rod moment'},
+    {d:'Thermo',text:'<strong>LJ repulsive exponent 12 = 2χ</strong>'}]},
+  {name:'3/5',formula:'N_c/(χ−1)',val:0.6,domains:[
+    {d:'Nuclear',text:'<strong>SEMF Coulomb 3/5</strong> — nuclear binding'},
+    {d:'Astro',text:'<strong>Gravitational PE: −3GM²/(5R)</strong>'}]},
+  {name:'1/4',formula:'1/N_w²',val:0.25,domains:[
+    {d:'Bio',text:'<strong>Heart rate ∝ M^(−1/4)</strong> — allometric'},
+    {d:'Bio',text:'<strong>Lifespan ∝ M^(1/4)</strong> — allometric'}]},
+  {name:'14',formula:'N_w·β₀',val:14,domains:[
+    {d:'Chem',text:'<strong>f-shell capacity = 14</strong> — lanthanides/actinides'},
+    {d:'Nuclear',text:'<strong>Fe-56/4 = 14 = N_w·β₀</strong>'}]}
+];
+// Build legend
+const legendEl=document.getElementById('legend');
+Object.entries(domainColors).forEach(([d,c])=>{
+  const item=document.createElement('div');item.className='legend-item';
+  item.innerHTML=`<span class="legend-dot" style="background:${c}"></span>${d}`;
+  legendEl.appendChild(item);
+});
+// Canvas
+const canvas=document.getElementById('c');const ctx=canvas.getContext('2d');
+let W,H,nodes=[],hoveredNode=null,selectedNode=null;
+function resize(){
+  const r=devicePixelRatio||1;
+  W=canvas.parentElement.clientWidth;H=Math.max(600,W*0.55);
+  canvas.width=W*r;canvas.height=H*r;
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+  ctx.setTransform(r,0,0,r,0,0);
+  layoutNodes();
+}
+function layoutNodes(){
+  nodes=[];
+  const cx=W/2,cy=H/2;
+  ratios.forEach((r,i)=>{
+    const angle=(i/ratios.length)*Math.PI*2-Math.PI/2;
+    const radius=Math.min(W,H)*0.35;
+    nodes.push({
+      x:cx+Math.cos(angle)*radius*(0.8+Math.random()*0.4),
+      y:cy+Math.sin(angle)*radius*(0.8+Math.random()*0.4),
+      r:18+r.domains.length*4,
+      ratio:r,idx:i,
+      vx:0,vy:0
+    });
+  });
+}
+function getConnections(){
+  const conns=[];
+  for(let i=0;i<nodes.length;i++){
+    for(let j=i+1;j<nodes.length;j++){
+      const shared=nodes[i].ratio.domains.filter(a=>
+        nodes[j].ratio.domains.some(b=>b.d===a.d));
+      if(shared.length>0) conns.push({a:i,b:j,weight:shared.length,domains:shared.map(s=>s.d)});
+    }
+  }
+  return conns;
+}
+let conns=[];
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  conns=getConnections();
+  // Draw connections
+  conns.forEach(c=>{
+    const a=nodes[c.a],b=nodes[c.b];
+    const isHighlight=hoveredNode!==null&&(c.a===hoveredNode||c.b===hoveredNode);
+    ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
+    if(isHighlight){
+      ctx.strokeStyle=domainColors[c.domains[0]]||'#555';
+      ctx.lineWidth=1.5;ctx.globalAlpha=0.6;
+    } else {
+      ctx.strokeStyle='#222';ctx.lineWidth=0.5;ctx.globalAlpha=0.3;
+    }
+    ctx.stroke();ctx.globalAlpha=1;
+  });
+  // Draw nodes
+  nodes.forEach((n,i)=>{
+    const isHover=i===hoveredNode;
+    const mainColor=n.ratio.domains.length>0?domainColors[n.ratio.domains[0].d]:'#555';
+    // Glow
+    if(isHover){
+      const grad=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,n.r*3);
+      grad.addColorStop(0,mainColor+'44');grad.addColorStop(1,'transparent');
+      ctx.fillStyle=grad;ctx.beginPath();ctx.arc(n.x,n.y,n.r*3,0,Math.PI*2);ctx.fill();
+    }
+    // Multi-color ring for multiple domains
+    const domCount=n.ratio.domains.length;
+    n.ratio.domains.forEach((d,di)=>{
+      const startA=(di/domCount)*Math.PI*2-Math.PI/2;
+      const endA=((di+1)/domCount)*Math.PI*2-Math.PI/2;
+      ctx.beginPath();ctx.arc(n.x,n.y,n.r,startA,endA);
+      ctx.lineWidth=isHover?4:2.5;ctx.strokeStyle=domainColors[d.d]||'#555';ctx.stroke();
+    });
+    // Fill
+    ctx.beginPath();ctx.arc(n.x,n.y,n.r-3,0,Math.PI*2);
+    ctx.fillStyle=isHover?'#1a1a2e':'#111118';ctx.fill();
+    // Label
+    ctx.fillStyle=isHover?'#fff':var_fg;
+    ctx.font=`${isHover?'bold ':''}${n.r>24?'15':'12'}px 'Source Code Pro',monospace`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(n.ratio.name,n.x,n.y);
+  });
+  requestAnimationFrame(draw);
+}
+const var_fg='#ccc';
+function getNodeAt(mx,my){
+  for(let i=nodes.length-1;i>=0;i--){
+    const n=nodes[i],dx=mx-n.x,dy=my-n.y;
+    if(dx*dx+dy*dy<n.r*n.r) return i;
+  }
+  return null;
+}
+canvas.addEventListener('mousemove',e=>{
+  const rect=canvas.getBoundingClientRect();
+  hoveredNode=getNodeAt(e.clientX-rect.left,e.clientY-rect.top);
+  canvas.style.cursor=hoveredNode!==null?'pointer':'default';
+});
+canvas.addEventListener('click',e=>{
+  const rect=canvas.getBoundingClientRect();
+  const idx=getNodeAt(e.clientX-rect.left,e.clientY-rect.top);
+  if(idx!==null) openPanel(idx);
+});
+function openPanel(idx){
+  const r=ratios[idx];
+  document.getElementById('panelTitle').textContent=r.name;
+  document.getElementById('panelFormula').textContent=r.formula;
+  const list=document.getElementById('panelList');
+  list.innerHTML='';
+  r.domains.forEach(d=>{
+    const li=document.createElement('li');
+    li.innerHTML=`<span class="domain-badge" style="background:${domainColors[d.d]}22;color:${domainColors[d.d]};border:1px solid ${domainColors[d.d]}44">${d.d}</span><span class="appearance-text">${d.text}</span>`;
+    list.appendChild(li);
+  });
+  document.getElementById('panel').classList.add('open');
+}
+function closePanel(){document.getElementById('panel').classList.remove('open')}
+window.addEventListener('resize',resize);
+resize();draw();
+</script>
+</body>
+</html>

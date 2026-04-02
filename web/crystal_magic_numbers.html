@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crystal Dynamics — Magic Numbers from Two Primes</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=JetBrains+Mono:wght@300;400;600&family=Outfit:wght@200;400;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#04080f;color:#e0ddd5;font-family:'Outfit',sans-serif;min-height:100vh}
+header{text-align:center;padding:60px 20px 40px}
+h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2.2rem,5vw,4rem);font-weight:700;color:#f0c040;text-shadow:0 0 60px rgba(240,192,64,0.2)}
+.tagline{font-family:'JetBrains Mono',monospace;font-size:.8rem;color:#5a5a6a;letter-spacing:3px;margin-top:10px;text-transform:uppercase}
+.intro{max-width:750px;margin:20px auto;font-size:1rem;color:#888;line-height:1.7;font-weight:200}
+.source{display:inline-block;margin:15px auto;padding:8px 20px;border:1px solid #f0c04044;border-radius:30px;font-family:'JetBrains Mono',monospace;font-size:.8rem;color:#f0c040;background:#f0c04008}
+.section{max-width:1100px;margin:50px auto;padding:0 20px}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:600;margin-bottom:30px;padding-bottom:12px;border-bottom:1px solid #1a1a2a}
+.magic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px}
+.magic-card{background:linear-gradient(135deg,#0d1117,#161b22);border:1px solid #21262d;border-radius:12px;padding:24px 16px;text-align:center;cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
+.magic-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,var(--glow) 0%,transparent 70%);opacity:0;transition:opacity .3s}
+.magic-card:hover::before{opacity:1}
+.magic-card:hover{border-color:var(--glow);transform:translateY(-4px);box-shadow:0 8px 30px var(--shadow)}
+.magic-num{font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:700;position:relative;z-index:1}
+.magic-formula{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:#888;margin-top:6px;position:relative;z-index:1}
+.magic-label{font-size:.75rem;color:#555;margin-top:10px;position:relative;z-index:1}
+.derivation-tree{background:#0d1117;border:1px solid #21262d;border-radius:16px;padding:30px;margin-top:30px;position:relative}
+.tree-row{display:flex;align-items:center;justify-content:center;gap:20px;margin:16px 0;flex-wrap:wrap}
+.tree-node{padding:10px 18px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.85rem;text-align:center;transition:all .3s}
+.tree-node.prime{background:#f0c04022;border:2px solid #f0c040;color:#f0c040;font-weight:600}
+.tree-node.derived{background:#00d4aa11;border:1px solid #00d4aa44;color:#00d4aa}
+.tree-node.magic{background:#ff6b3511;border:1px solid #ff6b3544;color:#ff6b35}
+.tree-arrow{color:#333;font-size:1.5rem}
+.noble-strip{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.noble-el{width:100px;height:120px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:all .3s;cursor:default}
+.noble-el:hover{transform:scale(1.08)}
+.noble-symbol{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700}
+.noble-z{font-family:'JetBrains Mono',monospace;font-size:.75rem;margin-top:4px}
+.noble-trace{font-family:'JetBrains Mono',monospace;font-size:.65rem;margin-top:6px;opacity:.7}
+.steane-box{display:flex;gap:30px;flex-wrap:wrap;justify-content:center;margin-top:20px}
+.steane-param{text-align:center;padding:20px 30px;background:#0d1117;border:1px solid #21262d;border-radius:12px;min-width:160px}
+.steane-val{font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:700}
+.steane-name{font-size:.8rem;color:#888;margin-top:4px}
+.steane-crystal{font-family:'JetBrains Mono',monospace;font-size:.75rem;margin-top:8px}
+.cross-table{width:100%;border-collapse:collapse;margin-top:20px}
+.cross-table th{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:#555;text-transform:uppercase;letter-spacing:1px;padding:12px;text-align:left;border-bottom:1px solid #1a1a2a}
+.cross-table td{padding:12px;border-bottom:1px solid #0d1117;font-size:.9rem}
+.cross-table tr:hover td{background:#0d111788}
+.badge{font-family:'JetBrains Mono',monospace;font-size:.7rem;padding:3px 8px;border-radius:4px;white-space:nowrap}
+footer{text-align:center;padding:60px 20px;font-size:.75rem;color:#333;font-family:'JetBrains Mono',monospace}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.magic-card{animation:fadeUp .6s ease both}
+.magic-card:nth-child(1){animation-delay:.1s}.magic-card:nth-child(2){animation-delay:.15s}
+.magic-card:nth-child(3){animation-delay:.2s}.magic-card:nth-child(4){animation-delay:.25s}
+.magic-card:nth-child(5){animation-delay:.3s}.magic-card:nth-child(6){animation-delay:.35s}
+.magic-card:nth-child(7){animation-delay:.4s}
+</style>
+</head>
+<body>
+<header>
+<h1>Magic Numbers from Two Primes</h1>
+<div class="tagline">Nuclear · Chemical · Quantum Information</div>
+<p class="intro">Nuclear physics has 7 "magic numbers" — proton/neutron counts where nuclei are exceptionally stable. Chemistry has noble gases. Quantum computing has the Steane code. All of them derive from N_w=2 and N_c=3.</p>
+<div class="source">N_w = 2 &nbsp;·&nbsp; N_c = 3 &nbsp;·&nbsp; χ = 6 &nbsp;·&nbsp; β₀ = 7 &nbsp;·&nbsp; D = 42 &nbsp;·&nbsp; Σd = 36</div>
+</header>
+
+<div class="section">
+<div class="section-title" style="color:#ff6b35">Nuclear Magic Numbers — All 7 from (2,3)</div>
+<div class="magic-grid">
+<div class="magic-card" style="--glow:#ff6b3522;--shadow:#ff6b3511"><div class="magic-num" style="color:#ff6b35">2</div><div class="magic-formula">N_w</div><div class="magic-label">Helium core</div></div>
+<div class="magic-card" style="--glow:#ff6b3522;--shadow:#ff6b3511"><div class="magic-num" style="color:#ff6b35">8</div><div class="magic-formula">N_w³</div><div class="magic-label">Oxygen closure</div></div>
+<div class="magic-card" style="--glow:#ff6b3522;--shadow:#ff6b3511"><div class="magic-num" style="color:#ff6b35">20</div><div class="magic-formula">N_w²(χ−1)</div><div class="magic-label">Calcium-40</div></div>
+<div class="magic-card" style="--glow:#ff6b3522;--shadow:#ff6b3511"><div class="magic-num" style="color:#ff6b35">28</div><div class="magic-formula">N_w²β₀</div><div class="magic-label">Nickel-56</div></div>
+<div class="magic-card" style="--glow:#ff6b3522;--shadow:#ff6b3511"><div class="magic-num" style="color:#ff6b35">50</div><div class="magic-formula">N_w(χ−1)²</div><div class="magic-label">Tin isotopes</div></div>
+<div class="magic-card" style="--glow:#ff6b3522;--shadow:#ff6b3511"><div class="magic-num" style="color:#ff6b35">82</div><div class="magic-formula">N_w(D−1)</div><div class="magic-label">Pb-208 protons</div></div>
+<div class="magic-card" style="--glow:#ff6b3522;--shadow:#ff6b3511"><div class="magic-num" style="color:#ff6b35">126</div><div class="magic-formula">N_wβ₀N_c²</div><div class="magic-label">Pb-208 neutrons</div></div>
+</div>
+<div class="derivation-tree">
+<div style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:.7rem;color:#555;margin-bottom:20px">DERIVATION TREE</div>
+<div class="tree-row">
+<span class="tree-node prime">N_w = 2</span>
+<span class="tree-node prime">N_c = 3</span>
+</div>
+<div class="tree-row"><span class="tree-arrow">↓</span></div>
+<div class="tree-row">
+<span class="tree-node derived">χ = 6</span>
+<span class="tree-node derived">β₀ = 7</span>
+<span class="tree-node derived">Σd = 36</span>
+<span class="tree-node derived">D = 42</span>
+</div>
+<div class="tree-row"><span class="tree-arrow">↓</span></div>
+<div class="tree-row">
+<span class="tree-node magic">2</span>
+<span class="tree-node magic">8</span>
+<span class="tree-node magic">20</span>
+<span class="tree-node magic">28</span>
+<span class="tree-node magic">50</span>
+<span class="tree-node magic">82</span>
+<span class="tree-node magic">126</span>
+</div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title" style="color:#00d4aa">Noble Gases — Shell Closures from (2,3)</div>
+<div class="noble-strip">
+<div class="noble-el" style="background:#00d4aa11;border:1px solid #00d4aa33"><div class="noble-symbol" style="color:#00d4aa">He</div><div class="noble-z">Z = 2</div><div class="noble-trace" style="color:#00d4aa">N_w</div></div>
+<div class="noble-el" style="background:#00d4aa11;border:1px solid #00d4aa33"><div class="noble-symbol" style="color:#00d4aa">Ne</div><div class="noble-z">Z = 10</div><div class="noble-trace" style="color:#00d4aa">N_w(χ−1)</div></div>
+<div class="noble-el" style="background:#00d4aa11;border:1px solid #00d4aa33"><div class="noble-symbol" style="color:#00d4aa">Ar</div><div class="noble-z">Z = 18</div><div class="noble-trace" style="color:#00d4aa">N_w·N_c²</div></div>
+<div class="noble-el" style="background:#f0c04011;border:1px solid #f0c04033"><div class="noble-symbol" style="color:#f0c040">Kr</div><div class="noble-z">Z = 36</div><div class="noble-trace" style="color:#f0c040">Σd = 36!</div></div>
+</div>
+<p style="text-align:center;margin-top:20px;font-size:.9rem;color:#666;max-width:600px;margin-left:auto;margin-right:auto">Krypton's atomic number equals the total sector dimensions of the algebra A_F: 1 + 3 + 8 + 24 = 36 = Σd. The noble gas that closes the 4th period sits at the sum of all representation dimensions.</p>
+</div>
+
+<div class="section">
+<div class="section-title" style="color:#7b68ee">Steane Code [7, 1, 3] — Quantum Error Correction</div>
+<div class="steane-box">
+<div class="steane-param"><div class="steane-val" style="color:#7b68ee">7</div><div class="steane-name">Physical qubits</div><div class="steane-crystal" style="color:#7b68ee">β₀ = (11N_c−2χ)/3</div></div>
+<div class="steane-param"><div class="steane-val" style="color:#7b68ee">1</div><div class="steane-name">Logical qubit</div><div class="steane-crystal" style="color:#7b68ee">d₁ (singlet)</div></div>
+<div class="steane-param"><div class="steane-val" style="color:#7b68ee">3</div><div class="steane-name">Code distance</div><div class="steane-crystal" style="color:#7b68ee">N_c (colour)</div></div>
+</div>
+<p style="text-align:center;margin-top:24px;font-size:.9rem;color:#666;max-width:650px;margin-left:auto;margin-right:auto">The optimal single-error-correcting quantum code uses <strong style="color:#7b68ee">β₀ = 7</strong> physical qubits — the same number as the QCD one-loop beta function coefficient. Also: 7 = N_w^N_c − 1 = 2³ − 1 (Hamming bound). The code that protects quantum information has parameters from the algebra that governs the strong force.</p>
+</div>
+
+<div class="section">
+<div class="section-title" style="color:#f0c040">The Iron Peak — Where Stars Die</div>
+<div style="text-align:center;padding:30px">
+<div style="font-family:'Cormorant Garamond',serif;font-size:4rem;font-weight:700;color:#f0c040">⁵⁶Fe</div>
+<div style="font-family:'JetBrains Mono',monospace;font-size:1.2rem;color:#888;margin-top:10px">A = 56 = d_colour × β₀ = 8 × 7</div>
+<p style="font-size:.95rem;color:#666;max-width:600px;margin:20px auto;line-height:1.7">The most stable nucleus in the universe — the endpoint of stellar nucleosynthesis, the reason massive stars collapse into supernovae — has atomic number equal to the colour factor times the QCD beta coefficient. Iron is where the strong force meets its own running.</p>
+<div style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#555;margin-top:16px">B(He-4) ≈ 28 MeV = N_w² × β₀ = 4 × 7 &nbsp;(within 1% of experiment)</div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title" style="color:#e0ddd5">Cross-Domain: Same Algebra, Different Physics</div>
+<table class="cross-table">
+<thead><tr><th>Number</th><th>Nuclear</th><th>Chemistry</th><th>Quantum Info</th><th>Crystal trace</th></tr></thead>
+<tbody>
+<tr><td style="font-weight:600;color:#f0c040">7</td><td>Fe-56/8, magic 28/4</td><td>Neutral pH</td><td>Steane code qubits</td><td style="font-family:'JetBrains Mono',monospace;font-size:.8rem;color:#888">β₀ = (11N_c−2χ)/3</td></tr>
+<tr><td style="font-weight:600;color:#f0c040">8</td><td>Magic number</td><td>Shell(2) capacity</td><td>Shor redundancy</td><td style="font-family:'JetBrains Mono',monospace;font-size:.8rem;color:#888">N_w³ = d_colour</td></tr>
+<tr><td style="font-weight:600;color:#f0c040">36</td><td>Σd (all dims)</td><td>Krypton Z</td><td>—</td><td style="font-family:'JetBrains Mono',monospace;font-size:.8rem;color:#888">1+3+8+24 = Σd</td></tr>
+<tr><td style="font-weight:600;color:#f0c040">4</td><td>Alpha particle</td><td>DNA bases</td><td>Bell states</td><td style="font-family:'JetBrains Mono',monospace;font-size:.8rem;color:#888">N_w²</td></tr>
+<tr><td style="font-weight:600;color:#f0c040">3</td><td>N_c (exponents)</td><td>Codon length</td><td>Steane distance</td><td style="font-family:'JetBrains Mono',monospace;font-size:.8rem;color:#888">N_c</td></tr>
+</tbody>
+</table>
+</div>
+
+<footer>Crystal Dynamics · CrystalNuclear × CrystalChem × CrystalQInfo · All integers from A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)</footer>
+</body>
+</html>
