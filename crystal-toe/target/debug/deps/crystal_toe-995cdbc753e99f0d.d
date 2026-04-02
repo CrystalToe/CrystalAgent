@@ -1,6 +1,6 @@
-/Users/davidmontgomery/coding/entity-project/CrystalAgent/crystal-toe/target/debug/deps/crystal_toe-995cdbc753e99f0d.d: src/lib.rs src/atoms.rs src/vev.rs src/toe.rs src/monad.rs src/tower.rs src/hierarchy.rs src/heyting.rs src/gauge.rs src/qcd.rs src/cosmo.rs src/mixing.rs src/alpha_proton.rs src/gravity.rs src/protein.rs src/cross_domain.rs src/waca_scan.rs src/quantum.rs src/mandelbrot.rs src/dynamics/mod.rs src/dynamics/classical.rs src/dynamics/gr.rs src/dynamics/gw.rs src/dynamics/em.rs src/dynamics/friedmann.rs src/dynamics/nbody.rs src/dynamics/thermo.rs src/dynamics/cfd.rs src/dynamics/decay.rs src/dynamics/optics.rs src/dynamics/md.rs src/dynamics/condensed.rs src/dynamics/plasma.rs src/dynamics/qft.rs src/dynamics/rigid.rs src/dynamics/chem.rs src/dynamics/nuclear.rs src/dynamics/astro.rs src/dynamics/qinfo.rs src/dynamics/bio.rs src/dynamics/arcade.rs
+/Users/davidmontgomery/coding/entity-project/CrystalAgent/crystal-toe/target/debug/deps/crystal_toe-995cdbc753e99f0d.d: src/lib.rs src/atoms.rs src/vev.rs src/toe.rs src/monad.rs src/tower.rs src/hierarchy.rs src/heyting.rs src/gauge.rs src/qcd.rs src/cosmo.rs src/mixing.rs src/alpha_proton.rs src/gravity.rs src/protein.rs src/cross_domain.rs src/waca_scan.rs src/quantum.rs src/mandelbrot.rs src/noether.rs src/structural.rs src/gravity_dyn.rs src/mera.rs src/hologron.rs src/layer.rs src/proton_radius.rs src/riemann.rs src/discoveries.rs src/qlib/mod.rs src/qlib/base.rs src/qlib/gates.rs src/qlib/channels.rs src/qlib/entangle.rs src/qlib/hamiltonians.rs src/qlib/algorithms.rs src/qlib/measure.rs src/qlib/simulation.rs src/dynamics/mod.rs src/dynamics/classical.rs src/dynamics/gr.rs src/dynamics/gw.rs src/dynamics/em.rs src/dynamics/friedmann.rs src/dynamics/nbody.rs src/dynamics/thermo.rs src/dynamics/cfd.rs src/dynamics/decay.rs src/dynamics/optics.rs src/dynamics/md.rs src/dynamics/condensed.rs src/dynamics/plasma.rs src/dynamics/qft.rs src/dynamics/rigid.rs src/dynamics/chem.rs src/dynamics/nuclear.rs src/dynamics/astro.rs src/dynamics/qinfo.rs src/dynamics/bio.rs src/dynamics/arcade.rs
 
-/Users/davidmontgomery/coding/entity-project/CrystalAgent/crystal-toe/target/debug/deps/crystal_toe-995cdbc753e99f0d: src/lib.rs src/atoms.rs src/vev.rs src/toe.rs src/monad.rs src/tower.rs src/hierarchy.rs src/heyting.rs src/gauge.rs src/qcd.rs src/cosmo.rs src/mixing.rs src/alpha_proton.rs src/gravity.rs src/protein.rs src/cross_domain.rs src/waca_scan.rs src/quantum.rs src/mandelbrot.rs src/dynamics/mod.rs src/dynamics/classical.rs src/dynamics/gr.rs src/dynamics/gw.rs src/dynamics/em.rs src/dynamics/friedmann.rs src/dynamics/nbody.rs src/dynamics/thermo.rs src/dynamics/cfd.rs src/dynamics/decay.rs src/dynamics/optics.rs src/dynamics/md.rs src/dynamics/condensed.rs src/dynamics/plasma.rs src/dynamics/qft.rs src/dynamics/rigid.rs src/dynamics/chem.rs src/dynamics/nuclear.rs src/dynamics/astro.rs src/dynamics/qinfo.rs src/dynamics/bio.rs src/dynamics/arcade.rs
+/Users/davidmontgomery/coding/entity-project/CrystalAgent/crystal-toe/target/debug/deps/crystal_toe-995cdbc753e99f0d: src/lib.rs src/atoms.rs src/vev.rs src/toe.rs src/monad.rs src/tower.rs src/hierarchy.rs src/heyting.rs src/gauge.rs src/qcd.rs src/cosmo.rs src/mixing.rs src/alpha_proton.rs src/gravity.rs src/protein.rs src/cross_domain.rs src/waca_scan.rs src/quantum.rs src/mandelbrot.rs src/noether.rs src/structural.rs src/gravity_dyn.rs src/mera.rs src/hologron.rs src/layer.rs src/proton_radius.rs src/riemann.rs src/discoveries.rs src/qlib/mod.rs src/qlib/base.rs src/qlib/gates.rs src/qlib/channels.rs src/qlib/entangle.rs src/qlib/hamiltonians.rs src/qlib/algorithms.rs src/qlib/measure.rs src/qlib/simulation.rs src/dynamics/mod.rs src/dynamics/classical.rs src/dynamics/gr.rs src/dynamics/gw.rs src/dynamics/em.rs src/dynamics/friedmann.rs src/dynamics/nbody.rs src/dynamics/thermo.rs src/dynamics/cfd.rs src/dynamics/decay.rs src/dynamics/optics.rs src/dynamics/md.rs src/dynamics/condensed.rs src/dynamics/plasma.rs src/dynamics/qft.rs src/dynamics/rigid.rs src/dynamics/chem.rs src/dynamics/nuclear.rs src/dynamics/astro.rs src/dynamics/qinfo.rs src/dynamics/bio.rs src/dynamics/arcade.rs
 
 src/lib.rs:
 src/atoms.rs:
@@ -21,6 +21,24 @@ src/cross_domain.rs:
 src/waca_scan.rs:
 src/quantum.rs:
 src/mandelbrot.rs:
+src/noether.rs:
+src/structural.rs:
+src/gravity_dyn.rs:
+src/mera.rs:
+src/hologron.rs:
+src/layer.rs:
+src/proton_radius.rs:
+src/riemann.rs:
+src/discoveries.rs:
+src/qlib/mod.rs:
+src/qlib/base.rs:
+src/qlib/gates.rs:
+src/qlib/channels.rs:
+src/qlib/entangle.rs:
+src/qlib/hamiltonians.rs:
+src/qlib/algorithms.rs:
+src/qlib/measure.rs:
+src/qlib/simulation.rs:
 src/dynamics/mod.rs:
 src/dynamics/classical.rs:
 src/dynamics/gr.rs:

@@ -38,6 +38,33 @@ impl PyToe {
     fn c_f(&self) -> f64 { self.inner.c_f() }
     fn mp_me_ratio(&self) -> f64 { self.inner.mp_me_ratio() }
     fn alpha_at_layer(&self, d: u64) -> f64 { self.inner.alpha_at_layer(d) }
+
+    // ── Dynamics factories — Toe is the parent ──────────────
+    fn classical(&self) -> PyClassical { PyClassical { toe: self.inner.clone() } }
+    fn nbody(&self) -> PyNBody { PyNBody { toe: self.inner.clone() } }
+    fn gr(&self) -> PyGR { PyGR { toe: self.inner.clone() } }
+    fn em(&self) -> PyEM { PyEM { toe: self.inner.clone() } }
+    fn thermo(&self) -> PyThermo { PyThermo { toe: self.inner.clone() } }
+    fn friedmann(&self) -> PyFriedmann { PyFriedmann { toe: self.inner.clone() } }
+    fn cfd(&self) -> PyCFD { PyCFD { toe: self.inner.clone() } }
+    fn decay(&self) -> PyDecay { PyDecay { toe: self.inner.clone() } }
+    fn optics(&self) -> PyOptics { PyOptics { toe: self.inner.clone() } }
+    fn md(&self) -> PyMD { PyMD { toe: self.inner.clone() } }
+    fn condensed(&self) -> PyCondensed { PyCondensed { toe: self.inner.clone() } }
+    fn plasma(&self) -> PyPlasma { PyPlasma { toe: self.inner.clone() } }
+    fn qft(&self) -> PyQFT { PyQFT { toe: self.inner.clone() } }
+    fn rigid(&self) -> PyRigid { PyRigid { toe: self.inner.clone() } }
+    fn gw(&self) -> PyGW { PyGW { toe: self.inner.clone() } }
+
+    // Crystal constants
+    fn n_w(&self) -> u64 { crate::atoms::N_W }
+    fn n_c(&self) -> u64 { crate::atoms::N_C }
+    fn chi(&self) -> u64 { crate::atoms::CHI }
+    fn beta0(&self) -> u64 { crate::atoms::BETA0 }
+    fn sigma_d(&self) -> u64 { crate::atoms::SIGMA_D }
+    fn gauss(&self) -> u64 { crate::atoms::GAUSS }
+    fn tower_d(&self) -> u64 { crate::atoms::TOWER_D }
+
     fn __repr__(&self) -> String { format!("Toe(v={:.2} GeV{})", self.inner.vev(), if self.inner.is_crystal_default() { ", crystal" } else { "" }) }
 }
 
@@ -267,166 +294,835 @@ impl PyAlgebraState {
 
 // ══ DYNAMICS — ALL 21 ═══════════════════════════════════════
 
-#[pyclass(name = "Classical")] struct PyClassical;
-#[pymethods] impl PyClassical {
-    #[new] fn new() -> Self { PyClassical }
+#[pyclass(name = "Classical")]
+#[derive(Clone)]
+struct PyClassical { toe: crate::toe::Toe }
+
+#[pymethods]
+impl PyClassical {
+    #[new]
+    #[pyo3(signature = (vev=None))]
+    fn new(vev: Option<f64>) -> Self {
+        PyClassical {
+            toe: match vev { Some(v) => crate::toe::Toe::with_vev(v), None => crate::toe::Toe::new() }
+        }
+    }
+
+    // ── Inherited from Toe ──────────────────────────────────────
+    fn vev(&self) -> f64 { self.toe.vev() }
+    fn is_crystal_default(&self) -> bool { self.toe.is_crystal_default() }
+    fn to_pdg(&self) -> Self { PyClassical { toe: self.toe.to_pdg() } }
+    fn proton_mass(&self) -> f64 { self.toe.proton_mass() }
+    fn electron_mass(&self) -> f64 { self.toe.electron_mass() }
+    fn muon_mass(&self) -> f64 { self.toe.muon_mass() }
+    fn pion_mass(&self) -> f64 { self.toe.pion_mass() }
+    fn higgs_mass(&self) -> f64 { self.toe.higgs_mass() }
+    fn w_mass(&self) -> f64 { self.toe.w_mass() }
+    fn z_mass(&self) -> f64 { self.toe.z_mass() }
+    fn lambda_h(&self) -> f64 { self.toe.lambda_h() }
+    fn lambda_qcd(&self) -> f64 { self.toe.lambda_qcd() }
+    fn f_pi(&self) -> f64 { self.toe.f_pi() }
+    fn bohr_radius(&self) -> f64 { self.toe.bohr_radius() }
+    fn alpha(&self) -> f64 { self.toe.alpha() }
+    fn alpha_inv(&self) -> f64 { self.toe.alpha_inv() }
+    fn sin2_theta_w(&self) -> f64 { self.toe.sin2_theta_w() }
+    fn kappa(&self) -> f64 { self.toe.kappa() }
+    fn c_f(&self) -> f64 { self.toe.c_f() }
+    fn mp_me_ratio(&self) -> f64 { self.toe.mp_me_ratio() }
+    fn alpha_at_layer(&self, d: u64) -> f64 { self.toe.alpha_at_layer(d) }
+
+    // ── Crystal constants ───────────────────────────────────────
+    fn n_w(&self) -> u64 { crate::atoms::N_W }
+    fn n_c(&self) -> u64 { crate::atoms::N_C }
+    fn chi(&self) -> u64 { crate::atoms::CHI }
+    fn beta0(&self) -> u64 { crate::atoms::BETA0 }
+    fn sigma_d(&self) -> u64 { crate::atoms::SIGMA_D }
+    fn gauss(&self) -> u64 { crate::atoms::GAUSS }
+    fn tower_d(&self) -> u64 { crate::atoms::TOWER_D }
     fn spatial_dim(&self) -> u64 { crate::dynamics::classical::SPATIAL_DIM }
     fn phase_space_dim(&self) -> u64 { crate::dynamics::classical::PHASE_SPACE_DIM }
     fn force_exponent(&self) -> u64 { crate::dynamics::classical::FORCE_EXPONENT }
-    fn verlet_step(&self, x: f64, v: f64, a: f64, dt: f64) -> (f64, f64) { crate::dynamics::classical::verlet_step(x, v, a, dt) }
-    fn gravitational_accel(&self, m: f64, r: f64) -> f64 { crate::dynamics::classical::gravitational_accel(m, r) }
-    fn kepler_period(&self, a: f64, m: f64) -> f64 { crate::dynamics::classical::kepler_period(a, m) }
+
+    // ── Classical dynamics ──────────────────────────────────────
+    fn kepler_period(&self, a: f64, gm: f64) -> f64 { crate::dynamics::classical::kepler_period(a, gm) }
+    fn escape_velocity(&self, gm: f64, r: f64) -> f64 { crate::dynamics::classical::escape_velocity(gm, r) }
+    fn vis_viva(&self, gm: f64, r: f64, a: f64) -> f64 { crate::dynamics::classical::vis_viva(gm, r, a) }
+    fn hohmann_transfer(&self, gm: f64, r1: f64, r2: f64) -> (f64, f64, f64) { crate::dynamics::classical::hohmann_transfer(gm, r1, r2) }
+    fn bielliptic_transfer(&self, gm: f64, r1: f64, r2: f64, r_int: f64) -> (f64, f64, f64, f64) { crate::dynamics::classical::bielliptic_transfer(gm, r1, r2, r_int) }
+
+    fn satellite_circular(&self, gm: f64, r: f64) -> ((f64,f64,f64,f64,f64,f64), f64, f64) {
+        let (ps, vc, t) = crate::dynamics::classical::satellite_circular(gm, r);
+        ((ps.pos.x, ps.pos.y, ps.pos.z, ps.vel.x, ps.vel.y, ps.vel.z), vc, t)
+    }
+
+    fn orbit_elliptical(&self, gm: f64, a: f64, ecc: f64) -> (f64,f64,f64,f64,f64,f64) {
+        let ps = crate::dynamics::classical::orbit_elliptical(gm, a, ecc);
+        (ps.pos.x, ps.pos.y, ps.pos.z, ps.vel.x, ps.vel.y, ps.vel.z)
+    }
+
+    /// Simulate Kepler orbit. Returns (xs, ys, zs, vxs, vys, vzs).
+    fn kepler_orbit(&self, gm: f64, px: f64, py: f64, pz: f64, vx: f64, vy: f64, vz: f64, dt: f64, n: usize)
+        -> (Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>)
+    {
+        use crate::dynamics::classical::*;
+        let ps0 = PhaseState::new(Vec3::new(px, py, pz), Vec3::new(vx, vy, vz));
+        let traj = kepler_orbit(gm, &ps0, dt, n);
+        (traj_x(&traj), traj_y(&traj), traj_z(&traj),
+         traj.iter().map(|p| p.vel.x).collect(),
+         traj.iter().map(|p| p.vel.y).collect(),
+         traj.iter().map(|p| p.vel.z).collect())
+    }
+
+    fn orbital_energy(&self, gm: f64, px: f64, py: f64, pz: f64, vx: f64, vy: f64, vz: f64) -> f64 {
+        use crate::dynamics::classical::*;
+        orbital_energy(gm, &PhaseState::new(Vec3::new(px, py, pz), Vec3::new(vx, vy, vz)))
+    }
+
+    fn angular_momentum(&self, px: f64, py: f64, pz: f64, vx: f64, vy: f64, vz: f64) -> f64 {
+        use crate::dynamics::classical::*;
+        angular_momentum_mag(&PhaseState::new(Vec3::new(px, py, pz), Vec3::new(vx, vy, vz)))
+    }
+
+    fn eccentricity(&self, gm: f64, px: f64, py: f64, pz: f64, vx: f64, vy: f64, vz: f64) -> f64 {
+        use crate::dynamics::classical::*;
+        eccentricity(gm, &PhaseState::new(Vec3::new(px, py, pz), Vec3::new(vx, vy, vz)))
+    }
+
+    fn kepler_energy_trace(&self, gm: f64, px: f64, py: f64, pz: f64, vx: f64, vy: f64, vz: f64, dt: f64, n: usize) -> Vec<f64> {
+        use crate::dynamics::classical::*;
+        let ps0 = PhaseState::new(Vec3::new(px, py, pz), Vec3::new(vx, vy, vz));
+        let traj = kepler_orbit(gm, &ps0, dt, n);
+        traj_energy(gm, &traj)
+    }
+
+    fn kepler_angular_momentum_trace(&self, px: f64, py: f64, pz: f64, vx: f64, vy: f64, vz: f64, dt: f64, n: usize, gm: f64) -> Vec<f64> {
+        use crate::dynamics::classical::*;
+        let ps0 = PhaseState::new(Vec3::new(px, py, pz), Vec3::new(vx, vy, vz));
+        let traj = kepler_orbit(gm, &ps0, dt, n);
+        traj_angular_momentum(&traj)
+    }
+
+    fn kepler_radius_trace(&self, gm: f64, px: f64, py: f64, pz: f64, vx: f64, vy: f64, vz: f64, dt: f64, n: usize) -> Vec<f64> {
+        use crate::dynamics::classical::*;
+        let ps0 = PhaseState::new(Vec3::new(px, py, pz), Vec3::new(vx, vy, vz));
+        let traj = kepler_orbit(gm, &ps0, dt, n);
+        traj_r(&traj)
+    }
+
+    fn kepler_speed_trace(&self, gm: f64, px: f64, py: f64, pz: f64, vx: f64, vy: f64, vz: f64, dt: f64, n: usize) -> Vec<f64> {
+        use crate::dynamics::classical::*;
+        let ps0 = PhaseState::new(Vec3::new(px, py, pz), Vec3::new(vx, vy, vz));
+        let traj = kepler_orbit(gm, &ps0, dt, n);
+        traj_speed(&traj)
+    }
+
+    fn time_array(&self, dt: f64, n: usize) -> Vec<f64> { crate::dynamics::classical::traj_time(dt, n) }
+
+    fn slingshot(&self, gm_primary: f64, gm_secondary: f64, sec_x: f64, sec_y: f64, sec_z: f64,
+                 px: f64, py: f64, pz: f64, vx: f64, vy: f64, vz: f64, dt: f64, n: usize)
+        -> (Vec<f64>, Vec<f64>, Vec<f64>)
+    {
+        use crate::dynamics::classical::*;
+        let ps0 = PhaseState::new(Vec3::new(px, py, pz), Vec3::new(vx, vy, vz));
+        let traj = slingshot(gm_primary, gm_secondary, Vec3::new(sec_x, sec_y, sec_z), &ps0, dt, n);
+        (traj_x(&traj), traj_y(&traj), traj_z(&traj))
+    }
+
+    fn __repr__(&self) -> String {
+        format!("Classical(vev={:.2} GeV{})", self.toe.vev(),
+                if self.toe.is_crystal_default() { ", crystal" } else { "" })
+    }
 }
 
-#[pyclass(name = "GR")] struct PyGR;
-#[pymethods] impl PyGR {
-    #[new] fn new() -> Self { PyGR }
+#[pyclass(name = "NBody")]
+#[derive(Clone)]
+struct PyNBody { toe: crate::toe::Toe }
+
+#[pymethods]
+impl PyNBody {
+    #[new]
+    #[pyo3(signature = (vev=None))]
+    fn new(vev: Option<f64>) -> Self {
+        PyNBody { toe: match vev { Some(v) => crate::toe::Toe::with_vev(v), None => crate::toe::Toe::new() } }
+    }
+
+    // ── Inherited from Toe ──
+    fn vev(&self) -> f64 { self.toe.vev() }
+    fn proton_mass(&self) -> f64 { self.toe.proton_mass() }
+    fn electron_mass(&self) -> f64 { self.toe.electron_mass() }
+    fn alpha(&self) -> f64 { self.toe.alpha() }
+    fn alpha_inv(&self) -> f64 { self.toe.alpha_inv() }
+    fn n_w(&self) -> u64 { crate::atoms::N_W }
+    fn n_c(&self) -> u64 { crate::atoms::N_C }
+    fn chi(&self) -> u64 { crate::atoms::CHI }
+
+    // ── N-Body constants ──
+    fn octree_children(&self) -> u64 { crate::dynamics::nbody::OCTREE_CHILDREN }
+    fn force_exponent(&self) -> u64 { crate::dynamics::nbody::FORCE_EXPONENT }
+    fn phase_per_body(&self) -> u64 { crate::dynamics::nbody::PHASE_PER_BODY }
+    fn should_open_node(&self, size: f64, dist: f64) -> bool { crate::dynamics::nbody::should_open_node(size, dist) }
+
+    // ── Initial conditions ──
+    /// Two-body Kepler: returns [(px,py,pz,vx,vy,vz,m), ...]
+    fn two_body_kepler(&self, m1: f64, m2: f64, sep: f64) -> Vec<(f64,f64,f64,f64,f64,f64,f64)> {
+        crate::dynamics::nbody::two_body_kepler(m1, m2, sep).iter()
+            .map(|b| (b.px, b.py, b.pz, b.vx, b.vy, b.vz, b.m)).collect()
+    }
+
+    fn three_body_figure_eight(&self) -> Vec<(f64,f64,f64,f64,f64,f64,f64)> {
+        crate::dynamics::nbody::three_body_figure_eight().iter()
+            .map(|b| (b.px, b.py, b.pz, b.vx, b.vy, b.vz, b.m)).collect()
+    }
+
+    fn plummer_sphere(&self, n: usize, total_m: f64, r_scale: f64) -> Vec<(f64,f64,f64,f64,f64,f64,f64)> {
+        crate::dynamics::nbody::plummer_sphere(n, total_m, r_scale).iter()
+            .map(|b| (b.px, b.py, b.pz, b.vx, b.vy, b.vz, b.m)).collect()
+    }
+
+    fn solar_system_inner(&self) -> Vec<(f64,f64,f64,f64,f64,f64,f64)> {
+        crate::dynamics::nbody::solar_system_inner().iter()
+            .map(|b| (b.px, b.py, b.pz, b.vx, b.vy, b.vz, b.m)).collect()
+    }
+
+    // ── Simulation ──
+    /// Evolve bodies for n steps (direct O(N²)). Returns all snapshots as list of body-lists.
+    fn evolve_direct(&self, dt: f64, eps: f64, n_steps: usize,
+                     bodies: Vec<(f64,f64,f64,f64,f64,f64,f64)>)
+        -> Vec<Vec<(f64,f64,f64,f64,f64,f64,f64)>>
+    {
+        let bs: Vec<crate::dynamics::nbody::Body> = bodies.iter()
+            .map(|&(px,py,pz,vx,vy,vz,m)| crate::dynamics::nbody::Body::new(px,py,pz,vx,vy,vz,m)).collect();
+        let snaps = crate::dynamics::nbody::evolve_direct(dt, eps, n_steps, &bs);
+        snaps.iter().map(|s| s.iter().map(|b| (b.px,b.py,b.pz,b.vx,b.vy,b.vz,b.m)).collect()).collect()
+    }
+
+    /// Evolve returning only final state.
+    fn evolve_direct_final(&self, dt: f64, eps: f64, n_steps: usize,
+                           bodies: Vec<(f64,f64,f64,f64,f64,f64,f64)>)
+        -> Vec<(f64,f64,f64,f64,f64,f64,f64)>
+    {
+        let bs: Vec<crate::dynamics::nbody::Body> = bodies.iter()
+            .map(|&(px,py,pz,vx,vy,vz,m)| crate::dynamics::nbody::Body::new(px,py,pz,vx,vy,vz,m)).collect();
+        let final_b = crate::dynamics::nbody::evolve_direct_final(dt, eps, n_steps, &bs);
+        final_b.iter().map(|b| (b.px,b.py,b.pz,b.vx,b.vy,b.vz,b.m)).collect()
+    }
+
+    // ── Conservation ──
+    fn kinetic_energy(&self, bodies: Vec<(f64,f64,f64,f64,f64,f64,f64)>) -> f64 {
+        let bs: Vec<crate::dynamics::nbody::Body> = bodies.iter()
+            .map(|&(px,py,pz,vx,vy,vz,m)| crate::dynamics::nbody::Body::new(px,py,pz,vx,vy,vz,m)).collect();
+        crate::dynamics::nbody::kinetic_energy(&bs)
+    }
+
+    fn potential_energy(&self, eps: f64, bodies: Vec<(f64,f64,f64,f64,f64,f64,f64)>) -> f64 {
+        let bs: Vec<crate::dynamics::nbody::Body> = bodies.iter()
+            .map(|&(px,py,pz,vx,vy,vz,m)| crate::dynamics::nbody::Body::new(px,py,pz,vx,vy,vz,m)).collect();
+        crate::dynamics::nbody::potential_energy(eps, &bs)
+    }
+
+    fn total_energy(&self, eps: f64, bodies: Vec<(f64,f64,f64,f64,f64,f64,f64)>) -> f64 {
+        let bs: Vec<crate::dynamics::nbody::Body> = bodies.iter()
+            .map(|&(px,py,pz,vx,vy,vz,m)| crate::dynamics::nbody::Body::new(px,py,pz,vx,vy,vz,m)).collect();
+        crate::dynamics::nbody::total_energy(eps, &bs)
+    }
+
+    fn total_momentum(&self, bodies: Vec<(f64,f64,f64,f64,f64,f64,f64)>) -> (f64, f64, f64) {
+        let bs: Vec<crate::dynamics::nbody::Body> = bodies.iter()
+            .map(|&(px,py,pz,vx,vy,vz,m)| crate::dynamics::nbody::Body::new(px,py,pz,vx,vy,vz,m)).collect();
+        crate::dynamics::nbody::total_momentum(&bs)
+    }
+
+    fn __repr__(&self) -> String {
+        format!("NBody(vev={:.2} GeV{})", self.toe.vev(),
+                if self.toe.is_crystal_default() { ", crystal" } else { "" })
+    }
+}
+
+#[pyclass(name = "GR")]
+#[derive(Clone)]
+struct PyGR { toe: crate::toe::Toe }
+
+#[pymethods]
+impl PyGR {
+    #[new]
+    #[pyo3(signature = (vev=None))]
+    fn new(vev: Option<f64>) -> Self {
+        PyGR { toe: match vev { Some(v) => crate::toe::Toe::with_vev(v), None => crate::toe::Toe::new() } }
+    }
+
+    // ── Inherited from Toe ──
+    fn vev(&self) -> f64 { self.toe.vev() }
+    fn proton_mass(&self) -> f64 { self.toe.proton_mass() }
+    fn alpha(&self) -> f64 { self.toe.alpha() }
+    fn alpha_inv(&self) -> f64 { self.toe.alpha_inv() }
+    fn n_w(&self) -> u64 { crate::atoms::N_W }
+    fn n_c(&self) -> u64 { crate::atoms::N_C }
+    fn chi(&self) -> u64 { crate::atoms::CHI }
+
+    // ── GR constants ──
     fn isco_factor(&self) -> u64 { crate::dynamics::gr::ISCO_FACTOR }
     fn precession_factor(&self) -> u64 { crate::dynamics::gr::PRECESSION_FACTOR }
     fn bending_factor(&self) -> u64 { crate::dynamics::gr::BENDING_FACTOR }
     fn photon_sphere(&self) -> u64 { crate::dynamics::gr::PHOTON_SPHERE }
+    fn spacetime_dim(&self) -> u64 { crate::dynamics::gr::SPACETIME_DIM }
+
+    // ── Schwarzschild ──
+    fn schwarzschild_r(&self, gm: f64) -> f64 { crate::dynamics::gr::schwarzschild_r(gm) }
     fn schwarzschild_metric(&self, r: f64, rs: f64) -> f64 { crate::dynamics::gr::schwarzschild_metric(r, rs) }
-    fn perihelion_precession(&self, gm: f64, a: f64, e: f64) -> f64 { crate::dynamics::gr::perihelion_precession(gm, a, e) }
-    fn light_deflection(&self, gm: f64, b: f64) -> f64 { crate::dynamics::gr::light_deflection(gm, b) }
     fn gravitational_redshift(&self, rs: f64, r: f64) -> f64 { crate::dynamics::gr::gravitational_redshift(rs, r) }
+    fn frequency_ratio(&self, rs: f64, r_emit: f64, r_recv: f64) -> f64 { crate::dynamics::gr::frequency_ratio(rs, r_emit, r_recv) }
+
+    // ── Effective potentials ──
+    fn v_eff_massive(&self, rs: f64, ang_l: f64, r: f64) -> f64 { crate::dynamics::gr::v_eff_massive(rs, ang_l, r) }
+    fn v_eff_photon(&self, rs: f64, ang_l: f64, r: f64) -> f64 { crate::dynamics::gr::v_eff_photon(rs, ang_l, r) }
+
+    // ── ISCO ──
+    fn isco_radius(&self, gm: f64) -> f64 { crate::dynamics::gr::isco_radius(gm) }
+    fn isco_angular_momentum(&self, gm: f64) -> f64 { crate::dynamics::gr::isco_angular_momentum(gm) }
+    fn isco_energy(&self) -> f64 { crate::dynamics::gr::isco_energy() }
+
+    // ── Precession & bending (analytic) ──
+    fn precession_analytic(&self, rs: f64, a: f64, e: f64) -> f64 { crate::dynamics::gr::precession_analytic(rs, a, e) }
+    fn light_bending_analytic(&self, rs: f64, b: f64) -> f64 { crate::dynamics::gr::light_bending_analytic(rs, b) }
+    fn shapiro_delay(&self, gm: f64, r1: f64, r2: f64, b: f64) -> f64 { crate::dynamics::gr::shapiro_delay(gm, r1, r2, b) }
+
+    // ── Orbit simulation ──
+    /// Simulate GR orbit. Returns (rs, phis, xs, ys).
+    fn evolve_orbit(&self, gm: f64, a: f64, e: f64, dtau: f64, n_steps: usize)
+        -> (Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>)
+    {
+        use crate::dynamics::gr::*;
+        let rs = schwarzschild_r(gm);
+        let r_peri = a * (1.0 - e);
+        let ang_l = (gm * a * (1.0 - e * e)).sqrt();
+        let e_sq = (1.0 - rs / r_peri).powi(2) * (1.0 + ang_l * ang_l / (r_peri * r_peri));
+        let energy = e_sq.sqrt();
+        let gs0 = GRState { r: r_peri, vr: 0.0, phi: 0.0, t: 0.0, tau: 0.0 };
+        let traj = evolve_gr(dtau, rs, ang_l, energy, n_steps, &gs0);
+        let (xs, ys) = traj_xy(&traj);
+        (traj_r(&traj), traj_phi(&traj), xs, ys)
+    }
+
+    /// V_eff curve for plotting. Returns (rs_array, veff_array).
+    fn effective_potential_curve(&self, gm: f64, ang_l: f64, r_min: f64, r_max: f64, n_points: usize)
+        -> (Vec<f64>, Vec<f64>)
+    {
+        let rs = crate::dynamics::gr::schwarzschild_r(gm);
+        let dr = (r_max - r_min) / n_points as f64;
+        let rs_arr: Vec<f64> = (0..n_points).map(|i| r_min + i as f64 * dr).collect();
+        let veff: Vec<f64> = rs_arr.iter().map(|&r| crate::dynamics::gr::v_eff_massive(rs, ang_l, r)).collect();
+        (rs_arr, veff)
+    }
+
+    fn __repr__(&self) -> String {
+        format!("GR(vev={:.2} GeV{})", self.toe.vev(),
+                if self.toe.is_crystal_default() { ", crystal" } else { "" })
+    }
 }
 
-#[pyclass(name = "GW")] struct PyGW;
-#[pymethods] impl PyGW {
-    #[new] fn new() -> Self { PyGW }
+#[pyclass(name = "GW")]
+#[derive(Clone)]
+struct PyGW { toe: crate::toe::Toe }
+
+#[pymethods]
+impl PyGW {
+    #[new]
+    #[pyo3(signature = (vev=None))]
+    fn new(vev: Option<f64>) -> Self {
+        PyGW { toe: match vev { Some(v) => crate::toe::Toe::with_vev(v), None => crate::toe::Toe::new() } }
+    }
+
+    // ── Inherited from Toe ──
+    fn vev(&self) -> f64 { self.toe.vev() }
+    fn proton_mass(&self) -> f64 { self.toe.proton_mass() }
+    fn alpha(&self) -> f64 { self.toe.alpha() }
+    fn n_w(&self) -> u64 { crate::atoms::N_W }
+    fn n_c(&self) -> u64 { crate::atoms::N_C }
+    fn chi(&self) -> u64 { crate::atoms::CHI }
+
+    // ── GW constants & formulas ──
     fn peters_coefficient(&self) -> f64 { crate::dynamics::gw::peters_coefficient() }
     fn chirp_exponent(&self) -> f64 { crate::dynamics::gw::chirp_exponent() }
     fn gw_polarizations(&self) -> u64 { crate::dynamics::gw::GW_POLARIZATIONS }
+    fn amplitude_factor(&self) -> u64 { crate::dynamics::gw::AMPLITUDE_FACTOR }
     fn chirp_mass(&self, m1: f64, m2: f64) -> f64 { crate::dynamics::gw::chirp_mass(m1, m2) }
-    fn orbital_decay_rate(&self, m1: f64, m2: f64, a: f64) -> f64 { crate::dynamics::gw::orbital_decay_rate(m1, m2, a) }
+    fn gw_frequency(&self, total_m: f64, a: f64) -> f64 { crate::dynamics::gw::gw_frequency(total_m, a) }
+    fn chirp_rate(&self, mc: f64, f_gw: f64) -> f64 { crate::dynamics::gw::chirp_rate(mc, f_gw) }
+    fn time_to_merger(&self, mc: f64, f_gw: f64) -> f64 { crate::dynamics::gw::time_to_merger(mc, f_gw) }
+    fn isco_frequency(&self, total_m: f64) -> f64 { crate::dynamics::gw::isco_frequency(total_m) }
+    fn gw_power(&self, mu: f64, total_m: f64, a: f64) -> f64 { crate::dynamics::gw::gw_power(mu, total_m, a) }
+    fn orbit_decay_rate(&self, mu: f64, total_m: f64, a: f64) -> f64 { crate::dynamics::gw::orbit_decay_rate(mu, total_m, a) }
+    fn separation_from_freq(&self, total_m: f64, f_gw: f64) -> f64 { crate::dynamics::gw::separation_from_freq(total_m, f_gw) }
+
+    /// Inspiral waveform. Returns (times, freqs, h_plus, h_cross).
+    fn inspiral_waveform(&self, m1: f64, m2: f64, dist: f64, iota: f64, f0: f64, dt: f64)
+        -> (Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>)
+    {
+        let wf = crate::dynamics::gw::inspiral_waveform(m1, m2, dist, iota, f0, dt);
+        (crate::dynamics::gw::wf_time(&wf), crate::dynamics::gw::wf_freq(&wf),
+         crate::dynamics::gw::wf_h_plus(&wf), crate::dynamics::gw::wf_h_cross(&wf))
+    }
+
+    /// Orbital inspiral. Returns (times, separations, frequencies).
+    fn integrate_inspiral(&self, m1: f64, m2: f64, a0: f64, dt: f64)
+        -> (Vec<f64>, Vec<f64>, Vec<f64>)
+    {
+        let bs = crate::dynamics::gw::integrate_inspiral(m1, m2, a0, dt);
+        (crate::dynamics::gw::insp_time(&bs), crate::dynamics::gw::insp_a(&bs),
+         crate::dynamics::gw::insp_freq(&bs))
+    }
+
+    fn __repr__(&self) -> String {
+        format!("GW(vev={:.2} GeV{})", self.toe.vev(),
+                if self.toe.is_crystal_default() { ", crystal" } else { "" })
+    }
 }
 
-#[pyclass(name = "EM")] struct PyEM;
-#[pymethods] impl PyEM {
-    #[new] fn new() -> Self { PyEM }
+#[pyclass(name = "EM")]
+#[derive(Clone)]
+struct PyEM { toe: crate::toe::Toe }
+#[pymethods]
+impl PyEM {
+    #[new] #[pyo3(signature = (vev=None))]
+    fn new(vev: Option<f64>) -> Self {
+        PyEM { toe: match vev { Some(v) => crate::toe::Toe::with_vev(v), None => crate::toe::Toe::new() } }
+    }
+    fn vev(&self) -> f64 { self.toe.vev() }
+    fn alpha(&self) -> f64 { self.toe.alpha() }
+    fn n_w(&self) -> u64 { crate::atoms::N_W }
+    fn n_c(&self) -> u64 { crate::atoms::N_C }
+    fn chi(&self) -> u64 { crate::atoms::CHI }
     fn em_components(&self) -> u64 { crate::dynamics::em::EM_COMPONENTS }
     fn maxwell_equations(&self) -> u64 { crate::dynamics::em::MAXWELL_EQUATIONS }
     fn polarization_states(&self) -> u64 { crate::dynamics::em::POLARIZATION_STATES }
+    fn planck_exponent(&self) -> u64 { crate::dynamics::em::PLANCK_EXPONENT }
+    fn stefan_exponent(&self) -> u64 { crate::dynamics::em::STEFAN_EXPONENT }
+    fn stefan_denom(&self) -> u64 { crate::dynamics::em::STEFAN_DENOM }
+    fn rayleigh_wave_exp(&self) -> u64 { crate::dynamics::em::RAYLEIGH_WAVE_EXP }
+    fn rayleigh_size_exp(&self) -> u64 { crate::dynamics::em::RAYLEIGH_SIZE_EXP }
+    fn wave_impedance(&self) -> f64 { crate::dynamics::em::wave_impedance() }
     fn larmor_power(&self, q: f64, a: f64) -> f64 { crate::dynamics::em::larmor_power(q, a) }
     fn coulomb_force(&self, q1: f64, q2: f64, r: f64) -> f64 { crate::dynamics::em::coulomb_force(q1, q2, r) }
+    fn rayleigh_sigma(&self, d: f64, lam: f64) -> f64 { crate::dynamics::em::rayleigh_sigma(d, lam) }
+    fn sky_blue_ratio(&self, lb: f64, lr: f64) -> f64 { crate::dynamics::em::sky_blue_ratio(lb, lr) }
+    fn stefan_boltzmann_power(&self, t: f64) -> f64 { crate::dynamics::em::stefan_boltzmann_power(t) }
+
+    /// Yee FDTD: simulate Gaussian pulse. Returns (ey_snapshots, energies).
+    fn simulate_pulse(&self, n_grid: usize, center: f64, width: f64, amp: f64,
+                      courant: f64, n_steps: usize, snap_every: usize) -> (Vec<Vec<f64>>, Vec<f64>) {
+        let st0 = crate::dynamics::em::gaussian_pulse(n_grid, center, width, amp);
+        let snaps = crate::dynamics::em::evolve_em(courant, n_steps, snap_every, &st0);
+        (crate::dynamics::em::snap_ey(&snaps), crate::dynamics::em::snap_energy(&snaps))
+    }
 }
 
-#[pyclass(name = "Friedmann")] struct PyFriedmann;
-#[pymethods] impl PyFriedmann {
-    #[new] fn new() -> Self { PyFriedmann }
+#[pyclass(name = "Friedmann")]
+#[derive(Clone)]
+struct PyFriedmann { toe: crate::toe::Toe }
+#[pymethods]
+impl PyFriedmann {
+    #[new] #[pyo3(signature = (vev=None))]
+    fn new(vev: Option<f64>) -> Self {
+        PyFriedmann { toe: match vev { Some(v) => crate::toe::Toe::with_vev(v), None => crate::toe::Toe::new() } }
+    }
+    fn vev(&self) -> f64 { self.toe.vev() }
+    fn n_w(&self) -> u64 { crate::atoms::N_W }
+    fn n_c(&self) -> u64 { crate::atoms::N_C }
+    fn chi(&self) -> u64 { crate::atoms::CHI }
     fn omega_lambda(&self) -> f64 { crate::dynamics::friedmann::omega_lambda() }
     fn omega_matter(&self) -> f64 { crate::dynamics::friedmann::omega_matter() }
     fn omega_baryon(&self) -> f64 { crate::dynamics::friedmann::omega_baryon() }
-    fn hubble_parameter(&self, a: f64) -> f64 { crate::dynamics::friedmann::hubble_parameter(a) }
-    fn deceleration_parameter(&self) -> f64 { crate::dynamics::friedmann::deceleration_parameter() }
+    fn omega_dm(&self) -> f64 { crate::dynamics::friedmann::omega_dm() }
+    fn omega_rad(&self) -> f64 { crate::dynamics::friedmann::omega_rad() }
+    fn dm_baryon_ratio(&self) -> f64 { crate::dynamics::friedmann::dm_baryon_ratio() }
+    fn hubble_norm(&self, a: f64) -> f64 { crate::dynamics::friedmann::hubble_norm(a) }
+    fn deceleration_param(&self, a: f64) -> f64 { crate::dynamics::friedmann::deceleration_param(a) }
+    fn h0_crystal(&self) -> f64 { crate::dynamics::friedmann::h0_crystal() }
+    fn cmb_100_theta(&self) -> f64 { crate::dynamics::friedmann::cmb_100_theta() }
+    fn cmb_temperature(&self) -> f64 { crate::dynamics::friedmann::cmb_temperature() }
+    fn spectral_index(&self) -> f64 { crate::dynamics::friedmann::spectral_index() }
+    fn ln_scalar_amplitude(&self) -> f64 { crate::dynamics::friedmann::ln_scalar_amplitude() }
+    fn age_analytic(&self) -> f64 { crate::dynamics::friedmann::age_analytic() }
+    fn n_effective(&self) -> f64 { crate::dynamics::friedmann::n_effective() }
+    fn comoving_distance(&self, z: f64, n: usize) -> f64 { crate::dynamics::friedmann::comoving_distance(z, n) }
+    fn luminosity_distance(&self, z: f64, n: usize) -> f64 { crate::dynamics::friedmann::luminosity_distance(z, n) }
+    fn acceleration_onset(&self) -> f64 { crate::dynamics::friedmann::acceleration_onset(0.001, 1e-4, 5000000) }
+
+    /// Integrate Friedmann. Returns (scale_factors, times, redshifts).
+    fn integrate(&self, a_init: f64, a_final: f64, dt: f64, max_steps: usize) -> (Vec<f64>, Vec<f64>, Vec<f64>) {
+        let traj = crate::dynamics::friedmann::integrate_friedmann(a_init, a_final, dt, max_steps);
+        (crate::dynamics::friedmann::traj_a(&traj),
+         crate::dynamics::friedmann::traj_time(&traj),
+         crate::dynamics::friedmann::traj_z(&traj))
+    }
 }
 
-#[pyclass(name = "NBody")] struct PyNBody;
-#[pymethods] impl PyNBody {
-    #[new] fn new() -> Self { PyNBody }
-    fn octree_children(&self) -> u64 { crate::dynamics::nbody::OCTREE_CHILDREN }
-    fn should_open_node(&self, size: f64, dist: f64) -> bool { crate::dynamics::nbody::should_open_node(size, dist) }
-}
-
-#[pyclass(name = "Thermo")] struct PyThermo;
-#[pymethods] impl PyThermo {
-    #[new] fn new() -> Self { PyThermo }
+#[pyclass(name = "Thermo")]
+#[derive(Clone)]
+struct PyThermo { toe: crate::toe::Toe }
+#[pymethods]
+impl PyThermo {
+    #[new] #[pyo3(signature = (vev=None))]
+    fn new(vev: Option<f64>) -> Self {
+        PyThermo { toe: match vev { Some(v) => crate::toe::Toe::with_vev(v), None => crate::toe::Toe::new() } }
+    }
+    fn vev(&self) -> f64 { self.toe.vev() }
+    fn alpha(&self) -> f64 { self.toe.alpha() }
+    fn n_w(&self) -> u64 { crate::atoms::N_W }
+    fn n_c(&self) -> u64 { crate::atoms::N_C }
+    fn chi(&self) -> u64 { crate::atoms::CHI }
     fn lj_attract(&self) -> u64 { crate::dynamics::thermo::LJ_ATTRACT }
     fn lj_repel(&self) -> u64 { crate::dynamics::thermo::LJ_REPEL }
-    fn lj_potential(&self, r: f64, sigma: f64, eps: f64) -> f64 { crate::dynamics::thermo::lj_potential(r, sigma, eps) }
+    fn lj_force_prefactor(&self) -> u64 { crate::dynamics::thermo::LJ_FORCE_PREFACTOR }
+    fn dof_mono(&self) -> u64 { crate::dynamics::thermo::DOF_MONO }
+    fn dof_di(&self) -> u64 { crate::dynamics::thermo::DOF_DI }
+    fn gamma_monatomic(&self) -> f64 { crate::dynamics::thermo::gamma_monatomic() }
+    fn gamma_diatomic(&self) -> f64 { crate::dynamics::thermo::gamma_diatomic() }
+    fn carnot_efficiency(&self) -> f64 { crate::dynamics::thermo::carnot_efficiency() }
+    fn entropy_per_tick(&self) -> f64 { crate::dynamics::thermo::entropy_per_tick() }
     fn maxwell_speed_rms(&self, kt: f64, m: f64) -> f64 { crate::dynamics::thermo::maxwell_speed_rms(kt, m) }
     fn equipartition_energy(&self, dof: u64, kt: f64) -> f64 { crate::dynamics::thermo::equipartition_energy(dof, kt) }
+    fn lj_potential(&self, eps: f64, sigma: f64, r: f64) -> f64 { crate::dynamics::thermo::lj_potential(eps, sigma, r) }
+    fn lj_force_mag(&self, eps: f64, sigma: f64, r: f64) -> f64 { crate::dynamics::thermo::lj_force_mag(eps, sigma, r) }
+
+    /// Run MD simulation. bodies = [(x,y,z,vx,vy,vz,m),...]. Returns snapshots.
+    fn simulate(&self, dt: f64, eps: f64, sigma: f64, cutoff: f64, n_steps: usize, snap_every: usize,
+                bodies: Vec<(f64,f64,f64,f64,f64,f64,f64)>)
+        -> Vec<Vec<(f64,f64,f64,f64,f64,f64,f64)>>
+    {
+        let parts: Vec<crate::dynamics::thermo::Particle> = bodies.iter()
+            .map(|&(x,y,z,vx,vy,vz,m)| crate::dynamics::thermo::Particle::new(x,y,z,vx,vy,vz,m)).collect();
+        let snaps = crate::dynamics::thermo::evolve_thermo(dt, eps, sigma, cutoff, n_steps, snap_every, &parts);
+        snaps.iter().map(|s| s.iter().map(|p| (p.x,p.y,p.z,p.vx,p.vy,p.vz,p.m)).collect()).collect()
+    }
+
+    fn make_gas(&self, n: usize, temp: f64, spacing: f64) -> Vec<(f64,f64,f64,f64,f64,f64,f64)> {
+        crate::dynamics::thermo::make_gas(n, temp, spacing).iter()
+            .map(|p| (p.x,p.y,p.z,p.vx,p.vy,p.vz,p.m)).collect()
+    }
+
+    fn make_lattice_2d(&self, nx: usize, ny: usize, spacing: f64, temp: f64) -> Vec<(f64,f64,f64,f64,f64,f64,f64)> {
+        crate::dynamics::thermo::make_lattice_2d(nx, ny, spacing, temp).iter()
+            .map(|p| (p.x,p.y,p.z,p.vx,p.vy,p.vz,p.m)).collect()
+    }
+
+    fn kinetic_energy(&self, bodies: Vec<(f64,f64,f64,f64,f64,f64,f64)>) -> f64 {
+        let parts: Vec<crate::dynamics::thermo::Particle> = bodies.iter()
+            .map(|&(x,y,z,vx,vy,vz,m)| crate::dynamics::thermo::Particle::new(x,y,z,vx,vy,vz,m)).collect();
+        crate::dynamics::thermo::kinetic_energy(&parts)
+    }
+
+    fn temperature(&self, bodies: Vec<(f64,f64,f64,f64,f64,f64,f64)>) -> f64 {
+        let parts: Vec<crate::dynamics::thermo::Particle> = bodies.iter()
+            .map(|&(x,y,z,vx,vy,vz,m)| crate::dynamics::thermo::Particle::new(x,y,z,vx,vy,vz,m)).collect();
+        crate::dynamics::thermo::temperature(&parts)
+    }
+
+    fn total_energy(&self, eps: f64, sigma: f64, cutoff: f64, bodies: Vec<(f64,f64,f64,f64,f64,f64,f64)>) -> f64 {
+        let parts: Vec<crate::dynamics::thermo::Particle> = bodies.iter()
+            .map(|&(x,y,z,vx,vy,vz,m)| crate::dynamics::thermo::Particle::new(x,y,z,vx,vy,vz,m)).collect();
+        crate::dynamics::thermo::total_energy(eps, sigma, cutoff, &parts)
+    }
 }
 
-#[pyclass(name = "CFD")] struct PyCFD;
-#[pymethods] impl PyCFD {
-    #[new] fn new() -> Self { PyCFD }
+#[pyclass(name = "CFD")]
+#[derive(Clone)]
+struct PyCFD { toe: crate::toe::Toe }
+#[pymethods]
+impl PyCFD {
+    #[new] #[pyo3(signature = (vev=None))]
+    fn new(vev: Option<f64>) -> Self {
+        PyCFD { toe: match vev { Some(v) => crate::toe::Toe::with_vev(v), None => crate::toe::Toe::new() } }
+    }
+    fn vev(&self) -> f64 { self.toe.vev() }
+    fn n_w(&self) -> u64 { crate::atoms::N_W }
+    fn n_c(&self) -> u64 { crate::atoms::N_C }
+    fn chi(&self) -> u64 { crate::atoms::CHI }
     fn d2q9_velocities(&self) -> u64 { crate::dynamics::cfd::D2Q9_VELOCITIES }
     fn stokes_drag(&self) -> u64 { crate::dynamics::cfd::STOKES_DRAG }
     fn reynolds_number(&self, rho: f64, v: f64, l: f64, mu: f64) -> f64 { crate::dynamics::cfd::reynolds_number(rho, v, l, mu) }
     fn kolmogorov_spectrum(&self, k: f64, eps: f64) -> f64 { crate::dynamics::cfd::kolmogorov_spectrum(k, eps) }
+    fn stokes_drag_force(&self, mu: f64, r: f64, v: f64) -> f64 { crate::dynamics::cfd::stokes_drag_force(mu, r, v) }
+    fn blasius_exponent(&self) -> f64 { crate::dynamics::cfd::blasius_exponent() }
+    fn von_karman(&self) -> f64 { crate::dynamics::cfd::von_karman() }
+
+    /// Run Poiseuille simulation. Returns (velocity_profile, analytical_profile).
+    fn poiseuille(&self, nx: usize, ny: usize, tau: f64, force_x: f64, n_steps: usize) -> (Vec<f64>, Vec<f64>) {
+        let st = crate::dynamics::cfd::lbm_init(nx, ny, 1.0);
+        let st2 = crate::dynamics::cfd::lbm_evolve(tau, force_x, n_steps, &st);
+        let num = crate::dynamics::cfd::velocity_profile_x(&st2, nx/2);
+        let ana: Vec<f64> = (0..ny).map(|j| crate::dynamics::cfd::poiseuille_profile(force_x, tau, ny, j)).collect();
+        (num, ana)
+    }
+
+    /// Run LBM and return density + speed fields. Returns (density_flat, speed_flat, nx, ny).
+    fn simulate(&self, nx: usize, ny: usize, tau: f64, force_x: f64, n_steps: usize) -> (Vec<f64>, Vec<f64>) {
+        let st = crate::dynamics::cfd::lbm_init(nx, ny, 1.0);
+        let st2 = crate::dynamics::cfd::lbm_evolve(tau, force_x, n_steps, &st);
+        (crate::dynamics::cfd::density_field(&st2), crate::dynamics::cfd::speed_field(&st2))
+    }
 }
 
-#[pyclass(name = "Decay")] struct PyDecay;
-#[pymethods] impl PyDecay {
-    #[new] fn new() -> Self { PyDecay }
+#[pyclass(name = "Decay")]
+#[derive(Clone)]
+struct PyDecay { toe: crate::toe::Toe }
+#[pymethods]
+impl PyDecay {
+    #[new] #[pyo3(signature = (vev=None))]
+    fn new(vev: Option<f64>) -> Self {
+        PyDecay { toe: match vev { Some(v) => crate::toe::Toe::with_vev(v), None => crate::toe::Toe::new() } }
+    }
+    fn vev(&self) -> f64 { self.toe.vev() }
+    fn n_w(&self) -> u64 { crate::atoms::N_W }
+    fn n_c(&self) -> u64 { crate::atoms::N_C }
+    fn chi(&self) -> u64 { crate::atoms::CHI }
     fn beta_factor(&self) -> u64 { crate::dynamics::decay::BETA_FACTOR }
+    fn sin2_theta_w(&self) -> f64 { crate::dynamics::decay::sin2_theta_w() }
+    fn sin2_theta_12(&self) -> f64 { crate::dynamics::decay::sin2_theta_12() }
+    fn sin2_theta_23(&self) -> f64 { crate::dynamics::decay::sin2_theta_23() }
+    fn sin2_2theta_23(&self) -> f64 { crate::dynamics::decay::sin2_2theta_23() }
+    fn phase_space_dim(&self, n: u64) -> u64 { crate::dynamics::decay::phase_space_dim(n) }
     fn fermi_golden_rule(&self, me_sq: f64, dos: f64) -> f64 { crate::dynamics::decay::fermi_golden_rule(me_sq, dos) }
     fn beta_decay_rate(&self, gf: f64, energy: f64) -> f64 { crate::dynamics::decay::beta_decay_rate(gf, energy) }
+    fn g_fermi(&self) -> f64 { crate::dynamics::decay::g_fermi() }
+    fn neutron_lifetime(&self) -> f64 { crate::dynamics::decay::neutron_lifetime() }
+    fn oscill_prob(&self, sin2_2th: f64, dm2: f64, l_over_e: f64) -> f64 { crate::dynamics::decay::oscill_prob(sin2_2th, dm2, l_over_e) }
+    fn atmos_oscillation(&self) -> f64 { crate::dynamics::decay::atmos_oscillation() }
+    fn beta_endpoint(&self) -> f64 { crate::dynamics::decay::beta_endpoint() }
+
+    /// Beta spectrum curve. Returns (energies_mev, spectrum).
+    fn beta_spectrum_curve(&self, n_points: usize) -> (Vec<f64>, Vec<f64>) {
+        crate::dynamics::decay::beta_spectrum_curve(n_points)
+    }
 }
 
-#[pyclass(name = "Optics")] struct PyOptics;
-#[pymethods] impl PyOptics {
-    #[new] fn new() -> Self { PyOptics }
+#[pyclass(name = "Optics")]
+#[derive(Clone)]
+struct PyOptics { toe: crate::toe::Toe }
+#[pymethods]
+impl PyOptics {
+    #[new] #[pyo3(signature = (vev=None))]
+    fn new(vev: Option<f64>) -> Self {
+        PyOptics { toe: match vev { Some(v) => crate::toe::Toe::with_vev(v), None => crate::toe::Toe::new() } }
+    }
+    fn vev(&self) -> f64 { self.toe.vev() }
+    fn n_w(&self) -> u64 { crate::atoms::N_W }
+    fn n_c(&self) -> u64 { crate::atoms::N_C }
+    fn chi(&self) -> u64 { crate::atoms::CHI }
     fn n_water(&self) -> f64 { crate::dynamics::optics::n_water() }
     fn n_glass(&self) -> f64 { crate::dynamics::optics::n_glass() }
     fn n_diamond(&self) -> f64 { crate::dynamics::optics::n_diamond() }
     fn rayleigh_lambda_exp(&self) -> u64 { crate::dynamics::optics::RAYLEIGH_LAMBDA_EXP }
+    fn rayleigh_size_exp(&self) -> u64 { crate::dynamics::optics::RAYLEIGH_SIZE_EXP }
     fn planck_lambda_exp(&self) -> u64 { crate::dynamics::optics::PLANCK_LAMBDA_EXP }
-    fn snell(&self, n1: f64, theta1: f64, n2: f64) -> f64 { crate::dynamics::optics::snell(n1, theta1, n2) }
+    fn sky_blue_ratio(&self) -> f64 { crate::dynamics::optics::sky_blue_ratio() }
+    fn rayleigh_intensity(&self, l0: f64, l: f64) -> f64 { crate::dynamics::optics::rayleigh_intensity(l0, l) }
+    fn snell(&self, n1: f64, n2: f64, theta: f64) -> Option<f64> { crate::dynamics::optics::snell(n1, n2, theta) }
+    fn critical_angle(&self, n1: f64, n2: f64) -> Option<f64> { crate::dynamics::optics::critical_angle(n1, n2) }
     fn brewster_angle(&self, n1: f64, n2: f64) -> f64 { crate::dynamics::optics::brewster_angle(n1, n2) }
+    fn fresnel_rs(&self, n1: f64, n2: f64, t: f64) -> f64 { crate::dynamics::optics::fresnel_rs(n1, n2, t) }
+    fn fresnel_rp(&self, n1: f64, n2: f64, t: f64) -> f64 { crate::dynamics::optics::fresnel_rp(n1, n2, t) }
+    fn fresnel_r(&self, n1: f64, n2: f64, t: f64) -> f64 { crate::dynamics::optics::fresnel_r(n1, n2, t) }
+    fn normal_reflectance(&self, n1: f64, n2: f64) -> f64 { crate::dynamics::optics::normal_reflectance(n1, n2) }
+    fn planck_radiance(&self, lam: f64, t: f64) -> f64 { crate::dynamics::optics::planck_radiance(lam, t) }
+    fn wien_displacement(&self, t: f64) -> f64 { crate::dynamics::optics::wien_displacement(t) }
+    fn thin_lens_focal(&self, n: f64, r1: f64, r2: f64) -> f64 { crate::dynamics::optics::thin_lens_focal(n, r1, r2) }
+    fn airy_radius(&self, lam: f64, aperture: f64) -> f64 { crate::dynamics::optics::airy_radius(lam, aperture) }
+
+    /// Fresnel reflectance curve. Returns (angles_deg, rs, rp, r_avg).
+    fn fresnel_curve(&self, n1: f64, n2: f64, n_points: usize) -> (Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>) {
+        crate::dynamics::optics::fresnel_curve(n1, n2, n_points)
+    }
+
+    /// Planck curves at given temperatures. Returns (lambdas_nm, [spectra]).
+    fn planck_curves(&self, temps: Vec<f64>, n_points: usize) -> (Vec<f64>, Vec<Vec<f64>>) {
+        crate::dynamics::optics::planck_curves(&temps, n_points)
+    }
 }
 
-#[pyclass(name = "MD")] struct PyMD;
-#[pymethods] impl PyMD {
-    #[new] fn new() -> Self { PyMD }
+#[pyclass(name = "MD")]
+#[derive(Clone)]
+struct PyMD { toe: crate::toe::Toe }
+#[pymethods]
+impl PyMD {
+    #[new] #[pyo3(signature = (vev=None))]
+    fn new(vev: Option<f64>) -> Self {
+        PyMD { toe: match vev { Some(v) => crate::toe::Toe::with_vev(v), None => crate::toe::Toe::new() } }
+    }
+    fn vev(&self) -> f64 { self.toe.vev() }
+    fn n_w(&self) -> u64 { crate::atoms::N_W }
+    fn n_c(&self) -> u64 { crate::atoms::N_C }
+    fn chi(&self) -> u64 { crate::atoms::CHI }
     fn tetrahedral_angle_deg(&self) -> f64 { crate::dynamics::md::tetrahedral_angle().to_degrees() }
     fn water_angle_deg(&self) -> f64 { crate::dynamics::md::water_angle().to_degrees() }
     fn helix_per_turn(&self) -> f64 { crate::dynamics::md::helix_per_turn() }
     fn flory_nu(&self) -> f64 { crate::dynamics::md::flory_nu() }
     fn amino_acids(&self) -> u64 { crate::dynamics::md::AMINO_ACIDS }
     fn dna_bases(&self) -> u64 { crate::dynamics::md::DNA_BASES }
+    fn codons(&self) -> u64 { crate::dynamics::md::CODONS }
+    fn hbond_at(&self) -> u64 { crate::dynamics::md::HBOND_AT }
+    fn hbond_gc(&self) -> u64 { crate::dynamics::md::HBOND_GC }
+    fn bp_per_turn(&self) -> u64 { crate::dynamics::md::BP_PER_TURN }
     fn lj_force(&self, r: f64, sigma: f64, eps: f64) -> f64 { crate::dynamics::md::lj_force(r, sigma, eps) }
+    fn lj_potential(&self, r: f64) -> f64 { crate::dynamics::md::lj_potential(r) }
+
+    /// LJ potential + force curves. Returns (r, V, F).
+    fn lj_curves(&self, r_min: f64, r_max: f64, n: usize) -> (Vec<f64>, Vec<f64>, Vec<f64>) {
+        crate::dynamics::md::lj_curves(r_min, r_max, n)
+    }
+
+    /// 2-particle MD simulation. Returns (separations, energies).
+    fn md2_evolve(&self, x1: f64, v1: f64, x2: f64, v2: f64, dt: f64, n: usize) -> (Vec<f64>, Vec<f64>) {
+        let st = crate::dynamics::md::MD2::new(x1, v1, x2, v2);
+        crate::dynamics::md::md2_evolve(dt, n, &st)
+    }
 }
 
-#[pyclass(name = "Condensed")] struct PyCondensed;
-#[pymethods] impl PyCondensed {
-    #[new] fn new() -> Self { PyCondensed }
+#[pyclass(name = "Condensed")]
+#[derive(Clone)]
+struct PyCondensed { toe: crate::toe::Toe }
+#[pymethods]
+impl PyCondensed {
+    #[new] #[pyo3(signature = (vev=None))]
+    fn new(vev: Option<f64>) -> Self {
+        PyCondensed { toe: match vev { Some(v) => crate::toe::Toe::with_vev(v), None => crate::toe::Toe::new() } }
+    }
+    fn vev(&self) -> f64 { self.toe.vev() }
+    fn n_w(&self) -> u64 { crate::atoms::N_W }
+    fn n_c(&self) -> u64 { crate::atoms::N_C }
+    fn chi(&self) -> u64 { crate::atoms::CHI }
     fn ising_z_square(&self) -> u64 { crate::dynamics::condensed::ISING_Z_SQUARE }
+    fn ising_z_cubic(&self) -> u64 { crate::dynamics::condensed::ISING_Z_CUBIC }
+    fn ising_states(&self) -> u64 { crate::dynamics::condensed::ISING_STATES }
     fn onsager_tc(&self) -> f64 { crate::dynamics::condensed::onsager_tc() }
-    fn bcs_gap_ratio(&self) -> f64 { crate::dynamics::condensed::bcs_gap_ratio() }
+    fn critical_beta(&self) -> f64 { crate::dynamics::condensed::critical_beta() }
+    fn bcs_ratio(&self) -> f64 { crate::dynamics::condensed::bcs_ratio() }
+    fn bcs_gap(&self, nv: f64) -> f64 { crate::dynamics::condensed::bcs_gap(nv) }
     fn ising_magnetization(&self, t: f64) -> f64 { crate::dynamics::condensed::ising_magnetization(t) }
+
+    /// Run Ising MC. Returns (magnetizations, energies).
+    fn ising_simulate(&self, n: usize, inv_t: f64, n_sweeps: usize, sample_every: usize) -> (Vec<f64>, Vec<i64>) {
+        let mut lat = crate::dynamics::condensed::Lattice::new(n, 1);
+        let mut seed = crate::atoms::TOWER_D as u64;
+        crate::dynamics::condensed::ising_run(&mut lat, n_sweeps, inv_t, &mut seed, sample_every)
+    }
 }
 
-#[pyclass(name = "Plasma")] struct PyPlasma;
-#[pymethods] impl PyPlasma {
-    #[new] fn new() -> Self { PyPlasma }
+#[pyclass(name = "Plasma")]
+#[derive(Clone)]
+struct PyPlasma { toe: crate::toe::Toe }
+#[pymethods]
+impl PyPlasma {
+    #[new] #[pyo3(signature = (vev=None))]
+    fn new(vev: Option<f64>) -> Self {
+        PyPlasma { toe: match vev { Some(v) => crate::toe::Toe::with_vev(v), None => crate::toe::Toe::new() } }
+    }
+    fn vev(&self) -> f64 { self.toe.vev() }
+    fn n_w(&self) -> u64 { crate::atoms::N_W }
+    fn n_c(&self) -> u64 { crate::atoms::N_C }
+    fn chi(&self) -> u64 { crate::atoms::CHI }
     fn mhd_states(&self) -> u64 { crate::dynamics::plasma::MHD_STATES }
     fn wave_types(&self) -> u64 { crate::dynamics::plasma::WAVE_TYPES }
     fn propagating_modes(&self) -> u64 { crate::dynamics::plasma::PROPAGATING_MODES }
+    fn non_propagating(&self) -> u64 { crate::dynamics::plasma::NON_PROPAGATING }
     fn alfven_speed(&self, b: f64, rho: f64) -> f64 { crate::dynamics::plasma::alfven_speed(b, rho) }
+    fn mag_pressure(&self, b: f64) -> f64 { crate::dynamics::plasma::mag_pressure(b) }
     fn plasma_beta(&self, p: f64, b: f64) -> f64 { crate::dynamics::plasma::plasma_beta(p, b) }
+    fn total_pressure(&self, p: f64, b: f64) -> f64 { crate::dynamics::plasma::total_pressure(p, b) }
     fn cyclotron_frequency(&self, q: f64, b: f64, m: f64) -> f64 { crate::dynamics::plasma::cyclotron_frequency(q, b, m) }
     fn debye_length(&self, kt: f64, n: f64, q: f64) -> f64 { crate::dynamics::plasma::debye_length(kt, n, q) }
+    fn plasma_frequency(&self, n: f64, m: f64) -> f64 { crate::dynamics::plasma::plasma_frequency(n, m) }
+    fn larmor_radius(&self, m: f64, v: f64, q: f64, b: f64) -> f64 { crate::dynamics::plasma::larmor_radius(m, v, q, b) }
+
+    /// Alfvén wave simulation. Returns (vy_snapshots, by_snapshots, energies).
+    fn simulate_alfven(&self, n_grid: usize, cfl: f64, n_steps: usize, snap_every: usize, pulse: bool)
+        -> (Vec<Vec<f64>>, Vec<Vec<f64>>, Vec<f64>)
+    {
+        let st0 = if pulse { crate::dynamics::plasma::mhd_pulse(n_grid, 0.3, 0.05) }
+                  else { crate::dynamics::plasma::mhd_init(n_grid) };
+        let snaps = crate::dynamics::plasma::mhd_evolve(n_grid, cfl, n_steps, snap_every, &st0);
+        let vys: Vec<Vec<f64>> = snaps.iter().map(|s| s.vy.clone()).collect();
+        let bys: Vec<Vec<f64>> = snaps.iter().map(|s| s.by.clone()).collect();
+        let ens: Vec<f64> = snaps.iter().map(|s| crate::dynamics::plasma::mhd_energy(s)).collect();
+        (vys, bys, ens)
+    }
 }
 
-#[pyclass(name = "QFT")] struct PyQFT;
-#[pymethods] impl PyQFT {
-    #[new] fn new() -> Self { PyQFT }
+#[pyclass(name = "QFT")]
+#[derive(Clone)]
+struct PyQFT { toe: crate::toe::Toe }
+#[pymethods]
+impl PyQFT {
+    #[new] #[pyo3(signature = (vev=None))]
+    fn new(vev: Option<f64>) -> Self {
+        PyQFT { toe: match vev { Some(v) => crate::toe::Toe::with_vev(v), None => crate::toe::Toe::new() } }
+    }
+    fn vev(&self) -> f64 { self.toe.vev() }
+    fn n_w(&self) -> u64 { crate::atoms::N_W }
+    fn n_c(&self) -> u64 { crate::atoms::N_C }
+    fn chi(&self) -> u64 { crate::atoms::CHI }
     fn spacetime_dim(&self) -> u64 { crate::dynamics::qft::SPACETIME_DIM }
     fn lorentz_generators(&self) -> u64 { crate::dynamics::qft::LORENTZ_GEN }
     fn dirac_gammas(&self) -> u64 { crate::dynamics::qft::DIRAC_GAMMAS }
+    fn spinor_comp(&self) -> u64 { crate::dynamics::qft::SPINOR_COMP }
     fn photon_pol(&self) -> u64 { crate::dynamics::qft::PHOTON_POL }
     fn gluon_colours(&self) -> u64 { crate::dynamics::qft::GLUON_COLOURS }
     fn qcd_beta0(&self) -> u64 { crate::dynamics::qft::QCD_BETA0 }
     fn one_loop_factor(&self) -> u64 { crate::dynamics::qft::ONE_LOOP_FACTOR }
+    fn propagator_exp(&self) -> u64 { crate::dynamics::qft::PROPAGATOR_EXP }
+    fn alpha_inv(&self) -> f64 { crate::dynamics::qft::alpha_inv() }
+    fn alpha_em(&self) -> f64 { crate::dynamics::qft::alpha_em() }
     fn sigma_ee_mumu(&self, sqrt_s: f64) -> f64 { crate::dynamics::qft::sigma_ee_mumu(sqrt_s) }
     fn thomson_cs(&self) -> f64 { crate::dynamics::qft::thomson_cs() }
+    fn pair_threshold(&self, m: f64) -> f64 { crate::dynamics::qft::pair_threshold(m) }
+    fn alpha_qed(&self, mu: f64, q: f64) -> f64 { crate::dynamics::qft::alpha_qed(mu, q) }
     fn alpha_qcd(&self, lambda: f64, q: f64) -> f64 { crate::dynamics::qft::alpha_qcd(lambda, q) }
+    fn alpha_s_mz(&self) -> f64 { crate::dynamics::qft::alpha_s_mz() }
+
+    /// σ(e⁺e⁻→μ⁺μ⁻) curve. Returns (sqrt_s, sigma_nb).
+    fn sigma_curve(&self, s_min: f64, s_max: f64, n: usize) -> (Vec<f64>, Vec<f64>) {
+        crate::dynamics::qft::sigma_curve(s_min, s_max, n)
+    }
+    /// α_s(Q) curve. Returns (Q, alpha_s).
+    fn alpha_s_curve(&self, q_min: f64, q_max: f64, lambda: f64, n: usize) -> (Vec<f64>, Vec<f64>) {
+        crate::dynamics::qft::alpha_s_curve(q_min, q_max, lambda, n)
+    }
 }
 
-#[pyclass(name = "Rigid")] struct PyRigid;
-#[pymethods] impl PyRigid {
-    #[new] fn new() -> Self { PyRigid }
+#[pyclass(name = "Rigid")]
+#[derive(Clone)]
+struct PyRigid { toe: crate::toe::Toe }
+#[pymethods]
+impl PyRigid {
+    #[new] #[pyo3(signature = (vev=None))]
+    fn new(vev: Option<f64>) -> Self {
+        PyRigid { toe: match vev { Some(v) => crate::toe::Toe::with_vev(v), None => crate::toe::Toe::new() } }
+    }
+    fn vev(&self) -> f64 { self.toe.vev() }
+    fn n_w(&self) -> u64 { crate::atoms::N_W }
+    fn n_c(&self) -> u64 { crate::atoms::N_C }
+    fn chi(&self) -> u64 { crate::atoms::CHI }
     fn quat_components(&self) -> u64 { crate::dynamics::rigid::QUAT_COMPONENTS }
     fn inertia_indep(&self) -> u64 { crate::dynamics::rigid::INERTIA_INDEP }
     fn rigid_dof(&self) -> u64 { crate::dynamics::rigid::RIGID_DOF }
     fn euler_angles(&self) -> u64 { crate::dynamics::rigid::EULER_ANGLES }
+    fn rot_matrix(&self) -> u64 { crate::dynamics::rigid::ROT_MATRIX }
     fn i_sphere(&self, m: f64, r: f64) -> f64 { crate::dynamics::rigid::i_sphere(m, r) }
     fn i_rod(&self, m: f64, l: f64) -> f64 { crate::dynamics::rigid::i_rod(m, l) }
     fn i_disk(&self, m: f64, r: f64) -> f64 { crate::dynamics::rigid::i_disk(m, r) }
     fn i_shell(&self, m: f64, r: f64) -> f64 { crate::dynamics::rigid::i_shell(m, r) }
     fn i_sphere_factor(&self) -> f64 { crate::dynamics::rigid::i_sphere_factor() }
+    fn i_rod_factor(&self) -> f64 { crate::dynamics::rigid::i_rod_factor() }
+    fn i_disk_factor(&self) -> f64 { crate::dynamics::rigid::i_disk_factor() }
+    fn i_shell_factor(&self) -> f64 { crate::dynamics::rigid::i_shell_factor() }
+
+    /// Torque-free rigid body simulation. Returns (energies, ang_mom, quat_norms).
+    fn simulate(&self, ix: f64, iy: f64, iz: f64, wx: f64, wy: f64, wz: f64, dt: f64, n_steps: usize)
+        -> (Vec<f64>, Vec<f64>, Vec<f64>)
+    {
+        let rb = crate::dynamics::rigid::RigidBody::new((ix,iy,iz), (wx,wy,wz));
+        crate::dynamics::rigid::rigid_evolve(dt, n_steps, &rb)
+    }
 }
 
 #[pyclass(name = "Chem")] struct PyChem;
