@@ -95,11 +95,11 @@ The algebra alone gives you integers (χ=6, β₀=7, Σd=36, D=42). To get physi
 | Wall breaches | **0** (prime wall = 4.5%) |
 | CODATA precision | **4** (α⁻¹ Δ/unc=0.12, m_p/m_e=0.04, sin²θ_W=0.07, r_p=0.0013) |
 | First law δS/δ⟨H_A⟩ | **1.0001 ± 0.0004** (χ=6 crystal) |
-| Haskell modules | **33** |
+| Haskell modules | **36 + 21 dynamics** |
 | Quantum operators | **96** |
-| Lean theorems | **763+** (native_decide) |
-| Agda proofs | **611+** (refl) |
-| Rust tests | **472+** |
+| Lean theorems | **1226+** (native_decide) |
+| Agda proofs | **991+** (refl) |
+| Rust tests | **568+** |
 
 ---
 
@@ -125,7 +125,9 @@ ghc -O2 -main-is CrystalFullTest CrystalFullTest.hs -o full_test
 sh proofs/haskell_proofs.sh    # 12/12 PASS (was 10/10)
 sh proofs/lean_proofs.sh       # 9/9 PASS (was 8/8)
 sh proofs/agda_proofs.sh       # 8/8 PASS (was 7/7)
-cd crystal-topos && cargo test # 466 PASS (was 294)
+cd crystal-topos && cargo test # Rust topos tests
+cd crystal-toe && cargo test   # Rust dynamics (538+ tests)
+cd crystal-toe && maturin develop --features python  # Python wheel
 ```
 
 ### Regression Gate
@@ -181,12 +183,17 @@ CrystalAgent/
 │   ├── CrystalTopos_RAG_1.md
 │   └── CrystalTopos_RAG_2.md
 │
-├── crystal-topos/                     ← Rust core + Python bindings
+├── crystal-topos/                     ← Rust core (topos algebra)
 │   ├── src/                           ← 11 Rust modules (+crystal_gravity_dyn.rs)
 │   ├── tests/                         ← 8 test files
 │   └── examples/                      ← 121 Python/HTML/JSX examples
-│       ├── mera_gravity_closed.py     ← S12: first law verification (NEW)
-│       └── mera_linearized_gravity.py ← S12: integer audit (NEW)
+│
+├── crystal-toe/                       ← Rust dynamics engine (PyO3 + WASM)
+│   ├── src/dynamics/                  ← 21 dynamics modules (all ported from Haskell)
+│   ├── src/py.rs                      ← Python bindings (all modules)
+│   ├── src/wasm.rs                    ← WebAssembly bindings (D3-ready)
+│   ├── python/examples/               ← 105 Python examples (21 directories)
+│   └── web/                           ← D3 dashboards, galaxy sim, photon evolution
 │
 ├── proofs/                            ← Formal proofs + runner scripts
 │   ├── haskell_proofs.sh              ← 12/12 PASS
@@ -305,11 +312,11 @@ Four independent proof systems verify the same identities:
 
 | System | Files | Count | Method |
 |--------|-------|-------|--------|
-| **GHC Haskell** | 33 `.hs` modules | 12/12 runners pass | Curry-Howard |
-| **Lean 4** | 12 `.lean` → `.olean` | **757** theorems | `native_decide` |
-| **Agda** | 11 `.agda` → `.agdai` | **603** proofs | `refl` |
-| **Rust** | 12 test files | **466** tests | `cargo test` |
-| **Python** | 13 proof modules | 24+ checks each | `assert` |
+| **GHC Haskell** | 36 + 21 dynamics `.hs` | 12/12 runners pass | Curry-Howard |
+| **Lean 4** | 36 `.lean` → `.olean` | **1226** theorems | `native_decide` |
+| **Agda** | 37 `.agda` → `.agdai` | **991** proofs | `refl` |
+| **Rust** | crystal-topos + crystal-toe | **568** tests | `cargo test` |
+| **Python** | 135 modules | 24+ checks each | `assert` |
 
 ---
 
