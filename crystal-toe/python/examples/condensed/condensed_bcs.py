@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Condensed — BCS Superconductivity: 2Δ/(kT_c) = N_w·π/e^γ"""
 import crystal_toe as ct
 import numpy as np

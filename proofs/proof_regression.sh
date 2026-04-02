@@ -31,7 +31,9 @@ fi
 PROOFS="$REPO/proofs"
 HASKEL="$REPO/haskel"
 RUST="$REPO/crystal-topos"
+RUST_TOE="$REPO/crystal-toe"
 EXAMPLES="$REPO/crystal-topos/examples"
+TOE_EXAMPLES="$REPO/crystal-toe/python/examples"
 BASELINE="$PROOFS/proof_manifest.baseline"
 CANDIDATE="/tmp/proof_manifest.candidate.$$"
 
@@ -109,14 +111,14 @@ generate_manifest() {
     echo "HASKELL $fname" >> "$out"
   done
 
-  # ── Rust: every #[test] function name ──
-  echo "# RUST TESTS" >> "$out"
+  # ── Rust (crystal-topos): every #[test] function name ──
+  echo "# RUST TESTS (crystal-topos)" >> "$out"
   if [ -d "$RUST/tests" ]; then
     for f in "$RUST"/tests/*.rs; do
       [ -f "$f" ] || continue
       local fname=$(basename "$f")
       grep -A1 "#\[test\]" "$f" 2>/dev/null | grep "fn " | \
-        sed "s/.*fn \([^ (]*\).*/RUST $fname \1/" >> "$out"
+        sed "s|.*fn \([^ (]*\).*|RUST topos/tests/$fname \1|" >> "$out"
     done
   fi
   if [ -d "$RUST/src" ]; then
@@ -124,18 +126,39 @@ generate_manifest() {
       [ -f "$f" ] || continue
       local fname=$(basename "$f")
       grep -A1 "#\[test\]" "$f" 2>/dev/null | grep "fn " | \
-        sed "s/.*fn \([^ (]*\).*/RUST $fname \1/" >> "$out"
+        sed "s|.*fn \([^ (]*\).*|RUST topos/src/$fname \1|" >> "$out"
     done
   fi
 
-  # ── Rust test count per file ──
+  # ── Rust (crystal-toe): every #[test] function name ──
+  # Scans src/, src/dynamics/, src/qlib/, tests/
+  echo "# RUST TESTS (crystal-toe)" >> "$out"
+  if [ -d "$RUST_TOE" ]; then
+    find "$RUST_TOE/src" -name '*.rs' 2>/dev/null | sort | while read -r f; do
+      [ -f "$f" ] || continue
+      local relpath
+      relpath=$(echo "$f" | sed "s|$RUST_TOE/||")
+      grep -A1 "#\[test\]" "$f" 2>/dev/null | grep "fn " | \
+        sed "s|.*fn \([^ (]*\).*|RUST toe/$relpath \1|" >> "$out"
+    done
+    if [ -d "$RUST_TOE/tests" ]; then
+      for f in "$RUST_TOE"/tests/*.rs; do
+        [ -f "$f" ] || continue
+        local fname=$(basename "$f")
+        grep -A1 "#\[test\]" "$f" 2>/dev/null | grep "fn " | \
+          sed "s|.*fn \([^ (]*\).*|RUST toe/tests/$fname \1|" >> "$out"
+      done
+    fi
+  fi
+
+  # ── Rust test count per file (crystal-topos) ──
   if [ -d "$RUST/tests" ]; then
     for f in "$RUST"/tests/*.rs; do
       [ -f "$f" ] || continue
       local fname=$(basename "$f")
       local count
       count=$(grep -c "#\[test\]" "$f" 2>/dev/null) || count=0
-      echo "RUST_COUNT $fname $count" >> "$out"
+      echo "RUST_COUNT topos/tests/$fname $count" >> "$out"
     done
   fi
   if [ -d "$RUST/src" ]; then
@@ -144,8 +167,29 @@ generate_manifest() {
       local fname=$(basename "$f")
       local count
       count=$(grep -c "#\[test\]" "$f" 2>/dev/null) || count=0
-      [ "$count" -gt 0 ] && echo "RUST_COUNT $fname $count" >> "$out"
+      [ "$count" -gt 0 ] && echo "RUST_COUNT topos/src/$fname $count" >> "$out"
     done
+  fi
+
+  # ── Rust test count per file (crystal-toe) ──
+  if [ -d "$RUST_TOE" ]; then
+    find "$RUST_TOE/src" -name '*.rs' 2>/dev/null | sort | while read -r f; do
+      [ -f "$f" ] || continue
+      local relpath
+      relpath=$(echo "$f" | sed "s|$RUST_TOE/||")
+      local count
+      count=$(grep -c "#\[test\]" "$f" 2>/dev/null) || count=0
+      [ "$count" -gt 0 ] && echo "RUST_COUNT toe/$relpath $count" >> "$out"
+    done
+    if [ -d "$RUST_TOE/tests" ]; then
+      for f in "$RUST_TOE"/tests/*.rs; do
+        [ -f "$f" ] || continue
+        local fname=$(basename "$f")
+        local count
+        count=$(grep -c "#\[test\]" "$f" 2>/dev/null) || count=0
+        [ "$count" -gt 0 ] && echo "RUST_COUNT toe/tests/$fname $count" >> "$out"
+      done
+    fi
   fi
 
   # ── Python proof files ──
@@ -153,13 +197,24 @@ generate_manifest() {
   for f in "$PROOFS"/crystal_*_proof.py; do
     [ -f "$f" ] || continue
     local fname=$(basename "$f")
-    echo "PYTHON $fname" >> "$out"
+    echo "PYTHON proofs/$fname" >> "$out"
   done
   if [ -d "$EXAMPLES" ]; then
     for f in "$EXAMPLES"/*.py; do
       [ -f "$f" ] || continue
       local fname=$(basename "$f")
-      echo "PYTHON $fname" >> "$out"
+      echo "PYTHON topos/examples/$fname" >> "$out"
+    done
+  fi
+
+  # ── Python examples (crystal-toe) ──
+  echo "# PYTHON EXAMPLES (crystal-toe)" >> "$out"
+  if [ -d "$TOE_EXAMPLES" ]; then
+    find "$TOE_EXAMPLES" -name '*.py' 2>/dev/null | sort | while read -r f; do
+      [ -f "$f" ] || continue
+      local relpath
+      relpath=$(echo "$f" | sed "s|$RUST_TOE/||")
+      echo "PYTHON toe/$relpath" >> "$out"
     done
   fi
 

@@ -57,6 +57,10 @@ impl PyToe {
     fn gw(&self) -> PyGW { PyGW { toe: self.inner.clone() } }
     fn chem(&self) -> PyChem { PyChem { toe: self.inner.clone() } }
     fn nuclear(&self) -> PyNuclear { PyNuclear { toe: self.inner.clone() } }
+    fn astro(&self) -> PyAstro { PyAstro { toe: self.inner.clone() } }
+    fn qinfo(&self) -> PyQInfo { PyQInfo { toe: self.inner.clone() } }
+    fn bio(&self) -> PyBio { PyBio { toe: self.inner.clone() } }
+    fn arcade(&self) -> PyArcade { PyArcade { toe: self.inner.clone() } }
 
     // Crystal constants
     fn n_w(&self) -> u64 { crate::atoms::N_W }
@@ -1246,67 +1250,225 @@ impl PyNuclear {
     fn self_test(&self) -> (usize, usize, Vec<String>) { crate::dynamics::nuclear::self_test() }
 }
 
-#[pyclass(name = "Astro")] struct PyAstro;
-#[pymethods] impl PyAstro {
-    #[new] fn new() -> Self { PyAstro }
-    fn polytrope_nr(&self) -> f64 { crate::atoms::N_C as f64 / crate::atoms::N_W as f64 }
+#[pyclass(name = "Astro")]
+#[derive(Clone)]
+struct PyAstro { toe: crate::toe::Toe }
+#[pymethods]
+impl PyAstro {
+    #[new] #[pyo3(signature = (vev=None))]
+    fn new(vev: Option<f64>) -> Self {
+        PyAstro { toe: match vev { Some(v) => crate::toe::Toe::with_vev(v), None => crate::toe::Toe::new() } }
+    }
+    fn vev(&self) -> f64 { self.toe.vev() }
+    fn n_w(&self) -> u64 { crate::atoms::N_W }
+    fn n_c(&self) -> u64 { crate::atoms::N_C }
+    fn chi(&self) -> u64 { crate::atoms::CHI }
+    fn beta0(&self) -> u64 { crate::atoms::BETA0 }
+
+    // §1 Constants
+    fn polytrope_nr(&self) -> (u64, u64) { crate::dynamics::astro::POLYTROPE_NR }
     fn polytrope_rel(&self) -> u64 { crate::dynamics::astro::POLYTROPE_REL }
+    fn schwarz(&self) -> u64 { crate::dynamics::astro::SCHWARZ }
     fn hawking_factor(&self) -> u64 { crate::dynamics::astro::HAWKING }
     fn sb_denominator(&self) -> u64 { crate::dynamics::astro::SB_DENOM }
     fn eddington_factor(&self) -> u64 { crate::dynamics::astro::EDDINGTON }
+    fn ms_lum_exp(&self) -> (u64, u64) { crate::dynamics::astro::MS_LUM_EXP }
+    fn ms_life_exp(&self) -> (u64, u64) { crate::dynamics::astro::MS_LIFE_EXP }
     fn virial(&self) -> u64 { crate::dynamics::astro::VIRIAL }
+    fn grav_pe(&self) -> (u64, u64) { crate::dynamics::astro::GRAV_PE }
+    fn chandra_mu_e(&self) -> u64 { crate::dynamics::astro::CHANDRA_MU_E }
+    fn jeans_t_exp(&self) -> (u64, u64) { crate::dynamics::astro::JEANS_T_EXP }
+    fn jeans_rho_exp(&self) -> (u64, u64) { crate::dynamics::astro::JEANS_RHO_EXP }
+
+    // §2 Lane-Emden
     fn lane_emden(&self, n: f64) -> (f64, f64) { crate::dynamics::astro::lane_emden(n) }
+    fn lane_emden_profile(&self, n: f64) -> Vec<(f64, f64)> { crate::dynamics::astro::lane_emden_profile(n) }
+    fn lane_emden_nr(&self) -> (f64, f64) { crate::dynamics::astro::lane_emden_nr() }
+    fn lane_emden_rel(&self) -> (f64, f64) { crate::dynamics::astro::lane_emden_rel() }
+
+    // §4 Scaling laws
+    fn ms_luminosity(&self, m: f64) -> f64 { crate::dynamics::astro::ms_luminosity(m) }
+    fn ms_lifetime(&self, m: f64) -> f64 { crate::dynamics::astro::ms_lifetime(m) }
+    fn schwarzschild_radius(&self, m: f64) -> f64 { crate::dynamics::astro::schwarzschild_radius(m) }
+    fn hawking_temperature(&self, m: f64) -> f64 { crate::dynamics::astro::hawking_temperature(m) }
+
+    // §5 Cross-checks
+    fn ms_exponent_identity(&self) -> bool { crate::dynamics::astro::ms_exponent_identity() }
+    fn hawking_eddington_product(&self) -> u64 { crate::dynamics::astro::hawking_eddington_product() }
+
+    // §6 Self-test
+    fn observable_count(&self) -> u64 { crate::dynamics::astro::OBSERVABLE_COUNT }
+    fn self_test(&self) -> (usize, usize, Vec<String>) { crate::dynamics::astro::self_test() }
 }
 
-#[pyclass(name = "QInfo")] struct PyQInfo;
-#[pymethods] impl PyQInfo {
-    #[new] fn new() -> Self { PyQInfo }
+#[pyclass(name = "QInfo")]
+#[derive(Clone)]
+struct PyQInfo { toe: crate::toe::Toe }
+#[pymethods]
+impl PyQInfo {
+    #[new] #[pyo3(signature = (vev=None))]
+    fn new(vev: Option<f64>) -> Self {
+        PyQInfo { toe: match vev { Some(v) => crate::toe::Toe::with_vev(v), None => crate::toe::Toe::new() } }
+    }
+    fn vev(&self) -> f64 { self.toe.vev() }
+    fn n_w(&self) -> u64 { crate::atoms::N_W }
+    fn n_c(&self) -> u64 { crate::atoms::N_C }
+    fn chi(&self) -> u64 { crate::atoms::CHI }
+    fn beta0(&self) -> u64 { crate::atoms::BETA0 }
+
+    // §1 Gate structure
     fn qubit_states(&self) -> u64 { crate::dynamics::qinfo::QUBIT_STATES }
     fn pauli_matrices(&self) -> u64 { crate::dynamics::qinfo::PAULI_MATRICES }
+    fn pauli_group(&self) -> u64 { crate::dynamics::qinfo::PAULI_GROUP }
     fn bell_states(&self) -> u64 { crate::dynamics::qinfo::BELL_STATES }
-    fn steane_code(&self) -> (u64, u64, u64) { (crate::dynamics::qinfo::STEANE_N, crate::dynamics::qinfo::STEANE_K, crate::dynamics::qinfo::STEANE_D) }
-    fn shor_n(&self) -> u64 { crate::dynamics::qinfo::SHOR_N }
     fn toffoli(&self) -> u64 { crate::dynamics::qinfo::TOFFOLI }
+
+    // §2 Error correction
+    fn steane_code(&self) -> (u64, u64, u64) { (crate::dynamics::qinfo::STEANE_N, crate::dynamics::qinfo::STEANE_K, crate::dynamics::qinfo::STEANE_D) }
+    fn steane_n(&self) -> u64 { crate::dynamics::qinfo::STEANE_N }
+    fn steane_d(&self) -> u64 { crate::dynamics::qinfo::STEANE_D }
+    fn steane_corrects(&self) -> u64 { crate::dynamics::qinfo::steane_corrects() }
+    fn shor_n(&self) -> u64 { crate::dynamics::qinfo::SHOR_N }
+    fn hamming_check(&self) -> bool { crate::dynamics::qinfo::hamming_check() }
+
+    // §3 MERA
     fn mera_bond(&self) -> u64 { crate::dynamics::qinfo::MERA_BOND }
     fn mera_depth(&self) -> u64 { crate::dynamics::qinfo::MERA_DEPTH }
-    fn teleport_bits(&self) -> u64 { crate::dynamics::qinfo::TELEPORT_BITS }
+    fn entropy_per_tick(&self) -> f64 { crate::dynamics::qinfo::entropy_per_tick() }
+
+    // §4 Entanglement
     fn bell_entropy(&self) -> f64 { crate::dynamics::qinfo::bell_entropy() }
     fn mera_link_entropy(&self) -> f64 { crate::dynamics::qinfo::mera_link_entropy() }
-    fn hamming_check(&self) -> bool { crate::dynamics::qinfo::hamming_check() }
+    fn teleport_bits(&self) -> u64 { crate::dynamics::qinfo::TELEPORT_BITS }
+    fn superdense_bits(&self) -> u64 { crate::dynamics::qinfo::SUPERDENSE_BITS }
+
+    // §5 Heyting algebra
+    fn truth_singlet(&self) -> (u64, u64) { crate::dynamics::qinfo::TRUTH_SINGLET }
+    fn truth_weak(&self) -> (u64, u64) { crate::dynamics::qinfo::TRUTH_WEAK }
+    fn truth_colour(&self) -> (u64, u64) { crate::dynamics::qinfo::TRUTH_COLOUR }
+    fn truth_mixed(&self) -> (u64, u64) { crate::dynamics::qinfo::TRUTH_MIXED }
+    fn uncertainty_meet(&self) -> (u64, u64) { crate::dynamics::qinfo::uncertainty_meet() }
+    fn coprimality_check(&self) -> bool { crate::dynamics::qinfo::coprimality_check() }
+    fn heyting_meet(&self, a: f64, b: f64) -> f64 { crate::dynamics::qinfo::heyting_meet(a, b) }
+    fn heyting_join(&self, a: f64, b: f64) -> f64 { crate::dynamics::qinfo::heyting_join(a, b) }
+
+    // §6 Info bounds
+    fn tomography_min(&self) -> u64 { crate::dynamics::qinfo::tomography_min() }
+
+    // §7 Self-test
+    fn observable_count(&self) -> u64 { crate::dynamics::qinfo::OBSERVABLE_COUNT }
+    fn self_test(&self) -> (usize, usize, Vec<String>) { crate::dynamics::qinfo::self_test() }
 }
 
-#[pyclass(name = "Bio")] struct PyBio;
-#[pymethods] impl PyBio {
-    #[new] fn new() -> Self { PyBio }
+#[pyclass(name = "Bio")]
+#[derive(Clone)]
+struct PyBio { toe: crate::toe::Toe }
+#[pymethods]
+impl PyBio {
+    #[new] #[pyo3(signature = (vev=None))]
+    fn new(vev: Option<f64>) -> Self {
+        PyBio { toe: match vev { Some(v) => crate::toe::Toe::with_vev(v), None => crate::toe::Toe::new() } }
+    }
+    fn vev(&self) -> f64 { self.toe.vev() }
+    fn n_w(&self) -> u64 { crate::atoms::N_W }
+    fn n_c(&self) -> u64 { crate::atoms::N_C }
+    fn chi(&self) -> u64 { crate::atoms::CHI }
+
+    // §1 Genetic code
     fn dna_bases(&self) -> u64 { crate::dynamics::bio::DNA_BASES }
     fn codon_len(&self) -> u64 { crate::dynamics::bio::CODON_LEN }
     fn codons(&self) -> u64 { crate::dynamics::bio::TOTAL_CODONS }
     fn amino_acids(&self) -> u64 { crate::dynamics::bio::AMINO_ACIDS }
     fn stop_codons(&self) -> u64 { crate::dynamics::bio::STOP_CODONS }
+    fn start_codons(&self) -> u64 { crate::dynamics::bio::START_CODONS }
+    fn sense_codons(&self) -> u64 { crate::dynamics::bio::SENSE_CODONS }
+    fn codon_redundancy(&self) -> f64 { crate::dynamics::bio::codon_redundancy() }
+
+    // §2 DNA structure
+    fn helix_strands(&self) -> u64 { crate::dynamics::bio::HELIX_STRANDS }
     fn hbond_at(&self) -> u64 { crate::dynamics::bio::HBOND_AT }
     fn hbond_gc(&self) -> u64 { crate::dynamics::bio::HBOND_GC }
-    fn helix_strands(&self) -> u64 { crate::dynamics::bio::HELIX_STRANDS }
     fn bp_per_turn(&self) -> u64 { crate::dynamics::bio::BP_PER_TURN }
-    fn lipid_layers(&self) -> u64 { crate::dynamics::bio::LIPID_LAYERS }
-    fn kleiber_exponent(&self) -> f64 { crate::dynamics::bio::kleiber_exp() }
-    fn surface_exponent(&self) -> f64 { crate::dynamics::bio::surface_exp() }
-    fn heart_rate_exponent(&self) -> f64 { crate::dynamics::bio::heart_rate_exp() }
+    fn chargaff_pairs(&self) -> u64 { crate::dynamics::bio::CHARGAFF_PAIRS }
+
+    // §3 Protein structure
     fn helix_per_turn(&self) -> f64 { crate::dynamics::bio::helix_per_turn() }
+    fn helix_per_turn_frac(&self) -> (u64, u64) { crate::dynamics::bio::HELIX_PER_TURN }
     fn flory_nu(&self) -> f64 { crate::dynamics::bio::flory_nu() }
-    fn codon_redundancy(&self) -> f64 { crate::dynamics::bio::codon_redundancy() }
+    fn flory_nu_frac(&self) -> (u64, u64) { crate::dynamics::bio::FLORY_NU }
+    fn ramachandran_angles(&self) -> u64 { crate::dynamics::bio::RAMACHANDRAN_ANGLES }
+    fn lipid_layers(&self) -> u64 { crate::dynamics::bio::LIPID_LAYERS }
+
+    // §4 Allometric scaling
+    fn kleiber_exponent(&self) -> f64 { crate::dynamics::bio::kleiber_exp() }
+    fn kleiber_exp_frac(&self) -> (u64, u64) { crate::dynamics::bio::KLEIBER_EXP }
+    fn heart_rate_exponent(&self) -> f64 { crate::dynamics::bio::heart_rate_exp() }
+    fn lifespan_exponent(&self) -> f64 { crate::dynamics::bio::lifespan_exp() }
+    fn surface_exponent(&self) -> f64 { crate::dynamics::bio::surface_exp() }
+    fn surface_exp_frac(&self) -> (u64, u64) { crate::dynamics::bio::SURFACE_AREA_EXP }
+    fn kleiber(&self, m: f64) -> f64 { crate::dynamics::bio::kleiber(m) }
+    fn heart_rate(&self, m: f64) -> f64 { crate::dynamics::bio::heart_rate(m) }
+    fn lifespan(&self, m: f64) -> f64 { crate::dynamics::bio::lifespan(m) }
+    fn constant_heartbeats(&self) -> bool { crate::dynamics::bio::constant_heartbeats() }
+
+    // §5 Cross-module
+    fn kleiber_is_chandrasekhar(&self) -> bool { crate::dynamics::bio::kleiber_is_chandrasekhar() }
+    fn surface_is_larmor(&self) -> bool { crate::dynamics::bio::surface_is_larmor() }
+    fn bases_are_bell_states(&self) -> bool { crate::dynamics::bio::bases_are_bell_states() }
+
+    // §6 Self-test
+    fn observable_count(&self) -> u64 { crate::dynamics::bio::OBSERVABLE_COUNT }
+    fn self_test(&self) -> (usize, usize, Vec<String>) { crate::dynamics::bio::self_test() }
 }
 
-#[pyclass(name = "Arcade")] struct PyArcade;
-#[pymethods] impl PyArcade {
-    #[new] fn new() -> Self { PyArcade }
+#[pyclass(name = "Arcade")]
+#[derive(Clone)]
+struct PyArcade { toe: crate::toe::Toe }
+#[pymethods]
+impl PyArcade {
+    #[new] #[pyo3(signature = (vev=None))]
+    fn new(vev: Option<f64>) -> Self {
+        PyArcade { toe: match vev { Some(v) => crate::toe::Toe::with_vev(v), None => crate::toe::Toe::new() } }
+    }
+    fn vev(&self) -> f64 { self.toe.vev() }
+    fn n_w(&self) -> u64 { crate::atoms::N_W }
+    fn n_c(&self) -> u64 { crate::atoms::N_C }
+    fn chi(&self) -> u64 { crate::atoms::CHI }
+
+    // §1 Parameters
     fn lj_cutoff(&self) -> u64 { crate::dynamics::arcade::LJ_CUTOFF }
+    fn bh_theta_den(&self) -> u64 { crate::dynamics::arcade::BH_THETA_DEN }
     fn octree_children(&self) -> u64 { crate::dynamics::arcade::OCTREE_CHILDREN }
+    fn euler_order(&self) -> u64 { crate::dynamics::arcade::EULER_ORDER }
+    fn verlet_order(&self) -> u64 { crate::dynamics::arcade::VERLET_ORDER }
     fn fixed_bits(&self) -> u64 { crate::dynamics::arcade::FIXED_BITS }
+    fn hash_cells(&self) -> u64 { crate::dynamics::arcade::HASH_CELLS }
     fn lod_levels(&self) -> u64 { crate::dynamics::arcade::LOD_LEVELS }
+    fn mf_tc(&self) -> u64 { crate::dynamics::arcade::MF_TC }
+    fn newton_iter(&self) -> u64 { crate::dynamics::arcade::NEWTON_ITER }
     fn fast_alpha_inv(&self) -> u64 { crate::dynamics::arcade::FAST_ALPHA_INV }
-    fn wca_cutoff(&self) -> f64 { crate::dynamics::arcade::wca_cutoff() }
+
+    // §2 Functions
     fn bh_theta(&self) -> f64 { crate::dynamics::arcade::bh_theta() }
+    fn wca_cutoff(&self) -> f64 { crate::dynamics::arcade::wca_cutoff() }
     fn fixed_resolution(&self) -> f64 { crate::dynamics::arcade::fixed_resolution() }
+    fn lj_exact(&self, r: f64) -> f64 { crate::dynamics::arcade::lj_exact(r) }
+    fn lj_arcade(&self, r: f64) -> f64 { crate::dynamics::arcade::lj_arcade(r) }
+    fn lj_wca(&self, r: f64) -> f64 { crate::dynamics::arcade::lj_wca(r) }
+    fn euler_step(&self, x: f64, v: f64, dt: f64) -> f64 { crate::dynamics::arcade::euler_step(x, v, dt) }
+    fn verlet_step(&self, x: f64, v: f64, a: f64, dt: f64) -> f64 { crate::dynamics::arcade::verlet_step(x, v, a, dt) }
+    fn fast_inv_sqrt(&self, x: f64) -> f64 { crate::dynamics::arcade::fast_inv_sqrt(x) }
+    fn fixed_round_trip(&self, x: f64) -> f64 { crate::dynamics::arcade::fixed_round_trip(x) }
+
+    // §3 Error bounds
+    fn lj_cutoff_error(&self) -> f64 { crate::dynamics::arcade::lj_cutoff_error() }
+    fn onsager_tc(&self) -> f64 { crate::dynamics::arcade::onsager_tc() }
+    fn mean_field_error(&self) -> f64 { crate::dynamics::arcade::mean_field_error() }
+    fn verify_alpha_inv(&self) -> bool { crate::dynamics::arcade::verify_alpha_inv() }
+
+    // §4 Self-test
+    fn observable_count(&self) -> u64 { crate::dynamics::arcade::OBSERVABLE_COUNT }
+    fn self_test(&self) -> (usize, usize, Vec<String>) { crate::dynamics::arcade::self_test() }
 }
 
 // ══ MODULE REGISTRATION ═════════════════════════════════════

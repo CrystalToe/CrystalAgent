@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Daland Montgomery
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Friedmann ODE — Ω_Λ=13/19, Ω_m=6/19, uses tower partition
 use crate::atoms::*;
 

@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal GW — Chirp Mass: M_c = μ^(3/5) M^(2/5) where 3/5=N_c/(χ−1), 2/5=N_w/(χ−1)"""
 import crystal_toe as ct
 import numpy as np

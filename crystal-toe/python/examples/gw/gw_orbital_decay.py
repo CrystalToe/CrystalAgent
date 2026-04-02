@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal GW — Orbital Decay: da/dt = −(64/5) μM²/a³ where 64/5 = N_w⁶/(χ−1)"""
 import crystal_toe as ct
 import numpy as np

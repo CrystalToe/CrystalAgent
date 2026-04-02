@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal EM — Larmor Radiation: P = (N_c−1)/N_c × q²a² = (2/3)q²a²"""
 import crystal_toe as ct
 import numpy as np

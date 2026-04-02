@@ -239,6 +239,32 @@ for f in $(ls crystal-topos/examples/*.py 2>/dev/null | sort); do
     tail -n +4 "$f" | grep -v "^from crystal_topos import\|^import math$\|^import " >> "$OUT1"
 done
 
+# crystal-toe Python examples (dynamics modules)
+echo "" >> "$OUT1"
+echo "---" >> "$OUT1"
+echo "# §CRYSTAL-TOE PYTHON EXAMPLES (dynamics)" >> "$OUT1"
+echo "" >> "$OUT1"
+echo "Each example uses the crystal_toe PyO3 module built with maturin." >> "$OUT1"
+
+if [ -d "crystal-toe/python/examples" ]; then
+    for dir in $(ls -d crystal-toe/python/examples/*/ 2>/dev/null | sort); do
+        modname=$(basename "$dir")
+        echo "" >> "$OUT1"
+        echo "## §crystal-toe/$modname" >> "$OUT1"
+        for f in $(ls "$dir"/*.py 2>/dev/null | sort); do
+            [ -f "$f" ] || continue
+            name=$(basename "$f" .py)
+            title=$(grep '""".*[a-zA-Z].*"""' "$f" | head -1 | sed 's/"""//g' | sed 's/^ *//')
+            [ -z "$title" ] && title="$name"
+            echo "" >> "$OUT1"
+            echo "### §$name: $title" >> "$OUT1"
+            echo '```python' >> "$OUT1"
+            cat "$f" >> "$OUT1"
+            echo '```' >> "$OUT1"
+        done
+    done
+fi
+
 # Spectral tower
 echo "" >> "$OUT1"
 echo "---" >> "$OUT1"
@@ -329,22 +355,51 @@ for dir in proofs haskel; do
     done
 done
 
-# Rust source + tests (glob)
+# Rust source + tests — crystal-topos (glob)
 echo "" >> "$OUT3"
 echo "---" >> "$OUT3"
-echo "# §RUST SOURCE & TESTS" >> "$OUT3"
+echo "# §RUST SOURCE & TESTS (crystal-topos)" >> "$OUT3"
 for dir in crystal-topos/src crystal-topos/tests; do
     for f in ${dir}/*.rs; do
         [ -f "$f" ] || continue
         name=$(basename "$f")
         lines=$(wc -l < "$f")
         echo "" >> "$OUT3"
-        echo "## §Rust: ${name} (${lines} lines)" >> "$OUT3"
+        echo "## §Rust topos: ${name} (${lines} lines)" >> "$OUT3"
         echo '```rust' >> "$OUT3"
         sed '/^\/\/ Copyright/d;/^\/\/ SPDX/d;/^use /d' "$f" >> "$OUT3"
         echo '```' >> "$OUT3"
     done
 done
+
+# Rust source + tests — crystal-toe (recursive glob)
+echo "" >> "$OUT3"
+echo "---" >> "$OUT3"
+echo "# §RUST SOURCE & TESTS (crystal-toe)" >> "$OUT3"
+if [ -d "crystal-toe/src" ]; then
+    find crystal-toe/src -name '*.rs' 2>/dev/null | sort | while read -r f; do
+        [ -f "$f" ] || continue
+        relpath=$(echo "$f" | sed 's|crystal-toe/||')
+        lines=$(wc -l < "$f")
+        echo "" >> "$OUT3"
+        echo "## §Rust toe: ${relpath} (${lines} lines)" >> "$OUT3"
+        echo '```rust' >> "$OUT3"
+        sed '/^\/\/ Copyright/d;/^\/\/ SPDX/d;/^use /d' "$f" >> "$OUT3"
+        echo '```' >> "$OUT3"
+    done
+fi
+if [ -d "crystal-toe/tests" ]; then
+    for f in crystal-toe/tests/*.rs; do
+        [ -f "$f" ] || continue
+        name=$(basename "$f")
+        lines=$(wc -l < "$f")
+        echo "" >> "$OUT3"
+        echo "## §Rust toe: tests/${name} (${lines} lines)" >> "$OUT3"
+        echo '```rust' >> "$OUT3"
+        sed '/^\/\/ Copyright/d;/^\/\/ SPDX/d;/^use /d' "$f" >> "$OUT3"
+        echo '```' >> "$OUT3"
+    done
+fi
 
 # Python proof modules (glob)
 echo "" >> "$OUT3"
@@ -423,8 +478,24 @@ for f in crystal-topos/tests/*.rs crystal-topos/src/*.rs; do
     [ -f "$f" ] || continue
     name=$(basename "$f")
     test_count=$(grep -c "#\[test\]" "$f" 2>/dev/null); test_count=${test_count:-0}
-    [ "$test_count" -gt 0 ] && echo "- **${name}** — ${test_count} tests" >> "$OUT3"
+    [ "$test_count" -gt 0 ] && echo "- **topos/${name}** — ${test_count} tests" >> "$OUT3"
 done
+if [ -d "crystal-toe/src" ]; then
+    find crystal-toe/src -name '*.rs' 2>/dev/null | sort | while read -r f; do
+        [ -f "$f" ] || continue
+        relpath=$(echo "$f" | sed 's|crystal-toe/||')
+        test_count=$(grep -c "#\[test\]" "$f" 2>/dev/null); test_count=${test_count:-0}
+        [ "$test_count" -gt 0 ] && echo "- **toe/${relpath}** — ${test_count} tests" >> "$OUT3"
+    done
+fi
+if [ -d "crystal-toe/tests" ]; then
+    for f in crystal-toe/tests/*.rs; do
+        [ -f "$f" ] || continue
+        name=$(basename "$f")
+        test_count=$(grep -c "#\[test\]" "$f" 2>/dev/null); test_count=${test_count:-0}
+        [ "$test_count" -gt 0 ] && echo "- **toe/tests/${name}** — ${test_count} tests" >> "$OUT3"
+    done
+fi
 
 echo "" >> "$OUT3"
 echo "## Python Proof Modules" >> "$OUT3"
@@ -436,8 +507,12 @@ done
 
 echo "" >> "$OUT3"
 echo "## Python Examples" >> "$OUT3"
-example_count=$(ls crystal-topos/examples/*.py 2>/dev/null | wc -l)
-echo "- ${example_count} Python examples in crystal-topos/examples/" >> "$OUT3"
+topos_count=$(ls crystal-topos/examples/*.py 2>/dev/null | wc -l)
+toe_count=$(find crystal-toe/python/examples -name '*.py' 2>/dev/null | wc -l)
+echo "- ${topos_count} Python examples in crystal-topos/examples/" >> "$OUT3"
+echo "- ${toe_count} Python examples in crystal-toe/python/examples/" >> "$OUT3"
+total_examples=$((topos_count + toe_count))
+echo "- **${total_examples} total Python examples**" >> "$OUT3"
 
 # ═══════════════════════════════════════════════════════════════════
 # SUMMARY

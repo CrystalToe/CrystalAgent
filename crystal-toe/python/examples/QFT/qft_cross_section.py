@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal QFT — e⁺e⁻→μ⁺μ⁻: σ = N_w²πα²/(N_c·s)"""
 import crystal_toe as ct
 import numpy as np

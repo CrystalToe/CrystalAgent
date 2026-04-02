@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal MD — DNA & Protein: bases=N_w²=4, amino acids=N_w²(χ−1)=20"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt

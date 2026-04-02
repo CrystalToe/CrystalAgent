@@ -509,11 +509,11 @@ Hierarchy: bond >> ω >> angle > H-bond ≈ hydrophobic >> VdW ~ kT
 
 | System | Count | Method |
 |--------|-------|--------|
-| Lean 4 | 1110+ theorems | native_decide, 0 sorry |
-| Agda | 886+ proofs | all by refl, 0 postulates |
+| Lean 4 | 1226+ theorems | native_decide, 0 sorry |
+| Agda | 991+ proofs | all by refl, 0 postulates |
 | Haskell/GHC | 36 modules + 21 dynamics, all PASS | Curry-Howard |
-| Rust | 527+ tests | cargo test |
-| Python | 27+ proof modules | assert |
+| Rust | 568+ tests | cargo test (crystal-topos + crystal-toe) |
+| Python | 135+ modules | assert |
 
 Lean `native_decide` and Agda `refl` proofs are FINAL TRUTH.
 LLM reasoning NEVER overrides a machine-verified proof.
@@ -565,10 +565,17 @@ CrystalAgent/
 │   ├── Crystal*.agda                      ← 22 Agda files (refl)
 │   ├── crystal_*_proof.py                 ← Python proof modules
 │   └── GHC_Certificate.txt               ← Runtime output
-├── crystal-topos/                         ← Rust core + Python bindings
+├── crystal-topos/                         ← Rust core (topos algebra)
 │   ├── src/*.rs                           ← 11 Rust modules
 │   ├── tests/*.rs                         ← 11 test files
-│   └── examples/*.py                      ← 122+ Python examples
+│   └── examples/*.py                      ← Python examples
+├── crystal-toe/                           ← Rust PyO3 crate (dynamics engine)
+│   ├── src/*.rs                           ← Core modules (toe, atoms, gauge, qcd, …)
+│   ├── src/dynamics/*.rs                  ← 21 dynamics modules (all ported)
+│   ├── src/qlib/*.rs                      ← Quantum library
+│   ├── src/py.rs                          ← PyO3 bindings (all modules)
+│   ├── tests/*.rs                         ← Integration tests
+│   └── python/examples/                   ← 105+ Python examples (per-module dirs)
 ├── quickstart/
 │   ├── crystal_topos_waca_llm.md
 │   ├── CrystalTopos_RAG_1.md             ← Python + READMEs + spectral tower
@@ -627,10 +634,10 @@ CrystalAgent/
 | Haskell modules | 36 + 21 dynamics |
 | Haskell proofs | 36/36 PASS |
 | Dynamics modules | 21/21 ALL PASS |
-| Lean theorems | 1110+ |
-| Agda proofs | 886+ |
-| Rust tests | 527+ |
-| Python proof modules | 27+ |
+| Lean theorems | 1226+ |
+| Agda proofs | 991+ |
+| Rust tests | 568+ |
+| Python proof modules | 135+ |
 | Dynamics Python checks | 559 |
 | Dynamics Lean theorems | 372 |
 | Dynamics Agda proofs | 291 |
@@ -669,6 +676,9 @@ done
 
 # Rust:
 cd crystal-topos && cargo test
+cd crystal-toe && cargo test
+cd crystal-toe && maturin develop --features python
+python crystal-toe/python/examples/chem/chem_integers.py
 
 # Regression gate:
 sh proofs/proof_regression.sh              # check vs baseline

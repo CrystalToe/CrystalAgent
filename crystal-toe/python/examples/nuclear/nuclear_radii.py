@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Nuclear — Nuclear Radii: R = r₀·A^(1/N_c)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
