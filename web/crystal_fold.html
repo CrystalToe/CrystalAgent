@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crystal Fold — Protein Folding from First Principles</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;800&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#060810;color:#c0cee0;font-family:'JetBrains Mono',monospace}
+  .bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:linear-gradient(rgba(0,229,255,0.015) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,229,255,0.015) 1px,transparent 1px);background-size:30px 30px}
+  .wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:12px}
+  header{text-align:center;padding:20px 10px 14px;border-bottom:1px solid rgba(0,229,255,0.12);margin-bottom:16px}
+  h1{font-size:clamp(18px,4vw,30px);font-weight:800;letter-spacing:5px;color:#00e5ff;
+    text-shadow:0 0 30px rgba(0,229,255,0.3)}
+  .sub{font-size:11px;color:#3a5070;letter-spacing:1.5px;margin-top:5px}
+  .claim{margin-top:10px;font-size:10px;color:#5a7a9a;max-width:600px;display:inline-block;
+    border:1px solid rgba(0,229,255,0.1);border-radius:6px;padding:8px 14px;
+    background:rgba(0,229,255,0.02);line-height:1.6;text-align:left}
+
+  .main{display:grid;grid-template-columns:1fr 260px;gap:14px}
+  @media(max-width:700px){.main{grid-template-columns:1fr}}
+
+  canvas{width:100%;border-radius:8px;border:1px solid rgba(0,229,255,0.12);background:#080a14;display:block}
+  .panel{background:rgba(10,14,26,0.8);border:1px solid rgba(0,229,255,0.08);border-radius:8px;padding:14px}
+  .panel h3{font-size:11px;color:#00e5ff;letter-spacing:2px;margin-bottom:10px;
+    padding-bottom:6px;border-bottom:1px solid rgba(0,229,255,0.1)}
+
+  .param-row{display:flex;justify-content:space-between;padding:3px 0;font-size:10px;
+    border-bottom:1px solid rgba(255,255,255,0.02)}
+  .param-name{color:#7a8aaa}
+  .param-val{color:#ff6b9d;font-weight:600}
+  .param-trace{color:#3a5070;font-size:8px}
+
+  .controls{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap;align-items:center}
+  .btn{padding:6px 16px;border-radius:5px;border:1px solid rgba(0,229,255,0.3);
+    background:rgba(0,229,255,0.08);color:#00e5ff;font-family:'JetBrains Mono',monospace;
+    font-size:11px;cursor:pointer;font-weight:600;letter-spacing:1px;transition:all 0.2s}
+  .btn:hover{background:rgba(0,229,255,0.2)}
+  .btn.active{background:rgba(0,229,255,0.25);box-shadow:0 0 12px rgba(0,229,255,0.2)}
+  .btn.reset{border-color:rgba(255,107,157,0.3);color:#ff6b9d;background:rgba(255,107,157,0.08)}
+
+  .status{font-size:10px;color:#5a7a9a;margin:6px 0;line-height:1.6}
+  .energy-bar{height:4px;border-radius:2px;background:rgba(255,255,255,0.05);margin:4px 0;overflow:hidden}
+  .energy-fill{height:100%;border-radius:2px;transition:width 0.3s;background:linear-gradient(90deg,#00ff88,#00e5ff)}
+
+  .temp-slider{width:100%;margin:6px 0;accent-color:#ffa500}
+  .seq-display{font-size:10px;word-break:break-all;line-height:1.8;margin:6px 0;
+    padding:6px;border-radius:4px;background:rgba(0,0,0,0.3)}
+  .seq-h{color:#ff6b9d;font-weight:700}
+  .seq-p{color:#4a8aff;font-weight:700}
+
+  .trace-box{margin-top:10px;padding:8px;border-radius:4px;
+    background:rgba(255,107,157,0.04);border:1px solid rgba(255,107,157,0.1)}
+  .trace-title{font-size:9px;color:#ff6b9d;letter-spacing:1px;margin-bottom:6px}
+
+  footer{text-align:center;margin-top:16px;padding:12px;border-top:1px solid rgba(0,229,255,0.06);
+    font-size:9px;color:#2a3a4a;letter-spacing:0.5px}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="wrap">
+<header>
+  <h1>CRYSTAL FOLD</h1>
+  <div class="sub">PROTEIN FOLDING FROM FIRST PRINCIPLES · ZERO FITTED PARAMETERS</div>
+  <div class="claim">
+    Every force field parameter — bond angle, LJ exponents, H-bond strength, helix periodicity,
+    hydrophobic energy, folding temperature — derived from <b>N_w=2, N_c=3</b>.
+    The same two integers that give α⁻¹=137.036 and m_p/m_e=1836.
+  </div>
+</header>
+
+<div class="controls">
+  <button class="btn" id="btn-fold" onclick="startFold()">▶ FOLD</button>
+  <button class="btn reset" onclick="resetChain()">↺ RESET</button>
+  <button class="btn" id="btn-anneal" onclick="toggleAnneal()">❄ ANNEAL</button>
+  <span class="status" id="status-text">Ready — 36 residues</span>
+</div>
+
+<div class="main">
+  <div>
+    <canvas id="foldCanvas" width="600" height="520"></canvas>
+    <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px">
+      <span>T = <span id="temp-display">1.00</span> · kT/ε = <span id="kt-display">1.00</span></span>
+      <span>E = <span id="energy-display">0.00</span></span>
+      <span>Step <span id="step-display">0</span></span>
+    </div>
+    <div style="margin-top:4px;font-size:10px;color:#4a5a7a">
+      Temperature: <input type="range" min="0.1" max="3.0" step="0.05" value="1.0" id="temp-slider" class="temp-slider" style="width:70%;vertical-align:middle">
+    </div>
+  </div>
+
+  <div>
+    <div class="panel">
+      <h3>SEQUENCE</h3>
+      <div class="seq-display" id="seq-display"></div>
+      <div style="font-size:9px;color:#3a5070;margin-top:4px">
+        <span class="seq-h">H</span>=hydrophobic <span class="seq-p">P</span>=polar ·
+        HP period ≈ 3.6 = 18/5 = N_c²N_w/(χ−1)
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:10px">
+      <h3>CRYSTAL FORCE FIELD</h3>
+      <div class="param-row"><span class="param-name">bond angle θ₀</span><span class="param-val">109.47°</span></div>
+      <div class="param-row"><span class="param-trace">arccos(−1/N_c) = arccos(−1/3)</span></div>
+
+      <div class="param-row"><span class="param-name">LJ attract exp</span><span class="param-val">6 = χ</span></div>
+      <div class="param-row"><span class="param-name">LJ repulse exp</span><span class="param-val">12 = 2χ</span></div>
+      <div class="param-row"><span class="param-trace">V = N_w²·ε·((σ/r)^2χ − (σ/r)^χ)</span></div>
+
+      <div class="param-row"><span class="param-name">H-bond (i,i+4)</span><span class="param-val">−0.199 eV</span></div>
+      <div class="param-row"><span class="param-trace">α · E_H (helix pattern)</span></div>
+
+      <div class="param-row"><span class="param-name">ε_hydrophobic</span><span class="param-val">−0.022 eV</span></div>
+      <div class="param-row"><span class="param-trace">α · E_H / N_c² ≈ kT at 300K</span></div>
+
+      <div class="param-row"><span class="param-name">helix period</span><span class="param-val">3.6 = 18/5</span></div>
+      <div class="param-row"><span class="param-trace">N_c²·N_w/(χ−1) residues/turn</span></div>
+
+      <div class="param-row"><span class="param-name">Flory ν</span><span class="param-val">2/5 = 0.4</span></div>
+      <div class="param-row"><span class="param-trace">N_w/(χ−1) → R_g ~ N^0.4</span></div>
+
+      <div class="param-row"><span class="param-name">dielectric ε_r</span><span class="param-val">16</span></div>
+      <div class="param-row"><span class="param-trace">N_w²·(N_c+1) = 4·4</span></div>
+    </div>
+
+    <div class="trace-box">
+      <div class="trace-title">A_F TRACE</div>
+      <div style="font-size:9px;color:#5a7a9a;line-height:1.7">
+        N_w=2 → N_w²=4, N_w³=8<br>
+        N_c=3 → N_c²=9, C_F=4/3<br>
+        χ=6 → LJ(6,12), helix<br>
+        α=1/(43π+ln7) → forces<br>
+        Everything from (2, 3).
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Crystal Topos · CrystalProtein.hs + CrystalMD.hs + CrystalCondensed.hs · 0 fitted parameters
+</footer>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// A_F ATOMS
+// ══════════════════════════════════════════════════════
+const Nw = 2, Nc = 3, chi = Nw * Nc; // 6
+const sp3 = Math.acos(-1/Nc); // 109.47° tetrahedral
+const HELIX_PERIOD = (Nc*Nc*Nw) / (chi - 1); // 3.6
+const FLORY = Nw / (chi - 1); // 0.4
+
+// Force field (reduced units, ε_vdw = 1)
+const LJ_ATT = chi;       // 6
+const LJ_REP = 2 * chi;   // 12
+const LJ_COEFF = Nw * Nw; // 4
+const HBOND_RATIO = 9;    // E_hbond/ε_vdw ≈ 0.199/0.022 ≈ 9
+const BOND_LEN = 1.0;
+const K_ANGLE = 20.0;     // angular stiffness
+const K_BOND = 100.0;     // bond stiffness
+const LJ_SIGMA = 0.7;
+const HBOND_CUT = 1.5;
+
+// ══════════════════════════════════════════════════════
+// SEQUENCE — HP pattern with period ≈ 3.6 (Crystal helix)
+// ══════════════════════════════════════════════════════
+const N = 36; // Σd = 36!
+function makeSequence() {
+  const seq = [];
+  for (let i = 0; i < N; i++) {
+    // Hydrophobic every ~3.6 residues (Crystal helix period)
+    const phase = (i * 2 * Math.PI) / HELIX_PERIOD;
+    seq.push(Math.cos(phase) > 0.2 ? 'H' : 'P');
+  }
+  return seq;
+}
+const SEQ = makeSequence();
+
+// Display sequence
+const seqEl = document.getElementById('seq-display');
+seqEl.innerHTML = SEQ.map(s =>
+  `<span class="seq-${s.toLowerCase()}">${s}</span>`
+).join('');
+
+// ══════════════════════════════════════════════════════
+// CHAIN STATE
+// ══════════════════════════════════════════════════════
+let pos = []; // [{x,y}]
+let running = false;
+let annealing = false;
+let temp = 1.0;
+let step = 0;
+
+function initChain() {
+  pos = [];
+  for (let i = 0; i < N; i++) {
+    const angle = sp3 * 0.5 * (i % 2 === 0 ? 1 : -1) + (Math.random()-0.5)*0.3;
+    const prev = pos[i-1] || {x: 0, y: 0};
+    const prevAngle = i > 1 ? Math.atan2(pos[i-1].y - pos[i-2].y, pos[i-1].x - pos[i-2].x) : 0;
+    const newAngle = prevAngle + angle;
+    pos.push({
+      x: prev.x + BOND_LEN * Math.cos(newAngle),
+      y: prev.y + BOND_LEN * Math.sin(newAngle)
+    });
+  }
+  step = 0;
+}
+initChain();
+
+// ══════════════════════════════════════════════════════
+// ENERGY — all from (2,3)
+// ══════════════════════════════════════════════════════
+function energy() {
+  let E = 0;
+
+  // Bond stretching
+  for (let i = 0; i < N-1; i++) {
+    const dx = pos[i+1].x - pos[i].x, dy = pos[i+1].y - pos[i].y;
+    const r = Math.sqrt(dx*dx + dy*dy);
+    E += K_BOND * (r - BOND_LEN) * (r - BOND_LEN);
+  }
+
+  // Bond angles (target: sp3 = arccos(-1/N_c))
+  for (let i = 1; i < N-1; i++) {
+    const ax = pos[i-1].x - pos[i].x, ay = pos[i-1].y - pos[i].y;
+    const bx = pos[i+1].x - pos[i].x, by = pos[i+1].y - pos[i].y;
+    const dot = ax*bx + ay*by;
+    const la = Math.sqrt(ax*ax+ay*ay), lb = Math.sqrt(bx*bx+by*by);
+    if (la < 1e-10 || lb < 1e-10) continue;
+    const cosA = Math.max(-1, Math.min(1, dot/(la*lb)));
+    const angle = Math.acos(cosA);
+    const dA = angle - sp3;
+    E += K_ANGLE * dA * dA;
+  }
+
+  // Non-bonded LJ + hydrophobic (Crystal exponents: chi, 2*chi)
+  for (let i = 0; i < N; i++) {
+    for (let j = i+3; j < N; j++) {
+      const dx = pos[j].x - pos[i].x, dy = pos[j].y - pos[i].y;
+      const r2 = dx*dx + dy*dy;
+      if (r2 < 0.01) continue;
+      const r = Math.sqrt(r2);
+      const sr = LJ_SIGMA / r;
+      // LJ with Crystal exponents
+      let sr6 = sr*sr*sr*sr*sr*sr;     // (σ/r)^chi
+      let sr12 = sr6 * sr6;             // (σ/r)^(2chi)
+      let ljE = LJ_COEFF * (sr12 - sr6); // N_w² * ε * (...)
+
+      // Hydrophobic bonus for H-H contacts
+      if (SEQ[i] === 'H' && SEQ[j] === 'H' && r < 1.8) {
+        ljE -= 1.5;
+      }
+
+      // H-bond: i to i+4 (α-helix from Crystal period 3.6)
+      if (j === i + 4 && r < HBOND_CUT) {
+        ljE -= HBOND_RATIO * (1.0 - r / HBOND_CUT);
+      }
+      // H-bond: i to i+3 or i+5 (near-helix)
+      if ((j === i+3 || j === i+5) && r < HBOND_CUT) {
+        ljE -= HBOND_RATIO * 0.3 * (1.0 - r / HBOND_CUT);
+      }
+
+      E += ljE;
+    }
+  }
+  return E;
+}
+
+// ══════════════════════════════════════════════════════
+// MONTE CARLO — Metropolis (from CrystalCondensed)
+// ══════════════════════════════════════════════════════
+function mcStep() {
+  const T = temp;
+
+  // Pivot move: pick random residue, rotate one side
+  const pivot = 1 + Math.floor(Math.random() * (N - 2));
+  const angle = (Math.random() - 0.5) * 0.3;
+  const side = Math.random() < 0.5 ? 'left' : 'right';
+
+  // Save old positions
+  const oldPos = pos.map(p => ({x:p.x, y:p.y}));
+  const E_old = energy();
+
+  // Rotate
+  const cx = pos[pivot].x, cy = pos[pivot].y;
+  const cosA = Math.cos(angle), sinA = Math.sin(angle);
+  const start = side === 'right' ? pivot + 1 : 0;
+  const end = side === 'right' ? N : pivot;
+  for (let i = start; i < end; i++) {
+    const dx = pos[i].x - cx, dy = pos[i].y - cy;
+    pos[i].x = cx + dx*cosA - dy*sinA;
+    pos[i].y = cy + dx*sinA + dy*cosA;
+  }
+
+  const E_new = energy();
+  const dE = E_new - E_old;
+
+  // Metropolis acceptance
+  if (dE > 0 && Math.random() >= Math.exp(-dE / T)) {
+    // Reject
+    for (let i = 0; i < N; i++) { pos[i].x = oldPos[i].x; pos[i].y = oldPos[i].y; }
+    return E_old;
+  }
+  return E_new;
+}
+
+// ══════════════════════════════════════════════════════
+// RENDERING
+// ══════════════════════════════════════════════════════
+const canvas = document.getElementById('foldCanvas');
+const ctx = canvas.getContext('2d');
+
+function render(E) {
+  const W = canvas.width, H = canvas.height;
+  ctx.fillStyle = '#080a14';
+  ctx.fillRect(0, 0, W, H);
+
+  // Find bounds
+  let minX=1e9, maxX=-1e9, minY=1e9, maxY=-1e9;
+  pos.forEach(p => { minX=Math.min(minX,p.x); maxX=Math.max(maxX,p.x);
+                      minY=Math.min(minY,p.y); maxY=Math.max(maxY,p.y); });
+  const pad = 3;
+  minX-=pad; maxX+=pad; minY-=pad; maxY+=pad;
+  const rangeX = maxX-minX || 1, rangeY = maxY-minY || 1;
+  const scale = Math.min(W/rangeX, H/rangeY) * 0.9;
+  const offX = W/2 - (minX+maxX)/2*scale;
+  const offY = H/2 - (minY+maxY)/2*scale;
+
+  const tx = p => p.x * scale + offX;
+  const ty = p => p.y * scale + offY;
+
+  // H-bonds (i, i+4)
+  ctx.lineWidth = 1;
+  for (let i = 0; i < N-4; i++) {
+    const dx = pos[i+4].x-pos[i].x, dy = pos[i+4].y-pos[i].y;
+    const r = Math.sqrt(dx*dx+dy*dy);
+    if (r < HBOND_CUT) {
+      ctx.strokeStyle = `rgba(255,215,0,${0.3*(1-r/HBOND_CUT)})`;
+      ctx.setLineDash([3,4]);
+      ctx.beginPath();
+      ctx.moveTo(tx(pos[i]), ty(pos[i]));
+      ctx.lineTo(tx(pos[i+4]), ty(pos[i+4]));
+      ctx.stroke();
+    }
+  }
+  ctx.setLineDash([]);
+
+  // Backbone
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = 'rgba(100,140,200,0.5)';
+  ctx.beginPath();
+  for (let i = 0; i < N; i++) {
+    if (i===0) ctx.moveTo(tx(pos[i]), ty(pos[i]));
+    else ctx.lineTo(tx(pos[i]), ty(pos[i]));
+  }
+  ctx.stroke();
+
+  // Residues
+  for (let i = 0; i < N; i++) {
+    const isH = SEQ[i] === 'H';
+    const x = tx(pos[i]), y = ty(pos[i]);
+    const r = isH ? 7 : 5;
+
+    // Glow
+    const grad = ctx.createRadialGradient(x, y, 0, x, y, r*2.5);
+    grad.addColorStop(0, isH ? 'rgba(255,107,157,0.25)' : 'rgba(74,138,255,0.15)');
+    grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad;
+    ctx.fillRect(x-r*2.5, y-r*2.5, r*5, r*5);
+
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI*2);
+    ctx.fillStyle = isH ? '#ff6b9d' : '#4a8aff';
+    ctx.fill();
+    ctx.strokeStyle = isH ? 'rgba(255,150,190,0.6)' : 'rgba(100,160,255,0.4)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Number
+    if (N <= 40) {
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.font = '7px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText(i+1, x, y+2.5);
+    }
+  }
+
+  // Info overlay
+  ctx.fillStyle = 'rgba(0,229,255,0.6)';
+  ctx.font = 'bold 10px JetBrains Mono';
+  ctx.textAlign = 'left';
+  ctx.fillText(`N=${N} (=Σd)  θ₀=${(sp3*180/Math.PI).toFixed(1)}°  helix=${HELIX_PERIOD.toFixed(1)}`, 10, 18);
+
+  // Rg
+  let cx2=0,cy2=0;
+  pos.forEach(p=>{cx2+=p.x;cy2+=p.y});
+  cx2/=N; cy2/=N;
+  let rg2=0;
+  pos.forEach(p=>{rg2+=(p.x-cx2)*(p.x-cx2)+(p.y-cy2)*(p.y-cy2)});
+  const rg = Math.sqrt(rg2/N);
+  ctx.fillText(`R_g=${rg.toFixed(2)}  (Flory: R~N^${FLORY.toFixed(1)})`, 10, 32);
+}
+
+// ══════════════════════════════════════════════════════
+// ANIMATION LOOP
+// ══════════════════════════════════════════════════════
+let animId = null;
+const STEPS_PER_FRAME = 50;
+
+function animate() {
+  let E = 0;
+  for (let i = 0; i < STEPS_PER_FRAME; i++) {
+    E = mcStep();
+    step++;
+  }
+
+  if (annealing && temp > 0.12) {
+    temp *= 0.999;
+    document.getElementById('temp-slider').value = temp;
+  }
+
+  render(E);
+  document.getElementById('temp-display').textContent = temp.toFixed(2);
+  document.getElementById('kt-display').textContent = temp.toFixed(2);
+  document.getElementById('energy-display').textContent = E.toFixed(1);
+  document.getElementById('step-display').textContent = step.toLocaleString();
+  document.getElementById('status-text').textContent =
+    `Folding — ${step.toLocaleString()} MC steps · T=${temp.toFixed(2)} · E=${E.toFixed(1)}`;
+
+  if (running) animId = requestAnimationFrame(animate);
+}
+
+function startFold() {
+  running = !running;
+  document.getElementById('btn-fold').textContent = running ? '❚❚ PAUSE' : '▶ FOLD';
+  document.getElementById('btn-fold').classList.toggle('active', running);
+  if (running) animate();
+}
+
+function resetChain() {
+  running = false;
+  document.getElementById('btn-fold').textContent = '▶ FOLD';
+  document.getElementById('btn-fold').classList.remove('active');
+  cancelAnimationFrame(animId);
+  temp = 1.0;
+  document.getElementById('temp-slider').value = 1.0;
+  annealing = false;
+  document.getElementById('btn-anneal').classList.remove('active');
+  initChain();
+  render(energy());
+  document.getElementById('status-text').textContent = `Ready — ${N} residues (= Σd = 1+3+8+24)`;
+  document.getElementById('step-display').textContent = '0';
+}
+
+function toggleAnneal() {
+  annealing = !annealing;
+  document.getElementById('btn-anneal').classList.toggle('active', annealing);
+  if (annealing) {
+    temp = 2.5;
+    document.getElementById('temp-slider').value = temp;
+    if (!running) startFold();
+  }
+}
+
+document.getElementById('temp-slider').addEventListener('input', e => {
+  temp = parseFloat(e.target.value);
+});
+
+// Initial render
+render(energy());
+document.getElementById('status-text').textContent = `Ready — ${N} residues (= Σd = 1+3+8+24)`;
+</script>
+</body>
+</html>

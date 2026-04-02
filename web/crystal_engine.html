@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crystal Algebra Engine — Every Integer from (N_w, N_c)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;800&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #060810;
+    color: #c0cee0;
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  .bg-grid {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  .container { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 20px; }
+  header {
+    text-align: center; padding: 40px 20px 20px;
+    border-bottom: 1px solid rgba(0,229,255,0.15);
+    margin-bottom: 30px;
+  }
+  h1 {
+    font-size: clamp(22px, 4vw, 36px); font-weight: 800;
+    letter-spacing: 6px; color: #00e5ff;
+    text-shadow: 0 0 40px rgba(0,229,255,0.3);
+    margin-bottom: 8px;
+  }
+  .subtitle { color: #3a5070; font-size: 12px; letter-spacing: 2px; }
+  .axiom {
+    margin-top: 14px; font-size: 13px; color: #5a7a9a;
+    padding: 8px 16px; display: inline-block;
+    border: 1px solid rgba(0,229,255,0.1); border-radius: 6px;
+    background: rgba(0,229,255,0.03);
+  }
+
+  /* Sliders */
+  .controls {
+    display: flex; gap: 40px; justify-content: center; align-items: center;
+    flex-wrap: wrap; margin-bottom: 30px;
+    padding: 24px; border-radius: 12px;
+    background: linear-gradient(135deg, rgba(0,229,255,0.04), rgba(255,107,157,0.04));
+    border: 1px solid rgba(0,229,255,0.1);
+  }
+  .slider-group { text-align: center; min-width: 200px; }
+  .slider-label { font-size: 11px; color: #5a7a9a; letter-spacing: 2px; margin-bottom: 6px; }
+  .slider-value {
+    font-size: 48px; font-weight: 800; line-height: 1;
+    margin: 4px 0;
+    transition: color 0.3s;
+  }
+  .slider-value.nw { color: #00e5ff; }
+  .slider-value.nc { color: #ff6b9d; }
+  .slider-origin { font-size: 10px; color: #3a5070; margin-bottom: 8px; }
+  input[type=range] {
+    -webkit-appearance: none; width: 100%; height: 6px;
+    background: rgba(255,255,255,0.08); border-radius: 3px; outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 22px; height: 22px;
+    border-radius: 50%; cursor: pointer;
+    border: 2px solid rgba(255,255,255,0.3);
+  }
+  .nw-slider::-webkit-slider-thumb { background: #00e5ff; box-shadow: 0 0 12px rgba(0,229,255,0.5); }
+  .nc-slider::-webkit-slider-thumb { background: #ff6b9d; box-shadow: 0 0 12px rgba(255,107,157,0.5); }
+
+  .lock-badge {
+    padding: 6px 16px; border-radius: 20px; font-size: 11px;
+    letter-spacing: 2px; font-weight: 600; transition: all 0.3s;
+  }
+  .lock-badge.locked {
+    background: rgba(0,255,136,0.1); border: 1px solid rgba(0,255,136,0.3);
+    color: #00ff88; box-shadow: 0 0 20px rgba(0,255,136,0.15);
+  }
+  .lock-badge.unlocked {
+    background: rgba(255,170,0,0.1); border: 1px solid rgba(255,170,0,0.3);
+    color: #ffaa00;
+  }
+
+  /* Module grid */
+  .modules { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+  .module-card {
+    background: rgba(10,14,26,0.8);
+    border: 1px solid rgba(0,229,255,0.08);
+    border-radius: 8px; padding: 16px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .module-card:hover {
+    border-color: rgba(0,229,255,0.25);
+    box-shadow: 0 0 20px rgba(0,229,255,0.05);
+  }
+  .module-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px; padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .module-name { font-size: 12px; font-weight: 600; color: #00e5ff; letter-spacing: 1px; }
+  .module-type { font-size: 9px; color: #3a5070; letter-spacing: 1px; }
+  .const-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.02);
+  }
+  .const-name { font-size: 11px; color: #7a8aaa; }
+  .const-formula { font-size: 10px; color: #4a5a7a; }
+  .const-value {
+    font-size: 14px; font-weight: 600; color: #e0e8f0;
+    transition: color 0.2s;
+    min-width: 60px; text-align: right;
+  }
+  .const-value.highlight { color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.3); }
+  .const-value.changed { color: #ffaa00; }
+
+  footer {
+    text-align: center; margin-top: 40px; padding: 20px;
+    border-top: 1px solid rgba(0,229,255,0.08);
+    font-size: 10px; color: #2a3a4a; letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="container">
+<header>
+  <h1>ALGEBRA ENGINE</h1>
+  <div class="subtitle">DRAG THE INTEGERS — WATCH PHYSICS CHANGE</div>
+  <div class="axiom">A_F = ℂ ⊕ M<sub>N_w</sub>(ℂ) ⊕ M<sub>N_c</sub>(ℂ)</div>
+</header>
+
+<div class="controls">
+  <div class="slider-group">
+    <div class="slider-label">WEAK DOUBLET</div>
+    <div class="slider-value nw" id="nw-display">2</div>
+    <div class="slider-origin">from M₂(ℂ)</div>
+    <input type="range" min="1" max="6" step="1" value="2" id="nw-slider" class="nw-slider">
+  </div>
+  <div>
+    <div class="lock-badge locked" id="lock-badge">◆ REALITY LOCK</div>
+  </div>
+  <div class="slider-group">
+    <div class="slider-label">COLOUR TRIPLET</div>
+    <div class="slider-value nc" id="nc-display">3</div>
+    <div class="slider-origin">from M₃(ℂ)</div>
+    <input type="range" min="1" max="6" step="1" value="3" id="nc-slider" class="nc-slider">
+  </div>
+</div>
+
+<div class="modules" id="modules-grid"></div>
+
+<footer>
+  Crystal Topos · A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ) · 13 dynamics modules · 198 observables · 0 free parameters
+</footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const nwSlider = $('nw-slider'), ncSlider = $('nc-slider');
+const nwDisplay = $('nw-display'), ncDisplay = $('nc-display');
+const lockBadge = $('lock-badge');
+const grid = $('modules-grid');
+
+// Reference values at N_w=2, N_c=3
+const REF = {};
+
+function compute(Nw, Nc) {
+  const chi = Nw * Nc;
+  const beta0 = (11*Nc - 2*chi) / 3;
+  const d1=1, d2=Nc, d3=Nc*Nc-1, d4=Nw*Nw*Nw*Nc;
+  const sigmaD = d1 + d2 + d3 + d4;
+  const sigmaD2 = d1*d1 + d2*d2 + d3*d3 + d4*d4;
+  const gauss = Nc*Nc + Nw*Nw;
+  const D = sigmaD + chi;
+  const CF = (Nc*Nc - 1) / (2*Nc);
+  const dColour = Nw*Nw*Nw;
+  const dMixed = Nw*Nw*Nw*Nc;
+  const kappa = Math.log(Nc) / Math.log(Nw);
+
+  return {
+    // Core invariants
+    chi, beta0, d1, d2, d3, d4, sigmaD, sigmaD2, gauss, D, CF, dColour, dMixed, kappa,
+
+    // Classical
+    forceDim: Nc - 1,
+    spaceDim: Nc,
+    phaseDim: chi,
+
+    // GR
+    precession: chi,
+    bending: Nw*Nw,
+    ISCO: chi,
+
+    // GW
+    peters: Math.pow(Nw,5) / (chi - 1 || 1),
+    chirp: (chi - 1) / Nc,
+
+    // EM
+    emComponents: chi,
+    maxwell: Nc + 1,
+
+    // Friedmann
+    omegaL: gauss / (gauss + chi),
+    omegaM: chi / (gauss + chi),
+
+    // NBody
+    octreeChildren: dColour,
+
+    // Thermo
+    ljAtt: chi,
+    ljRep: 2 * chi,
+    ljForce: dMixed,
+    gammaMono: (chi - 1) / Nc,
+    gammaDi: (chi + 1) / (chi - 1 || 1),
+
+    // CFD
+    d2q9: Nc * Nc,
+    kolmogorov: -(chi - 1) / Nc,
+    stokes: dMixed,
+    vonKarman: Nw / (chi - 1 || 1),
+
+    // Decay
+    betaConst: dMixed * dColour,
+    sin2tw: Nc / gauss,
+    sin2t23: chi / (2*chi - 1 || 1),
+
+    // Optics
+    nWater: CF,
+    nGlass: Nc / Nw,
+    rayleighLam: Nw * Nw,
+    rayleighSize: chi,
+    planckExp: chi - 1,
+
+    // MD
+    bondAngle: Math.acos(-1/Nc) * 180 / Math.PI,
+    hbondAT: Nw,
+    hbondGC: Nc,
+    helix: (Nc*Nc*Nw) / (chi - 1 || 1),
+    flory: Nw / (chi - 1 || 1),
+    coulombExp: Nc - 1,
+
+    // Condensed
+    zSquare: Nw * Nw,
+    zCubic: chi,
+    isingStates: Nw,
+    critBeta: 1 / (Nw*Nw*Nw),
+    onsagerTc: Nw > 0 ? Nw / Math.log(1 + Math.sqrt(Nw)) : 0,
+    bcsRatio: Nw * Math.PI / Math.exp(0.5772156649),
+    groundE: -Nw,
+
+    // Plasma
+    mhdStates: dColour,
+    waveTypes: Nc,
+    propModes: chi,
+    nonProp: Nw,
+  };
+}
+
+const modules = [
+  { name: "CORE INVARIANTS", type: "A_F ATOMS", constants: [
+    { key: "chi", label: "χ", formula: "N_w × N_c" },
+    { key: "beta0", label: "β₀", formula: "(11N_c−2χ)/3" },
+    { key: "sigmaD", label: "Σd", formula: "d₁+d₂+d₃+d₄" },
+    { key: "D", label: "D (tower)", formula: "Σd + χ" },
+    { key: "gauss", label: "gauss", formula: "N_c² + N_w²" },
+    { key: "CF", label: "C_F", formula: "(N_c²−1)/(2N_c)" },
+  ]},
+  { name: "CLASSICAL", type: "Störmer-Verlet", constants: [
+    { key: "forceDim", label: "force dim", formula: "N_c − 1" },
+    { key: "spaceDim", label: "space dim", formula: "N_c" },
+    { key: "phaseDim", label: "phase dim", formula: "χ" },
+  ]},
+  { name: "GR", type: "Schwarzschild", constants: [
+    { key: "precession", label: "precession", formula: "χ" },
+    { key: "bending", label: "bending", formula: "N_w²" },
+    { key: "ISCO", label: "ISCO", formula: "χ" },
+  ]},
+  { name: "GW", type: "Inspiral", constants: [
+    { key: "peters", label: "Peters", formula: "N_w⁵/(χ−1)" },
+    { key: "chirp", label: "chirp", formula: "(χ−1)/N_c" },
+  ]},
+  { name: "EM", type: "Yee FDTD", constants: [
+    { key: "emComponents", label: "field comp.", formula: "χ" },
+    { key: "maxwell", label: "Maxwell eq.", formula: "N_c + 1" },
+  ]},
+  { name: "FRIEDMANN", type: "Cosmology ODE", constants: [
+    { key: "omegaL", label: "Ω_Λ", formula: "gauss/(gauss+χ)" },
+    { key: "omegaM", label: "Ω_m", formula: "χ/(gauss+χ)" },
+  ]},
+  { name: "THERMO", type: "Velocity Verlet", constants: [
+    { key: "ljAtt", label: "LJ attract", formula: "χ" },
+    { key: "ljRep", label: "LJ repulse", formula: "2χ" },
+    { key: "ljForce", label: "LJ force", formula: "d_mixed" },
+    { key: "gammaMono", label: "γ_mono", formula: "(χ−1)/N_c" },
+  ]},
+  { name: "CFD", type: "Lattice Boltzmann", constants: [
+    { key: "d2q9", label: "D2Q9", formula: "N_c²" },
+    { key: "kolmogorov", label: "Kolmogorov", formula: "−(χ−1)/N_c" },
+    { key: "stokes", label: "Stokes", formula: "d_mixed" },
+  ]},
+  { name: "DECAY", type: "Monte Carlo", constants: [
+    { key: "betaConst", label: "β decay", formula: "d_mix × d_col" },
+    { key: "sin2tw", label: "sin²θ_W", formula: "N_c/gauss" },
+    { key: "sin2t23", label: "sin²θ₂₃", formula: "χ/(2χ−1)" },
+  ]},
+  { name: "OPTICS", type: "Snell + Fresnel", constants: [
+    { key: "nWater", label: "n_water", formula: "C_F" },
+    { key: "nGlass", label: "n_glass", formula: "N_c/N_w" },
+    { key: "planckExp", label: "Planck exp", formula: "χ − 1" },
+    { key: "rayleighLam", label: "Rayleigh λ", formula: "N_w²" },
+  ]},
+  { name: "MD", type: "LJ + Coulomb", constants: [
+    { key: "bondAngle", label: "bond angle°", formula: "arccos(−1/N_c)" },
+    { key: "helix", label: "helix/turn", formula: "N_c²N_w/(χ−1)" },
+    { key: "flory", label: "Flory ν", formula: "N_w/(χ−1)" },
+    { key: "coulombExp", label: "Coulomb", formula: "N_c − 1" },
+  ]},
+  { name: "CONDENSED", type: "Metropolis MC", constants: [
+    { key: "zSquare", label: "z (square)", formula: "N_w²" },
+    { key: "zCubic", label: "z (cubic)", formula: "χ" },
+    { key: "onsagerTc", label: "T_c Onsager", formula: "N_w/ln(1+√N_w)" },
+    { key: "bcsRatio", label: "BCS ratio", formula: "N_w·π/e^γ" },
+  ]},
+  { name: "PLASMA", type: "MHD = EM+CFD", constants: [
+    { key: "mhdStates", label: "MHD states", formula: "N_w³" },
+    { key: "waveTypes", label: "wave types", formula: "N_c" },
+    { key: "propModes", label: "propagating", formula: "χ" },
+    { key: "nonProp", label: "non-prop", formula: "N_w" },
+  ]},
+];
+
+function fmt(v) {
+  if (!isFinite(v)) return "—";
+  if (Number.isInteger(v)) return v.toString();
+  return Math.abs(v) < 0.001 ? v.toExponential(2) : v.toFixed(4);
+}
+
+function buildGrid() {
+  grid.innerHTML = '';
+  for (const mod of modules) {
+    const card = document.createElement('div');
+    card.className = 'module-card';
+    card.innerHTML = `
+      <div class="module-header">
+        <span class="module-name">${mod.name}</span>
+        <span class="module-type">${mod.type}</span>
+      </div>
+      ${mod.constants.map(c => `
+        <div class="const-row">
+          <span>
+            <span class="const-name">${c.label}</span>
+            <span class="const-formula"> = ${c.formula}</span>
+          </span>
+          <span class="const-value" id="val-${c.key}">${fmt(REF[c.key])}</span>
+        </div>
+      `).join('')}
+    `;
+    grid.appendChild(card);
+  }
+}
+
+function update() {
+  const Nw = parseInt(nwSlider.value);
+  const Nc = parseInt(ncSlider.value);
+  nwDisplay.textContent = Nw;
+  ncDisplay.textContent = Nc;
+
+  const isReal = Nw === 2 && Nc === 3;
+  lockBadge.className = 'lock-badge ' + (isReal ? 'locked' : 'unlocked');
+  lockBadge.textContent = isReal ? '◆ REALITY LOCK' : '◇ EXPLORING';
+
+  const vals = compute(Nw, Nc);
+
+  for (const mod of modules) {
+    for (const c of mod.constants) {
+      const el = document.getElementById('val-' + c.key);
+      if (!el) continue;
+      const v = vals[c.key];
+      el.textContent = fmt(v);
+      if (isReal) {
+        el.className = 'const-value highlight';
+      } else {
+        el.className = 'const-value changed';
+      }
+    }
+  }
+}
+
+// Init
+Object.assign(REF, compute(2, 3));
+buildGrid();
+update();
+
+nwSlider.addEventListener('input', update);
+ncSlider.addEventListener('input', update);
+</script>
+</body>
+</html>

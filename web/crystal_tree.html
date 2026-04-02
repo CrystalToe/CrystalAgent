@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crystal Derivation Tree — Trace Any Constant to A_F</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;800&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #060810; color: #c0cee0;
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh; overflow-x: hidden;
+  }
+  header {
+    text-align: center; padding: 30px 20px 16px;
+    border-bottom: 1px solid rgba(0,229,255,0.12);
+  }
+  h1 { font-size: clamp(20px,3.5vw,32px); font-weight: 800; letter-spacing: 5px; color: #00e5ff;
+       text-shadow: 0 0 30px rgba(0,229,255,0.25); }
+  .sub { font-size: 11px; color: #3a5070; letter-spacing: 2px; margin-top: 6px; }
+  #info-panel {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 10;
+    background: linear-gradient(180deg, transparent, #0a0e18 30%);
+    padding: 20px 20px 16px; text-align: center;
+    transition: opacity 0.3s;
+  }
+  #info-chain {
+    font-size: 14px; color: #00e5ff; margin-bottom: 4px;
+    text-shadow: 0 0 10px rgba(0,229,255,0.3);
+  }
+  #info-detail { font-size: 11px; color: #5a7a9a; }
+  .tree-container { width: 100%; overflow-x: auto; padding: 20px 0 100px; }
+  svg text { font-family: 'JetBrains Mono', monospace; }
+</style>
+</head>
+<body>
+<header>
+  <h1>DERIVATION TREE</h1>
+  <div class="sub">CLICK ANY NODE — TRACE IT BACK TO THE AXIOM</div>
+</header>
+<div class="tree-container">
+  <svg id="tree" width="1200" height="900"></svg>
+</div>
+<div id="info-panel">
+  <div id="info-chain">Click any node to trace its derivation</div>
+  <div id="info-detail">A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ) → every integer from (2, 3)</div>
+</div>
+
+<script>
+const svg = document.getElementById('tree');
+const infoChain = document.getElementById('info-chain');
+const infoDetail = document.getElementById('info-detail');
+
+// Node data: { id, label, value, formula, parent, layer, color }
+const nodes = [
+  // Layer 0: Axiom
+  { id: "af", label: "A_F", value: "ℂ⊕M₂⊕M₃", formula: "Axiom", parent: null, layer: 0, color: "#ffd700" },
+
+  // Layer 1: Inputs
+  { id: "nw", label: "N_w", value: "2", formula: "dim M₂(ℂ)", parent: "af", layer: 1, color: "#00e5ff" },
+  { id: "nc", label: "N_c", value: "3", formula: "dim M₃(ℂ)", parent: "af", layer: 1, color: "#ff6b9d" },
+
+  // Layer 2: Primary invariants
+  { id: "chi", label: "χ", value: "6", formula: "N_w × N_c", parent: "nw", layer: 2, color: "#00ff88" },
+  { id: "gauss", label: "gauss", value: "13", formula: "N_c² + N_w²", parent: "nc", layer: 2, color: "#00ff88" },
+  { id: "nw2", label: "N_w²", value: "4", formula: "N_w × N_w", parent: "nw", layer: 2, color: "#00e5ff" },
+  { id: "nc2", label: "N_c²", value: "9", formula: "N_c × N_c", parent: "nc", layer: 2, color: "#ff6b9d" },
+  { id: "dcol", label: "d_colour", value: "8", formula: "N_w³", parent: "nw", layer: 2, color: "#00e5ff" },
+
+  // Layer 3: Secondary
+  { id: "beta0", label: "β₀", value: "7", formula: "(11N_c−2χ)/3", parent: "chi", layer: 3, color: "#c0a0ff" },
+  { id: "sd", label: "Σd", value: "36", formula: "1+3+8+24", parent: "nc", layer: 3, color: "#c0a0ff" },
+  { id: "dmix", label: "d_mixed", value: "24", formula: "N_w³·N_c", parent: "dcol", layer: 3, color: "#c0a0ff" },
+  { id: "cf", label: "C_F", value: "4/3", formula: "(N_c²−1)/(2N_c)", parent: "nc2", layer: 3, color: "#c0a0ff" },
+  { id: "chim1", label: "χ−1", value: "5", formula: "N_w·N_c − 1", parent: "chi", layer: 3, color: "#c0a0ff" },
+
+  // Layer 4: Tower
+  { id: "tower", label: "D", value: "42", formula: "Σd + χ", parent: "sd", layer: 4, color: "#ffa500" },
+
+  // Layer 5: Physics constants (13 modules)
+  { id: "kolm", label: "−5/3", value: "Kolmogorov", formula: "−(χ−1)/N_c", parent: "chim1", layer: 5, color: "#4af" },
+  { id: "nwater", label: "4/3", value: "n_water", formula: "C_F", parent: "cf", layer: 5, color: "#4af" },
+  { id: "nglass", label: "3/2", value: "n_glass", formula: "N_c/N_w", parent: "nc", layer: 5, color: "#4af" },
+  { id: "planck", label: "5", value: "Planck λ exp", formula: "χ − 1", parent: "chim1", layer: 5, color: "#4af" },
+  { id: "rayl", label: "4", value: "Rayleigh λ⁻⁴", formula: "N_w²", parent: "nw2", layer: 5, color: "#4af" },
+  { id: "lj6", label: "6", value: "LJ attract", formula: "χ", parent: "chi", layer: 5, color: "#f84" },
+  { id: "lj12", label: "12", value: "LJ repulse", formula: "2χ", parent: "chi", layer: 5, color: "#f84" },
+  { id: "ljf", label: "24", value: "LJ force", formula: "d_mixed", parent: "dmix", layer: 5, color: "#f84" },
+  { id: "beta192", label: "192", value: "β decay", formula: "d_mix·d_col", parent: "dmix", layer: 5, color: "#fa4" },
+  { id: "sin2w", label: "3/13", value: "sin²θ_W", formula: "N_c/gauss", parent: "gauss", layer: 5, color: "#fa4" },
+  { id: "ising", label: "4", value: "Ising z□", formula: "N_w²", parent: "nw2", layer: 5, color: "#a8f" },
+  { id: "bcs", label: "3.53", value: "BCS ratio", formula: "N_w·π/e^γ", parent: "nw", layer: 5, color: "#a8f" },
+  { id: "mhd8", label: "8", value: "MHD states", formula: "N_w³", parent: "dcol", layer: 5, color: "#8ff" },
+  { id: "mhd3", label: "3", value: "MHD waves", formula: "N_c", parent: "nc", layer: 5, color: "#8ff" },
+  { id: "bond", label: "109.5°", value: "bond angle", formula: "arccos(−1/N_c)", parent: "nc", layer: 5, color: "#f84" },
+  { id: "helix", label: "3.6", value: "helix/turn", formula: "N_c²N_w/(χ−1)", parent: "chim1", layer: 5, color: "#f84" },
+  { id: "prec", label: "6", value: "GR precession", formula: "χ", parent: "chi", layer: 5, color: "#4f8" },
+  { id: "peters", label: "32/5", value: "GW Peters", formula: "N_w⁵/(χ−1)", parent: "chim1", layer: 5, color: "#4f8" },
+  { id: "d2q9", label: "9", value: "CFD D2Q9", formula: "N_c²", parent: "nc2", layer: 5, color: "#4af" },
+  { id: "omL", label: "13/19", value: "Ω_Λ", formula: "gauss/(gauss+χ)", parent: "gauss", layer: 5, color: "#4f8" },
+];
+
+// Layout
+const W = 1200, H = 900;
+const layerY = [60, 160, 280, 400, 520, 700];
+const layerCounts = [0,0,0,0,0,0];
+nodes.forEach(n => layerCounts[n.layer]++);
+const layerIdx = [0,0,0,0,0,0];
+
+nodes.forEach(n => {
+  const count = layerCounts[n.layer];
+  const idx = layerIdx[n.layer]++;
+  const spacing = W / (count + 1);
+  n.x = spacing * (idx + 1);
+  n.y = layerY[n.layer];
+});
+
+// Build parent lookup
+const nodeMap = {};
+nodes.forEach(n => nodeMap[n.id] = n);
+
+function getAncestors(id) {
+  const chain = [];
+  let cur = nodeMap[id];
+  while (cur) {
+    chain.unshift(cur);
+    cur = cur.parent ? nodeMap[cur.parent] : null;
+  }
+  return chain;
+}
+
+// Draw
+function render(highlighted) {
+  const hl = new Set((highlighted || []).map(n => n.id));
+
+  let html = `<defs>
+    <filter id="glow"><feGaussianBlur stdDeviation="4" result="g"/>
+      <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>`;
+
+  // Draw edges
+  nodes.forEach(n => {
+    if (!n.parent) return;
+    const p = nodeMap[n.parent];
+    const active = hl.has(n.id) && hl.has(p.id);
+    const col = active ? n.color : "rgba(60,80,120,0.2)";
+    const w = active ? 2.5 : 0.8;
+    html += `<line x1="${p.x}" y1="${p.y+16}" x2="${n.x}" y2="${n.y-16}"
+              stroke="${col}" stroke-width="${w}" ${active ? 'filter="url(#glow)"' : ''}/>`;
+  });
+
+  // Draw nodes
+  nodes.forEach(n => {
+    const active = hl.has(n.id);
+    const r = n.layer === 0 ? 28 : n.layer <= 2 ? 22 : n.layer <= 4 ? 18 : 16;
+    const opacity = highlighted ? (active ? 1 : 0.2) : 0.85;
+    const strokeW = active ? 2.5 : 1;
+
+    html += `<g style="cursor:pointer;opacity:${opacity}" data-id="${n.id}">
+      <circle cx="${n.x}" cy="${n.y}" r="${r}" fill="rgba(8,10,20,0.9)"
+        stroke="${active ? n.color : 'rgba(100,120,160,0.3)'}" stroke-width="${strokeW}"
+        ${active ? 'filter="url(#glow)"' : ''}/>
+      <text x="${n.x}" y="${n.y + (n.layer>=5 ? -1 : 1)}" text-anchor="middle"
+        dominant-baseline="middle" fill="${active ? '#fff' : n.color}"
+        font-size="${n.layer === 0 ? 13 : n.layer <= 2 ? 14 : 11}" font-weight="${n.layer <= 1 ? 800 : 600}">
+        ${n.label}
+      </text>`;
+
+    if (n.layer >= 5) {
+      html += `<text x="${n.x}" y="${n.y + 12}" text-anchor="middle"
+        fill="${active ? 'rgba(255,255,255,0.7)' : 'rgba(150,170,200,0.4)'}" font-size="8">
+        ${n.value}
+      </text>`;
+    }
+    html += `</g>`;
+  });
+
+  // Layer labels
+  const layerNames = ["AXIOM", "INPUTS", "PRIMARY", "SECONDARY", "TOWER", "PHYSICS (13 MODULES)"];
+  layerY.forEach((y, i) => {
+    html += `<text x="14" y="${y + 4}" fill="rgba(60,80,120,0.4)" font-size="9"
+      letter-spacing="2">${layerNames[i]}</text>`;
+  });
+
+  svg.innerHTML = html;
+
+  // Click handlers
+  svg.querySelectorAll('g[data-id]').forEach(g => {
+    g.addEventListener('click', () => {
+      const id = g.dataset.id;
+      const chain = getAncestors(id);
+      render(chain);
+
+      const node = nodeMap[id];
+      infoChain.innerHTML = chain.map((n,i) =>
+        `<span style="color:${n.color}">${n.label}=${n.layer===0?'axiom':n.value||n.label}</span>`
+      ).join(' → ');
+      infoDetail.textContent = `${node.label} = ${node.formula}`;
+    });
+  });
+
+  // Click background to reset
+  svg.addEventListener('click', (e) => {
+    if (e.target === svg) {
+      render(null);
+      infoChain.textContent = 'Click any node to trace its derivation';
+      infoDetail.textContent = 'A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ) → every integer from (2, 3)';
+    }
+  });
+}
+
+render(null);
+</script>
+</body>
+</html>

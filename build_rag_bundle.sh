@@ -41,7 +41,7 @@ write_header() {
 # Rendering/scattering: Planck λ⁻⁵ (χ−1=5), Rayleigh d⁶ (χ=6), Rayleigh λ⁻⁴ (N_w²=4)
 # Hologron dynamics: emergent gravity from monad ticks, V(L)∝L^(-2ln2/ln6), no F=ma
 # 13/13 dynamics modules COMPLETE: Classical→Plasma capstone (EM+CFD)
-# 346 Python checks · 235 Lean theorems · 194 Agda proofs · 0 regressions
+# 346 Python checks · 234 Lean theorems · 192 Agda proofs · 0 regressions
 # Every integrator IS a classical limit of S=W∘U. Every integer from (2,3).
 # Upload ALL 3 parts for 100% coverage. Each part works standalone for basic queries.
 

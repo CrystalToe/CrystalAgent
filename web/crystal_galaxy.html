@@ -1,0 +1,344 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Crystal Galaxy — N-Body from (2,3)</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #000; overflow: hidden; font-family: 'Courier New', monospace; }
+canvas { display: block; }
+#hud {
+  position: fixed; top: 16px; left: 16px; color: #8af; font-size: 12px;
+  text-shadow: 0 0 8px #48f; pointer-events: none; line-height: 1.6;
+  z-index: 10;
+}
+#hud .val { color: #fff; }
+#hud .crystal { color: #f8a; text-shadow: 0 0 8px #f48; }
+#title {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  color: #fff; font-size: 28px; text-align: center; pointer-events: none;
+  text-shadow: 0 0 30px #48f, 0 0 60px #28a; z-index: 20;
+  transition: opacity 2s; letter-spacing: 4px;
+}
+#title .sub { font-size: 14px; color: #8af; margin-top: 8px; letter-spacing: 2px; }
+#controls {
+  position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+  color: #456; font-size: 11px; z-index: 10; text-align: center;
+}
+#controls span { color: #68a; cursor: pointer; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="title">
+  CRYSTAL GALAXY<br>
+  <div class="sub">N-body dynamics from A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)</div>
+</div>
+<div id="hud"></div>
+<div id="controls">
+  <span onclick="reset()">[ RESET ]</span> &nbsp;
+  <span onclick="toggleTrails()">[ TRAILS ]</span> &nbsp;
+  <span onclick="togglePause()">[ PAUSE ]</span> &nbsp;
+  <span onclick="addCluster()">[ ADD CLUSTER ]</span>
+</div>
+<script>
+// ═══════════════════════════════════════════════════════════
+// CRYSTAL ATOMS — everything from (N_w, N_c) = (2, 3)
+// ═══════════════════════════════════════════════════════════
+const N_W = 2, N_C = 3;
+const CHI = N_W * N_C;           // 6
+const D_COLOUR = N_C*N_C - 1;   // 8
+const GAUSS = N_C*N_C + N_W*N_W; // 13
+const FORCE_EXP = N_C - 1;      // 2 (inverse square)
+const PHASE_DIM = 2 * N_C;      // 6 per body
+const SIGMA_D = 1+3+8+24;       // 36
+const TOWER_D = SIGMA_D + CHI;  // 42
+
+// ═══════════════════════════════════════════════════════════
+// SIMULATION STATE
+// ═══════════════════════════════════════════════════════════
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H;
+
+// Body arrays (SoA for performance)
+let px = [], py = [], pz = [];  // position (N_c = 3 components)
+let vx = [], vy = [], vz = [];  // velocity (N_c = 3 components)
+let mass = [];
+let r = [], g = [], b = [];     // colour
+let N = 0;
+
+let paused = false;
+let showTrails = true;
+let frame = 0;
+let totalE0 = 0;
+
+const DT = 0.008;
+const SOFTENING = 0.5;  // eps^2
+const G = 1.0;
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ═══════════════════════════════════════════════════════════
+// GALAXY GENERATION
+// ═══════════════════════════════════════════════════════════
+function spiral(cx, cy, cz, cvx, cvy, nStars, radius, totalMass, hue, tilt) {
+  const coreMass = totalMass * 0.4;
+  const starMass = totalMass * 0.6 / nStars;
+
+  // Central black hole
+  const idx = N;
+  px.push(cx); py.push(cy); pz.push(cz);
+  vx.push(cvx); vy.push(cvy); vz.push(0);
+  mass.push(coreMass);
+  r.push(255); g.push(255); b.push(255);
+  N++;
+
+  // Spiral arms
+  for (let i = 0; i < nStars; i++) {
+    const t = i / nStars;
+    const arm = i % N_W;  // N_w = 2 spiral arms!
+    const angle = arm * Math.PI + t * 4 * Math.PI + (Math.random()-0.5)*0.8;
+    const rad = radius * (0.05 + t * 0.95) * (0.7 + Math.random()*0.6);
+
+    // Position in disk plane
+    let sx = rad * Math.cos(angle);
+    let sy = rad * Math.sin(angle);
+    let sz = (Math.random()-0.5) * radius * 0.05;
+
+    // Tilt the disk
+    const ct = Math.cos(tilt), st = Math.sin(tilt);
+    const sy2 = sy * ct - sz * st;
+    const sz2 = sy * st + sz * ct;
+
+    // Circular velocity: v = sqrt(G*M_enc/r) — from 1/r^(N_c-1)
+    const dist = Math.sqrt(sx*sx + sy2*sy2 + sz2*sz2) + 0.01;
+    const encMass = coreMass + starMass * i * 0.5;
+    const orbV = Math.sqrt(G * encMass / dist) * (0.85 + Math.random()*0.3);
+
+    // Perpendicular velocity (in tilted plane)
+    let tvx = -orbV * Math.sin(angle);
+    let tvy = orbV * Math.cos(angle) * ct;
+    let tvz = orbV * Math.cos(angle) * st;
+
+    px.push(cx + sx); py.push(cy + sy2); pz.push(cz + sz2);
+    vx.push(cvx + tvx); vy.push(cvy + tvy); vz.push(tvz);
+    mass.push(starMass);
+
+    // Colour from hue
+    const rgb = hsl2rgb(hue + t*0.1, 0.6 + t*0.3, 0.5 + t*0.4);
+    r.push(rgb[0]); g.push(rgb[1]); b.push(rgb[2]);
+    N++;
+  }
+}
+
+function hsl2rgb(h, s, l) {
+  h = ((h % 1) + 1) % 1;
+  const a = s * Math.min(l, 1-l);
+  const f = n => { const k = (n + h*12) % 12; return l - a * Math.max(-1, Math.min(k-3, 9-k, 1)); };
+  return [Math.round(f(0)*255), Math.round(f(8)*255), Math.round(f(4)*255)];
+}
+
+function addCluster() {
+  const angle = Math.random() * Math.PI * 2;
+  const dist = 100 + Math.random() * 100;
+  spiral(
+    dist * Math.cos(angle), dist * Math.sin(angle), (Math.random()-0.5)*30,
+    -15 * Math.sin(angle), 15 * Math.cos(angle),
+    150, 40 + Math.random()*30, 800 + Math.random()*400,
+    Math.random(), Math.random()*0.5
+  );
+}
+
+function reset() {
+  px=[]; py=[]; pz=[]; vx=[]; vy=[]; vz=[]; mass=[]; r=[]; g=[]; b=[]; N=0; frame=0;
+
+  // Two colliding spiral galaxies
+  spiral(-90, -30, 0, 12, 4, 300, 55, 1200, 0.6, 0.15);      // blue galaxy
+  spiral(90, 30, 10, -12, -4, 250, 45, 900, 0.05, -0.3);     // gold galaxy
+
+  // Small dwarf
+  spiral(0, 120, -20, -2, -10, 60, 15, 200, 0.35, 0.8);
+
+  totalE0 = totalEnergy();
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, W, H);
+
+  document.getElementById('title').style.opacity = '1';
+  setTimeout(() => document.getElementById('title').style.opacity = '0', 3000);
+}
+
+// ═══════════════════════════════════════════════════════════
+// SYMPLECTIC LEAPFROG — W∘U∘W from CrystalClassical
+// Force: F = -G*m1*m2 / r^(N_c-1+1) * r_hat = -G*m*r_hat/r^3
+// This IS the monad's classical limit.
+// ═══════════════════════════════════════════════════════════
+function leapfrogTick() {
+  const eps2 = SOFTENING * SOFTENING;
+
+  // W: half-kick velocities
+  for (let i = 0; i < N; i++) {
+    let ax = 0, ay = 0, az = 0;
+    for (let j = 0; j < N; j++) {
+      if (i === j) continue;
+      const dx = px[i]-px[j], dy = py[i]-py[j], dz = pz[i]-pz[j];
+      const r2 = dx*dx + dy*dy + dz*dz + eps2;
+      const rInv = 1/Math.sqrt(r2);
+      const r3Inv = rInv * rInv * rInv;
+      const f = -G * mass[j] * r3Inv;  // -GM/r^3 (force/distance = accel/r)
+      ax += f*dx; ay += f*dy; az += f*dz;
+    }
+    vx[i] += (DT/2)*ax; vy[i] += (DT/2)*ay; vz[i] += (DT/2)*az;
+  }
+
+  // U: full drift positions
+  for (let i = 0; i < N; i++) {
+    px[i] += DT*vx[i]; py[i] += DT*vy[i]; pz[i] += DT*vz[i];
+  }
+
+  // W: half-kick velocities (recompute forces at new positions)
+  for (let i = 0; i < N; i++) {
+    let ax = 0, ay = 0, az = 0;
+    for (let j = 0; j < N; j++) {
+      if (i === j) continue;
+      const dx = px[i]-px[j], dy = py[i]-py[j], dz = pz[i]-pz[j];
+      const r2 = dx*dx + dy*dy + dz*dz + eps2;
+      const rInv = 1/Math.sqrt(r2);
+      const r3Inv = rInv * rInv * rInv;
+      const f = -G * mass[j] * r3Inv;
+      ax += f*dx; ay += f*dy; az += f*dz;
+    }
+    vx[i] += (DT/2)*ax; vy[i] += (DT/2)*ay; vz[i] += (DT/2)*az;
+  }
+}
+
+function totalEnergy() {
+  let ke = 0, pe = 0;
+  for (let i = 0; i < N; i++)
+    ke += 0.5 * mass[i] * (vx[i]*vx[i] + vy[i]*vy[i] + vz[i]*vz[i]);
+  for (let i = 0; i < N; i++)
+    for (let j = i+1; j < N; j++) {
+      const dx = px[i]-px[j], dy = py[i]-py[j], dz = pz[i]-pz[j];
+      const dist = Math.sqrt(dx*dx + dy*dy + dz*dz + SOFTENING*SOFTENING);
+      pe -= G * mass[i] * mass[j] / dist;
+    }
+  return ke + pe;
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDERING — 3D projection with glow
+// ═══════════════════════════════════════════════════════════
+const CAM_DIST = 400;
+let camAngle = 0;
+
+function render() {
+  // Fade trails
+  if (showTrails) {
+    ctx.fillStyle = 'rgba(0,0,0,0.06)';
+    ctx.fillRect(0, 0, W, H);
+  } else {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // Slow camera rotation
+  camAngle += 0.001;
+  const cosA = Math.cos(camAngle), sinA = Math.sin(camAngle);
+
+  // Sort by depth for proper rendering
+  const indices = Array.from({length: N}, (_, i) => i);
+  const depths = indices.map(i => {
+    const rx = px[i]*cosA - pz[i]*sinA;
+    const rz = px[i]*sinA + pz[i]*cosA;
+    return rz;
+  });
+  indices.sort((a, b) => depths[a] - depths[b]);
+
+  for (const i of indices) {
+    // Rotate around Y axis
+    const rx = px[i]*cosA - pz[i]*sinA;
+    const rz = px[i]*sinA + pz[i]*cosA;
+    const ry = py[i];
+
+    // Perspective projection
+    const perspective = CAM_DIST / (CAM_DIST + rz);
+    const sx = W/2 + rx * perspective * 2;
+    const sy = H/2 + ry * perspective * 2;
+
+    if (sx < -50 || sx > W+50 || sy < -50 || sy > H+50) continue;
+
+    const size = Math.max(0.5, (mass[i] > 50 ? 4 : 1.5) * perspective);
+    const brightness = Math.min(1, 0.5 + 0.5 * perspective);
+
+    // Glow
+    const cr = Math.round(r[i] * brightness);
+    const cg = Math.round(g[i] * brightness);
+    const cb = Math.round(b[i] * brightness);
+
+    if (mass[i] > 50) {
+      // Core — big glow
+      const grad = ctx.createRadialGradient(sx, sy, 0, sx, sy, size * 6);
+      grad.addColorStop(0, `rgba(${cr},${cg},${cb},0.9)`);
+      grad.addColorStop(0.3, `rgba(${cr},${cg},${cb},0.3)`);
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(sx - size*6, sy - size*6, size*12, size*12);
+    }
+
+    ctx.fillStyle = `rgba(${cr},${cg},${cb},${brightness})`;
+    ctx.beginPath();
+    ctx.arc(sx, sy, size, 0, Math.PI*2);
+    ctx.fill();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// HUD
+// ═══════════════════════════════════════════════════════════
+function updateHUD() {
+  if (frame % 30 !== 0) return;
+  const E = totalEnergy();
+  const dE = totalE0 !== 0 ? Math.abs((E - totalE0)/totalE0 * 100).toFixed(2) : '—';
+  document.getElementById('hud').innerHTML =
+    `<span class="crystal">A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)</span><br>` +
+    `Bodies: <span class="val">${N}</span> &nbsp; ` +
+    `Force: <span class="val">1/r<sup>${FORCE_EXP}</sup></span> <span class="crystal">(N_c−1=${N_C-1})</span><br>` +
+    `Phase/body: <span class="val">${PHASE_DIM}</span> <span class="crystal">(χ=${CHI})</span> &nbsp; ` +
+    `Spatial dim: <span class="val">${N_C}</span><br>` +
+    `Arms: <span class="val">${N_W}</span> <span class="crystal">(N_w=${N_W})</span> &nbsp; ` +
+    `Integrator: <span class="val">W∘U∘W</span> (symplectic leapfrog)<br>` +
+    `ΔE: <span class="val">${dE}%</span> &nbsp; ` +
+    `Frame: <span class="val">${frame}</span><br>` +
+    `<span class="crystal">Every integer from (2, 3)</span>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// MAIN LOOP
+// ═══════════════════════════════════════════════════════════
+function toggleTrails() { showTrails = !showTrails; }
+function togglePause() { paused = !paused; }
+
+function loop() {
+  if (!paused) {
+    // Sub-step for accuracy
+    leapfrogTick();
+    leapfrogTick();
+    render();
+    updateHUD();
+    frame++;
+  }
+  requestAnimationFrame(loop);
+}
+
+reset();
+loop();
+</script>
+</body>
+</html>

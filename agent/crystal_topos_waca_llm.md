@@ -282,7 +282,7 @@ equations. The monad is the source of truth. Schrödinger is its shadow.
 
 Each module: §0 A_F atoms → §1 Force law → §2 Integrator → §3-7 Physics → §8 Integer proofs → §9 Self-test.
 Every integrator IS a classical limit of S=W∘U. Zero new observables. Every integer from (2,3).
-346 Python checks · 235 Lean theorems · 194 Agda proofs · 0 regressions.
+346 Python checks · 234 Lean theorems · 192 Agda proofs · 0 regressions.
 
 | Module | Integrator | Key integers |
 |--------|-----------|-------------|
@@ -612,13 +612,13 @@ CrystalAgent/
 | Haskell modules | 36 + 13 dynamics |
 | Haskell proofs | 36/36 PASS |
 | Dynamics modules | 13/13 ALL PASS |
-| Lean theorems | 972+ |
-| Agda proofs | 787+ |
+| Lean theorems | 971+ |
+| Agda proofs | 785+ |
 | Rust tests | 527+ |
 | Python proof modules | 19+ |
 | Dynamics Python checks | 346 |
-| Dynamics Lean theorems | 235 |
-| Dynamics Agda proofs | 194 |
+| Dynamics Lean theorems | 234 |
+| Dynamics Agda proofs | 192 |
 | Gravity integer audit | 12/12 PASS |
 | First law δS/δ⟨H_A⟩ | 1.0001 ± 0.0004 |
 | VdW mean error | 3.1% vs Bondi |
