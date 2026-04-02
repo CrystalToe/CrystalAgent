@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Crystal Topos — Galaxy Collision</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #050510; color: #ccc; font-family: 'Segoe UI', system-ui, sans-serif; overflow: hidden; }
+  #ui { position: absolute; top: 12px; left: 12px; z-index: 10; }
+  h1 { font-size: 1.1em; color: #7ec8e3; letter-spacing: 2px; margin-bottom: 8px; }
+  h1 span { color: #e74c3c; }
+  .row { display: flex; gap: 8px; margin-bottom: 6px; align-items: center; }
+  button { background: #1a1a3a; border: 1px solid #3a3a6a; color: #7ec8e3; padding: 6px 14px;
+           border-radius: 6px; cursor: pointer; font-size: 0.85em; }
+  button:hover { background: #2a2a5a; }
+  button.active { background: #e74c3c; color: white; border-color: #e74c3c; }
+  .stat { background: #0a0a20; border: 1px solid #1a1a3a; border-radius: 6px; padding: 6px 10px;
+          font-size: 0.8em; font-family: monospace; }
+  .stat b { color: #7ec8e3; }
+  select { background: #1a1a3a; border: 1px solid #3a3a6a; color: #ccc; padding: 4px 8px;
+           border-radius: 4px; font-size: 0.85em; }
+  label { font-size: 0.85em; color: #888; }
+  input[type=range] { width: 100px; }
+  canvas { display: block; }
+  #crystal-badge { position: absolute; bottom: 12px; right: 12px; font-size: 0.75em; color: #444;
+                   font-family: monospace; }
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div id="ui">
+  <h1>CRYSTAL <span>TOPOS</span> — GALAXY COLLISION</h1>
+  <div class="row">
+    <button id="btn-play" class="active">▶ Play</button>
+    <button id="btn-pause">⏸ Pause</button>
+    <button id="btn-reset">↺ Reset</button>
+    <select id="preset">
+      <option value="collision">Two Galaxies (collision)</option>
+      <option value="flyby">Two Galaxies (flyby)</option>
+      <option value="three">Three Galaxies</option>
+      <option value="figure8">Figure-8 (3-body)</option>
+      <option value="solar">Solar System</option>
+    </select>
+  </div>
+  <div class="row">
+    <label>Stars/galaxy:</label>
+    <input type="range" id="slider-n" min="50" max="500" value="200" step="50">
+    <span id="lbl-n">200</span>
+    <label>Speed:</label>
+    <input type="range" id="slider-speed" min="1" max="20" value="5">
+    <span id="lbl-speed">5</span>
+  </div>
+  <div class="row">
+    <div class="stat">Step: <b id="stat-step">0</b></div>
+    <div class="stat">Bodies: <b id="stat-n">0</b></div>
+    <div class="stat">E: <b id="stat-energy">0</b></div>
+    <div class="stat">ΔE: <b id="stat-de">0%</b></div>
+  </div>
+  <div class="row">
+    <div class="stat" style="color:#555">
+      Octree: <b>N_w³ = 8</b> · Force: <b>1/r^(N_c−1)</b> · Phase: <b>χ = 6</b>/body
+    </div>
+  </div>
+</div>
+
+<div id="crystal-badge">Crystal Topos — N_w=2, N_c=3 — zero free parameters</div>
+
+<script type="module">
+// ═══════════════════════════════════════════════════════════════
+// Try WASM first, fall back to pure JS N-body
+// ═══════════════════════════════════════════════════════════════
+
+let USE_WASM = false;
+let WasmNBody;
+
+try {
+  const wasm = await import('../pkg/crystal_toe.js');
+  await wasm.default();
+  WasmNBody = wasm.WasmNBody;
+  USE_WASM = true;
+  console.log('✓ WASM engine loaded');
+} catch (e) {
+  console.warn('WASM not available, using JS fallback:', e.message);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// JS Fallback N-body engine (same physics, slower)
+// ═══════════════════════════════════════════════════════════════
+
+class JsNBody {
+  constructor(dt, eps) {
+    this.dt = dt; this.eps = eps; this.step = 0;
+    this.bx = []; this.by = []; this.bz = [];
+    this.vx = []; this.vy = []; this.vz = [];
+    this.bm = [];
+  }
+  add_body(px, py, pz, vx, vy, vz, m) {
+    this.bx.push(px); this.by.push(py); this.bz.push(pz);
+    this.vx.push(vx); this.vy.push(vy); this.vz.push(vz);
+    this.bm.push(m);
+  }
+  add_galaxy(n, totalM, rScale, cx, cy, cz, bvx, bvy, bvz) {
+    const mEach = totalM / n;
+    for (let i = 1; i <= n; i++) {
+      const fi = i / n;
+      const theta = fi * 7.13, phi = fi * 11.07;
+      const r = rScale * (Math.pow(fi, 0.33) + 0.1);
+      const x = r * Math.sin(theta) * Math.cos(phi) + cx;
+      const y = r * Math.sin(theta) * Math.sin(phi) + cy;
+      const z = r * Math.cos(theta) + cz;
+      const vs = 0.1 * Math.sqrt(totalM / (r + rScale));
+      this.add_body(x, y, z,
+        vs * Math.cos(phi + 1.5) + bvx,
+        vs * Math.sin(phi + 1.5) + bvy,
+        vs * Math.cos(theta) * 0.3 + bvz, mEach);
+    }
+  }
+  load_figure_eight() {
+    this.clear();
+    const v = 0.347111;
+    this.add_body(-1, 0, 0, v, v, 0, 1);
+    this.add_body(1, 0, 0, v, v, 0, 1);
+    this.add_body(0, 0, 0, -2*v, -2*v, 0, 1);
+  }
+  load_solar_system() {
+    this.clear();
+    const TAU = 2 * Math.PI;
+    this.add_body(0,0,0, 0,0,0, 1);
+    this.add_body(0.387,0,0, 0,TAU/0.241,0, 1.66e-7);
+    this.add_body(0.723,0,0, 0,TAU/0.615,0, 2.45e-6);
+    this.add_body(1.0,0,0, 0,TAU,0, 3e-6);
+    this.add_body(1.524,0,0, 0,TAU/1.881,0, 3.23e-7);
+  }
+  clear() {
+    this.bx=[]; this.by=[]; this.bz=[];
+    this.vx=[]; this.vy=[]; this.vz=[];
+    this.bm=[]; this.step=0;
+  }
+  tick() {
+    const n = this.bx.length;
+    const ax = new Float64Array(n), ay = new Float64Array(n), az = new Float64Array(n);
+    const eps2 = this.eps * this.eps;
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        const dx = this.bx[j]-this.bx[i], dy = this.by[j]-this.by[i], dz = this.bz[j]-this.bz[i];
+        const r2 = dx*dx + dy*dy + dz*dz + eps2;
+        const inv = 1 / (r2 * Math.sqrt(r2));
+        const fj = this.bm[j] * inv, fi = this.bm[i] * inv;
+        ax[i] += fj*dx; ay[i] += fj*dy; az[i] += fj*dz;
+        ax[j] -= fi*dx; ay[j] -= fi*dy; az[j] -= fi*dz;
+      }
+    }
+    const dt = this.dt;
+    for (let i = 0; i < n; i++) {
+      this.vx[i] += ax[i]*dt; this.vy[i] += ay[i]*dt; this.vz[i] += az[i]*dt;
+      this.bx[i] += this.vx[i]*dt; this.by[i] += this.vy[i]*dt; this.bz[i] += this.vz[i]*dt;
+    }
+    this.step++;
+  }
+  advance(steps) { for (let i = 0; i < steps; i++) this.tick(); }
+  n_bodies() { return this.bx.length; }
+  current_step() { return this.step; }
+  positions_2d() { return this.bx.map((x, i) => [x, this.by[i]]); }
+  total_energy() {
+    let ke = 0, pe = 0;
+    const n = this.bx.length, eps2 = this.eps * this.eps;
+    for (let i = 0; i < n; i++)
+      ke += 0.5 * this.bm[i] * (this.vx[i]**2 + this.vy[i]**2 + this.vz[i]**2);
+    for (let i = 0; i < n; i++)
+      for (let j = i+1; j < n; j++) {
+        const r = Math.sqrt((this.bx[i]-this.bx[j])**2+(this.by[i]-this.by[j])**2+(this.bz[i]-this.bz[j])**2+eps2);
+        pe -= this.bm[i]*this.bm[j]/r;
+      }
+    return ke + pe;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Simulation wrapper — same API for WASM or JS
+// ═══════════════════════════════════════════════════════════════
+
+let sim, E0, playing = true;
+
+function createSim(dt, eps) {
+  return USE_WASM ? new WasmNBody(dt, eps) : new JsNBody(dt, eps);
+}
+
+function setupPreset(name) {
+  const n = +document.getElementById('slider-n').value;
+  const dt = 0.005, eps = 0.05;
+  sim = createSim(dt, eps);
+
+  if (name === 'collision') {
+    sim.add_galaxy(n, 1.0, 1.0, -3, 0, 0, 0.3, 0.1, 0);
+    sim.add_galaxy(n, 0.8, 0.8, 3, 0, 0, -0.3, -0.05, 0);
+  } else if (name === 'flyby') {
+    sim.add_galaxy(n, 1.0, 1.0, -4, -2, 0, 0.2, 0.15, 0);
+    sim.add_galaxy(n, 0.6, 0.7, 4, 2, 0, -0.15, -0.1, 0);
+  } else if (name === 'three') {
+    const n3 = Math.max(30, Math.floor(n / 3));
+    sim.add_galaxy(n3, 0.8, 0.8, -3, -2, 0, 0.15, 0.2, 0);
+    sim.add_galaxy(n3, 0.6, 0.7, 3, -1, 0, -0.2, 0.1, 0);
+    sim.add_galaxy(n3, 0.5, 0.6, 0, 3, 0, 0.05, -0.2, 0);
+  } else if (name === 'figure8') {
+    sim.load_figure_eight();
+  } else if (name === 'solar') {
+    sim.load_solar_system();
+  }
+
+  E0 = sim.total_energy();
+  updateStats();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Rendering — Canvas for speed
+// ═══════════════════════════════════════════════════════════════
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let W, H;
+
+function resize() {
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = W; canvas.height = H;
+}
+window.addEventListener('resize', resize);
+resize();
+
+function draw() {
+  ctx.fillStyle = 'rgba(5, 5, 16, 0.25)';  // trail fade
+  ctx.fillRect(0, 0, W, H);
+
+  const pts = sim.positions_2d();
+  const preset = document.getElementById('preset').value;
+  const scale = (preset === 'solar') ? W * 0.3 :
+                (preset === 'figure8') ? W * 0.2 : W * 0.06;
+  const cx = W / 2, cy = H / 2;
+
+  for (let i = 0; i < pts.length; i++) {
+    const sx = cx + pts[i][0] * scale;
+    const sy = cy + pts[i][1] * scale;
+    if (sx < -10 || sx > W+10 || sy < -10 || sy > H+10) continue;
+
+    // Color: galaxy 1 = cyan, galaxy 2 = red-orange, galaxy 3 = green
+    const n = +document.getElementById('slider-n').value;
+    let r, g, b;
+    if (preset === 'figure8' || preset === 'solar') {
+      r = 180; g = 220; b = 255;
+    } else if (i < n) {
+      r = 100; g = 200; b = 255;  // cyan
+    } else if (i < 2 * n) {
+      r = 255; g = 120; b = 80;   // orange
+    } else {
+      r = 100; g = 255; b = 140;  // green
+    }
+
+    ctx.fillStyle = `rgba(${r},${g},${b},0.9)`;
+    ctx.beginPath();
+    ctx.arc(sx, sy, 1.2, 0, 6.283);
+    ctx.fill();
+  }
+}
+
+function updateStats() {
+  const step = USE_WASM ? sim.current_step() : sim.step;
+  const nb = USE_WASM ? sim.n_bodies() : sim.bx.length;
+  const E = sim.total_energy();
+  const de = E0 !== 0 ? Math.abs((E - E0) / E0 * 100) : 0;
+  document.getElementById('stat-step').textContent = step;
+  document.getElementById('stat-n').textContent = nb;
+  document.getElementById('stat-energy').textContent = E.toFixed(4);
+  document.getElementById('stat-de').textContent = de.toFixed(2) + '%';
+  document.getElementById('stat-de').style.color = de < 1 ? '#2ecc71' : de < 5 ? '#f39c12' : '#e74c3c';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Animation loop
+// ═══════════════════════════════════════════════════════════════
+
+function loop() {
+  if (playing) {
+    const speed = +document.getElementById('slider-speed').value;
+    sim.advance(speed);
+    draw();
+    if (sim.current_step() % 10 < speed) updateStats();
+  }
+  requestAnimationFrame(loop);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Controls
+// ═══════════════════════════════════════════════════════════════
+
+document.getElementById('btn-play').onclick = () => {
+  playing = true;
+  document.getElementById('btn-play').classList.add('active');
+  document.getElementById('btn-pause').classList.remove('active');
+};
+document.getElementById('btn-pause').onclick = () => {
+  playing = false;
+  document.getElementById('btn-pause').classList.add('active');
+  document.getElementById('btn-play').classList.remove('active');
+};
+document.getElementById('btn-reset').onclick = () => {
+  ctx.fillStyle = '#050510'; ctx.fillRect(0, 0, W, H);
+  setupPreset(document.getElementById('preset').value);
+};
+document.getElementById('preset').onchange = () => {
+  ctx.fillStyle = '#050510'; ctx.fillRect(0, 0, W, H);
+  setupPreset(document.getElementById('preset').value);
+};
+document.getElementById('slider-n').oninput = function() {
+  document.getElementById('lbl-n').textContent = this.value;
+};
+document.getElementById('slider-speed').oninput = function() {
+  document.getElementById('lbl-speed').textContent = this.value;
+};
+
+// ═══════════════════════════════════════════════════════════════
+// Start
+// ═══════════════════════════════════════════════════════════════
+
+setupPreset('collision');
+loop();
+</script>
+</body>
+</html>
