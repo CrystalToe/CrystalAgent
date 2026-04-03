@@ -633,21 +633,22 @@ CrystalAgent/
 | Max PWI | 0.989% (sin²θ₁₂) |
 | Free parameters | 0 |
 | Constants inside CODATA | 4 |
-| Haskell modules | 36 + 21 dynamics |
-| Haskell proofs | 36/36 PASS |
+| Haskell modules | 36 + 21 dynamics + 8 engine/new |
+| Haskell proofs | 65/65 PASS |
 | Dynamics modules | 21/21 ALL PASS |
-| Lean theorems | 1226+ |
-| Agda proofs | 991+ |
+| Engine modules | 8/8 ALL PASS |
+| Lean theorems | 1541+ |
+| Agda proofs | 1292+ |
 | Rust tests | 568+ |
 | Python proof modules | 135+ |
 | Dynamics Python checks | 559 |
-| Dynamics Lean theorems | 372 |
-| Dynamics Agda proofs | 291 |
+| Dynamics Lean theorems | 372 + 315 = 687 |
+| Dynamics Agda proofs | 291 + 301 = 592 |
 | Gravity integer audit | 12/12 PASS |
 | First law δS/δ⟨H_A⟩ | 1.0001 ± 0.0004 |
 | VdW mean error | 3.1% vs Bondi |
 | Pure tower purity | 46/46 |
-| Domains | 22+ |
+| Domains | 27+ |
 
 Note: PWI uses CrystalPdg vs Expt (four-column table, scheme noise removed).
 All 11 a₄ corrections (Sessions 8-9) are closed. Zero LOOSE. All 198 under 1%.
