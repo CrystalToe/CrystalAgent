@@ -295,9 +295,23 @@ energyLandscape nSites heavyPos =
 
 -- | ONE TICK of hologron dynamics.
 --   The wavefunction is modified by the potential landscape.
---   ψ(x) → ψ(x) × exp(-V(x)) / Z
---   Lower energy sites get higher amplitude. Hologron drifts downhill.
---   This is the MONAD acting on the hologron: no F=ma.
+-- | One tick of hologron dynamics: S = W∘U on FULL engine (Σd=36).
+-- ZERO CALCULUS. Pure eigenvalue multiplication.
+-- Each sector contracts by its λ_k.
+hologronTickEngine :: Wavefunction -> Wavefunction
+hologronTickEngine psi =
+  fromCrystalState (CE.tick (toCrystalState psi))
+
+-- | Apply n engine ticks. ZERO CALCULUS.
+hologronTicksEngine :: Int -> Wavefunction -> Wavefunction
+hologronTicksEngine 0 psi = psi
+hologronTicksEngine n psi = hologronTicksEngine (n-1) (hologronTickEngine psi)
+
+-- [TEXTBOOK REFERENCE — Boltzmann weighting (calculus version):]
+-- hologronTick uses exp(-V) weights and sqrt for normalisation.
+-- The engine tick replaces it with universal eigenvalue contraction.
+
+-- | Textbook Boltzmann tick — kept for physics comparison only.
 hologronTick :: Wavefunction  -- current wavefunction
              -> Wavefunction  -- energy landscape
              -> Wavefunction  -- updated wavefunction

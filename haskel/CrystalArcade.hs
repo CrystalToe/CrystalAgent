@@ -127,7 +127,23 @@ ljWCA r
   | r > wcaCutoff = 0.0
   | otherwise     = ljExact r + 1.0  -- shift so V(r_min) = 0
 
+-- | One tick of 1D dynamics: S = W∘U on weak⊕colour sector.
+-- ZERO CALCULUS. Pure eigenvalue multiplication.
+-- Position (weak) contracts by λ_weak = 1/2.
+-- Velocity (colour) contracts by λ_colour = 1/3.
+arcadeTick :: (Double, Double) -> (Double, Double)
+arcadeTick = fromCrystalState . tick . toCrystalState
+
+-- | Evolve via engine. ZERO CALCULUS.
+arcadeEvolve :: Int -> (Double, Double) -> [(Double, Double)]
+arcadeEvolve n pv0 = take (n + 1) $ iterate arcadeTick pv0
+
+-- [TEXTBOOK REFERENCE — Euler/Verlet integrators:]
+-- eulerStep, verletStep implement classical ODE integration.
+-- The engine tick replaces them with universal eigenvalue contraction.
+
 -- | Euler integrator: x' = x + v*dt (order d_1 = 1).
+-- TEXTBOOK — kept for physics comparison only.
 eulerStep :: Double -> Double -> Double -> Double
 eulerStep x v dt = x + v * dt
 

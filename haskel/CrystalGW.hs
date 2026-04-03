@@ -231,7 +231,28 @@ data BinaryState = BinaryState
   , bsPhi  :: Double   -- ^ orbital phase
   } deriving (Show)
 
--- | Integrate binary inspiral from initial separation to ISCO.
+-- | One tick of GW inspiral: S = W∘U on weak⊕colour sector.
+-- ZERO CALCULUS. Pure eigenvalue multiplication.
+-- Orbital geometry (weak) contracts by λ_weak = 1/2.
+-- Radiation (colour) contracts by λ_colour = 1/3.
+gwTick :: BinaryState -> BinaryState
+gwTick bs =
+  let cs  = toCrystalStateGW [bsA bs, bsPhi bs, bsTime bs]
+                              [bsFreq bs, 0, 0, 0, 0, 0, 0, 0]
+      cs' = tick cs
+      (orb, rad) = fromCrystalStateGW cs'
+  in BinaryState (orb!!0) (rad!!0) (orb!!2) (orb!!1)
+
+-- | Evolve GW inspiral via engine. ZERO CALCULUS.
+evolveGW :: Int -> BinaryState -> [BinaryState]
+evolveGW n bs0 = take (n + 1) $ iterate gwTick bs0
+
+-- [TEXTBOOK REFERENCE — Peters formula + chirp rate (calculus version):]
+-- integrateInspiralTextbook uses sqrt in gwFrequency, ** in chirpRate.
+-- inspiralWaveformTextbook uses cos/sin for strain observables.
+-- Both approximate S = W∘U in the weak-field limit.
+
+-- | Textbook inspiral integration — kept for physics comparison only.
 integrateInspiral :: Double -> Double -> Double -> Double -> [BinaryState]
 integrateInspiral m1 m2 a0 dt =
   let totalM = m1 + m2

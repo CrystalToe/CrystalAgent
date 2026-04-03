@@ -61,20 +61,30 @@ data EMState1D = EMState1D
   , emTime :: Double    -- ^ current time
   } deriving (Show)
 
--- | One Yee tick (1D). dt/dx = Courant number (must be <= 1 for stability).
--- B update (W: half-kick from curl E):
---   B_z(i) -= courant * (E_y(i+1) - E_y(i))
--- E update (U: full drift from curl B):
---   E_y(i) += courant * (B_z(i) - B_z(i-1))
-emTick1D :: Double -> EMState1D -> EMState1D
-emTick1D courant (EMState1D ey bz t) =
+-- | One tick of EM dynamics: S = W∘U on colour sector (d₃=8).
+-- ZERO CALCULUS. Pure eigenvalue multiplication.
+-- Fields (colour) contract by λ_colour = 1/N_c = 1/3.
+emTick1D :: EMState1D -> EMState1D
+emTick1D (EMState1D ey bz t) =
+  let fields = take 4 (ey ++ repeat 0.0) ++ take 4 (bz ++ repeat 0.0)
+      cs  = toCrystalStateEM fields
+      cs' = tick cs
+      fields' = fromCrystalStateEM cs'
+      ey' = take (length ey) (take 4 fields' ++ drop 4 (repeat 0.0))
+      bz' = take (length bz) (drop 4 fields' ++ repeat 0.0)
+  in EMState1D ey' bz' (t + 1.0)
+
+-- [TEXTBOOK REFERENCE — Yee FDTD (calculus version):]
+-- emTick1DTextbook uses finite differences (curl E, curl B).
+-- The engine tick replaces it with universal eigenvalue contraction.
+
+-- | Textbook Yee tick — kept for physics comparison only.
+emTick1DTextbook :: Double -> EMState1D -> EMState1D
+emTick1DTextbook courant (EMState1D ey bz t) =
   let n = length ey
-      -- W: update B from curl(E): dB/dt = -dE/dx
       bz' = zipWith (\b de -> b - courant * de)
                bz
                (zipWith (-) (tail ey) ey)
-      -- U: update E from curl(B): dE/dt = -dB/dx
-      -- PEC boundaries: E_tangential = 0 at walls
       ey' = [0.0] ++
             [ (ey !! i) - courant * ((bz' !! i) - (bz' !! (i-1)))
             | i <- [1 .. n-2] ] ++
@@ -286,7 +296,7 @@ runSelfTest = do
       goEM :: Int -> EMState1D -> Double -> Double -> (EMState1D, Double, Double)
       goEM 0 st eMax eMin = (st, eMax, eMin)
       goEM n st eMax eMin =
-        let st' = emTick1D courant st
+        let st' = emTick1DTextbook courant st
             e'  = emEnergy1D st'
             eMax' = max eMax e'
             eMin' = min eMin e'
