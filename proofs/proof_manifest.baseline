@@ -456,6 +456,44 @@ LEAN CrystalEngine.lean nuclear_magic_2
 LEAN CrystalEngine.lean nuclear_magic_8
 LEAN CrystalEngine.lean nuclear_magic_20
 LEAN CrystalEngine.lean nuclear_magic_28
+LEAN CrystalFold.lean tile_capacity
+LEAN CrystalFold.lean residue_dof
+LEAN CrystalFold.lean residues_per_tile
+LEAN CrystalFold.lean tile_fills_mixed
+LEAN CrystalFold.lean amino_acid_count
+LEAN CrystalFold.lean stop_codons
+LEAN CrystalFold.lean total_codons
+LEAN CrystalFold.lean coding_codons
+LEAN CrystalFold.lean ramachandran_num
+LEAN CrystalFold.lean ramachandran_den
+LEAN CrystalFold.lean ramachandran_cross
+LEAN CrystalFold.lean helix_num
+LEAN CrystalFold.lean helix_den
+LEAN CrystalFold.lean helix_cross
+LEAN CrystalFold.lean rise_cross
+LEAN CrystalFold.lean pitch_num
+LEAN CrystalFold.lean pitch_den
+LEAN CrystalFold.lean flory_cross
+LEAN CrystalFold.lean sheet_cross
+LEAN CrystalFold.lean eigen_order_1
+LEAN CrystalFold.lean eigen_order_2
+LEAN CrystalFold.lean eigen_order_3
+LEAN CrystalFold.lean levinthal_rails
+LEAN CrystalFold.lean sectors_count
+LEAN CrystalFold.lean fold_depth
+LEAN CrystalFold.lean hbond_at
+LEAN CrystalFold.lean hbond_gc
+LEAN CrystalFold.lean bp_per_turn
+LEAN CrystalFold.lean imp_vdw_num
+LEAN CrystalFold.lean imp_vdw_den
+LEAN CrystalFold.lean imp_hbond_num
+LEAN CrystalFold.lean imp_hbond_den
+LEAN CrystalFold.lean imp_angle_den
+LEAN CrystalFold.lean imp_angle_num
+LEAN CrystalFold.lean energy_ratio
+LEAN CrystalFold.lean tile_is_bell
+LEAN CrystalFold.lean mixed_factored
+LEAN CrystalFold.lean mixed_is_tensor
 LEAN CrystalFriedmann.lean omega_L_num
 LEAN CrystalFriedmann.lean omega_L_den
 LEAN CrystalFriedmann.lean omega_m_num
@@ -2056,7 +2094,7 @@ LEAN Main.lean id_sigma_chi_sq
 LEAN Main.lean id_sigma_d2
 LEAN Main.lean id_D_decomp
 LEAN Main.lean id_algebra_N_c
-LEAN_FILES 68
+LEAN_FILES 69
 # AGDA PROOFS
 AGDA CrystalAlphaProton.agda chi-eq
 AGDA CrystalAlphaProton.agda sigma-d-eq
@@ -2444,6 +2482,37 @@ AGDA CrystalEngine.agda nuclear-magic-2
 AGDA CrystalEngine.agda nuclear-magic-8
 AGDA CrystalEngine.agda nuclear-magic-20
 AGDA CrystalEngine.agda nuclear-magic-28
+AGDA CrystalFold.agda tile-capacity
+AGDA CrystalFold.agda residue-dof
+AGDA CrystalFold.agda tile-fills-mixed
+AGDA CrystalFold.agda amino-acid-count
+AGDA CrystalFold.agda total-codons
+AGDA CrystalFold.agda stop-codons
+AGDA CrystalFold.agda ramachandran-num
+AGDA CrystalFold.agda ramachandran-cross
+AGDA CrystalFold.agda helix-num
+AGDA CrystalFold.agda helix-den
+AGDA CrystalFold.agda helix-cross
+AGDA CrystalFold.agda rise-cross
+AGDA CrystalFold.agda flory-cross
+AGDA CrystalFold.agda sheet-cross
+AGDA CrystalFold.agda eigen-1-lt-2
+AGDA CrystalFold.agda levinthal-rails
+AGDA CrystalFold.agda fold-depth
+AGDA CrystalFold.agda hbond-at
+AGDA CrystalFold.agda hbond-gc
+AGDA CrystalFold.agda bp-turn
+AGDA CrystalFold.agda imp-vdw-num
+AGDA CrystalFold.agda imp-vdw-den
+AGDA CrystalFold.agda imp-hbond-num
+AGDA CrystalFold.agda imp-hbond-den
+AGDA CrystalFold.agda imp-angle-den
+AGDA CrystalFold.agda imp-angle-num
+AGDA CrystalFold.agda energy-ratio
+AGDA CrystalFold.agda tile-is-bell
+AGDA CrystalFold.agda mixed-tensor
+AGDA CrystalFold.agda sector-sum
+AGDA CrystalFold.agda gauss-val
 AGDA CrystalFriedmann.agda omega-L-num
 AGDA CrystalFriedmann.agda omega-den
 AGDA CrystalFriedmann.agda omega-m-num
@@ -3741,7 +3810,7 @@ AGDA CrystalZResonance.agda gauge-nw5
 AGDA CrystalZResonance.agda cross-tower
 AGDA CrystalZResonance.agda cross-state
 AGDA CrystalZResonance.agda cross-fe56
-AGDA_FILES 67
+AGDA_FILES 68
 # HASKELL MODULES
 HASKELL CrystalAlphaProton.hs
 HASKELL CrystalArcade.hs
@@ -3760,6 +3829,7 @@ HASKELL CrystalDiffusion.hs
 HASKELL CrystalDiscoveries.hs
 HASKELL CrystalEM.hs
 HASKELL CrystalEngine.hs
+HASKELL CrystalFold.hs
 HASKELL CrystalFriedmann.hs
 HASKELL CrystalFullTest.hs
 HASKELL CrystalGauge.hs
@@ -4561,8 +4631,8 @@ PYTHON toe/python/examples/thermo/thermo_lattice.py
 PYTHON toe/python/examples/thermo/thermo_lj_potential.py
 PYTHON toe/python/examples/thermo/thermo_md_simulation.py
 # SUMMARY COUNTS
-TOTAL_LEAN_THEOREMS     2057
-TOTAL_AGDA_PROOFS     1683
+TOTAL_LEAN_THEOREMS     2095
+TOTAL_AGDA_PROOFS     1714
 TOTAL_RUST_TESTS      568
-TOTAL_HASKELL_MODULES       67
+TOTAL_HASKELL_MODULES       68
 TOTAL_PYTHON_MODULES      135

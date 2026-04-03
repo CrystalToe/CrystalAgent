@@ -2506,6 +2506,27 @@ Observable count: 0 new (infrastructure). Every number from (2,3).
 
 ```
 
+## §Haskell: CrystalFold (     503 lines)
+```haskell
+{-# LANGUAGE BangPatterns #-}
+
+{- | CrystalFold.hs — Protein Folding from (2,3) v2
+
+  1. 3D GEOMETRY: dihedrals from colour sector → 3D backbone via rotations
+  2. SIDE CHAINS: Cβ centroid, 9 DOF/residue, 4×9≈36=Σd per tile
+  3. SEQUENCE-DEPENDENT: amino acid identity sets initial amplitudes
+
+  Sector layout:
+    Singlet (d=1):  bond length — λ=1 (conserved topology)
+    Weak    (d=3):  tile COM — λ=1/2 (hydrophobic collapse)
+    Colour  (d=8):  4×(φ,ψ) dihedrals — λ=1/3 (angle relaxation)
+    Mixed   (d=24): 4×(x,y,z,scX,scY,scZ) — λ=1/6 (refinement)
+
+  ghc -O2 -main-is CrystalFold CrystalFold.hs && ./CrystalFold
+-}
+
+```
+
 ## §Haskell: CrystalFriedmann (     405 lines)
 ```haskell
 
