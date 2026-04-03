@@ -10143,6 +10143,28 @@ proveRayleighWavelengthExp =
 
 ```
 
+## §Haskell: CrystalZResonance (     268 lines)
+```haskell
+
+{- | CrystalZResonance.hs - Z Boson Resonance from (2,3)
+
+  The Z peak at 91.19 GeV is the most precisely measured resonance
+  in particle physics. LEP measured it with millions of events.
+
+  Crystal prediction:
+    M_Z = v / cos(θ_W)  where v = CrystalPdg VEV
+    Γ_Z = N_c × Γ_ν + (3 + 2N_c) × Γ_l + N_c × Γ_had
+    N_ν = N_c = 3 (from invisible width - THE killer prediction)
+
+  All integers from (2,3). No fitted parameters.
+
+  Sector restriction: mixed (d=24, full EW coupling)
+
+  Compile: ghc -O2 -main-is CrystalZResonance CrystalZResonance.hs && ./CrystalZResonance
+-}
+
+```
+
 ## §Haskell: GravityDynTest (      27 lines)
 ```haskell
 
