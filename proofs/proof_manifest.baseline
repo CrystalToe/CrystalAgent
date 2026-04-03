@@ -1469,6 +1469,41 @@ LEAN CrystalTopos.lean inv_sigmaD
 LEAN CrystalTopos.lean inv_gauss
 LEAN CrystalTopos.lean inv_towerD
 LEAN CrystalTopos.lean inv_sigmaD2
+LEAN CrystalZResonance.lean weinberg_num
+LEAN CrystalZResonance.lean weinberg_den
+LEAN CrystalZResonance.lean weinberg_cross
+LEAN CrystalZResonance.lean isospin_denom
+LEAN CrystalZResonance.lean su2_doublet
+LEAN CrystalZResonance.lean su2_generators
+LEAN CrystalZResonance.lean n_nu_equals_n_c
+LEAN CrystalZResonance.lean generations
+LEAN CrystalZResonance.lean up_charge_num
+LEAN CrystalZResonance.lean up_charge_den
+LEAN CrystalZResonance.lean down_charge_den
+LEAN CrystalZResonance.lean colour_factor
+LEAN CrystalZResonance.lean gluons
+LEAN CrystalZResonance.lean flavours_below_mz
+LEAN CrystalZResonance.lean up_types
+LEAN CrystalZResonance.lean down_types
+LEAN CrystalZResonance.lean flavour_sum
+LEAN CrystalZResonance.lean w_pair
+LEAN CrystalZResonance.lean w_count
+LEAN CrystalZResonance.lean ew_gauge
+LEAN CrystalZResonance.lean lep_channels
+LEAN CrystalZResonance.lean had_channels
+LEAN CrystalZResonance.lean total_channels
+LEAN CrystalZResonance.lean beta0_val
+LEAN CrystalZResonance.lean gauss_val
+LEAN CrystalZResonance.lean bw_twelve
+LEAN CrystalZResonance.lean bw_twelve_alt
+LEAN CrystalZResonance.lean z_sector
+LEAN CrystalZResonance.lean gauge_dof
+LEAN CrystalZResonance.lean gauge_nw5
+LEAN CrystalZResonance.lean cross_tower
+LEAN CrystalZResonance.lean cross_state
+LEAN CrystalZResonance.lean cross_casimir_num
+LEAN CrystalZResonance.lean cross_casimir_den
+LEAN CrystalZResonance.lean cross_fe56
 LEAN Main.lean chi_eq
 LEAN Main.lean beta_0_eq
 LEAN Main.lean sigma_d_eq
@@ -1527,7 +1562,7 @@ LEAN Main.lean id_sigma_chi_sq
 LEAN Main.lean id_sigma_d2
 LEAN Main.lean id_D_decomp
 LEAN Main.lean id_algebra_N_c
-LEAN_FILES 45
+LEAN_FILES 46
 # AGDA PROOFS
 AGDA CrystalAlphaProton.agda chi-eq
 AGDA CrystalAlphaProton.agda sigma-d-eq
@@ -2821,7 +2856,39 @@ AGDA CrystalWavelet.agda cross-fshell
 AGDA CrystalWavelet.agda cross-tower
 AGDA CrystalWavelet.agda cross-spin
 AGDA CrystalWavelet.agda cross-mixed
-AGDA_FILES 45
+AGDA CrystalZResonance.agda weinberg-num
+AGDA CrystalZResonance.agda weinberg-den
+AGDA CrystalZResonance.agda weinberg-cross
+AGDA CrystalZResonance.agda isospin
+AGDA CrystalZResonance.agda su2-doublet
+AGDA CrystalZResonance.agda su2-generators
+AGDA CrystalZResonance.agda n-nu
+AGDA CrystalZResonance.agda generations
+AGDA CrystalZResonance.agda up-num
+AGDA CrystalZResonance.agda up-den
+AGDA CrystalZResonance.agda down-den
+AGDA CrystalZResonance.agda colour
+AGDA CrystalZResonance.agda gluons
+AGDA CrystalZResonance.agda flavours
+AGDA CrystalZResonance.agda up-types
+AGDA CrystalZResonance.agda down-types
+AGDA CrystalZResonance.agda flavour-sum
+AGDA CrystalZResonance.agda w-pair
+AGDA CrystalZResonance.agda w-count
+AGDA CrystalZResonance.agda ew-gauge
+AGDA CrystalZResonance.agda lep-channels
+AGDA CrystalZResonance.agda had-channels
+AGDA CrystalZResonance.agda total-channels
+AGDA CrystalZResonance.agda beta0-val
+AGDA CrystalZResonance.agda gauss-val
+AGDA CrystalZResonance.agda bw-twelve
+AGDA CrystalZResonance.agda z-sector
+AGDA CrystalZResonance.agda gauge-dof
+AGDA CrystalZResonance.agda gauge-nw5
+AGDA CrystalZResonance.agda cross-tower
+AGDA CrystalZResonance.agda cross-state
+AGDA CrystalZResonance.agda cross-fe56
+AGDA_FILES 46
 # HASKELL MODULES
 HASKELL CrystalAlphaProton.hs
 HASKELL CrystalArcade.hs
@@ -2886,6 +2953,7 @@ HASKELL CrystalThermo.hs
 HASKELL CrystalVEV.hs
 HASKELL CrystalWACAScan.hs
 HASKELL CrystalWavelet.hs
+HASKELL CrystalZResonance.hs
 HASKELL GravityDynTest.hs
 HASKELL Main.hs
 HASKELL WACAScanTest.hs
@@ -3640,8 +3708,8 @@ PYTHON toe/python/examples/thermo/thermo_lattice.py
 PYTHON toe/python/examples/thermo/thermo_lj_potential.py
 PYTHON toe/python/examples/thermo/thermo_md_simulation.py
 # SUMMARY COUNTS
-TOTAL_LEAN_THEOREMS     1528
-TOTAL_AGDA_PROOFS     1292
+TOTAL_LEAN_THEOREMS     1563
+TOTAL_AGDA_PROOFS     1324
 TOTAL_RUST_TESTS      568
-TOTAL_HASKELL_MODULES       66
+TOTAL_HASKELL_MODULES       67
 TOTAL_PYTHON_MODULES      135
