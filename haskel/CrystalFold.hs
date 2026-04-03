@@ -1,3 +1,4 @@
+{-# LANGUAGE BangPatterns #-}
 -- Copyright (c) 2026 Daland Montgomery
 -- SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -18,6 +19,7 @@
 
 module CrystalFold where
 
+import Data.List (foldl')
 import CrystalEngine
   ( nW, nC, chi, beta0, sigmaD, towerD, gauss
   , d1, d2, d3, d4
@@ -124,49 +126,56 @@ tileFromList :: [Residue] -> Tile
 tileFromList rs = Tile (take 4 (rs ++ repeat emptyRes))
 
 -- §5 Tile ↔ CrystalState
--- | Target dihedral angles per amino acid.
--- Helix-formers → helix angles. Breakers → extended.
--- The colour sector stores DEVIATIONS from these targets.
--- Eigenvalue contraction (1/3 per tick) shrinks deviations → native angles.
-targetPhi, targetPsi :: AminoAcid -> Double
-targetPhi aa = helixPhi * helixPropensity aa + sheetPhi * (1 - helixPropensity aa)
-targetPsi aa = helixPsi * helixPropensity aa + sheetPsi * (1 - helixPropensity aa)
+
+-- | PAIR dihedral target (strict, no intermediate list)
+targetPP :: AminoAcid -> AminoAcid -> (Double, Double)
+targetPP _   Pro = (-1.309, 2.618)
+targetPP Pro _   = (-1.047, 2.618)
+targetPP Gly _   = (-1.396, 0.0)
+targetPP aa  _   = let !hp=helixPropensity aa
+                   in (helixPhi*hp+sheetPhi*(1-hp), helixPsi*hp+sheetPsi*(1-hp))
 
 tileToCrystalState :: Tile -> CrystalState
 tileToCrystalState tile =
   let rs = tileRes tile
-      singlet = [caBondLength]
-      weak = [sum(map resX rs)/4, sum(map resY rs)/4, sum(map resZ rs)/4]
-      -- Colour: store DEVIATION from target angle
-      -- When engine contracts by 1/3, deviation shrinks → angle approaches target
-      colour = concatMap (\r ->
-        [resPhi r - targetPhi(resAA r),    -- deviation from native φ
-         resPsi r - targetPsi(resAA r)     -- deviation from native ψ
-        ]) rs                               -- 4×2 = 8
-      -- Mixed: positions + side chains, amplitude scaled by hydrophobicity
-      mixed = concatMap (\r ->
-        let h=1.0+0.5*hydrophobicity(resAA r)
+      aas = map resAA rs
+      !singlet = [caBondLength]
+      -- Hydrophobic COM
+      ws = map (\r -> 1.0 + max 0 (hydrophobicity(resAA r))) rs
+      !tw = sum ws
+      !weak = [sum(zipWith(\r w->resX r*w/tw)rs ws),
+               sum(zipWith(\r w->resY r*w/tw)rs ws),
+               sum(zipWith(\r w->resZ r*w/tw)rs ws)]
+      -- Pair targets inline
+      nexts = drop 1 aas ++ [Gly]
+      !colour = concat(zipWith3(\r a n->let(!tp,!ts)=targetPP a n
+                                       in [resPhi r-tp, resPsi r-ts]) rs aas nexts)
+      !mixed = concatMap (\r ->
+        let !h=1.0+0.5*hydrophobicity(resAA r)
         in [resX r*h, resY r*h, resZ r*h,
-            resScX r*h, resScY r*h, resScZ r*h]) rs  -- 4×6 = 24
+            resScX r*h, resScY r*h, resScZ r*h]) rs
   in singlet ++ weak ++ colour ++ mixed
 
 crystalStateToTile :: Tile -> CrystalState -> Tile
 crystalStateToTile oldTile cs =
   let aas = map resAA (tileRes oldTile)
-      bondLen = head (extractSector 0 cs)
+      !bondLen = head (extractSector 0 cs)
       [cx,cy,cz] = extractSector 1 cs
-      devs = extractSector 2 cs                -- contracted deviations
+      devs = extractSector 2 cs
       mixed = extractSector 3 cs
-      -- Reconstruct dihedrals: target + contracted deviation
-      devPairs = pairUp devs                    -- [(Δφ₁,Δψ₁), ...]
-      phiPsis = zipWith (\aa (dp,ds) ->
-        (targetPhi aa + dp, targetPsi aa + ds)) aas (devPairs ++ repeat (0,0))
-      -- Build 3D backbone from reconstructed dihedrals
+      nexts = drop 1 aas ++ [Gly]
+      devPairs = pairUp devs
+      phiPsis = zipWith3 (\a n (dp,ds)->let(!tp,!ts)=targetPP a n in(tp+dp,ts+ds))
+                         aas nexts (devPairs++repeat(0,0))
       backbone = buildBackbone bondLen (phiPsis ++ repeat (helixPhi,helixPsi))
       caPos = take 4 backbone
       oldRs = tileRes oldTile
-      ocx=sum(map resX oldRs)/4; ocy=sum(map resY oldRs)/4; ocz=sum(map resZ oldRs)/4
-      dx=cx-ocx; dy=cy-ocy; dz=cz-ocz
+      ws=map(\r->1.0+max 0(hydrophobicity(resAA r)))oldRs
+      !tw=sum ws
+      !ocx=sum(zipWith(\r w->resX r*w/tw)oldRs ws)
+      !ocy=sum(zipWith(\r w->resY r*w/tw)oldRs ws)
+      !ocz=sum(zipWith(\r w->resZ r*w/tw)oldRs ws)
+      !dx=cx-ocx; !dy=cy-ocy; !dz=cz-ocz
       nextP i = if i+1<length caPos then caPos!!(i+1)
                 else let(px,py,pz)=caPos!!i in(px+bondLen,py,pz)
       buildRes i aa =
@@ -253,6 +262,107 @@ fixBoundaries (t1:t2:rest) =
 foldN :: Int -> Chain -> Chain
 foldN 0 c = c
 foldN n c = let c'=foldStep c in c' `seq` foldN(n-1) c'
+
+-- | PRE-FOLD CONDITIONING: pull hydrophobic residues toward each other
+-- BEFORE engine ticks. Constant-force (direction only, not 1/r²) so it
+-- works at extended-chain distances (50-70 Å).
+condition :: Int -> Chain -> Chain
+condition 0 c = c
+condition n c =
+  let rs = allResidues c
+      nR = length rs
+      str = 0.3  -- Å per round per partner
+      step i ri = foldl' acc (0::Double,0::Double,0::Double) [0..nR-1]
+        where acc (!ax,!ay,!az) j
+                | abs(i-j)<=2 = (ax,ay,az)
+                | otherwise =
+                    let rj=rs!!j
+                        !d=max 1.0(residueDistance ri rj)
+                        hi=hydrophobicity(resAA ri)
+                        hj=hydrophobicity(resAA rj)
+                        -- CONSTANT FORCE: direction only, no 1/r falloff
+                        -- So it works at 50 Å just as well as 5 Å
+                        !a | hi>0.2&&hj>0.2 = str*hi*hj         -- hydrophobic attract
+                           | hi<(-0.3)&&hj<(-0.3) = str*0.15    -- polar H-bond
+                           | hi>0.2&&hj<(-0.2) = -str*0.05      -- repel mixed
+                           | hi<(-0.2)&&hj>0.2 = -str*0.05
+                           | otherwise = 0
+                    in (ax+a*(resX rj-resX ri)/d,
+                        ay+a*(resY rj-resY ri)/d,
+                        az+a*(resZ rj-resZ ri)/d)
+      displaced = zipWith(\i ri->let(!dx,!dy,!dz)=step i ri
+        in ri{resX=resX ri+dx,resY=resY ri+dy,resZ=resZ ri+dz,
+              resScX=resScX ri+dx,resScY=resScY ri+dy,resScZ=resScZ ri+dz})[0..]rs
+      c' = c{chainTiles=map tileFromList(chunksOf 4 displaced)}
+  in c' `seq` condition (n-1) c'
+
+-- | Full pipeline: condition → extract dihedrals → fold.
+-- Conditioning moves atoms via LR forces.
+-- Then we extract the new dihedrals from the 3D positions.
+-- Engine fold preserves the conditioned shape through colour sector.
+foldPipeline :: Int -> Int -> Chain -> Chain
+foldPipeline condRounds foldSteps c =
+  let !conditioned = condition condRounds c
+      !withAngles = extractDihedrals conditioned
+      !folded = foldN foldSteps withAngles
+  in folded
+
+-- | Extract backbone dihedrals from 3D Cα positions.
+-- Uses atan2 — this is INIT, not tick. Allowed.
+extractDihedrals :: Chain -> Chain
+extractDihedrals c =
+  let rs = allResidues c
+      n = length rs
+      -- Compute dihedral-like angles from consecutive Cα positions
+      -- For each residue i, compute the "virtual torsion" from
+      -- positions i-1, i, i+1 which determines local chain direction
+      newRs = zipWith (\i r ->
+        if i < 1 || i >= n-1 then r  -- endpoints keep original
+        else let r0 = rs!!(i-1); r2 = rs!!(i+1)
+                 -- Vector from previous to current
+                 dx1 = resX r - resX r0; dy1 = resY r - resY r0; dz1 = resZ r - resZ r0
+                 -- Vector from current to next
+                 dx2 = resX r2 - resX r; dy2 = resY r2 - resY r; dz2 = resZ r2 - resZ r
+                 -- Bend angle in xy-plane → maps to φ
+                 phi = atan2 (dx1*dy2 - dy1*dx2) (dx1*dx2 + dy1*dy2)
+                 -- Bend angle in xz-plane → maps to ψ
+                 psi = atan2 (dx1*dz2 - dz1*dx2) (dx1*dx2 + dz1*dz2)
+             in r { resPhi = phi, resPsi = psi }
+        ) [0..] rs
+  in c { chainTiles = map tileFromList (chunksOf 4 newRs) }
+
+-- | Long-range hydrophobic steering (post-tick version, weaker).
+longRangePass :: Chain -> Chain
+longRangePass c =
+  let rs = allResidues c
+      n = length rs
+      str = 0.2
+      step i ri = foldl' acc (0::Double,0::Double,0::Double) [0..n-1]
+        where acc (!ax,!ay,!az) j
+                | abs(i-j)<=3 = (ax,ay,az)
+                | otherwise   =
+                    let rj=rs!!j; d=max 1.0(residueDistance ri rj)
+                    in if d>2*contactCutoff then (ax,ay,az)
+                       else let hi=hydrophobicity(resAA ri)
+                                hj=hydrophobicity(resAA rj)
+                                a | hi>0&&hj>0 = str*hi*hj/d
+                                  | hi<(-0.3)&&hj<(-0.3) = str*0.3/d
+                                  | otherwise = 0
+                            in (ax+a*(resX rj-resX ri)/d,
+                                ay+a*(resY rj-resY ri)/d,
+                                az+a*(resZ rj-resZ ri)/d)
+      displaced = zipWith(\i ri->let(!dx,!dy,!dz)=step i ri
+        in ri{resX=resX ri+dx,resY=resY ri+dy,resZ=resZ ri+dz,
+              resScX=resScX ri+dx,resScY=resScY ri+dy,resScZ=resScZ ri+dz})[0..]rs
+  in c{chainTiles=map tileFromList(chunksOf 4 displaced)}
+
+-- | Fold with periodic long-range passes (every `p` steps)
+foldLR :: Int -> Int -> Chain -> Chain
+foldLR 0 _ c = c
+foldLR n p c =
+  let c1 = foldStep c
+      c2 = if n`mod`p==0 then longRangePass c1 else c1
+  in c2 `seq` foldLR (n-1) p c2
 
 -- §9 Observables
 radiusOfGyration :: Chain -> Double
