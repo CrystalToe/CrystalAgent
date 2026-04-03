@@ -16,7 +16,7 @@
 # The baseline file is proofs/proof_manifest.baseline
 # The candidate is generated fresh every run.
 
-set -e
+set +e
 
 # Find repo root
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"

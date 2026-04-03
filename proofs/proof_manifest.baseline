@@ -262,6 +262,74 @@ LEAN CrystalEM.lean gauss_e_sector
 LEAN CrystalEM.lean gauss_b_sector
 LEAN CrystalEM.lean faraday_sector
 LEAN CrystalEM.lean ampere_sector
+LEAN CrystalEngine.lean state_dim
+LEAN CrystalEngine.lean sector_singlet
+LEAN CrystalEngine.lean sector_weak
+LEAN CrystalEngine.lean sector_colour
+LEAN CrystalEngine.lean sector_mixed
+LEAN CrystalEngine.lean state_partition
+LEAN CrystalEngine.lean lambda_singlet_denom
+LEAN CrystalEngine.lean lambda_weak_denom
+LEAN CrystalEngine.lean lambda_colour_denom
+LEAN CrystalEngine.lean lambda_mixed_denom
+LEAN CrystalEngine.lean lambda_product
+LEAN CrystalEngine.lean factor_singlet
+LEAN CrystalEngine.lean factor_weak
+LEAN CrystalEngine.lean factor_colour
+LEAN CrystalEngine.lean factor_mixed
+LEAN CrystalEngine.lean classical_phase
+LEAN CrystalEngine.lean classical_pos_dim
+LEAN CrystalEngine.lean classical_force_exp
+LEAN CrystalEngine.lean classical_kepler
+LEAN CrystalEngine.lean classical_lagrange
+LEAN CrystalEngine.lean classical_verlet
+LEAN CrystalEngine.lean classical_octree
+LEAN CrystalEngine.lean em_components
+LEAN CrystalEngine.lean em_e_dim
+LEAN CrystalEngine.lean em_b_dim
+LEAN CrystalEngine.lean em_courant_denom
+LEAN CrystalEngine.lean em_maxwell
+LEAN CrystalEngine.lean em_polarizations
+LEAN CrystalEngine.lean fluid_d2q9
+LEAN CrystalEngine.lean fluid_kolmogorov_num
+LEAN CrystalEngine.lean fluid_kolmogorov_den
+LEAN CrystalEngine.lean fluid_stokes
+LEAN CrystalEngine.lean fluid_w_rest_num
+LEAN CrystalEngine.lean fluid_w_rest_den
+LEAN CrystalEngine.lean thermal_states
+LEAN CrystalEngine.lean thermal_z_square
+LEAN CrystalEngine.lean thermal_z_cubic
+LEAN CrystalEngine.lean thermal_gamma_num
+LEAN CrystalEngine.lean thermal_gamma_den
+LEAN CrystalEngine.lean thermal_gamma_di_num
+LEAN CrystalEngine.lean thermal_gamma_di_den
+LEAN CrystalEngine.lean gr_spacetime
+LEAN CrystalEngine.lean gr_16piG
+LEAN CrystalEngine.lean gr_schwarzschild
+LEAN CrystalEngine.lean gr_bekenstein
+LEAN CrystalEngine.lean gr_isco
+LEAN CrystalEngine.lean gw_quad_num
+LEAN CrystalEngine.lean gw_quad_den
+LEAN CrystalEngine.lean gw_pol
+LEAN CrystalEngine.lean gw_doubling
+LEAN CrystalEngine.lean arrow_lost_dof
+LEAN CrystalEngine.lean arrow_chi_gt_1
+LEAN CrystalEngine.lean arrow_tower
+LEAN CrystalEngine.lean lj_attractive
+LEAN CrystalEngine.lean lj_repulsive
+LEAN CrystalEngine.lean lj_force
+LEAN CrystalEngine.lean lj_potential
+LEAN CrystalEngine.lean rigid_axes
+LEAN CrystalEngine.lean rigid_quaternion
+LEAN CrystalEngine.lean rigid_inertia_dim
+LEAN CrystalEngine.lean rigid_dof
+LEAN CrystalEngine.lean rigid_sphere_num
+LEAN CrystalEngine.lean rigid_sphere_den
+LEAN CrystalEngine.lean nuclear_fe56
+LEAN CrystalEngine.lean nuclear_magic_2
+LEAN CrystalEngine.lean nuclear_magic_8
+LEAN CrystalEngine.lean nuclear_magic_20
+LEAN CrystalEngine.lean nuclear_magic_28
 LEAN CrystalFriedmann.lean omega_L_num
 LEAN CrystalFriedmann.lean omega_L_den
 LEAN CrystalFriedmann.lean omega_m_num
@@ -442,6 +510,39 @@ LEAN CrystalHierarchy.lean shared_atom_chi_m1
 LEAN CrystalHierarchy.lean cross_130
 LEAN CrystalHierarchy.lean cross_75
 LEAN CrystalHierarchy.lean denoms_distinct
+LEAN CrystalHMC.lean hmc_state_dim
+LEAN CrystalHMC.lean hmc_sectors
+LEAN CrystalHMC.lean hmc_momentum_dim
+LEAN CrystalHMC.lean hmc_momentum_is_weak
+LEAN CrystalHMC.lean hmc_leapfrog_pos
+LEAN CrystalHMC.lean hmc_leapfrog_phase
+LEAN CrystalHMC.lean hmc_verlet_order
+LEAN CrystalHMC.lean hmc_metropolis_states
+LEAN CrystalHMC.lean hmc_mixed_dim
+LEAN CrystalHMC.lean hmc_energy_singlet
+LEAN CrystalHMC.lean hmc_energy_weak
+LEAN CrystalHMC.lean hmc_energy_colour
+LEAN CrystalHMC.lean hmc_energy_mixed
+LEAN CrystalHMC.lean hmc_energy_additive
+LEAN CrystalHMC.lean hmc_gradient_factor
+LEAN CrystalHMC.lean hmc_mera_layers
+LEAN CrystalHMC.lean hmc_mera_state_per_layer
+LEAN CrystalHMC.lean hmc_mera_total
+LEAN CrystalHMC.lean hmc_lcg_mult
+LEAN CrystalHMC.lean hmc_lcg_inc
+LEAN CrystalHMC.lean hmc_lcg_exp
+LEAN CrystalHMC.lean hmc_verlet_dim
+LEAN CrystalHMC.lean hmc_phase_per_body
+LEAN CrystalHMC.lean hmc_metropolis_dim
+LEAN CrystalHMC.lean hmc_rt_four
+LEAN CrystalHMC.lean hmc_rt_eight
+LEAN CrystalHMC.lean hmc_bond
+LEAN CrystalHMC.lean hmc_no_ode
+LEAN CrystalHMC.lean hmc_no_continuum
+LEAN CrystalHMC.lean hmc_discrete_time
+LEAN CrystalHMC.lean hmc_spatial_discrete
+LEAN CrystalHMC.lean hmc_kolmogorov_num
+LEAN CrystalHMC.lean hmc_kolmogorov_den
 LEAN CrystalHologron.lean delta_singlet_arg
 LEAN CrystalHologron.lean delta_weak_arg
 LEAN CrystalHologron.lean delta_colour_arg
@@ -589,6 +690,48 @@ LEAN CrystalMonad.lean min_uncertainty
 LEAN CrystalMonad.lean tower_depth
 LEAN CrystalMonad.lean endo_count
 LEAN CrystalMonad.lean sigma_d_eq
+LEAN CrystalMonadProof.lean wedderburn_sum
+LEAN CrystalMonadProof.lean wedderburn_sigmaD
+LEAN CrystalMonadProof.lean wedderburn_d1
+LEAN CrystalMonadProof.lean wedderburn_d2
+LEAN CrystalMonadProof.lean wedderburn_d3
+LEAN CrystalMonadProof.lean wedderburn_d4
+LEAN CrystalMonadProof.lean heyting_count
+LEAN CrystalMonadProof.lean heyting_nw_sq
+LEAN CrystalMonadProof.lean truth_val_chi
+LEAN CrystalMonadProof.lean truth_val_nw
+LEAN CrystalMonadProof.lean truth_val_nc
+LEAN CrystalMonadProof.lean denom_order_1
+LEAN CrystalMonadProof.lean denom_order_2
+LEAN CrystalMonadProof.lean denom_order_3
+LEAN CrystalMonadProof.lean aut_omega_trivial
+LEAN CrystalMonadProof.lean mixed_eigenvalue_forced
+LEAN CrystalMonadProof.lean singlet_one
+LEAN CrystalMonadProof.lean weak_denom
+LEAN CrystalMonadProof.lean colour_denom
+LEAN CrystalMonadProof.lean factorisation_weak
+LEAN CrystalMonadProof.lean factorisation_colour
+LEAN CrystalMonadProof.lean factorisation_mixed
+LEAN CrystalMonadProof.lean disentanglers_per_layer
+LEAN CrystalMonadProof.lean bond_dimension
+LEAN CrystalMonadProof.lean tower_depth
+LEAN CrystalMonadProof.lean mera_consistency
+LEAN CrystalMonadProof.lean causal_fan_in
+LEAN CrystalMonadProof.lean uniqueness_aut_trivial
+LEAN CrystalMonadProof.lean uniqueness_total_order_size
+LEAN CrystalMonadProof.lean verlet_order
+LEAN CrystalMonadProof.lean yee_components
+LEAN CrystalMonadProof.lean d2q9_velocities
+LEAN CrystalMonadProof.lean metropolis_states
+LEAN CrystalMonadProof.lean octree_children
+LEAN CrystalMonadProof.lean gamma_monatomic_num
+LEAN CrystalMonadProof.lean gamma_monatomic_den
+LEAN CrystalMonadProof.lean lj_attractive
+LEAN CrystalMonadProof.lean lj_repulsive
+LEAN CrystalMonadProof.lean gw_quad_num
+LEAN CrystalMonadProof.lean gw_quad_den
+LEAN CrystalMonadProof.lean inertia_sphere_num
+LEAN CrystalMonadProof.lean inertia_sphere_den
 LEAN CrystalNoether.lean generators_eq_12
 LEAN CrystalNoether.lean noether_currents
 LEAN CrystalNoether.lean rank_drop_eq
@@ -1225,7 +1368,7 @@ LEAN Main.lean id_sigma_chi_sq
 LEAN Main.lean id_sigma_d2
 LEAN Main.lean id_D_decomp
 LEAN Main.lean id_algebra_N_c
-LEAN_FILES 36
+LEAN_FILES 39
 # AGDA PROOFS
 AGDA CrystalAlphaProton.agda chi-eq
 AGDA CrystalAlphaProton.agda sigma-d-eq
@@ -1443,6 +1586,71 @@ AGDA CrystalEM.agda stefan-exp
 AGDA CrystalEM.agda stefan-denom
 AGDA CrystalEM.agda faraday-sector
 AGDA CrystalEM.agda ampere-sector
+AGDA CrystalEngine.agda state-dim
+AGDA CrystalEngine.agda sector-singlet
+AGDA CrystalEngine.agda sector-weak
+AGDA CrystalEngine.agda sector-colour
+AGDA CrystalEngine.agda sector-mixed
+AGDA CrystalEngine.agda state-partition
+AGDA CrystalEngine.agda lambda-singlet
+AGDA CrystalEngine.agda lambda-weak
+AGDA CrystalEngine.agda lambda-colour
+AGDA CrystalEngine.agda lambda-mixed
+AGDA CrystalEngine.agda lambda-product
+AGDA CrystalEngine.agda factor-mixed
+AGDA CrystalEngine.agda classical-phase
+AGDA CrystalEngine.agda classical-pos
+AGDA CrystalEngine.agda classical-force
+AGDA CrystalEngine.agda classical-kepler
+AGDA CrystalEngine.agda classical-lagrange
+AGDA CrystalEngine.agda classical-verlet
+AGDA CrystalEngine.agda classical-octree
+AGDA CrystalEngine.agda em-components
+AGDA CrystalEngine.agda em-e
+AGDA CrystalEngine.agda em-b
+AGDA CrystalEngine.agda em-courant
+AGDA CrystalEngine.agda em-maxwell
+AGDA CrystalEngine.agda em-polarizations
+AGDA CrystalEngine.agda fluid-d2q9
+AGDA CrystalEngine.agda fluid-kolmogorov-num
+AGDA CrystalEngine.agda fluid-kolmogorov-den
+AGDA CrystalEngine.agda fluid-stokes
+AGDA CrystalEngine.agda fluid-w-rest-num
+AGDA CrystalEngine.agda fluid-w-rest-den
+AGDA CrystalEngine.agda thermal-states
+AGDA CrystalEngine.agda thermal-z-square
+AGDA CrystalEngine.agda thermal-z-cubic
+AGDA CrystalEngine.agda thermal-gamma-num
+AGDA CrystalEngine.agda thermal-gamma-den
+AGDA CrystalEngine.agda thermal-gamma-di-num
+AGDA CrystalEngine.agda thermal-gamma-di-den
+AGDA CrystalEngine.agda gr-spacetime
+AGDA CrystalEngine.agda gr-16piG
+AGDA CrystalEngine.agda gr-schwarzschild
+AGDA CrystalEngine.agda gr-bekenstein
+AGDA CrystalEngine.agda gr-isco
+AGDA CrystalEngine.agda gw-quad-num
+AGDA CrystalEngine.agda gw-quad-den
+AGDA CrystalEngine.agda gw-pol
+AGDA CrystalEngine.agda gw-doubling
+AGDA CrystalEngine.agda arrow-lost
+AGDA CrystalEngine.agda arrow-chi
+AGDA CrystalEngine.agda arrow-tower
+AGDA CrystalEngine.agda lj-attractive
+AGDA CrystalEngine.agda lj-repulsive
+AGDA CrystalEngine.agda lj-force
+AGDA CrystalEngine.agda lj-potential
+AGDA CrystalEngine.agda rigid-axes
+AGDA CrystalEngine.agda rigid-quaternion
+AGDA CrystalEngine.agda rigid-inertia
+AGDA CrystalEngine.agda rigid-dof
+AGDA CrystalEngine.agda rigid-sphere-num
+AGDA CrystalEngine.agda rigid-sphere-den
+AGDA CrystalEngine.agda nuclear-fe56
+AGDA CrystalEngine.agda nuclear-magic-2
+AGDA CrystalEngine.agda nuclear-magic-8
+AGDA CrystalEngine.agda nuclear-magic-20
+AGDA CrystalEngine.agda nuclear-magic-28
 AGDA CrystalFriedmann.agda omega-L-num
 AGDA CrystalFriedmann.agda omega-den
 AGDA CrystalFriedmann.agda omega-m-num
@@ -1572,6 +1780,39 @@ AGDA CrystalHierarchy.agda shared-2chi-m1
 AGDA CrystalHierarchy.agda shared-chi-m1
 AGDA CrystalHierarchy.agda cross-130
 AGDA CrystalHierarchy.agda cross-75
+AGDA CrystalHMC.agda hmc-state
+AGDA CrystalHMC.agda hmc-sectors
+AGDA CrystalHMC.agda hmc-momentum
+AGDA CrystalHMC.agda hmc-momentum-weak
+AGDA CrystalHMC.agda hmc-phase
+AGDA CrystalHMC.agda hmc-verlet
+AGDA CrystalHMC.agda hmc-pos
+AGDA CrystalHMC.agda hmc-states
+AGDA CrystalHMC.agda hmc-mixed
+AGDA CrystalHMC.agda hmc-e-singlet
+AGDA CrystalHMC.agda hmc-e-weak
+AGDA CrystalHMC.agda hmc-e-colour
+AGDA CrystalHMC.agda hmc-e-mixed
+AGDA CrystalHMC.agda hmc-e-additive
+AGDA CrystalHMC.agda hmc-grad-factor
+AGDA CrystalHMC.agda hmc-layers
+AGDA CrystalHMC.agda hmc-per-layer
+AGDA CrystalHMC.agda hmc-total
+AGDA CrystalHMC.agda hmc-lcg-mult
+AGDA CrystalHMC.agda hmc-lcg-inc
+AGDA CrystalHMC.agda hmc-lcg-exp
+AGDA CrystalHMC.agda hmc-verlet-dim
+AGDA CrystalHMC.agda hmc-phase-body
+AGDA CrystalHMC.agda hmc-metro-dim
+AGDA CrystalHMC.agda hmc-rt-four
+AGDA CrystalHMC.agda hmc-rt-eight
+AGDA CrystalHMC.agda hmc-bond
+AGDA CrystalHMC.agda hmc-no-ode
+AGDA CrystalHMC.agda hmc-discrete
+AGDA CrystalHMC.agda hmc-time
+AGDA CrystalHMC.agda hmc-spatial
+AGDA CrystalHMC.agda hmc-kolm-num
+AGDA CrystalHMC.agda hmc-kolm-den
 AGDA CrystalHologron.agda delta-singlet-arg
 AGDA CrystalHologron.agda delta-weak-arg
 AGDA CrystalHologron.agda delta-colour-arg
@@ -1703,6 +1944,42 @@ AGDA CrystalMonad.agda coprime
 AGDA CrystalMonad.agda tower
 AGDA CrystalMonad.agda sigma
 AGDA CrystalMonad.agda endos
+AGDA CrystalMonadProof.agda wedderburn-d1
+AGDA CrystalMonadProof.agda wedderburn-d2
+AGDA CrystalMonadProof.agda wedderburn-d3
+AGDA CrystalMonadProof.agda wedderburn-d4
+AGDA CrystalMonadProof.agda wedderburn-sum
+AGDA CrystalMonadProof.agda heyting-count
+AGDA CrystalMonadProof.agda heyting-nw-sq
+AGDA CrystalMonadProof.agda truth-chi
+AGDA CrystalMonadProof.agda truth-nw
+AGDA CrystalMonadProof.agda truth-nc
+AGDA CrystalMonadProof.agda aut-omega-size
+AGDA CrystalMonadProof.agda mixed-eigenvalue
+AGDA CrystalMonadProof.agda singlet-one
+AGDA CrystalMonadProof.agda weak-denom
+AGDA CrystalMonadProof.agda colour-denom
+AGDA CrystalMonadProof.agda mixed-denom-forced
+AGDA CrystalMonadProof.agda factorisation-mixed
+AGDA CrystalMonadProof.agda disentanglers-per-layer
+AGDA CrystalMonadProof.agda bond-dimension
+AGDA CrystalMonadProof.agda tower-depth
+AGDA CrystalMonadProof.agda mera-consistency
+AGDA CrystalMonadProof.agda causal-fan-in
+AGDA CrystalMonadProof.agda uniqueness-sectors
+AGDA CrystalMonadProof.agda verlet-order
+AGDA CrystalMonadProof.agda yee-components
+AGDA CrystalMonadProof.agda d2q9-velocities
+AGDA CrystalMonadProof.agda metropolis-states
+AGDA CrystalMonadProof.agda octree-children
+AGDA CrystalMonadProof.agda gamma-num
+AGDA CrystalMonadProof.agda gamma-den
+AGDA CrystalMonadProof.agda lj-attractive
+AGDA CrystalMonadProof.agda lj-repulsive
+AGDA CrystalMonadProof.agda gw-quad-num
+AGDA CrystalMonadProof.agda gw-quad-den
+AGDA CrystalMonadProof.agda inertia-sphere-num
+AGDA CrystalMonadProof.agda inertia-sphere-den
 AGDA CrystalNoether.agda generators-eq-12
 AGDA CrystalNoether.agda lorentz-double
 AGDA CrystalNoether.agda poincare-eq-10
@@ -2218,7 +2495,7 @@ AGDA CrystalThermo.agda carnot-num
 AGDA CrystalThermo.agda carnot-den
 AGDA CrystalThermo.agda stokes
 AGDA CrystalThermo.agda beta0-val
-AGDA_FILES 37
+AGDA_FILES 40
 # HASKELL MODULES
 HASKELL CrystalAlphaProton.hs
 HASKELL CrystalArcade.hs
@@ -2235,6 +2512,7 @@ HASKELL CrystalCrossDomain.hs
 HASKELL CrystalDecay.hs
 HASKELL CrystalDiscoveries.hs
 HASKELL CrystalEM.hs
+HASKELL CrystalEngine.hs
 HASKELL CrystalFriedmann.hs
 HASKELL CrystalFullTest.hs
 HASKELL CrystalGauge.hs
@@ -2243,6 +2521,7 @@ HASKELL CrystalGravity.hs
 HASKELL CrystalGravityDyn.hs
 HASKELL CrystalGW.hs
 HASKELL CrystalHierarchy.hs
+HASKELL CrystalHMC.hs
 HASKELL CrystalHologron.hs
 HASKELL CrystalLayer.hs
 HASKELL CrystalMandelbrot.hs
@@ -2250,6 +2529,7 @@ HASKELL CrystalMD.hs
 HASKELL CrystalMERA.hs
 HASKELL CrystalMixing.hs
 HASKELL CrystalMonad.hs
+HASKELL CrystalMonadProof.hs
 HASKELL CrystalNBody.hs
 HASKELL CrystalNoether.hs
 HASKELL CrystalNuclear.hs
@@ -3029,8 +3309,8 @@ PYTHON toe/python/examples/thermo/thermo_lattice.py
 PYTHON toe/python/examples/thermo/thermo_lj_potential.py
 PYTHON toe/python/examples/thermo/thermo_md_simulation.py
 # SUMMARY COUNTS
-TOTAL_LEAN_THEOREMS     1226
-TOTAL_AGDA_PROOFS      991
+TOTAL_LEAN_THEOREMS     1369
+TOTAL_AGDA_PROOFS     1125
 TOTAL_RUST_TESTS      568
-TOTAL_HASKELL_MODULES       58
+TOTAL_HASKELL_MODULES       61
 TOTAL_PYTHON_MODULES      135

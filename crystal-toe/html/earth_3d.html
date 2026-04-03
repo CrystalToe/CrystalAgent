@@ -1,0 +1,196 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Crystal Topos — Earth Satellite Orbits</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#000;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif}
+  #hud{position:absolute;top:0;left:0;right:0;padding:10px 16px;background:linear-gradient(180deg,rgba(0,0,0,0.8) 60%,transparent);z-index:10;pointer-events:none}
+  h1{font-size:1em;color:#7ec8e3;letter-spacing:3px}
+  h1 span{color:#e74c3c}
+  .sub{color:#444;font-size:0.65em}
+  #legend{position:absolute;top:70px;right:16px;font-family:monospace;font-size:0.6em;color:#444;line-height:1.8;z-index:10;pointer-events:none}
+  .ldot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle}
+  #stats{position:absolute;bottom:10px;left:16px;font-family:monospace;font-size:0.6em;color:#333;z-index:10}
+  #stats b{color:#5a9}
+</style>
+</head>
+<body>
+<div id="hud">
+  <h1>EARTH <span>ORBITS</span></h1>
+  <div class="sub">10 satellites — Kepler v²=GM/r where force=1/r^(N_c−1) — closed orbits from Bertrand (N_c=3) — T²∝a³</div>
+</div>
+<div id="legend"></div>
+<div id="stats">T <b id="st">0</b> hrs · Fastest orbit <b id="sf">—</b></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const RE = 5; // Earth radius in scene units
+
+const SATS = [
+  { name:'ISS',     alt:0.065, inc:0.90, phase:0.0,  color:0x7ec8e3, type:'LEO' },
+  { name:'Hubble',  alt:0.095, inc:0.50, phase:1.2,  color:0x3498db, type:'LEO' },
+  { name:'SpySat',  alt:0.050, inc:1.57, phase:2.8,  color:0xe67e22, type:'LEO' },
+  { name:'GPS-1',   alt:3.30,  inc:0.96, phase:0.0,  color:0xe74c3c, type:'MEO' },
+  { name:'GPS-2',   alt:3.30,  inc:0.96, phase:2.09, color:0xc0392b, type:'MEO' },
+  { name:'GPS-3',   alt:3.30,  inc:0.96, phase:4.19, color:0xe74c3c, type:'MEO' },
+  { name:'GEO-E',   alt:5.61,  inc:0.02, phase:0.0,  color:0x2ecc71, type:'GEO' },
+  { name:'GEO-W',   alt:5.61,  inc:0.02, phase:3.14, color:0x27ae60, type:'GEO' },
+  { name:'Molniya', alt:3.80,  inc:1.10, phase:1.5,  color:0xf1c40f, type:'HEO' },
+  { name:'Polar',   alt:1.20,  inc:1.72, phase:0.5,  color:0x9b59b6, type:'SSO' },
+];
+
+// Legend
+document.getElementById('legend').innerHTML = SATS.map(s => {
+  const c = '#' + s.color.toString(16).padStart(6,'0');
+  return `<div><span class="ldot" style="background:${c}"></span>${s.name} ${s.type}</div>`;
+}).join('');
+
+// Three.js
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 500);
+camera.position.set(0, 10, 35);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+document.body.appendChild(renderer.domElement);
+addEventListener('resize', () => { camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
+
+// Stars
+const sGeo = new THREE.BufferGeometry();
+const sp = new Float32Array(6000);
+for(let i=0;i<6000;i+=3){const th=Math.random()*6.28,ph=Math.acos(2*Math.random()-1),r=150+Math.random()*200;sp[i]=r*Math.sin(ph)*Math.cos(th);sp[i+1]=r*Math.sin(ph)*Math.sin(th);sp[i+2]=r*Math.cos(ph)}
+sGeo.setAttribute('position',new THREE.BufferAttribute(sp,3));
+scene.add(new THREE.Points(sGeo, new THREE.PointsMaterial({color:0xffffff,size:0.3})));
+
+// Earth
+const earthGeo = new THREE.SphereGeometry(RE, 64, 64);
+const earthMat = new THREE.MeshPhongMaterial({
+  color: 0x1a5276,
+  emissive: 0x050510,
+  specular: 0x333355,
+  shininess: 15,
+});
+const earth = new THREE.Mesh(earthGeo, earthMat);
+scene.add(earth);
+
+// Continents (green patches — simplified without texture)
+for (let i = 0; i < 30; i++) {
+  const lat = (Math.random()-0.5)*3, lon = Math.random()*6.28;
+  const size = 0.3 + Math.random()*0.8;
+  const cGeo = new THREE.SphereGeometry(size, 8, 8);
+  const cMat = new THREE.MeshPhongMaterial({color:0x1a6b3a, transparent:true, opacity:0.3});
+  const c = new THREE.Mesh(cGeo, cMat);
+  c.position.set(RE*Math.cos(lat)*Math.cos(lon), RE*Math.sin(lat), RE*Math.cos(lat)*Math.sin(lon));
+  earth.add(c);
+}
+
+// Atmosphere glow (two shells)
+const atmosGeo = new THREE.SphereGeometry(RE*1.08, 64, 64);
+const atmosMat = new THREE.MeshBasicMaterial({ color:0x4488cc, transparent:true, opacity:0.08, side:THREE.BackSide });
+scene.add(new THREE.Mesh(atmosGeo, atmosMat));
+const atmos2Geo = new THREE.SphereGeometry(RE*1.2, 64, 64);
+const atmos2Mat = new THREE.MeshBasicMaterial({ color:0x3366aa, transparent:true, opacity:0.03, side:THREE.BackSide });
+scene.add(new THREE.Mesh(atmos2Geo, atmos2Mat));
+
+// Lighting
+scene.add(new THREE.AmbientLight(0x111122));
+const sun = new THREE.DirectionalLight(0xffeedd, 1.0);
+sun.position.set(50, 20, 30);
+scene.add(sun);
+
+// Satellites
+const satObjs = SATS.map(s => {
+  const r = RE * (1 + s.alt);
+  const omega = Math.sqrt(1 / Math.pow(1+s.alt, 3)); // Kepler
+  
+  // Orbit ring
+  const ringGeo = new THREE.BufferGeometry();
+  const ringPts = [];
+  for (let a = 0; a <= 128; a++) {
+    const th = a/128 * Math.PI * 2;
+    const x = r * Math.cos(th);
+    const y = r * Math.sin(th) * Math.cos(s.inc);
+    const z = r * Math.sin(th) * Math.sin(s.inc);
+    ringPts.push(x, y, z);
+  }
+  ringGeo.setAttribute('position', new THREE.Float32BufferAttribute(ringPts, 3));
+  const ringMat = new THREE.LineBasicMaterial({ color: s.color, transparent: true, opacity: 0.12 });
+  scene.add(new THREE.Line(ringGeo, ringMat));
+
+  // Satellite dot
+  const dotGeo = new THREE.SphereGeometry(0.12, 8, 8);
+  const dotMat = new THREE.MeshBasicMaterial({ color: s.color });
+  const dot = new THREE.Mesh(dotGeo, dotMat);
+  scene.add(dot);
+
+  // Glow
+  const glowGeo = new THREE.SphereGeometry(0.35, 8, 8);
+  const glowMat = new THREE.MeshBasicMaterial({ color: s.color, transparent: true, opacity: 0.2 });
+  const glowDot = new THREE.Mesh(glowGeo, glowMat);
+  scene.add(glowDot);
+
+  // Trail
+  const TRAIL = 200;
+  const trailGeo = new THREE.BufferGeometry();
+  const trailPos = new Float32Array(TRAIL * 3);
+  trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPos, 3));
+  const trailMat = new THREE.LineBasicMaterial({ color: s.color, transparent: true, opacity: 0.3 });
+  const trail = new THREE.Line(trailGeo, trailMat);
+  scene.add(trail);
+
+  return { ...s, r, omega, theta: s.phase, dot, glowDot, trail, trailGeo, trailPos, trailIdx: 0 };
+});
+
+let frame = 0, time = 0;
+function animate() {
+  requestAnimationFrame(animate);
+  frame++;
+  time += 0.003;
+
+  // Earth rotation
+  earth.rotation.y += 0.002;
+
+  // Update satellites
+  satObjs.forEach(s => {
+    s.theta += s.omega * 0.015;
+    const x = s.r * Math.cos(s.theta);
+    const y = s.r * Math.sin(s.theta) * Math.cos(s.inc);
+    const z = s.r * Math.sin(s.theta) * Math.sin(s.inc);
+    s.dot.position.set(x, y, z);
+    s.glowDot.position.set(x, y, z);
+
+    // Trail
+    const ti = (s.trailIdx % 200) * 3;
+    s.trailPos[ti] = x; s.trailPos[ti+1] = y; s.trailPos[ti+2] = z;
+    s.trailIdx++;
+    s.trailGeo.attributes.position.needsUpdate = true;
+    s.trailGeo.setDrawRange(0, Math.min(s.trailIdx, 200));
+  });
+
+  // Camera
+  const ct = frame * 0.0006;
+  camera.position.x = 35 * Math.cos(ct);
+  camera.position.z = 35 * Math.sin(ct);
+  camera.position.y = 10 + 5 * Math.sin(ct * 0.3);
+  camera.lookAt(0, 0, 0);
+
+  // Sun position tracks camera slightly
+  sun.position.x = 50 * Math.cos(ct * 0.5);
+  sun.position.z = 30 * Math.sin(ct * 0.5);
+
+  // Stats
+  if (frame % 20 === 0) {
+    document.getElementById('st').textContent = (time * 240).toFixed(0);
+    document.getElementById('sf').textContent = satObjs[2].name + ' (' + (2*Math.PI/satObjs[2].omega*0.24).toFixed(0) + 'm)';
+  }
+
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>

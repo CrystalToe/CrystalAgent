@@ -1,5 +1,3 @@
-<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
-
 # Crystal Topos — RAG Knowledge Base (Part 1 of 3)
 # 198 observables · 22 domains · 0 free parameters · 4 constants inside CODATA
 # Pure spectral tower D=0→D=42 · Layer provenance in 5 languages
@@ -290,11 +288,11 @@ The algebra alone gives you integers (χ=6, β₀=7, Σd=36, D=42). To get physi
 | Wall breaches | **0** (prime wall = 4.5%) |
 | CODATA precision | **4** (α⁻¹ Δ/unc=0.12, m_p/m_e=0.04, sin²θ_W=0.07, r_p=0.0013) |
 | First law δS/δ⟨H_A⟩ | **1.0001 ± 0.0004** (χ=6 crystal) |
-| Haskell modules | **33** |
+| Haskell modules | **36 + 21 dynamics** |
 | Quantum operators | **96** |
-| Lean theorems | **763+** (native_decide) |
-| Agda proofs | **611+** (refl) |
-| Rust tests | **472+** |
+| Lean theorems | **1226+** (native_decide) |
+| Agda proofs | **991+** (refl) |
+| Rust tests | **568+** |
 
 ---
 
@@ -320,7 +318,9 @@ ghc -O2 -main-is CrystalFullTest CrystalFullTest.hs -o full_test
 sh proofs/haskell_proofs.sh    # 12/12 PASS (was 10/10)
 sh proofs/lean_proofs.sh       # 9/9 PASS (was 8/8)
 sh proofs/agda_proofs.sh       # 8/8 PASS (was 7/7)
-cd crystal-topos && cargo test # 466 PASS (was 294)
+cd crystal-topos && cargo test # Rust topos tests
+cd crystal-toe && cargo test   # Rust dynamics (538+ tests)
+cd crystal-toe && maturin develop --features python  # Python wheel
 ```
 
 ### Regression Gate
@@ -376,12 +376,17 @@ CrystalAgent/
 │   ├── CrystalTopos_RAG_1.md
 │   └── CrystalTopos_RAG_2.md
 │
-├── crystal-topos/                     ← Rust core + Python bindings
+├── crystal-topos/                     ← Rust core (topos algebra)
 │   ├── src/                           ← 11 Rust modules (+crystal_gravity_dyn.rs)
 │   ├── tests/                         ← 8 test files
 │   └── examples/                      ← 121 Python/HTML/JSX examples
-│       ├── mera_gravity_closed.py     ← S12: first law verification (NEW)
-│       └── mera_linearized_gravity.py ← S12: integer audit (NEW)
+│
+├── crystal-toe/                       ← Rust dynamics engine (PyO3 + WASM)
+│   ├── src/dynamics/                  ← 21 dynamics modules (all ported from Haskell)
+│   ├── src/py.rs                      ← Python bindings (all modules)
+│   ├── src/wasm.rs                    ← WebAssembly bindings (D3-ready)
+│   ├── python/examples/               ← 105 Python examples (21 directories)
+│   └── web/                           ← D3 dashboards, galaxy sim, photon evolution
 │
 ├── proofs/                            ← Formal proofs + runner scripts
 │   ├── haskell_proofs.sh              ← 12/12 PASS
@@ -500,11 +505,11 @@ Four independent proof systems verify the same identities:
 
 | System | Files | Count | Method |
 |--------|-------|-------|--------|
-| **GHC Haskell** | 33 `.hs` modules | 12/12 runners pass | Curry-Howard |
-| **Lean 4** | 12 `.lean` → `.olean` | **757** theorems | `native_decide` |
-| **Agda** | 11 `.agda` → `.agdai` | **603** proofs | `refl` |
-| **Rust** | 12 test files | **466** tests | `cargo test` |
-| **Python** | 13 proof modules | 24+ checks each | `assert` |
+| **GHC Haskell** | 36 + 21 dynamics `.hs` | 12/12 runners pass | Curry-Howard |
+| **Lean 4** | 36 `.lean` → `.olean` | **1226** theorems | `native_decide` |
+| **Agda** | 37 `.agda` → `.agdai` | **991** proofs | `refl` |
+| **Rust** | crystal-topos + crystal-toe | **568** tests | `cargo test` |
+| **Python** | 135 modules | 24+ checks each | `assert` |
 
 ---
 
@@ -3703,6 +3708,315 @@ Crystal routes:
 ## Dependencies
 Standalone (redefines constants internally for independence).
 
+## §Module: Engine
+
+# CrystalEngine — The Native Dynamics Engine
+
+## One Rule
+
+```
+tick = applyW . applyU
+```
+
+That's it. S = W∘U on 36 dimensions. Every textbook integrator is a sector restriction.
+
+## State Space
+
+The full state is a 36-component vector partitioned by Wedderburn:
+
+```
+[1] ⊕ [3] ⊕ [8] ⊕ [24]  =  singlet ⊕ weak ⊕ colour ⊕ mixed  =  Σd = 36
+```
+
+Each sector contracts at its eigenvalue per tick:
+
+| Sector | Dim | λ | √λ (W) | √λ (U) | Physics |
+|--------|-----|---|--------|--------|---------|
+| Singlet | 1 | 1 | 1 | 1 | Dark matter, photon (immortal) |
+| Weak | 3 | 1/2 | 1/√2 | 1/√2 | Positions, Higgs |
+| Colour | 8 | 1/3 | 1/√3 | 1/√3 | Momenta, gluons |
+| Mixed | 24 | 1/6 | 1/√6 | 1/√6 | Full SM coupling |
+
+λ_mixed = λ_weak × λ_colour = 1/6. Not free — forced by tensor structure.
+
+## How Textbook Methods Emerge
+
+The engine doesn't call Verlet or Yee. It applies S = W∘U on all 36 dimensions. Restrict to a sector and you recover the textbook method:
+
+| Sector restriction | What you see | Textbook name |
+|-------------------|-------------|---------------|
+| Weak ⊕ Colour (dim 3+3) | kick-drift on (x,v) | Verlet |
+| Colour (dim 3+3) | B-update then E-update | Yee FDTD |
+| Colour (dim 9) | collide then stream | Lattice Boltzmann |
+| Mixed (dim 24) | accept/reject then propose | Metropolis |
+| Weak ⊕ Colour (dim 6) | momentum then coordinate | Leapfrog (GR) |
+| Colour (dim 8) | force then integrate | Barnes-Hut |
+| Weak (dim 3) | torque then rotate | Euler equations |
+
+Every method has the same structure: W first (kick/update/collide), then U (drift/propagate/stream). The order is forced by the MERA causal cone.
+
+## Crystal Constants in the Engine
+
+Every integer in every method traces to (2, 3):
+
+| Constant | Value | Crystal | Used by |
+|----------|-------|---------|---------|
+| Phase space per body | 6 | χ = N_w × N_c | Classical, GR |
+| Force exponent | 2 | N_c − 1 | Newton, Coulomb |
+| Spatial dimensions | 3 | N_c | All |
+| Verlet order | 2 | N_w | Classical |
+| EM components | 6 | χ (3E + 3B) | Yee FDTD |
+| D2Q9 velocities | 9 | N_c² | LBM |
+| Ising states | 2 | N_w | Metropolis |
+| LJ attractive | 6 | χ | MD |
+| LJ repulsive | 12 | 2χ | MD |
+| LJ force coeff | 24 | d_mixed | MD |
+| γ monatomic | 5/3 | (χ−1)/N_c | Thermo |
+| Quadrupole | 32/5 | N_w⁵/(χ−1) | GW |
+| 16πG | 16 | N_w⁴ | GR |
+| Octree children | 8 | N_w³ | N-body |
+| Quaternion components | 4 | N_w² | Rigid body |
+| Fe-56 | 56 | d_colour × β₀ | Nuclear |
+
+## What the Tests Prove
+
+The Haskell module runs 28 checks:
+
+1. Singlet is immortal — norm = 1 after 100 ticks (dark matter, photon)
+2. Weak decays as (1/2)^t — verified at t = 10
+3. Colour decays as (1/3)^t — verified at t = 10
+4. Equal superposition → singlet dominates at late times (arrow of time)
+5. Entropy decreases toward pure singlet (2nd law as sector extinction)
+6. W∘U = tick verified component-by-component (all 36)
+7. E_mixed = E_weak + E_colour (energy additivity)
+8. All 10 textbook projection identities
+
+## Files
+
+| File | Location | Count | Method |
+|------|----------|-------|--------|
+| `CrystalEngine.hs` | `haskel/` | 28 checks | GHC runtime |
+| `CrystalEngine.lean` | `proofs/` | 68 theorems | `native_decide` |
+| `CrystalEngine.agda` | `proofs/` | 65 proofs | `refl` |
+
+## Run
+
+```bash
+# Haskell (from haskel/)
+ghc -O2 -main-is CrystalEngine CrystalEngine.hs && ./CrystalEngine
+
+# Lean (from proofs/)
+lean CrystalEngine.lean
+
+# Agda (from proofs/)
+agda CrystalEngine.agda
+```
+
+## Relationship to Other Modules
+
+CrystalEngine is the roof. The 21 dynamics modules are windows:
+
+```
+                    CrystalEngine.hs
+                    S = W∘U on Σd = 36
+                   /    |    |    \
+         Classical  EM   CFD  Thermo  ...21 total
+         (Verlet)  (Yee) (LBM) (MC)
+```
+
+Each dynamics module (CrystalClassical, CrystalEM, CrystalCFD, etc.) implements one sector restriction with its own physics-specific state representation. CrystalEngine shows they all come from the same operator applied to the same space.
+
+The CrystalMonadProof module proves this factorisation is unique. CrystalEngine builds it.
+
+## §Module: HMC
+
+# CrystalHMC — Hamiltonian Monte Carlo on the MERA
+
+## What It Is
+
+HMC without calculus. The three steps of traditional HMC map exactly
+to three sector restrictions of S = W∘U:
+
+| Traditional HMC | Crystal HMC | Sector |
+|----------------|-------------|--------|
+| Draw momentum p ~ N(0,1) | Inject random into weak sector | d₂ = 3 |
+| Leapfrog (Hamilton's equations) | N ticks of S\|_{weak⊕colour} | d₂ + d₃ = 11 |
+| Accept/reject (Metropolis) | Compare energies | d₄ = 24 |
+
+HMC is not *implemented using* S = W∘U. HMC *is* S = W∘U.
+
+## No Calculus
+
+| Traditional | Crystal | Why |
+|------------|---------|-----|
+| Action = ∫ L dt | Action = Σ dₖ\|ψₖ\|²Eₖ | Sum, not integral |
+| Gradient = ∂S/∂φ | Gradient = 2ψᵢ × Eₖ | Multiply, not derivative |
+| Leapfrog = solve ODE | Leapfrog = tick() | Discrete update, not ODE |
+| Accept = exp(-ΔH) | Accept = compare | Single exp for threshold, not dynamics |
+| Path integral | Sector restriction | Finite sum over 4 sectors |
+
+The only transcendental in the hot loop is one `exp(-ΔH)` per proposal
+for the Metropolis criterion. This is a THRESHOLD COMPARISON, not dynamics.
+The dynamics are pure multiply-add.
+
+## MERA Sampling
+
+The MERA has D = 42 layers, each with Σd = 36 dimensions.
+Total state space: 42 × 36 = 1512 components.
+
+CrystalHMC samples all 42 layers simultaneously:
+
+```
+for each layer d = 0..41:
+    1. inject random momentum (3 components)
+    2. leapfrog trajectory (20 steps of tick)
+    3. accept/reject (compare energies)
+```
+
+This explores:
+- **Inter-layer correlations** — how UV (D=0) talks to IR (D=41)
+- **Phase transitions** — topology changes in the MERA at critical temperature
+- **Entanglement entropy** — every HMC sample measures S_ent at every cut
+
+## Crystal Constants in HMC
+
+| Constant | Value | Crystal | Role in HMC |
+|----------|-------|---------|-------------|
+| Momentum dim | 3 | d₂ = N_w²−1 | Random draw dimension |
+| Phase space | 6 | χ = N_w×N_c | Leapfrog dimension |
+| Verlet order | 2 | N_w | Leapfrog accuracy |
+| Mixed dim | 24 | d₄ | Accept/reject space |
+| MERA layers | 42 | D = Σd+χ | Sweep depth |
+| State dim | 36 | Σd | Components per layer |
+| LCG multiplier | 650 | Σd² | Pseudo-random |
+| LCG increment | 7 | β₀ | Pseudo-random |
+| LCG modulus | 65536 | 2^(N_w⁴) | Pseudo-random |
+| S = A/(4G) | 4 | N_w² | Entanglement entropy |
+
+## What You Discover
+
+### Phase 1: Single-layer HMC
+Sample the 36-dim state on one layer. Measure sector fractions.
+The singlet dominates at late times (arrow of time).
+
+### Phase 2: Full MERA HMC
+Sample all 42 layers jointly. Measure correlations between layers.
+If δS = δ⟨H_A⟩ holds per sample, every sample IS a linearized
+Einstein equation. You're sampling gravity.
+
+### Phase 3: Temperature scan
+Vary the KMS temperature β = 2π/T. At critical T, the MERA
+changes topology — this is a cosmological phase transition with
+no continuum description. Only the discrete engine can see it.
+
+## Files
+
+| File | Location | Count | Method |
+|------|----------|-------|--------|
+| `CrystalHMC.hs` | `haskel/` | 26 checks | GHC runtime |
+| `CrystalHMC.lean` | `proofs/` | 33 theorems | `native_decide` |
+| `CrystalHMC.agda` | `proofs/` | 33 proofs | `refl` |
+
+## Run
+
+```bash
+# Haskell (from haskel/)
+ghc -O2 -main-is CrystalHMC CrystalHMC.hs && ./CrystalHMC
+
+# Lean (from proofs/)
+lean CrystalHMC.lean
+
+# Agda (from proofs/)
+agda CrystalHMC.agda
+```
+
+## Relationship to Other Modules
+
+```
+CrystalMonadProof.hs    proves S = W∘U is unique
+CrystalEngine.hs        builds S = W∘U on 36 dims
+CrystalHMC.hs           samples S = W∘U on 42 × 36 dims  ← YOU ARE HERE
+    ↓ restricts to
+CrystalClassical.hs     Verlet (positions + momenta)
+CrystalCondensed.hs     Metropolis (accept/reject)
+CrystalThermo.hs        MD (LJ forces)
+... all 21 dynamics
+```
+
+CrystalHMC is not a new method. It's the recognition that HMC was
+always S = W∘U, and the MERA gives it a natural home: 42 layers of
+36-dimensional state, sampled by the monad.
+
+## §Module: MonadProof
+
+# CrystalMonadProof — S = W∘U Unique Factorisation
+
+## Theorem
+
+Given A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ), the unique *-endomorphism preserving
+unitarity, causality, and the Heyting lattice is **S = W ∘ U**, where
+W is the isometry (Higgs, vertical) and U is the disentangler (gravity,
+horizontal). No other factorisation exists.
+
+## Proof Steps
+
+| Step | Statement | Method |
+|------|-----------|--------|
+| 1 | Wedderburn: sectors {1,3,8,24}, Σd = 36 | Arithmetic |
+| 2 | Heyting lattice: 4 truth values {1,½,⅓,⅙}, total order | Enumeration |
+| 3 | Lattice rigid: \|Aut(Ω)\| = 1 (total order, distinct elements) | Order theory |
+| 4 | Endomorphism block-diagonal (rigidity forces sector preservation) | Step 2+3 |
+| 5 | Eigenvalues forced: λ_mixed = λ_weak × λ_colour = 1/6 | Tensor structure |
+| 6 | S = W∘U: λ_k = (√λ_k)², MERA causal cone forces W∘U order | MERA geometry |
+| 7 | Uniqueness: any Φ ∈ Aut(Ω) = {id}, so W'=W and U'=U | Step 3 |
+
+## Corollary
+
+All textbook integration methods are projections of S = W∘U:
+
+| Method | W (kick) | U (drift) | Crystal constant |
+|--------|----------|-----------|-----------------|
+| Verlet | velocity update | position update | order = N_w = 2 |
+| Yee FDTD | B-update | E-update | components = χ = 6 |
+| Lattice Boltzmann | collision | streaming | D2Q9 = N_c² = 9 |
+| Metropolis | accept/reject | propose | states = N_w = 2 |
+| Leapfrog (GR) | momentum | coordinate | phase space = χ = 6 |
+
+The universe does not integrate differential equations. It applies S = W∘U.
+
+## Files
+
+| File | Location | Proofs | Method |
+|------|----------|--------|--------|
+| `CrystalMonadProof.hs` | `haskel/` | 12 prove functions | GHC runtime |
+| `CrystalMonadProof.lean` | `proofs/` | 42 theorems | `native_decide` |
+| `CrystalMonadProof.agda` | `proofs/` | 36 proofs | `refl` |
+
+## Run
+
+```bash
+# Haskell (from haskel/)
+ghc -O2 -main-is CrystalMonadProof CrystalMonadProof.hs -o monad_proof && ./monad_proof
+
+# Lean (from proofs/)
+lean CrystalMonadProof.lean
+
+# Agda (from proofs/)
+agda CrystalMonadProof.agda
+```
+
+## Key Insight
+
+The factorisation is unique because the Heyting lattice {1, 1/2, 1/3, 1/6}
+is a total order on 4 distinct elements. The only order-automorphism of a
+finite total order with distinct elements is the identity. This means any
+two factorisations S = W∘U = W'∘U' must satisfy W' = W and U' = U.
+
+The number 4 = N_w² is not a coincidence. The algebra M₂(ℂ) has N_w² = 4
+matrix entries, giving exactly 4 truth values in the subobject classifier.
+The rigidity of the factorisation is inherited from the rigidity of the
+(2,3) lattice.
+
 ## §Module: PROOFS
 
 # proofs/ — Formal Verification Suite
@@ -4179,6 +4493,9 @@ Each example uses the crystal_toe PyO3 module built with maturin.
 ### §arcade_fixed_point: Crystal Arcade — Fixed-Point 16.16 Precision (N_w⁴.N_w⁴)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Arcade — Fixed-Point 16.16 Precision (N_w⁴.N_w⁴)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -4228,12 +4545,14 @@ for i, x in enumerate(test_vals):
             color=color, transform=ax.transAxes)
 
 plt.tight_layout()
-plt.savefig('arcade_fixed_point.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('arcade_fixed_point.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §arcade_integers: Crystal Arcade — Every Integer Dashboard
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Arcade — Every Integer Dashboard"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -4264,12 +4583,14 @@ for i, (name, val, origin) in enumerate(rows):
             fontweight='bold', color='crimson', transform=ax.transAxes)
     ax.text(0.48, y, f'= {origin}', fontsize=9.5, fontfamily='monospace',
             va='top', transform=ax.transAxes)
-plt.savefig('arcade_integers.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('arcade_integers.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §arcade_integrators: Crystal Arcade — Euler (d₁=1) vs Verlet (N_w=2) Integrators
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Arcade — Euler (d₁=1) vs Verlet (N_w=2) Integrators"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -4328,12 +4649,14 @@ ax.legend(fontsize=10)
 ax.grid(True, alpha=0.3, which='both')
 
 plt.tight_layout()
-plt.savefig('arcade_integrators.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('arcade_integrators.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §arcade_lj_potentials: Crystal Arcade — LJ Potential: Exact vs Arcade vs WCA
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Arcade — LJ Potential: Exact vs Arcade vs WCA"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -4380,12 +4703,14 @@ ax.text(0.98, 0.95, f'Cutoff error: {arc.lj_cutoff_error():.4f}\n(< 1% beyond N_
         bbox=dict(boxstyle='round', facecolor='lightyellow'))
 
 plt.tight_layout()
-plt.savefig('arcade_lj_potentials.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('arcade_lj_potentials.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §arcade_mean_field: Crystal Arcade — Mean-Field vs Exact Ising & Self-Test
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Arcade — Mean-Field vs Exact Ising & Self-Test"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -4451,14 +4776,16 @@ fig.text(0.5, 0.01,
          ha='center', fontsize=11, fontstyle='italic')
 
 plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-plt.savefig('arcade_mean_field.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('arcade_mean_field.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ## §crystal-toe/astro
 
 ### §astro_black_holes: Crystal Astro — Black Holes: Schwarzschild & Hawking from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Astro — Black Holes: Schwarzschild & Hawking from (2,3)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -4498,12 +4825,14 @@ ax.text(0.05, 0.9, f'T_H ∝ 1/M\nfactor = {ast.hawking_factor()} = N_w³\n'
         bbox=dict(boxstyle='round', facecolor='lightyellow'))
 
 plt.tight_layout()
-plt.savefig('astro_black_holes.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('astro_black_holes.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §astro_cross_checks: Crystal Astro — Cross-Module Traces & Self-Test
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Astro — Cross-Module Traces & Self-Test"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -4554,12 +4883,14 @@ fig.text(0.5, 0.01,
          ha='center', fontsize=11, fontstyle='italic')
 
 plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-plt.savefig('astro_cross_checks.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('astro_cross_checks.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §astro_integers: Crystal Astro — Every Integer Dashboard
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Astro — Every Integer Dashboard"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -4592,12 +4923,14 @@ for i, (name, val, origin) in enumerate(rows):
             fontweight='bold', color='crimson', transform=ax.transAxes)
     ax.text(0.42, y, f'= {origin}', fontsize=9, fontfamily='monospace',
             va='top', transform=ax.transAxes)
-plt.savefig('astro_integers.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('astro_integers.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §astro_lane_emden: Crystal Astro — Lane-Emden Stellar Profiles
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Astro — Lane-Emden Stellar Profiles"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -4658,12 +4991,14 @@ ax.legend(fontsize=10)
 ax.grid(True, alpha=0.3)
 
 plt.tight_layout()
-plt.savefig('astro_lane_emden.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('astro_lane_emden.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §astro_scaling: Crystal Astro — Main Sequence Scaling Laws from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Astro — Main Sequence Scaling Laws from (2,3)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -4714,14 +5049,16 @@ ax.legend(fontsize=11)
 ax.grid(True, alpha=0.3, which='both')
 
 plt.tight_layout()
-plt.savefig('astro_scaling.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('astro_scaling.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ## §crystal-toe/bio
 
 ### §bio_allometric: Crystal Bio — Allometric Scaling from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Bio — Allometric Scaling from (2,3)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -4775,12 +5112,14 @@ ax.text(0.5, 0.15, f'✓ constant_heartbeats = {bio.constant_heartbeats()}',
         color='green', bbox=dict(boxstyle='round', facecolor='lightyellow'))
 
 plt.tight_layout()
-plt.savefig('bio_allometric.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('bio_allometric.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §bio_cross_module: Crystal Bio — Cross-Module Traces & Self-Test
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Bio — Cross-Module Traces & Self-Test"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -4831,12 +5170,14 @@ fig.text(0.5, 0.01,
          ha='center', fontsize=11, fontstyle='italic')
 
 plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-plt.savefig('bio_cross_module.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('bio_cross_module.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §bio_genetic_code: Crystal Bio — Genetic Code from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Bio — Genetic Code from (2,3)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -4879,12 +5220,14 @@ wedges, texts, autotexts = ax.pie(sizes, labels=labels_pie, colors=colors_pie,
 ax.set_title(f'Codon Usage: redundancy = {bio.codon_redundancy():.2f} ≈ N_c')
 
 plt.tight_layout()
-plt.savefig('bio_genetic_code.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('bio_genetic_code.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §bio_integers: Crystal Bio — Every Integer Dashboard
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Bio — Every Integer Dashboard"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -4920,12 +5263,14 @@ for i, (name, val, origin) in enumerate(rows):
             fontweight='bold', color='crimson', transform=ax.transAxes)
     ax.text(0.42, y, f'= {origin}', fontsize=9, fontfamily='monospace',
             va='top', transform=ax.transAxes)
-plt.savefig('bio_integers.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('bio_integers.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §bio_protein: Crystal Bio — Protein & DNA Structure from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Bio — Protein & DNA Structure from (2,3)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -4993,14 +5338,16 @@ ax.set_title('Protein Structure Parameters')
 ax.set_ylim(0, max(values) * 1.4)
 
 plt.tight_layout()
-plt.savefig('bio_protein.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('bio_protein.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ## §crystal-toe/CFD
 
 ### §cfd_flow_field: Crystal CFD — LBM Flow Field Visualization
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal CFD — LBM Flow Field Visualization"""
 import crystal_toe as ct
 import numpy as np
@@ -5022,12 +5369,14 @@ plt.colorbar(im1, ax=axes[0]); axes[0].set_title('Density Field'); axes[0].set_x
 im2 = axes[1].imshow(speed.T, origin='lower', cmap='hot', aspect='auto')
 plt.colorbar(im2, ax=axes[1]); axes[1].set_title('Speed Field |u|'); axes[1].set_xlabel('x'); axes[1].set_ylabel('y')
 
-plt.tight_layout(); plt.savefig('cfd_flow_field.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('cfd_flow_field.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §cfd_integers: Crystal CFD — Every Integer from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal CFD — Every Integer from (2,3)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -5054,12 +5403,14 @@ for i, (name, val, origin) in enumerate(rows):
     ax.text(0.02, y, name, fontsize=11, fontfamily='monospace', va='top', transform=ax.transAxes)
     ax.text(0.35, y, val, fontsize=11, fontfamily='monospace', va='top', fontweight='bold', color='crimson', transform=ax.transAxes)
     ax.text(0.50, y, f'= {origin}', fontsize=10, fontfamily='monospace', va='top', transform=ax.transAxes)
-plt.savefig('cfd_integers.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('cfd_integers.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §cfd_kolmogorov: Crystal CFD — Kolmogorov Turbulence Spectrum: E(k) ∝ k^(−5/3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal CFD — Kolmogorov Turbulence Spectrum: E(k) ∝ k^(−5/3)"""
 import crystal_toe as ct
 import numpy as np
@@ -5091,12 +5442,14 @@ for i, l in enumerate([f"Kolmogorov −5/3 = −(χ−1)/N_c",
     f"Blasius δ ∝ Re^(−1/N_w²) = Re^(−{cfd.blasius_exponent():.2f})",
     f"Stokes drag = {cfd.stokes_drag()} = d_mixed"]):
     axes[2].text(0.05, 0.95-i*0.1, l, transform=axes[2].transAxes, fontsize=11, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('cfd_kolmogorov.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('cfd_kolmogorov.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §cfd_poiseuille: Crystal CFD — Poiseuille Channel Flow: LBM D2Q9 = N_c²
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal CFD — Poiseuille Channel Flow: LBM D2Q9 = N_c²"""
 import crystal_toe as ct
 import numpy as np
@@ -5127,12 +5480,14 @@ for i, l in enumerate([f"D2Q9 = {cfd.d2q9_velocities()} = N_c² = {cfd.n_c()}²"
     f"ν = c_s²(τ−½) = (τ−½)/N_c", "", f"Collision = W (BGK)", f"Streaming = U (propagate)",
     f"Tick = W∘U = crystal monad"]):
     axes[2].text(0.05, 0.95-i*0.09, l, transform=axes[2].transAxes, fontsize=11, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('cfd_poiseuille.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('cfd_poiseuille.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §cfd_stokes: Crystal CFD — Stokes Drag: F = 6πμrv where 6 = χ
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal CFD — Stokes Drag: F = 6πμrv where 6 = χ"""
 import crystal_toe as ct
 import numpy as np
@@ -5161,14 +5516,16 @@ terminal = [vi * 1.0 / (cfd.stokes_drag() * np.pi * 1e-3 * r) for r, vi in zip(r
 axes[2].plot(radii*1000, [cfd.stokes_drag_force(1e-3, r, 0.01) for r in radii], 'purple', linewidth=2)
 axes[2].set_xlabel('Radius (mm)'); axes[2].set_ylabel('Force'); axes[2].set_title('Drag vs Particle Size')
 axes[2].grid(True, alpha=0.3)
-plt.tight_layout(); plt.savefig('cfd_stokes.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('cfd_stokes.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ## §crystal-toe/chem
 
 ### §chem_arrhenius: Crystal Chem — Arrhenius Kinetics & Noble Gases from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Chem — Arrhenius Kinetics & Noble Gases from (2,3)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -5241,12 +5598,14 @@ fig.text(0.5, 0.01,
          color='green' if passes == total else 'red')
 
 plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-plt.savefig('chem_arrhenius.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('chem_arrhenius.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §chem_energy_scales: Crystal Chem — Energy Scales from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Chem — Energy Scales from (2,3)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -5306,12 +5665,14 @@ ax.legend(fontsize=10)
 ax.set_ylim(0, 0.06)
 
 plt.tight_layout()
-plt.savefig('chem_energy_scales.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('chem_energy_scales.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §chem_hybridization: Crystal Chem — Hybridization Angles from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Chem — Hybridization Angles from (2,3)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -5362,12 +5723,14 @@ for ax, (title, angle_deg, formula, color, n_bonds) in zip(axes.flat, angles_dat
     ax.grid(True, alpha=0.3)
 
 plt.tight_layout()
-plt.savefig('chem_hybridization.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('chem_hybridization.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §chem_integers: Crystal Chem — Every Integer Dashboard
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Chem — Every Integer Dashboard"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -5404,12 +5767,14 @@ for i, (name, val, origin) in enumerate(rows):
             fontweight='bold', color='crimson', transform=ax.transAxes)
     ax.text(0.47, y, f'= {origin}', fontsize=9, fontfamily='monospace',
             va='top', transform=ax.transAxes)
-plt.savefig('chem_integers.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('chem_integers.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §chem_orbitals: Crystal Chem — Orbital Shell Filling from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Chem — Orbital Shell Filling from (2,3)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -5452,14 +5817,16 @@ ax.legend(fontsize=11)
 ax.set_ylim(0, 55)
 
 plt.tight_layout()
-plt.savefig('chem_orbitals.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('chem_orbitals.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ## §crystal-toe/classical
 
 ### §01_leo_orbit: 01_leo_orbit
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """
 Crystal Classical Dynamics — Example 1: LEO Satellite
 =====================================================
@@ -5590,12 +5957,14 @@ for i, line in enumerate(lines):
 
 plt.savefig('crystal_classical_01_leo.png', dpi=150, bbox_inches='tight')
 plt.show()
-print("\nSaved: crystal_classical_01_leo.png")
-```
+print("\nSaved: crystal_classical_01_leo.png")```
 
 ### §02_elliptical_orbits: 02_elliptical_orbits
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """
 Crystal Classical Dynamics — Example 2: Elliptical Orbits
 ==========================================================
@@ -5690,12 +6059,14 @@ ax_k3.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.savefig('crystal_classical_02_elliptical.png', dpi=150, bbox_inches='tight')
 plt.show()
-print("Saved: crystal_classical_02_elliptical.png")
-```
+print("Saved: crystal_classical_02_elliptical.png")```
 
 ### §03_hohmann_transfer: 03_hohmann_transfer
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """
 Crystal Classical Dynamics — Example 3: Hohmann Transfer Earth→Mars
 ====================================================================
@@ -5804,12 +6175,14 @@ ax2.grid(True, alpha=0.3, axis='y')
 plt.tight_layout()
 plt.savefig('crystal_classical_03_hohmann.png', dpi=150, bbox_inches='tight')
 plt.show()
-print("\nSaved: crystal_classical_03_hohmann.png")
-```
+print("\nSaved: crystal_classical_03_hohmann.png")```
 
 ### §04_slingshot: 04_slingshot
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """
 Crystal Classical Dynamics — Example 4: Lunar Gravity Slingshot
 ================================================================
@@ -5898,12 +6271,14 @@ for idx, v_launch in enumerate(launch_speeds):
 plt.tight_layout()
 plt.savefig('crystal_classical_04_slingshot.png', dpi=150, bbox_inches='tight')
 plt.show()
-print("\nSaved: crystal_classical_04_slingshot.png")
-```
+print("\nSaved: crystal_classical_04_slingshot.png")```
 
 ### §05_conservation_dashboard: 05_conservation_dashboard
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """
 Crystal Classical Dynamics — Example 5: Conservation Law Dashboard
 ===================================================================
@@ -6059,14 +6434,16 @@ for i, line in enumerate(lines):
 
 plt.savefig('crystal_classical_05_conservation.png', dpi=150, bbox_inches='tight')
 plt.show()
-print("\nSaved: crystal_classical_05_conservation.png")
-```
+print("\nSaved: crystal_classical_05_conservation.png")```
 
 ## §crystal-toe/condensed
 
 ### §condensed_bcs: Crystal Condensed — BCS Superconductivity: 2Δ/(kT_c) = N_w·π/e^γ
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Condensed — BCS Superconductivity: 2Δ/(kT_c) = N_w·π/e^γ"""
 import crystal_toe as ct
 import numpy as np
@@ -6097,12 +6474,14 @@ for i, l in enumerate([f"BCS gap ratio = {cm.bcs_ratio():.4f}", f"  = N_w·π/e^
     f"Δ(0) = N_w·ℏω_D·exp(−1/(N(0)V))", f"  N_w = 2 (Cooper pair = 2 electrons)", "",
     f"Experimental: 2Δ/(kT_c) ≈ 3.53"]):
     axes[2].text(0.05, 0.95-i*0.1, l, transform=axes[2].transAxes, fontsize=11, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('condensed_bcs.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('condensed_bcs.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §condensed_integers: Crystal Condensed — Every Integer from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Condensed — Every Integer from (2,3)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -6128,12 +6507,14 @@ for i, (name, val, origin) in enumerate(rows):
     ax.text(0.02, y, name, fontsize=11, fontfamily='monospace', va='top', transform=ax.transAxes)
     ax.text(0.30, y, val, fontsize=11, fontfamily='monospace', va='top', fontweight='bold', color='crimson', transform=ax.transAxes)
     ax.text(0.50, y, f'= {origin}', fontsize=10, fontfamily='monospace', va='top', transform=ax.transAxes)
-plt.savefig('condensed_integers.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('condensed_integers.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §condensed_ising_mc: Crystal Condensed — Ising Monte Carlo: z=N_w²=4, T_c=N_w/ln(1+√N_w)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Condensed — Ising Monte Carlo: z=N_w²=4, T_c=N_w/ln(1+√N_w)"""
 import crystal_toe as ct
 import numpy as np
@@ -6177,12 +6558,14 @@ for i, l in enumerate([f"z_square = N_w² = {cm.ising_z_square()}", f"z_cubic = 
     f"β_crit = 1/N_w³ = {cm.critical_beta():.4f}", f"E_ground/site = −N_w = −2", "",
     f"Metropolis = crystal monad on lattice"]):
     axes[1][1].text(0.05, 0.95-i*0.11, l, transform=axes[1][1].transAxes, fontsize=11, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('condensed_ising.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('condensed_ising.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §condensed_lattice_snapshot: Crystal Condensed — Ising Lattice Snapshots: ordered vs disordered
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Condensed — Ising Lattice Snapshots: ordered vs disordered"""
 import crystal_toe as ct
 import numpy as np
@@ -6207,12 +6590,14 @@ for idx, (T, title) in enumerate([(1.0, f'T=1.0 (ordered)'), (tc, f'T=T_c={tc:.2
     axes[idx].set_title(f'{title}\n|M|≈{abs(mags[-1]):.2f}')
     axes[idx].axis('off')
 
-plt.tight_layout(); plt.savefig('condensed_lattice.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('condensed_lattice.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §condensed_phase_transition: Crystal Condensed — Phase Transition: M(T) with β=1/8=1/N_w³
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Condensed — Phase Transition: M(T) with β=1/8=1/N_w³"""
 import crystal_toe as ct
 import numpy as np
@@ -6247,14 +6632,16 @@ for i, l in enumerate([f"Onsager T_c = N_w/ln(1+√N_w) = {tc:.6f}",
     f"z = {cm.ising_z_cubic()} neighbours (cubic = χ)", "",
     f"|M| ~ (1 − T/T_c)^(1/8) near T_c", f"Exact 2D Ising (Onsager 1944)"]):
     axes[1].text(0.05, 0.95-i*0.11, l, transform=axes[1].transAxes, fontsize=12, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('condensed_phase.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('condensed_phase.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ## §crystal-toe/decay
 
 ### §decay_beta_spectrum: Crystal Decay — Neutron Beta Spectrum: Γ = G_F²E⁵/(192π³)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Decay — Neutron Beta Spectrum: Γ = G_F²E⁵/(192π³)"""
 import crystal_toe as ct
 import numpy as np
@@ -6286,12 +6673,14 @@ for i, l in enumerate([f"β constant = {dc.beta_factor()} = d_mixed×d_colour",
     f"Γ = G_F²m_e⁵(1+3λ²)fV_ud²/(2π³)", f"192 appears in denominator",
     f"192 = 24 × 8 = d_mixed × d_colour"]):
     axes[2].text(0.05, 0.95-i*0.11, l, transform=axes[2].transAxes, fontsize=11, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('decay_beta.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('decay_beta.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §decay_integers: Crystal Decay — Every Integer from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Decay — Every Integer from (2,3)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -6318,12 +6707,14 @@ for i, (name, val, origin) in enumerate(rows):
     ax.text(0.02, y, name, fontsize=11, fontfamily='monospace', va='top', transform=ax.transAxes)
     ax.text(0.28, y, val, fontsize=11, fontfamily='monospace', va='top', fontweight='bold', color='crimson', transform=ax.transAxes)
     ax.text(0.45, y, f'= {origin}', fontsize=10, fontfamily='monospace', va='top', transform=ax.transAxes)
-plt.savefig('decay_integers.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('decay_integers.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §decay_muon: Crystal Decay — Muon Decay: G_F² = 192π³/(τ_μ·m_μ⁵)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Decay — Muon Decay: G_F² = 192π³/(τ_μ·m_μ⁵)"""
 import crystal_toe as ct
 import numpy as np
@@ -6353,12 +6744,14 @@ for i, l in enumerate([f"Muon decay: μ⁻ → e⁻ + ν̄_e + ν_μ",
     f"    = {dc.chi()*dc.n_w()*dc.n_w()} × {dc.n_w()**3}",
     f"    = (N_w³·N_c) × (N_w³)", f"    = 24 × 8"]):
     axes[1].text(0.05, 0.95-i*0.09, l, transform=axes[1].transAxes, fontsize=12, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('decay_muon.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('decay_muon.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §decay_oscillations: Crystal Decay — Neutrino Oscillations: sin²(2θ₂₃) = 120/121
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Decay — Neutrino Oscillations: sin²(2θ₂₃) = 120/121"""
 import crystal_toe as ct
 import numpy as np
@@ -6394,12 +6787,14 @@ for i, l in enumerate([f"sin²θ₂₃ = χ/(2χ−1) = 6/11 = {dc.sin2_theta_23
     f"  θ₁₂: 0.307  (crystal: {dc.sin2_theta_12():.4f})",
     f"  θ_W: 0.231  (crystal: {dc.sin2_theta_w():.4f})"]):
     axes[2].text(0.05, 0.95-i*0.1, l, transform=axes[2].transAxes, fontsize=11, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('decay_oscillations.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('decay_oscillations.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §decay_phase_space: Crystal Decay — Phase Space Dimensions: 3N−4 = N_c·N−(N_c+1)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Decay — Phase Space Dimensions: 3N−4 = N_c·N−(N_c+1)"""
 import crystal_toe as ct
 import numpy as np
@@ -6426,14 +6821,16 @@ for i, l in enumerate([f"N=2: dim = {dc.phase_space_dim(2)} (2-body)",
     f"N_c = {dc.n_c()} spatial dimensions", f"N_c+1 = {dc.n_c()+1} conservation laws",
     f"(energy + {dc.n_c()} momentum)"]):
     axes[1].text(0.05, 0.95-i*0.09, l, transform=axes[1].transAxes, fontsize=12, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('decay_phase_space.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('decay_phase_space.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ## §crystal-toe/em
 
 ### §em_integers: Crystal EM — Every Integer Dashboard
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal EM — Every Integer Dashboard"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -6463,12 +6860,14 @@ for i, (name, val, origin) in enumerate(rows):
     ax.text(0.02, y, name, fontsize=11, fontfamily='monospace', va='top', transform=ax.transAxes)
     ax.text(0.35, y, val, fontsize=11, fontfamily='monospace', va='top', fontweight='bold', color='crimson', transform=ax.transAxes)
     ax.text(0.45, y, f'= {origin}', fontsize=10, fontfamily='monospace', va='top', transform=ax.transAxes)
-plt.savefig('em_integers.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('em_integers.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §em_larmor: Crystal EM — Larmor Radiation: P = (N_c−1)/N_c × q²a² = (2/3)q²a²
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal EM — Larmor Radiation: P = (N_c−1)/N_c × q²a² = (2/3)q²a²"""
 import crystal_toe as ct
 import numpy as np
@@ -6493,12 +6892,14 @@ r_vals = np.linspace(0.5, 10, 200)
 force = [em.coulomb_force(1.0, 1.0, r) for r in r_vals]
 axes[2].plot(r_vals, force, 'blue', linewidth=2); axes[2].set_xlabel('r'); axes[2].set_ylabel('F')
 axes[2].set_title(f'Coulomb 1/r^(N_c−1) = 1/r²'); axes[2].grid(True, alpha=0.3)
-plt.tight_layout(); plt.savefig('em_larmor.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('em_larmor.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §em_planck_stefan: Crystal EM — Planck λ^(−5) and Stefan T⁴: exponents from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal EM — Planck λ^(−5) and Stefan T⁴: exponents from (2,3)"""
 import crystal_toe as ct
 import numpy as np
@@ -6531,12 +6932,14 @@ for i, l in enumerate([f"Planck exp = χ−1 = {em.planck_exponent()}", f"Stefan
     f"  = {em.wave_impedance():.2f} Ω", "", f"Three derivations of N_w² = 4:",
     f"  Stefan T⁴, Rayleigh λ⁻⁴, Bekenstein A/4G"]):
     axes[2].text(0.05, 0.95-i*0.11, l, transform=axes[2].transAxes, fontsize=12, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('em_planck_stefan.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('em_planck_stefan.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §em_rayleigh: Crystal EM — Why the Sky is Blue: Rayleigh σ ∝ 1/λ^(N_w²) = 1/λ⁴
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal EM — Why the Sky is Blue: Rayleigh σ ∝ 1/λ^(N_w²) = 1/λ⁴"""
 import crystal_toe as ct
 import numpy as np
@@ -6565,12 +6968,14 @@ for i, l in enumerate([f"σ ∝ d^{em.rayleigh_size_exp()}/λ^{em.rayleigh_wave_
     f"Blue/Red = {ratio:.1f}×", "", f"Same N_w²=4 as:", f"  Stefan-Boltzmann T⁴",
     f"  Bekenstein S=A/4G", f"  Light bending 4GM/b"]):
     axes[2].text(0.05, 0.95-i*0.1, l, transform=axes[2].transAxes, fontsize=12, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('em_rayleigh.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('em_rayleigh.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §em_yee_fdtd: Crystal EM — Yee FDTD: Gaussian pulse propagation at c = χ/χ = 1
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal EM — Yee FDTD: Gaussian pulse propagation at c = χ/χ = 1"""
 import crystal_toe as ct
 import numpy as np
@@ -6603,14 +7008,16 @@ for i, l in enumerate([f"Components = χ = {em.em_components()}", f"Maxwell = N_
     f"Polarizations = N_c−1 = {em.polarization_states()}", f"c = χ/χ = 1 (Lieb-Robinson)",
     f"Yee = monad W∘U on EM sector", f"CFL: dt/dx ≤ 1", "", "All from (2,3)."]):
     axes[1][1].text(0.05, 0.95-i*0.11, l, transform=axes[1][1].transAxes, fontsize=12, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('em_yee_fdtd.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('em_yee_fdtd.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ## §crystal-toe/friedmann
 
 ### §friedmann_cmb: Crystal Friedmann — CMB Parameters: all from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Friedmann — CMB Parameters: all from (2,3)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -6644,12 +7051,14 @@ for i, (name, val, formula, planck) in enumerate(rows):
     ax.text(0.22, y, val, fontsize=10, fontfamily='monospace', color='crimson', transform=ax.transAxes)
     ax.text(0.38, y, formula, fontsize=9, fontfamily='monospace', transform=ax.transAxes)
     ax.text(0.72, y, planck, fontsize=10, fontfamily='monospace', color='navy', transform=ax.transAxes)
-plt.savefig('friedmann_cmb.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('friedmann_cmb.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §friedmann_densities: Crystal Friedmann — Density Parameters: Ω(a) evolution
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Friedmann — Density Parameters: Ω(a) evolution"""
 import crystal_toe as ct
 import numpy as np
@@ -6683,12 +7092,14 @@ for i, l in enumerate([f"Ω_Λ = gauss/(gauss+χ) = 13/19 = {fr.omega_lambda():.
     f"Flat: Ω_total = {fr.omega_lambda()+fr.omega_matter()+fr.omega_rad():.4f}",
     "", f"Planck (2018):", f"  Ω_Λ = 0.6847", f"  Ω_m = 0.3153", f"  DM/b = 5.36"]):
     axes[2].text(0.05, 0.95-i*0.09, l, transform=axes[2].transAxes, fontsize=11, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('friedmann_densities.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('friedmann_densities.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §friedmann_distances: Crystal Friedmann — Comoving & Luminosity Distances
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Friedmann — Comoving & Luminosity Distances"""
 import crystal_toe as ct
 import numpy as np
@@ -6712,12 +7123,14 @@ mu = [5*np.log10(dl*3000) + 25 if dl > 0 else 0 for dl in d_l]  # distance modul
 axes[1].plot(z_vals, mu, 'purple', linewidth=2)
 axes[1].set_xlabel('Redshift z'); axes[1].set_ylabel('Distance modulus μ')
 axes[1].set_title('Hubble Diagram (Type Ia SNe)'); axes[1].grid(True, alpha=0.3)
-plt.tight_layout(); plt.savefig('friedmann_distances.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('friedmann_distances.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §friedmann_expansion: Crystal Friedmann — Cosmic Expansion: a(t) from Big Bang to today
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Friedmann — Cosmic Expansion: a(t) from Big Bang to today"""
 import crystal_toe as ct
 import numpy as np
@@ -6745,12 +7158,14 @@ z_acc = fr.acceleration_onset()
 axes[2].axvline(1/(1+z_acc), color='green', linestyle='--', label=f'q=0 at z={z_acc:.2f}')
 axes[2].set_xlabel('a'); axes[2].set_ylabel('q(a)'); axes[2].set_title('Deceleration → Acceleration')
 axes[2].legend(); axes[2].grid(True, alpha=0.3)
-plt.tight_layout(); plt.savefig('friedmann_expansion.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('friedmann_expansion.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §friedmann_integers: Crystal Friedmann — Every Integer from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Friedmann — Every Integer from (2,3)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -6778,14 +7193,16 @@ for i, (name, val, origin) in enumerate(rows):
     ax.text(0.02, y, name, fontsize=11, fontfamily='monospace', va='top', transform=ax.transAxes)
     ax.text(0.38, y, val, fontsize=11, fontfamily='monospace', va='top', fontweight='bold', color='crimson', transform=ax.transAxes)
     ax.text(0.52, y, f'= {origin}', fontsize=10, fontfamily='monospace', va='top', transform=ax.transAxes)
-plt.savefig('friedmann_integers.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('friedmann_integers.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ## §crystal-toe/gr
 
 ### §gr_dashboard: gr_dashboard
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """
 Crystal GR — Every Integer from (2,3)
 =======================================
@@ -6862,12 +7279,14 @@ ax4.set_xlabel('r / r_s'); ax4.set_ylim(-1, 5)
 ax4.set_title('Metric & Redshift'); ax4.legend(fontsize=9); ax4.grid(True, alpha=0.3)
 
 plt.tight_layout()
-plt.savefig('gr_dashboard.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('gr_dashboard.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §gr_isco: gr_isco
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """
 Crystal GR — ISCO & Black Hole Orbits
 =======================================
@@ -6932,12 +7351,14 @@ axes[2].set_xlabel('r / r_s'); axes[2].set_ylabel('Redshift z')
 axes[2].set_title('Gravitational Redshift'); axes[2].legend(); axes[2].grid(True, alpha=0.3)
 
 plt.tight_layout()
-plt.savefig('gr_isco.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('gr_isco.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §gr_light_bending: gr_light_bending
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """
 Crystal GR — Light Bending
 ============================
@@ -7007,12 +7428,14 @@ for i, line in enumerate(lines):
                  fontweight='bold' if 'All from' in line else 'normal')
 
 plt.tight_layout()
-plt.savefig('gr_light_bending.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('gr_light_bending.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §gr_precession: gr_precession
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """
 Crystal GR — Mercury Perihelion Precession
 ============================================
@@ -7061,12 +7484,14 @@ axes[2].set_xlabel('arcsec/century'); axes[2].set_title('GR Precession by Planet
 axes[2].grid(True, alpha=0.3, axis='x')
 
 plt.tight_layout()
-plt.savefig('gr_precession.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('gr_precession.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §gr_shapiro: gr_shapiro
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """
 Crystal GR — Shapiro Time Delay
 =================================
@@ -7110,14 +7535,16 @@ axes[1].set_xlabel('Emission radius r / r_s'); axes[1].set_ylabel('f_recv / f_em
 axes[1].set_title('Gravitational Frequency Shift'); axes[1].grid(True, alpha=0.3)
 
 plt.tight_layout()
-plt.savefig('gr_shapiro.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('gr_shapiro.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ## §crystal-toe/gw
 
 ### §gw_chirp_mass: Crystal GW — Chirp Mass: M_c = μ^(3/5) M^(2/5) where 3/5=N_c/(χ−1), 2/5=N_w/(χ−1)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal GW — Chirp Mass: M_c = μ^(3/5) M^(2/5) where 3/5=N_c/(χ−1), 2/5=N_w/(χ−1)"""
 import crystal_toe as ct
 import numpy as np
@@ -7141,12 +7568,14 @@ for m1,m2 in masses:
     t,f,hp,_ = gw.inspiral_waveform(m1, m2, 1e6, 0.0, f_isco/30, 0.3)
     axes[2].plot(t, hp, linewidth=0.5, label=f'{m1}+{m2}')
 axes[2].set_title('Waveforms by Mass'); axes[2].legend(fontsize=9); axes[2].grid(True, alpha=0.3)
-plt.tight_layout(); plt.savefig('gw_chirp_mass.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('gw_chirp_mass.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §gw_crystal_integers: Crystal GW — Every Integer from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal GW — Every Integer from (2,3)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -7178,12 +7607,14 @@ for i, (name, val, origin, computed) in enumerate(rows):
 
 ax.text(0.02, 0.05, "Kolmogorov turbulence = GW chirp = 5/3. Same crystal fraction.", 
         fontsize=12, fontfamily='monospace', fontweight='bold', va='top', transform=ax.transAxes)
-plt.savefig('gw_integers.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('gw_integers.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §gw_frequency_evolution: Crystal GW — Frequency Evolution and ISCO Cutoff
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal GW — Frequency Evolution and ISCO Cutoff"""
 import crystal_toe as ct
 import numpy as np
@@ -7208,12 +7639,14 @@ axes[1].set_xlabel('f_GW'); axes[1].set_ylabel('df/dt'); axes[1].set_title('Chir
 ttm = [gw.time_to_merger(mc, f) for f in f_vals]
 axes[2].loglog(f_vals, ttm, 'darkred', linewidth=2)
 axes[2].set_xlabel('f_GW'); axes[2].set_ylabel('Time to Merger'); axes[2].set_title('Merger Countdown'); axes[2].grid(True, alpha=0.3)
-plt.tight_layout(); plt.savefig('gw_frequency.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('gw_frequency.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §gw_inspiral: Crystal GW — Binary Black Hole Inspiral Waveform
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal GW — Binary Black Hole Inspiral Waveform"""
 import crystal_toe as ct
 import numpy as np
@@ -7239,12 +7672,14 @@ for i, l in enumerate([f"Peters = 32/5 = N_w⁵/(χ−1)", f"Chirp = 5/3 = (χ�
     f"Polarizations = {gw.gw_polarizations()} = N_c−1", f"Amplitude = {gw.amplitude_factor()} = N_w²",
     f"ISCO = {gw.chi()} GM = χ", "", "Every coefficient from (2,3)."]):
     axes[1][1].text(0.05, 0.95-i*0.12, l, transform=axes[1][1].transAxes, fontsize=12, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('gw_inspiral.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('gw_inspiral.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §gw_orbital_decay: Crystal GW — Orbital Decay: da/dt = −(64/5) μM²/a³ where 64/5 = N_w⁶/(χ−1)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal GW — Orbital Decay: da/dt = −(64/5) μM²/a³ where 64/5 = N_w⁶/(χ−1)"""
 import crystal_toe as ct
 import numpy as np
@@ -7267,14 +7702,16 @@ for m1, m2, color in [(30,30,'b'), (10,30,'r')]:
     power = [gw.gw_power(mu, M, a) for a in a_vals]
     axes[2].semilogy(a_vals, power, color=color, linewidth=2, label=f'{m1}+{m2}')
 axes[2].set_xlabel('Separation'); axes[2].set_ylabel('GW Power'); axes[2].set_title('Radiated Power'); axes[2].legend(); axes[2].grid(True, alpha=0.3)
-plt.tight_layout(); plt.savefig('gw_orbital_decay.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('gw_orbital_decay.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ## §crystal-toe/md
 
 ### §md_bond_angles: Crystal MD — Molecular Bond Angles: sp3=acos(−1/N_c), water=acos(−1/N_w²)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal MD — Molecular Bond Angles: sp3=acos(−1/N_c), water=acos(−1/N_w²)"""
 import crystal_toe as ct
 import numpy as np
@@ -7307,12 +7744,14 @@ for i, l in enumerate([f"sp3 tetrahedral = acos(−1/N_c)", f"  = acos(−1/{md.
     f"  = N_c²·N_w/(χ−1) = 18/5",
     f"Flory ν = N_w/(χ−1) = {md.flory_nu():.1f}"]):
     axes[2].text(0.05, 0.95-i*0.085, l, transform=axes[2].transAxes, fontsize=11, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('md_bond_angles.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('md_bond_angles.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §md_dna: Crystal MD — DNA & Protein: bases=N_w²=4, amino acids=N_w²(χ−1)=20
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal MD — DNA & Protein: bases=N_w²=4, amino acids=N_w²(χ−1)=20"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -7349,12 +7788,14 @@ for i, l in enumerate([f"DNA bases = N_w² = {md.dna_bases()}",
     f"Flory ν = N_w/(χ−1) = {md.flory_nu():.1f}", "",
     f"20 amino acids = 4 bases × 5 DOF"]):
     axes[2].text(0.05, 0.95-i*0.085, l, transform=axes[2].transAxes, fontsize=11, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('md_dna.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('md_dna.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §md_integers: Crystal MD — Every Integer from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal MD — Every Integer from (2,3)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -7385,12 +7826,14 @@ for i, (name, val, origin) in enumerate(rows):
     ax.text(0.02, y, name, fontsize=10, fontfamily='monospace', va='top', transform=ax.transAxes)
     ax.text(0.30, y, val, fontsize=10, fontfamily='monospace', va='top', fontweight='bold', color='crimson', transform=ax.transAxes)
     ax.text(0.45, y, f'= {origin}', fontsize=9.5, fontfamily='monospace', va='top', transform=ax.transAxes)
-plt.savefig('md_integers.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('md_integers.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §md_lj_vibration: Crystal MD — LJ Molecular Vibration: 2-particle Velocity Verlet
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal MD — LJ Molecular Vibration: 2-particle Velocity Verlet"""
 import crystal_toe as ct
 import numpy as np
@@ -7422,12 +7865,14 @@ axes[2].plot(r_arr, f_arr, 'r-', linewidth=2, label='F(r)')
 axes[2].axhline(0, color='k', linewidth=0.5)
 axes[2].set_xlabel('r/σ'); axes[2].set_ylabel('V, F'); axes[2].set_ylim(-2, 5)
 axes[2].set_title('LJ Potential & Force'); axes[2].legend(); axes[2].grid(True, alpha=0.3)
-plt.tight_layout(); plt.savefig('md_lj_vibration.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('md_lj_vibration.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §md_polymer: Crystal MD — Polymer Scaling: Flory ν = N_w/(χ−1) = 2/5
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal MD — Polymer Scaling: Flory ν = N_w/(χ−1) = 2/5"""
 import crystal_toe as ct
 import numpy as np
@@ -7454,14 +7899,16 @@ for i, l in enumerate([f"Flory exponent ν = N_w/(χ−1) = 2/5 = 0.4",
     f"ν = 1/N_c: collapsed globule", "",
     f"R ~ N^ν, N = # monomers", f"Same 2/5 as von Karman κ in turbulence!"]):
     axes[1].text(0.05, 0.95-i*0.11, l, transform=axes[1].transAxes, fontsize=12, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('md_polymer.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('md_polymer.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ## §crystal-toe/nbody
 
 ### §nbody_figure_eight: nbody_figure_eight
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """
 Crystal N-Body — Three-Body Figure-Eight
 ==========================================
@@ -7517,12 +7964,14 @@ axes[2].grid(True, alpha=0.3)
 
 plt.tight_layout()
 plt.savefig('nbody_figure_eight.png', dpi=150, bbox_inches='tight')
-plt.show()
-```
+plt.show()```
 
 ### §nbody_mass_ratio: nbody_mass_ratio
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """
 Crystal N-Body — Mass Ratio Scan
 ==================================
@@ -7579,12 +8028,14 @@ for idx, q in enumerate(ratios):
 
 plt.tight_layout()
 plt.savefig('nbody_mass_ratio.png', dpi=150, bbox_inches='tight')
-plt.show()
-```
+plt.show()```
 
 ### §nbody_plummer: nbody_plummer
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """
 Crystal N-Body — Plummer Sphere
 ================================
@@ -7655,12 +8106,14 @@ ax_txt.axis('off')
 
 plt.tight_layout()
 plt.savefig('nbody_plummer.png', dpi=150, bbox_inches='tight')
-plt.show()
-```
+plt.show()```
 
 ### §nbody_solar_system: nbody_solar_system
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """
 Crystal N-Body — Inner Solar System
 =====================================
@@ -7725,12 +8178,14 @@ ax3.grid(True, alpha=0.3)
 
 plt.tight_layout()
 plt.savefig('nbody_solar_system.png', dpi=150, bbox_inches='tight')
-plt.show()
-```
+plt.show()```
 
 ### §nbody_two_body: nbody_two_body
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """
 Crystal N-Body — Two-Body Kepler
 =================================
@@ -7794,14 +8249,16 @@ axes[2].set_title('Binary Separation'); axes[2].grid(True, alpha=0.3)
 
 plt.tight_layout()
 plt.savefig('nbody_two_body.png', dpi=150, bbox_inches='tight')
-plt.show()
-```
+plt.show()```
 
 ## §crystal-toe/nuclear
 
 ### §nuclear_binding: Crystal Nuclear — Binding Energy Curve from SEMF
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Nuclear — Binding Energy Curve from SEMF"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -7859,12 +8316,14 @@ ax.legend(fontsize=11)
 ax.grid(True, alpha=0.3)
 
 plt.tight_layout()
-plt.savefig('nuclear_binding.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('nuclear_binding.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §nuclear_integers: Crystal Nuclear — Every Integer Dashboard
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Nuclear — Every Integer Dashboard"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -7899,12 +8358,14 @@ for i, (name, val, origin) in enumerate(rows):
             fontweight='bold', color='crimson', transform=ax.transAxes)
     ax.text(0.50, y, f'= {origin}', fontsize=9, fontfamily='monospace',
             va='top', transform=ax.transAxes)
-plt.savefig('nuclear_integers.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('nuclear_integers.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §nuclear_magic: Crystal Nuclear — Magic Numbers from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Nuclear — Magic Numbers from (2,3)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -7946,12 +8407,14 @@ for idx, text in annotations:
                 arrowprops=dict(arrowstyle='->', color='gray'))
 
 plt.tight_layout()
-plt.savefig('nuclear_magic.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('nuclear_magic.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §nuclear_radii: Crystal Nuclear — Nuclear Radii: R = r₀·A^(1/N_c)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Nuclear — Nuclear Radii: R = r₀·A^(1/N_c)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -8010,12 +8473,14 @@ fig.text(0.5, 0.01,
          color='green' if passes == total else 'red')
 
 plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-plt.savefig('nuclear_radii.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('nuclear_radii.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §nuclear_semf: Crystal Nuclear — SEMF Term Decomposition
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Nuclear — SEMF Term Decomposition"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -8058,14 +8523,16 @@ ax.set_ylim(0, 17)
 ax.grid(True, alpha=0.3)
 
 plt.tight_layout()
-plt.savefig('nuclear_semf.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('nuclear_semf.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ## §crystal-toe/optics
 
 ### §optics_fresnel: Crystal Optics — Fresnel Reflectance: n_water=4/3=C_F, n_glass=3/2=N_c/N_w
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Optics — Fresnel Reflectance: n_water=4/3=C_F, n_glass=3/2=N_c/N_w"""
 import crystal_toe as ct
 import numpy as np
@@ -8099,12 +8566,14 @@ for i, l in enumerate([f"n_water = C_F = (N_c²−1)/(2N_c) = 4/3 = {op.n_water(
     f"Normal R(diamond) = {op.normal_reflectance(1.0, op.n_diamond())*100:.1f}%", "",
     f"C_F is the Casimir factor of SU(N_c)", f"The SAME fraction governs QCD and water!"]):
     axes[2].text(0.05, 0.95-i*0.1, l, transform=axes[2].transAxes, fontsize=11, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('optics_fresnel.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('optics_fresnel.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §optics_integers: Crystal Optics — Every Integer from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Optics — Every Integer from (2,3)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -8130,12 +8599,14 @@ for i, (name, val, origin) in enumerate(rows):
     ax.text(0.02, y, name, fontsize=11, fontfamily='monospace', va='top', transform=ax.transAxes)
     ax.text(0.32, y, val, fontsize=11, fontfamily='monospace', va='top', fontweight='bold', color='crimson', transform=ax.transAxes)
     ax.text(0.50, y, f'= {origin}', fontsize=10, fontfamily='monospace', va='top', transform=ax.transAxes)
-plt.savefig('optics_integers.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('optics_integers.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §optics_planck: Crystal Optics — Planck Radiation: B(λ) ∝ λ^(−5) = λ^(−(χ−1))
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Optics — Planck Radiation: B(λ) ∝ λ^(−5) = λ^(−(χ−1))"""
 import crystal_toe as ct
 import numpy as np
@@ -8170,12 +8641,14 @@ for i, l in enumerate([f"Planck exp = χ−1 = {op.planck_lambda_exp()}", f"Wien
     f"  Planck λ^(−{op.planck_lambda_exp()}) = λ^(−(χ−1))",
     f"  Stefan T^{op.rayleigh_lambda_exp()} = T^(N_w²)"]):
     axes[2].text(0.05, 0.95-i*0.11, l, transform=axes[2].transAxes, fontsize=11, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('optics_planck.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('optics_planck.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §optics_rayleigh: Crystal Optics — Rayleigh: I ∝ λ^(−N_w²) = λ⁻⁴
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Optics — Rayleigh: I ∝ λ^(−N_w²) = λ⁻⁴"""
 import crystal_toe as ct
 import numpy as np
@@ -8203,12 +8676,14 @@ for i, l in enumerate([f"Rayleigh: I ∝ λ^(−{op.rayleigh_lambda_exp()}) = λ
     f"N_w² = {op.rayleigh_lambda_exp()} appears in:", f"  Rayleigh scattering λ⁻⁴",
     f"  Stefan-Boltzmann T⁴", f"  Light bending 4GM/b", f"  Bekenstein S = A/4G"]):
     axes[1].text(0.05, 0.95-i*0.1, l, transform=axes[1].transAxes, fontsize=12, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('optics_rayleigh.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('optics_rayleigh.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §optics_snell: Crystal Optics — Snell's Law & Total Internal Reflection
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Optics — Snell's Law & Total Internal Reflection"""
 import crystal_toe as ct
 import numpy as np
@@ -8249,14 +8724,16 @@ for i, l in enumerate([f"n_water = C_F = 4/3 = {op.n_water():.4f}", f"n_glass = 
     f"  Glass→Air: {np.degrees(op.critical_angle(op.n_glass(), 1.0)):.1f}°",
     f"  Diamond→Air: {np.degrees(op.critical_angle(op.n_diamond(), 1.0)):.1f}°"]):
     axes[2].text(0.05, 0.95-i*0.11, l, transform=axes[2].transAxes, fontsize=11, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('optics_snell.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('optics_snell.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ## §crystal-toe/plasma
 
 ### §plasma_alfven: Crystal Plasma — Alfvén Wave Propagation: FDTD staggered leapfrog
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Plasma — Alfvén Wave Propagation: FDTD staggered leapfrog"""
 import crystal_toe as ct
 import numpy as np
@@ -8290,12 +8767,14 @@ for i, l in enumerate([f"MHD states = {pl.mhd_states()} = N_w³ = d_colour",
     f"v_A = B/√ρ (Alfvén speed)", "",
     f"FDTD = staggered leapfrog", f"Same W∘U as Yee EM"]):
     axes[1][1].text(0.05, 0.95-i*0.11, l, transform=axes[1][1].transAxes, fontsize=11, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('plasma_alfven.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('plasma_alfven.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §plasma_beta: Crystal Plasma — Plasma Beta & Magnetic Pressure
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Plasma — Plasma Beta & Magnetic Pressure"""
 import crystal_toe as ct
 import numpy as np
@@ -8326,12 +8805,14 @@ va = [pl.alfven_speed(1.0, r) for r in rho]
 axes[2].loglog(rho, va, 'red', linewidth=2)
 axes[2].set_xlabel('ρ'); axes[2].set_ylabel('v_A'); axes[2].set_title('Alfvén Speed = B/√ρ')
 axes[2].grid(True, alpha=0.3)
-plt.tight_layout(); plt.savefig('plasma_beta.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('plasma_beta.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §plasma_integers: Crystal Plasma — Every Integer from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Plasma — Every Integer from (2,3)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -8357,12 +8838,14 @@ for i, (name, val, origin) in enumerate(rows):
     ax.text(0.02, y, name, fontsize=11, fontfamily='monospace', va='top', transform=ax.transAxes)
     ax.text(0.35, y, val, fontsize=11, fontfamily='monospace', va='top', fontweight='bold', color='crimson', transform=ax.transAxes)
     ax.text(0.50, y, f'= {origin}', fontsize=10, fontfamily='monospace', va='top', transform=ax.transAxes)
-plt.savefig('plasma_integers.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('plasma_integers.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §plasma_pulse: Crystal Plasma — Alfvén Pulse Propagation
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Plasma — Alfvén Pulse Propagation"""
 import crystal_toe as ct
 import numpy as np
@@ -8379,12 +8862,14 @@ for i, vy in enumerate(vys):
     ax.plot(x, np.array(vy) + i*0.3, 'b-', linewidth=0.8, alpha=0.7)
 ax.set_xlabel('x'); ax.set_ylabel('v_y + offset'); ax.set_title('Waterfall Plot')
 ax.grid(True, alpha=0.3)
-plt.tight_layout(); plt.savefig('plasma_pulse.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('plasma_pulse.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §plasma_scales: Crystal Plasma — Characteristic Scales: Debye, Larmor, cyclotron
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Plasma — Characteristic Scales: Debye, Larmor, cyclotron"""
 import crystal_toe as ct
 import numpy as np
@@ -8410,14 +8895,16 @@ wp = [pl.plasma_frequency(n, 9.1e-31) for n in n_vals]
 axes[2].loglog(n_vals, wp, 'green', linewidth=2)
 axes[2].set_xlabel('Density n (m⁻³)'); axes[2].set_ylabel('ω_p (rad/s)')
 axes[2].set_title('Plasma Frequency'); axes[2].grid(True, alpha=0.3)
-plt.tight_layout(); plt.savefig('plasma_scales.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('plasma_scales.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ## §crystal-toe/QFT
 
 ### §qft_cross_section: Crystal QFT — e⁺e⁻→μ⁺μ⁻: σ = N_w²πα²/(N_c·s)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal QFT — e⁺e⁻→μ⁺μ⁻: σ = N_w²πα²/(N_c·s)"""
 import crystal_toe as ct
 import numpy as np
@@ -8444,12 +8931,14 @@ for i, l in enumerate([f"σ = N_w²πα²/(N_c·s) × ℏ²c²", f"  N_w² = {qf
     f"  = (8/3)πr_e² = {qf.thomson_cs():.4e} barn", "",
     f"Pair threshold = N_w·m = 2m"]):
     axes[2].text(0.05, 0.95-i*0.1, l, transform=axes[2].transAxes, fontsize=11, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('qft_cross_section.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('qft_cross_section.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §qft_feynman_rules: Crystal QFT — Feynman Rules: every counting factor from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal QFT — Feynman Rules: every counting factor from (2,3)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -8479,12 +8968,14 @@ for i, (name, val, origin) in enumerate(rows):
     ax.text(0.02, y, name, fontsize=10.5, fontfamily='monospace', va='top', transform=ax.transAxes)
     ax.text(0.30, y, val, fontsize=10.5, fontfamily='monospace', va='top', fontweight='bold', color='crimson', transform=ax.transAxes)
     ax.text(0.42, y, f'= {origin}', fontsize=10, fontfamily='monospace', va='top', transform=ax.transAxes)
-plt.savefig('qft_feynman.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('qft_feynman.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §qft_integers: Crystal QFT — Every Integer from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal QFT — Every Integer from (2,3)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -8506,12 +8997,14 @@ for i, (name, val, origin) in enumerate(rows):
     ax.text(0.02, y, name, fontsize=11, fontfamily='monospace', va='top', transform=ax.transAxes)
     ax.text(0.25, y, val, fontsize=11, fontfamily='monospace', va='top', fontweight='bold', color='crimson', transform=ax.transAxes)
     ax.text(0.40, y, f'= {origin}', fontsize=10, fontfamily='monospace', va='top', transform=ax.transAxes)
-plt.savefig('qft_integers.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('qft_integers.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §qft_phase_space: Crystal QFT — Phase Space: Φ₂ = 1/(8π) = 1/(d_colour·π)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal QFT — Phase Space: Φ₂ = 1/(8π) = 1/(d_colour·π)"""
 import crystal_toe as ct
 import numpy as np
@@ -8532,12 +9025,14 @@ dims = [qf.n_c()*n - (qf.n_c()+1) for n in n_final]
 axes[1].bar([str(n) for n in n_final], dims, color='coral')
 axes[1].set_xlabel('Final-state particles'); axes[1].set_ylabel('Phase space dim')
 axes[1].set_title(f'dim = N_c·n − (N_c+1) = 3n−4'); axes[1].grid(True, alpha=0.3, axis='y')
-plt.tight_layout(); plt.savefig('qft_phase_space.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('qft_phase_space.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §qft_running_couplings: Crystal QFT — Running Couplings: α_s(Q) = 2π/(β₀·ln(Q/Λ))
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal QFT — Running Couplings: α_s(Q) = 2π/(β₀·ln(Q/Λ))"""
 import crystal_toe as ct
 import numpy as np
@@ -8570,14 +9065,16 @@ for i, l in enumerate([f"QCD: α_s = 2π/(β₀·ln(Q/Λ))", f"  β₀ = {qf.qcd
     f"α⁻¹ = (D+1)π + ln(β₀) = {qf.alpha_inv():.3f}",
     f"  = {int(toe.tower_d())+1}π + ln({qf.qcd_beta0()})"]):
     axes[2].text(0.05, 0.95-i*0.1, l, transform=axes[2].transAxes, fontsize=11, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('qft_running.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('qft_running.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ## §crystal-toe/qinfo
 
 ### §qinfo_entropy: Crystal QInfo — Entanglement Entropy from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal QInfo — Entanglement Entropy from (2,3)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -8638,12 +9135,14 @@ ax.set_title('Entropy Factorization: ln(χ) = ln(N_w) + ln(N_c)')
 ax.set_ylim(0, 2.2)
 
 plt.tight_layout()
-plt.savefig('qinfo_entropy.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('qinfo_entropy.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §qinfo_error_codes: Crystal QInfo — Error Correction Codes from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal QInfo — Error Correction Codes from (2,3)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -8705,12 +9204,14 @@ ax.text(0.95, 0.05, f'Note: Shor {qi.shor_n()} = N_c² = D2Q9\n(same as CFD latt
         bbox=dict(boxstyle='round', facecolor='lightyellow'))
 
 plt.tight_layout()
-plt.savefig('qinfo_error_codes.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('qinfo_error_codes.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §qinfo_heyting: Crystal QInfo — Heyting Algebra & Uncertainty Principle from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal QInfo — Heyting Algebra & Uncertainty Principle from (2,3)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -8787,12 +9288,14 @@ ax.set_aspect('equal')
 ax.axis('off')
 
 plt.tight_layout()
-plt.savefig('qinfo_heyting.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('qinfo_heyting.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §qinfo_integers: Crystal QInfo — Every Integer Dashboard
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal QInfo — Every Integer Dashboard"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -8829,12 +9332,14 @@ for i, (name, val, origin) in enumerate(rows):
             fontweight='bold', color='crimson', transform=ax.transAxes)
     ax.text(0.50, y, f'= {origin}', fontsize=9, fontfamily='monospace',
             va='top', transform=ax.transAxes)
-plt.savefig('qinfo_integers.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('qinfo_integers.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §qinfo_mera: Crystal QInfo — MERA Structure & Teleport/Superdense Duality
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal QInfo — MERA Structure & Teleport/Superdense Duality"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -8920,14 +9425,16 @@ fig.text(0.5, 0.01,
          color='green' if passes == total else 'red')
 
 plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-plt.savefig('qinfo_mera.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('qinfo_mera.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ## §crystal-toe/rigid
 
 ### §rigid_asymmetric: Crystal Rigid — Asymmetric Top: intermediate axis instability
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Rigid — Asymmetric Top: intermediate axis instability"""
 import crystal_toe as ct
 import numpy as np
@@ -8949,12 +9456,14 @@ axes[0].plot(t, ens_min, 'b-', linewidth=0.5); axes[0].set_title('Min axis (stab
 axes[1].plot(t, ens_int, 'r-', linewidth=0.5); axes[1].set_title('Intermediate axis (UNSTABLE)'); axes[1].grid(True, alpha=0.3)
 axes[2].plot(t, ens_max, 'g-', linewidth=0.5); axes[2].set_title('Max axis (stable)'); axes[2].grid(True, alpha=0.3)
 for ax in axes: ax.set_xlabel('Time'); ax.set_ylabel('KE')
-plt.tight_layout(); plt.savefig('rigid_asymmetric.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('rigid_asymmetric.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §rigid_gyroscope: Crystal Rigid — Gyroscope: symmetric top precession
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Rigid — Gyroscope: symmetric top precession"""
 import crystal_toe as ct
 import numpy as np
@@ -8973,12 +9482,14 @@ axes[0].set_title('Energy (conserved)'); axes[0].set_xlabel('Time'); axes[0].gri
 
 axes[1].plot(t, lms, 'r-', linewidth=0.5)
 axes[1].set_title('|L| (conserved)'); axes[1].set_xlabel('Time'); axes[1].grid(True, alpha=0.3)
-plt.tight_layout(); plt.savefig('rigid_gyroscope.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('rigid_gyroscope.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §rigid_inertia: Crystal Rigid — Moments of Inertia: every factor from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Rigid — Moments of Inertia: every factor from (2,3)"""
 import crystal_toe as ct
 import numpy as np
@@ -9018,12 +9529,14 @@ for i, l in enumerate([f"I_sphere = 2/5 MR² = N_w/(χ−1) MR²",
     f"I_shell = 2/3 MR² = N_w/N_c MR²", "",
     f"Every fraction from (2,3)!"]):
     axes[2].text(0.05, 0.95-i*0.11, l, transform=axes[2].transAxes, fontsize=11, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('rigid_inertia.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('rigid_inertia.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §rigid_integers: Crystal Rigid — Every Integer from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Rigid — Every Integer from (2,3)"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -9050,12 +9563,14 @@ for i, (name, val, origin) in enumerate(rows):
     ax.text(0.02, y, name, fontsize=11, fontfamily='monospace', va='top', transform=ax.transAxes)
     ax.text(0.30, y, val, fontsize=11, fontfamily='monospace', va='top', fontweight='bold', color='crimson', transform=ax.transAxes)
     ax.text(0.45, y, f'= {origin}', fontsize=10, fontfamily='monospace', va='top', transform=ax.transAxes)
-plt.savefig('rigid_integers.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('rigid_integers.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §rigid_tumbling: Crystal Rigid — Torque-Free Tumbling: Euler equations + quaternion
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Rigid — Torque-Free Tumbling: Euler equations + quaternion"""
 import crystal_toe as ct
 import numpy as np
@@ -9088,14 +9603,16 @@ for i, l in enumerate([f"Quaternion = {rg.quat_components()} = N_w² components"
     f"Euler angles = {rg.euler_angles()} = N_c", "",
     f"Euler eqns: dω/dt = (I×ω)/I", f"Quat update: dq/dt = ½q·ω"]):
     axes[1][1].text(0.05, 0.95-i*0.11, l, transform=axes[1][1].transAxes, fontsize=11, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('rigid_tumbling.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('rigid_tumbling.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ## §crystal-toe/thermo
 
 ### §thermo_gamma: Crystal Thermo — Adiabatic Indices γ from (2,3)
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Thermo — Adiabatic Indices γ from (2,3)"""
 import crystal_toe as ct
 import numpy as np
@@ -9130,12 +9647,14 @@ for i, l in enumerate([f"DOF mono = N_c = {th.dof_mono()}", f"DOF di = χ−1 = 
     f"v_rms = √(N_c·kT/m)", f"E = f·kT/N_w = f·kT/2", "",
     f"Kolmogorov 5/3 = (χ−1)/N_c = γ_mono!", f"Same fraction in GW chirp!"]):
     axes[2].text(0.05, 0.95-i*0.085, l, transform=axes[2].transAxes, fontsize=11, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('thermo_gamma.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('thermo_gamma.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §thermo_integers: Crystal Thermo — Every Integer Dashboard
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Thermo — Every Integer Dashboard"""
 import crystal_toe as ct
 import matplotlib.pyplot as plt
@@ -9163,12 +9682,14 @@ for i, (name, val, origin) in enumerate(rows):
     ax.text(0.02, y, name, fontsize=11, fontfamily='monospace', va='top', transform=ax.transAxes)
     ax.text(0.30, y, val, fontsize=11, fontfamily='monospace', va='top', fontweight='bold', color='crimson', transform=ax.transAxes)
     ax.text(0.45, y, f'= {origin}', fontsize=10, fontfamily='monospace', va='top', transform=ax.transAxes)
-plt.savefig('thermo_integers.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.savefig('thermo_integers.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §thermo_lattice: Crystal Thermo — 2D Lattice MD: Watch Crystal Melt
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Thermo — 2D Lattice MD: Watch Crystal Melt"""
 import crystal_toe as ct
 import numpy as np
@@ -9190,12 +9711,14 @@ for idx in range(min(6, len(snaps))):
     ax.scatter(xs, ys, s=50, c='royalblue', edgecolors='navy')
     ax.set_xlim(-2, 7); ax.set_ylim(-2, 7); ax.set_aspect('equal')
     ax.set_title(f'Snapshot {idx}'); ax.grid(True, alpha=0.3)
-plt.tight_layout(); plt.savefig('thermo_lattice.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('thermo_lattice.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §thermo_lj_potential: Crystal Thermo — LJ 6-12 Potential: χ and 2χ
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Thermo — LJ 6-12 Potential: χ and 2χ"""
 import crystal_toe as ct
 import numpy as np
@@ -9225,12 +9748,14 @@ for i, l in enumerate([f"Attractive: (σ/r)^{th.lj_attract()} = (σ/r)^χ", f"Re
     f"V(σ) = 0, V(r_min) = −ε", "", f"γ_mono = {th.gamma_monatomic():.4f} = (χ−1)/N_c = 5/3",
     f"γ_di = {th.gamma_diatomic():.4f} = β₀/(χ−1) = 7/5", f"Carnot = {th.carnot_efficiency():.4f} = (χ−1)/χ = 5/6"]):
     axes[2].text(0.05, 0.95-i*0.1, l, transform=axes[2].transAxes, fontsize=11, fontfamily='monospace', va='top')
-plt.tight_layout(); plt.savefig('thermo_lj.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('thermo_lj.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ### §thermo_md_simulation: Crystal Thermo — MD Simulation with Energy Conservation
 ```python
 #!/usr/bin/env python3
+# Copyright (c) 2026 Daland Montgomery
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 """Crystal Thermo — MD Simulation with Energy Conservation"""
 import crystal_toe as ct
 import numpy as np
@@ -9270,8 +9795,7 @@ axes[1][0].set_title('Temperature'); axes[1][0].set_xlabel('Snapshot'); axes[1][
 axes[1][1].plot(range(len(ke)), ke, 'blue', linewidth=1, label='KE')
 axes[1][1].plot(range(len(energies)), np.array(energies)-np.array(ke), 'green', linewidth=1, label='PE')
 axes[1][1].set_title('KE vs PE'); axes[1][1].legend(); axes[1][1].grid(True, alpha=0.3)
-plt.tight_layout(); plt.savefig('thermo_md.png', dpi=150, bbox_inches='tight'); plt.show()
-```
+plt.tight_layout(); plt.savefig('thermo_md.png', dpi=150, bbox_inches='tight'); plt.show()```
 
 ---
 # §SPECTRAL TOWER — Pure D=0→D=42 Derivation Chain

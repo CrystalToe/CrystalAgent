@@ -1,0 +1,340 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Crystal Topos — Black Hole</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#000;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif}
+  canvas{display:block}
+  #hud{position:absolute;top:0;left:0;right:0;padding:12px 16px;
+       background:linear-gradient(180deg,rgba(0,0,0,0.8) 60%,transparent);z-index:10;pointer-events:none}
+  h1{font-size:1em;color:#7ec8e3;letter-spacing:3px;margin-bottom:2px}
+  h1 span{color:#e74c3c}
+  .sub{color:#444;font-size:0.68em}
+  .chips{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+  .chip{background:rgba(126,200,227,0.06);border:1px solid rgba(126,200,227,0.1);
+        border-radius:14px;padding:2px 9px;font-size:0.6em;color:#5a9;font-family:monospace}
+  .chip b{color:#7ec8e3}
+  #info{position:absolute;bottom:12px;left:16px;z-index:10;pointer-events:none;
+        font-family:monospace;font-size:0.65em;color:#333;line-height:1.6}
+  #info b{color:#5a9}
+  #info em{color:#e74c3c;font-style:normal}
+  #btn-explain{position:absolute;bottom:12px;right:16px;z-index:10;background:rgba(255,255,255,0.04);
+               border:1px solid #1a1a3a;color:#5a9;padding:4px 12px;border-radius:5px;cursor:pointer;font-size:0.7em}
+  #overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.93);z-index:20;
+           display:none;overflow-y:auto;padding:40px 20px}
+  #overlay.show{display:block}
+  #overlay .inner{max-width:700px;margin:auto;font-size:0.85em;line-height:1.8;color:#999}
+  #overlay h3{color:#7ec8e3;font-size:1em;margin:16px 0 6px}
+  #overlay h3 span{color:#e74c3c}
+  #overlay b{color:#7ec8e3}
+  #overlay em{color:#e74c3c;font-style:normal}
+  #overlay code{color:#7ec8e3;background:#0a0a20;padding:1px 5px;border-radius:3px}
+  #overlay table{border-collapse:collapse;margin:10px 0;width:100%}
+  #overlay td,#overlay th{border:1px solid #1a1a3a;padding:5px 10px;font-size:0.85em;text-align:left}
+  #overlay th{color:#7ec8e3;background:#0a0a20}
+  #overlay .close{color:#e74c3c;cursor:pointer;font-size:0.8em;margin-top:16px;display:inline-block}
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <h1>SCHWARZSCHILD <span>BLACK HOLE</span></h1>
+  <div class="sub">Accretion disk from ISCO = χ·GM — geodesic orbit — gravitational redshift — all from (2,3)</div>
+  <div class="chips">
+    <span class="chip"><b>r_s</b>=N_w·GM=2GM</span>
+    <span class="chip"><b>Photon</b>=N_c·GM=3GM</span>
+    <span class="chip"><b>ISCO</b>=χ·GM=6GM</span>
+    <span class="chip"><b>16πG</b>=N_w⁴·π·G</span>
+    <span class="chip"><b>Redshift</b>=√(1−r_s/r)</span>
+  </div>
+</div>
+
+<div id="info">
+  Particle r = <b id="pr">—</b> GM · φ = <b id="pp">—</b>° · Orbits <b id="po">0</b><br>
+  Redshift z = <b id="pz">—</b> · <em id="pstatus">orbiting</em>
+</div>
+
+<button id="btn-explain" onclick="document.getElementById('overlay').classList.toggle('show')">? EXPLAIN</button>
+
+<div id="overlay">
+<div class="inner">
+<h3>WHAT YOU'RE <span>SEEING</span></h3>
+<p>A <b>Schwarzschild black hole</b> rendered in 3D. The black sphere is the <b>event horizon</b>
+at <code>r_s = N_w · GM = 2GM</code>. The faint blue ring is the <b>photon sphere</b> at
+<code>N_c · GM = 3GM</code> — where light itself orbits. The glowing disk starts at the
+<b>innermost stable circular orbit</b> at <code>ISCO = χ · GM = 6GM</code>.</p>
+
+<p>The bright particle traces a <b>real geodesic</b> computed by <code>WasmGR</code> — a solution
+to Einstein's field equations in Schwarzschild spacetime. Watch it precess: each orbit rotates
+by <code>δφ = χ·π·GM/a = 6πGM/a</code>. This is what Mercury does — 43 arcseconds per century.</p>
+
+<h3>THE ACCRETION <span>DISK</span></h3>
+<p>Matter can't orbit closer than the ISCO. Below <code>r = 6GM = χ·GM</code>, there are no stable
+orbits — everything plunges in. The disk's inner edge IS the Crystal's bond dimension. The disk
+particles orbit at Keplerian speeds: <code>v = √(GM/r)</code>, faster closer in. The color shifts
+from blue (approaching) to red (receding) via <code>gravitational_redshift(r_s, r)</code>.</p>
+
+<h3>EVERY INTEGER FROM <span>(2,3)</span></h3>
+<table>
+<tr><th>Feature</th><th>Value</th><th>Crystal</th></tr>
+<tr><td>Event horizon</td><td>r = 2GM</td><td><b>N_w · GM</b></td></tr>
+<tr><td>Photon sphere</td><td>r = 3GM</td><td><b>N_c · GM</b></td></tr>
+<tr><td>ISCO (disk edge)</td><td>r = 6GM</td><td><b>χ · GM</b></td></tr>
+<tr><td>Precession</td><td>6πGM/a</td><td><b>χ · π · GM/a</b></td></tr>
+<tr><td>Light bending</td><td>4GM/b</td><td><b>N_w² · GM/b</b></td></tr>
+<tr><td>BH entropy</td><td>A/4G</td><td><b>A / (N_w² · G)</b></td></tr>
+<tr><td>Einstein eq.</td><td>16πG</td><td><b>N_w⁴ · π · G</b></td></tr>
+<tr><td>Spacetime</td><td>3+1 = 4</td><td><b>N_c + 1</b></td></tr>
+</table>
+
+<h3>WHAT'S <span>MISSING</span> (TODO)</h3>
+<p>Full photon ray-tracing (needs <code>photon_geodesic</code> in Haskell → Rust → WASM).
+Kerr rotation (frame dragging, ergosphere). Disk temperature profile <code>T ∝ r^{−3/4}</code>.
+These are on the TODO for next session. What you see now uses only existing WASM calls.</p>
+
+<p class="close" onclick="document.getElementById('overlay').classList.remove('show')">✕ Close</p>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script type="module">
+// ══════════════════════════════════════════════════════════════
+// WASM
+// ══════════════════════════════════════════════════════════════
+let GR, OK = false, geodesicPts = [];
+try {
+  const m = await import('./pkg/crystal_toe.js');
+  await m.default();
+  GR = new m.WasmGR();
+  geodesicPts = GR.geodesic(1.0, 4.2, 0.965, 0.3, 12000);
+  OK = true;
+  console.log('✓ WasmGR:', geodesicPts.length, 'points');
+} catch(e) {
+  console.warn('JS fallback:', e.message);
+  // Fallback: precessing ellipse
+  for (let i=0;i<12000;i++) {
+    const th=i*0.002, a=15, e2=0.5, prec=0.025;
+    const r=a*(1-e2*e2)/(1+e2*Math.cos(th*(1-prec)));
+    geodesicPts.push([r*Math.cos(th), r*Math.sin(th)]);
+  }
+}
+
+const RS = 2, ISCO = 6, PHOTON = 3; // N_w, χ, N_c
+
+// ══════════════════════════════════════════════════════════════
+// Three.js scene
+// ══════════════════════════════════════════════════════════════
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(55, innerWidth/innerHeight, 0.1, 2000);
+camera.position.set(0, 25, 45);
+camera.lookAt(0, 0, 0);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+document.body.appendChild(renderer.domElement);
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+// ── Stars ──
+const starGeo = new THREE.BufferGeometry();
+const starPos = new Float32Array(6000);
+for (let i=0;i<6000;i+=3) {
+  const theta=Math.random()*Math.PI*2, phi=Math.acos(2*Math.random()-1);
+  const r=300+Math.random()*700;
+  starPos[i]=r*Math.sin(phi)*Math.cos(theta);
+  starPos[i+1]=r*Math.sin(phi)*Math.sin(theta);
+  starPos[i+2]=r*Math.cos(phi);
+}
+starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+const starMat = new THREE.PointsMaterial({color:0xffffff, size:0.5, sizeAttenuation:true});
+scene.add(new THREE.Points(starGeo, starMat));
+
+// ── Event horizon (black sphere) ──
+const bhGeo = new THREE.SphereGeometry(RS, 64, 64);
+const bhMat = new THREE.MeshBasicMaterial({color: 0x000000});
+const bh = new THREE.Mesh(bhGeo, bhMat);
+scene.add(bh);
+
+// ── Photon sphere glow ──
+const photonGeo = new THREE.TorusGeometry(PHOTON, 0.08, 8, 128);
+const photonMat = new THREE.MeshBasicMaterial({color: 0x3498db, transparent: true, opacity: 0.15});
+const photonRing = new THREE.Mesh(photonGeo, photonMat);
+photonRing.rotation.x = Math.PI/2;
+scene.add(photonRing);
+
+// ── Accretion disk (particle system) ──
+const DISK_N = 8000;
+const diskGeo = new THREE.BufferGeometry();
+const diskPositions = new Float32Array(DISK_N * 3);
+const diskColors = new Float32Array(DISK_N * 3);
+const diskSpeeds = new Float32Array(DISK_N); // angular velocities
+const diskRadii = new Float32Array(DISK_N);
+const diskPhases = new Float32Array(DISK_N);
+
+for (let i = 0; i < DISK_N; i++) {
+  const r = ISCO + Math.random() * 25; // ISCO to ~31 GM
+  const phase = Math.random() * Math.PI * 2;
+  const omega = Math.sqrt(1 / (r*r*r)); // Kepler: ω = √(GM/r³)
+  diskRadii[i] = r;
+  diskPhases[i] = phase;
+  diskSpeeds[i] = omega;
+  
+  // Vertical spread: thinner near ISCO, thicker farther out
+  const y = (Math.random()-0.5) * 0.3 * Math.sqrt(r - ISCO + 1);
+  diskPositions[i*3] = r * Math.cos(phase);
+  diskPositions[i*3+1] = y;
+  diskPositions[i*3+2] = r * Math.sin(phase);
+
+  // Color: hot white/yellow near ISCO → orange → red far out
+  const t = Math.min(1, (r - ISCO) / 20);
+  diskColors[i*3]   = 1.0;                    // R
+  diskColors[i*3+1] = 0.9 - t * 0.6;          // G: yellow → red
+  diskColors[i*3+2] = 0.7 - t * 0.65;         // B: white → dark
+}
+
+diskGeo.setAttribute('position', new THREE.BufferAttribute(diskPositions, 3));
+diskGeo.setAttribute('color', new THREE.BufferAttribute(diskColors, 3));
+const diskMat = new THREE.PointsMaterial({
+  size: 0.25, vertexColors: true, transparent: true, opacity: 0.8,
+  blending: THREE.AdditiveBlending, depthWrite: false
+});
+const disk = new THREE.Points(diskGeo, diskMat);
+scene.add(disk);
+
+// ── Inner glow (around event horizon) ──
+const glowGeo = new THREE.SphereGeometry(RS * 1.5, 32, 32);
+const glowMat = new THREE.MeshBasicMaterial({
+  color: 0xe74c3c, transparent: true, opacity: 0.04, side: THREE.BackSide
+});
+scene.add(new THREE.Mesh(glowGeo, glowMat));
+
+const glow2Geo = new THREE.SphereGeometry(RS * 3, 32, 32);
+const glow2Mat = new THREE.MeshBasicMaterial({
+  color: 0x9b59b6, transparent: true, opacity: 0.015, side: THREE.BackSide
+});
+scene.add(new THREE.Mesh(glow2Geo, glow2Mat));
+
+// ── ISCO ring ──
+const iscoGeo = new THREE.TorusGeometry(ISCO, 0.05, 8, 128);
+const iscoMat = new THREE.MeshBasicMaterial({color: 0x7ec8e3, transparent: true, opacity: 0.1});
+const iscoRing = new THREE.Mesh(iscoGeo, iscoMat);
+iscoRing.rotation.x = Math.PI/2;
+scene.add(iscoRing);
+
+// ── Orbiting particle (geodesic) ──
+const partGeo = new THREE.SphereGeometry(0.3, 16, 16);
+const partMat = new THREE.MeshBasicMaterial({color: 0x7ec8e3});
+const particle = new THREE.Mesh(partGeo, partMat);
+scene.add(particle);
+
+// Particle glow
+const partGlowGeo = new THREE.SphereGeometry(0.8, 16, 16);
+const partGlowMat = new THREE.MeshBasicMaterial({color: 0x7ec8e3, transparent: true, opacity: 0.3});
+const partGlow = new THREE.Mesh(partGlowGeo, partGlowMat);
+scene.add(partGlow);
+
+// Geodesic trail
+const TRAIL_LEN = 800;
+const trailGeo = new THREE.BufferGeometry();
+const trailPositions = new Float32Array(TRAIL_LEN * 3);
+trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3));
+const trailMat = new THREE.LineBasicMaterial({color: 0x7ec8e3, transparent: true, opacity: 0.3});
+const trail = new THREE.Line(trailGeo, trailMat);
+scene.add(trail);
+
+// ── Ambient light ──
+scene.add(new THREE.AmbientLight(0x111122));
+
+// ══════════════════════════════════════════════════════════════
+// Animation
+// ══════════════════════════════════════════════════════════════
+let frame = 0, geoIdx = 0, orbits = 0, prevPhi = 0;
+const trailHistory = [];
+const scale = 1.0; // 1 GM = 1 Three.js unit
+
+function animate() {
+  requestAnimationFrame(animate);
+  frame++;
+
+  // Camera orbit
+  const t = frame * 0.001;
+  camera.position.x = 45 * Math.cos(t * 0.3);
+  camera.position.z = 45 * Math.sin(t * 0.3);
+  camera.position.y = 15 + 10 * Math.sin(t * 0.15);
+  camera.lookAt(0, 0, 0);
+
+  // Rotate disk particles (Keplerian)
+  const pos = disk.geometry.attributes.position.array;
+  for (let i = 0; i < DISK_N; i++) {
+    diskPhases[i] += diskSpeeds[i] * 0.15;
+    const r = diskRadii[i];
+    pos[i*3]   = r * Math.cos(diskPhases[i]);
+    pos[i*3+2] = r * Math.sin(diskPhases[i]);
+  }
+  disk.geometry.attributes.position.needsUpdate = true;
+
+  // Move particle along geodesic
+  geoIdx = (geoIdx + 3) % geodesicPts.length;
+  const gp = geodesicPts[geoIdx];
+  const px = gp[0] * scale, pz = gp[1] * scale;
+  particle.position.set(px, 0, pz);
+  partGlow.position.set(px, 0, pz);
+
+  // Count orbits
+  const phi = Math.atan2(pz, px);
+  if (prevPhi > 2 && phi < -2) orbits++;
+  if (prevPhi < -2 && phi > 2) orbits--;
+  prevPhi = phi;
+
+  // Trail
+  trailHistory.push([px, 0, pz]);
+  if (trailHistory.length > TRAIL_LEN) trailHistory.shift();
+  const tp = trail.geometry.attributes.position.array;
+  for (let i = 0; i < TRAIL_LEN; i++) {
+    if (i < trailHistory.length) {
+      tp[i*3] = trailHistory[i][0]; tp[i*3+1] = trailHistory[i][1]; tp[i*3+2] = trailHistory[i][2];
+    } else {
+      tp[i*3] = px; tp[i*3+1] = 0; tp[i*3+2] = pz;
+    }
+  }
+  trail.geometry.attributes.position.needsUpdate = true;
+  trail.geometry.setDrawRange(0, Math.min(trailHistory.length, TRAIL_LEN));
+
+  // Photon sphere pulse
+  photonRing.material.opacity = 0.1 + 0.05 * Math.sin(frame * 0.05);
+
+  // Stats
+  const r = Math.sqrt(px*px + pz*pz);
+  if (frame % 5 === 0) {
+    document.getElementById('pr').textContent = r.toFixed(2);
+    document.getElementById('pp').textContent = ((phi * 180 / Math.PI + 360) % 360).toFixed(1);
+    document.getElementById('po').textContent = Math.abs(orbits);
+
+    // Gravitational redshift
+    const z_grav = OK ? GR.gravitational_redshift(RS, r) : Math.sqrt(1 - RS/r);
+    document.getElementById('pz').textContent = z_grav.toFixed(4);
+
+    const status = document.getElementById('pstatus');
+    if (r < ISCO) { status.textContent = 'inside ISCO — plunging!'; status.style.color = '#e74c3c'; }
+    else if (r < ISCO * 1.5) { status.textContent = 'near ISCO'; status.style.color = '#f39c12'; }
+    else { status.textContent = 'orbiting'; status.style.color = '#2ecc71'; }
+  }
+
+  renderer.render(scene, camera);
+}
+
+animate();
+</script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Crystal Topos — 3D Ising Lattice</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#000;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif}
+  #panel{position:absolute;top:10px;right:10px;width:220px;background:rgba(10,10,30,0.9);border:1px solid #1a1a3a;border-radius:8px;padding:10px;z-index:10}
+  h1{font-size:0.85em;color:#7ec8e3;letter-spacing:2px;margin-bottom:4px}
+  h1 span{color:#e74c3c}
+  .sub{color:#444;font-size:0.58em;margin-bottom:8px}
+  .row{display:flex;gap:6px;align-items:center;margin-bottom:5px}
+  label{color:#555;font-size:0.62em;white-space:nowrap}
+  input[type=range]{flex:1;height:12px}
+  .val{color:#7ec8e3;font-family:monospace;font-size:0.7em;min-width:35px}
+  .stat{font-family:monospace;font-size:0.6em;color:#444;margin:2px 0}
+  .stat b{color:#7ec8e3}
+  .stat em{color:#e74c3c;font-style:normal}
+  .note{font-size:0.55em;color:#333;margin-top:6px;border-top:1px solid #1a1a3a;padding-top:5px;line-height:1.4}
+  .note b{color:#5a9}
+</style>
+</head>
+<body>
+<div id="panel">
+  <h1>3D ISING <span>LATTICE</span></h1>
+  <div class="sub">N_w = 2 spin states · z = χ = 6 cubic neighbours</div>
+  <div class="row"><label>Temperature:</label><input type="range" id="st" min="1.0" max="8.0" value="5.5" step="0.1"><span class="val" id="vt">5.50</span></div>
+  <div class="stat">Sweep <b id="ssw">0</b></div>
+  <div class="stat">|M| <b id="smag">0</b></div>
+  <div class="stat">T_c (cubic) ≈ <em>4.51</em></div>
+  <div class="stat" id="sph"></div>
+  <div class="note">
+    <b>z = χ = 6</b> neighbours (cubic).<br>
+    <b>N_w = 2</b> spin states.<br>
+    Cool below T_c → watch domains form.<br>
+    Blue = up, red = down.<br>
+    Cubes flip in real-time.
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const N = 16; // 16³ = 4096 cubes
+const N3 = N*N*N;
+const TC = 4.51; // cubic Ising Tc ≈ 4.51 J/k
+
+// Spin lattice
+const spins = new Int8Array(N3);
+for (let i = 0; i < N3; i++) spins[i] = Math.random() < 0.5 ? 1 : -1;
+let sweep = 0;
+
+function idx(x,y,z) { return ((z+N)%N)*N*N + ((y+N)%N)*N + ((x+N)%N); }
+
+// RNG
+let rng = 42;
+function lcg() { rng = (rng * 1103515245 + 12345) & 0x7fffffff; return rng / 0x7fffffff; }
+
+// Metropolis sweep (cubic lattice, z = χ = 6 neighbours)
+function metropolis() {
+  const T = +document.getElementById('st').value;
+  const beta = 1.0 / T;
+  for (let iter = 0; iter < N3; iter++) {
+    const x = Math.floor(lcg()*N), y = Math.floor(lcg()*N), z = Math.floor(lcg()*N);
+    const i = idx(x,y,z);
+    const s = spins[i];
+    // 6 neighbours = χ (cubic coordination)
+    const sum = spins[idx(x+1,y,z)] + spins[idx(x-1,y,z)]
+              + spins[idx(x,y+1,z)] + spins[idx(x,y-1,z)]
+              + spins[idx(x,y,z+1)] + spins[idx(x,y,z-1)];
+    const dE = 2 * s * sum;
+    if (dE <= 0 || lcg() < Math.exp(-beta * dE)) spins[i] = -s;
+  }
+  sweep++;
+}
+
+function magnetization() {
+  let m = 0;
+  for (let i = 0; i < N3; i++) m += spins[i];
+  return Math.abs(m / N3);
+}
+
+// Three.js
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x000000, 0.025);
+const camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 200);
+camera.position.set(N*1.2, N*0.8, N*1.5);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+document.body.appendChild(renderer.domElement);
+addEventListener('resize', () => { camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
+
+// Lighting
+scene.add(new THREE.AmbientLight(0x222233));
+const dl = new THREE.DirectionalLight(0xffffff, 0.6);
+dl.position.set(N, N*2, N);
+scene.add(dl);
+const pl = new THREE.PointLight(0x7ec8e3, 0.4, N*4);
+pl.position.set(N/2, N/2, N/2);
+scene.add(pl);
+
+// Instanced cubes
+const cubeGeo = new THREE.BoxGeometry(0.85, 0.85, 0.85);
+const cubeMat = new THREE.MeshStandardMaterial({ metalness: 0.7, roughness: 0.3 });
+const mesh = new THREE.InstancedMesh(cubeGeo, cubeMat, N3);
+scene.add(mesh);
+
+const dummy = new THREE.Object3D();
+const colorUp = new THREE.Color(0.15, 0.45, 0.85);   // blue = up
+const colorDown = new THREE.Color(0.85, 0.2, 0.15);    // red = down
+
+function updateCubes() {
+  for (let z = 0; z < N; z++) for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+    const i = z*N*N + y*N + x;
+    dummy.position.set(x, y, z);
+    // Slight scale animation for recently flipped
+    dummy.scale.setScalar(0.95);
+    dummy.updateMatrix();
+    mesh.setMatrixAt(i, dummy.matrix);
+    mesh.setColorAt(i, spins[i] > 0 ? colorUp : colorDown);
+  }
+  mesh.instanceMatrix.needsUpdate = true;
+  mesh.instanceColor.needsUpdate = true;
+}
+
+// Center
+const center = new THREE.Vector3(N/2-0.5, N/2-0.5, N/2-0.5);
+
+let frame = 0;
+function animate() {
+  requestAnimationFrame(animate);
+  frame++;
+
+  // MC sweep
+  metropolis();
+  updateCubes();
+
+  // Camera orbit
+  const t = frame * 0.003;
+  camera.position.x = center.x + N*1.5 * Math.cos(t);
+  camera.position.z = center.z + N*1.5 * Math.sin(t);
+  camera.position.y = center.y + N*0.5 + N*0.3 * Math.sin(t*0.4);
+  camera.lookAt(center);
+
+  // Stats
+  if (frame % 5 === 0) {
+    document.getElementById('vt').textContent = (+document.getElementById('st').value).toFixed(2);
+    document.getElementById('ssw').textContent = sweep;
+    const m = magnetization();
+    document.getElementById('smag').textContent = m.toFixed(3);
+    const T = +document.getElementById('st').value;
+    const ph = document.getElementById('sph');
+    if (T < TC*0.9) { ph.textContent='❄ ORDERED'; ph.style.color='#3498db'; }
+    else if (T > TC*1.1) { ph.textContent='🔥 DISORDERED'; ph.style.color='#e74c3c'; }
+    else { ph.textContent='⚡ CRITICAL'; ph.style.color='#f39c12'; }
+  }
+
+  renderer.render(scene, camera);
+}
+
+updateCubes();
+animate();
+
+document.getElementById('st').oninput = function() { document.getElementById('vt').textContent = (+this.value).toFixed(2); };
+</script>
+</body>
+</html>

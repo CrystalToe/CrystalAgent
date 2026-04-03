@@ -3,6 +3,24 @@
 //
 // Crystal Toe — Physics from A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)
 
+//! # Crystal Topos Dynamics Engine
+//!
+//! ## THE RULE: NO CALCULUS
+//!
+//! Every dynamics module in this crate uses ONLY:
+//! - Vector add (position += velocity * dt)
+//! - Scalar multiply (force = GM / r²)
+//! - Inner product (r² = dx*dx + dy*dy + dz*dz)
+//! - Compare (if ΔE < 0, flip spin)
+//!
+//! No integrals. No derivatives. No symbolic math.
+//! No std::f64::sin/cos/exp in update loops.
+//! Transcendentals appear ONLY in constants (α⁻¹ = 43π + ln7)
+//! computed once at init, never in the tick loop.
+//!
+//! S = W∘U is the native engine. Verlet, Yee, LBM, Metropolis
+//! are sector restrictions. See CrystalEngine.hs for the proof.
+
 // Wave 0: Foundation
 pub mod atoms;
 pub mod vev;

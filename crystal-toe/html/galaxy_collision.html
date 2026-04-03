@@ -78,7 +78,7 @@ let USE_WASM = false;
 let WasmNBody;
 
 try {
-  const wasm = await import('../pkg/crystal_toe.js');
+  const wasm = await import('crystal_toe.js');
   await wasm.default();
   WasmNBody = wasm.WasmNBody;
   USE_WASM = true;

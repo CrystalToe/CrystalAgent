@@ -1,0 +1,133 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Crystal Topos — Three-Body Choreography</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#020208;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif}
+  canvas{display:block}
+  #hud{position:absolute;top:0;left:0;right:0;padding:14px 20px;
+       background:linear-gradient(180deg,rgba(2,2,8,0.95) 60%,rgba(2,2,8,0));
+       pointer-events:none;z-index:10}
+  h1{font-size:1.15em;color:#7ec8e3;letter-spacing:3px;text-transform:uppercase;margin-bottom:2px}
+  h1 span{color:#e74c3c}
+  .sub{color:#444;font-size:0.73em;letter-spacing:1px}
+  .chips{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .chip{background:rgba(126,200,227,0.08);border:1px solid rgba(126,200,227,0.15);
+        border-radius:16px;padding:2px 10px;font-size:0.68em;color:#5a9;font-family:monospace}
+  .chip b{color:#7ec8e3}
+  #stats{position:absolute;bottom:14px;left:20px;font-family:monospace;font-size:0.72em;color:#333;z-index:10}
+  #stats b{color:#5a9}
+  #ctrl{position:absolute;bottom:14px;right:20px;display:flex;gap:6px;z-index:10}
+  #ctrl button{background:rgba(255,255,255,0.04);border:1px solid #1a1a3a;color:#5a9;
+               padding:4px 12px;border-radius:5px;cursor:pointer;font-size:0.75em}
+  #ctrl button:hover{background:rgba(126,200,227,0.1)}
+  #ctrl button.on{background:rgba(231,76,60,0.2);border-color:#e74c3c;color:#e74c3c}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <h1>THREE-BODY <span>CHOREOGRAPHY</span></h1>
+  <div class="sub">Figure-8 periodic orbit (Moore 1993) — force 1/r^(N_c−1) = 1/r², integrator order N_w = 2</div>
+  <div class="chips" id="chips"></div>
+</div>
+<div id="stats">Step <b id="st">0</b> · E <b id="en">—</b> · ΔE <b id="de">—</b></div>
+<div id="ctrl">
+  <button class="on" id="bplay">▶</button>
+  <button id="bpause">⏸</button>
+  <button id="breset">↺</button>
+  <button id="btrail">Trails</button>
+</div>
+
+<script type="module">
+let USE_WASM=false, WasmNBody=null, CD=null;
+try {
+  const w=await import('./pkg/crystal_toe.js'); await w.default();
+  if(w.WasmNBody){WasmNBody=w.WasmNBody;USE_WASM=true}
+  if(w.crystal_dump)CD=w.crystal_dump();
+  console.log('WASM NBody:',!!WasmNBody);
+} catch(e){console.warn('JS fallback:',e.message)}
+const C=CD||{n_w:2,n_c:3,chi:6,beta0:7,sigma_d:36,tower_d:42};
+document.getElementById('chips').innerHTML=[
+  ['N_w',C.n_w],['N_c',C.n_c],['χ',C.chi],['Force','1/r²'],
+  ['Dims','N_c=3'],['Phase','χ=6/body'],['Engine',USE_WASM?'WASM ✓':'JS'],
+].map(([k,v])=>`<span class="chip"><b>${k}</b>=${v}</span>`).join('');
+
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+let W,H; function resize(){W=cv.width=innerWidth;H=cv.height=innerHeight} addEventListener('resize',resize);resize();
+
+let sim,step=0,E0,playing=true,showTrails=true;
+const trails=[[],[],[]],COLORS=['#7ec8e3','#e74c3c','#2ecc71'],NAMES=['α','β','γ'];
+
+// Figure-8 ICs
+const vx=0.347111,vy=0.532728;
+
+function init(){
+  step=0;trails[0]=[];trails[1]=[];trails[2]=[];
+  ctx.fillStyle='#020208';ctx.fillRect(0,0,W,H);
+  if(USE_WASM){
+    sim=new WasmNBody(0.001,0.0);
+    sim.add_body(-0.97000436,0.24308753,0,vx,vy,0,1);
+    sim.add_body(0.97000436,-0.24308753,0,vx,vy,0,1);
+    sim.add_body(0,0,0,-2*vx,-2*vy,0,1);
+    E0=sim.total_energy();
+  } else { E0=-2.5; }
+}
+
+// JS fallback
+let jb=[{x:-0.97000436,y:0.24308753,vx,vy,m:1},{x:0.97000436,y:-0.24308753,vx,vy,m:1},{x:0,y:0,vx:-2*vx,vy:-2*vy,m:1}];
+function jsAccel(b,i){let ax=0,ay=0;for(let j=0;j<b.length;j++){if(i===j)continue;const dx=b[j].x-b[i].x,dy=b[j].y-b[i].y,r2=dx*dx+dy*dy+1e-12,f=b[j].m/(r2*Math.sqrt(r2));ax+=f*dx;ay+=f*dy}return[ax,ay]}
+function jsTick(){const b=jb,n=b.length,dt=0.001,a0=b.map((_,i)=>jsAccel(b,i));for(let i=0;i<n;i++){b[i].vx+=.5*dt*a0[i][0];b[i].vy+=.5*dt*a0[i][1]}for(let i=0;i<n;i++){b[i].x+=dt*b[i].vx;b[i].y+=dt*b[i].vy}for(let i=0;i<n;i++){const[ax,ay]=jsAccel(b,i);b[i].vx+=.5*dt*ax;b[i].vy+=.5*dt*ay}}
+function jsE(){const b=jb;let ke=0,pe=0;for(const p of b)ke+=.5*p.m*(p.vx*p.vx+p.vy*p.vy);for(let i=0;i<b.length;i++)for(let j=i+1;j<b.length;j++){const dx=b[i].x-b[j].x,dy=b[i].y-b[j].y;pe-=b[i].m*b[j].m/Math.sqrt(dx*dx+dy*dy+1e-12)}return ke+pe}
+
+function getPos(){if(USE_WASM)return sim.positions_2d();return jb.map(b=>[b.x,b.y])}
+function getE(){return USE_WASM?sim.total_energy():jsE()}
+function getStep(){return USE_WASM?sim.current_step():step}
+function advance(n){if(USE_WASM)sim.advance(n);else for(let i=0;i<n;i++){jsTick();step++}}
+
+function toS(x,y){const s=Math.min(W,H)*0.28;return[W/2+x*s,H/2-y*s]}
+
+function draw(){
+  if(showTrails){ctx.fillStyle='rgba(2,2,8,0.03)';ctx.fillRect(0,0,W,H)}
+  else{ctx.fillStyle='#020208';ctx.fillRect(0,0,W,H)}
+  const pos=getPos();
+  for(let i=0;i<3;i++){trails[i].push([pos[i][0],pos[i][1]]);if(trails[i].length>5000)trails[i].shift()}
+  // Trails
+  for(let i=0;i<3;i++){const t=trails[i];if(t.length<2)continue;ctx.lineWidth=1.8;
+    for(let j=1;j<t.length;j++){ctx.globalAlpha=(j/t.length)*0.7;ctx.strokeStyle=COLORS[i];
+      ctx.beginPath();const[x1,y1]=toS(t[j-1][0],t[j-1][1]),[ x2,y2]=toS(t[j][0],t[j][1]);
+      ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()}}
+  ctx.globalAlpha=1;
+  // Bodies
+  for(let i=0;i<3;i++){const[sx,sy]=toS(pos[i][0],pos[i][1]);
+    const g=ctx.createRadialGradient(sx,sy,0,sx,sy,32);
+    g.addColorStop(0,COLORS[i]+'66');g.addColorStop(.5,COLORS[i]+'11');g.addColorStop(1,'transparent');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(sx,sy,32,0,6.283);ctx.fill();
+    ctx.fillStyle=COLORS[i];ctx.beginPath();ctx.arc(sx,sy,5,0,6.283);ctx.fill();
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(sx,sy,1.8,0,6.283);ctx.fill();
+    ctx.fillStyle=COLORS[i];ctx.font='bold 14px monospace';ctx.fillText(NAMES[i],sx+14,sy-14)}
+}
+
+function updateStats(){
+  document.getElementById('st').textContent=getStep();
+  const E=getE();document.getElementById('en').textContent=E.toFixed(6);
+  const de=E0?Math.abs((E-E0)/E0*100):0;const el=document.getElementById('de');
+  el.textContent=de.toFixed(6)+'%';el.style.color=de<.001?'#2ecc71':de<.01?'#f39c12':'#e74c3c'}
+
+init();
+if(!USE_WASM){jb=[{x:-0.97000436,y:0.24308753,vx,vy,m:1},{x:0.97000436,y:-0.24308753,vx,vy,m:1},{x:0,y:0,vx:-2*vx,vy:-2*vy,m:1}];E0=jsE()}
+
+function loop(){if(playing){advance(12);draw();if(getStep()%60<12)updateStats()}requestAnimationFrame(loop)}
+loop();
+
+document.getElementById('bplay').onclick=()=>{playing=true;document.getElementById('bplay').classList.add('on');document.getElementById('bpause').classList.remove('on')};
+document.getElementById('bpause').onclick=()=>{playing=false;document.getElementById('bpause').classList.add('on');document.getElementById('bplay').classList.remove('on')};
+document.getElementById('breset').onclick=()=>{if(!USE_WASM)jb=[{x:-0.97000436,y:0.24308753,vx,vy,m:1},{x:0.97000436,y:-0.24308753,vx,vy,m:1},{x:0,y:0,vx:-2*vx,vy:-2*vy,m:1}];init()};
+document.getElementById('btrail').onclick=function(){showTrails=!showTrails;this.classList.toggle('on')};
+</script>
+</body>
+</html>

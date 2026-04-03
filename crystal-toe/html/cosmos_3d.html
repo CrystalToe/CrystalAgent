@@ -1,0 +1,166 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Crystal Topos — Expanding Universe</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#000;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif}
+  #hud{position:absolute;top:0;left:0;right:0;padding:10px 16px;background:linear-gradient(180deg,rgba(0,0,0,0.85) 60%,transparent);z-index:10;pointer-events:none}
+  h1{font-size:1em;color:#7ec8e3;letter-spacing:3px}h1 span{color:#e74c3c}
+  .sub{color:#444;font-size:0.65em}
+  .chips{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap}
+  .chip{background:rgba(126,200,227,0.06);border:1px solid rgba(126,200,227,0.1);border-radius:14px;padding:2px 9px;font-size:0.58em;color:#5a9;font-family:monospace}
+  .chip b{color:#7ec8e3}
+  #stats{position:absolute;bottom:10px;left:16px;font-family:monospace;font-size:0.7em;color:#333;z-index:10;line-height:1.6}
+  #stats b{color:#7ec8e3}
+  #stats em{color:#e74c3c;font-style:normal}
+</style>
+</head>
+<body>
+<div id="hud">
+  <h1>EXPANDING <span>UNIVERSE</span></h1>
+  <div class="sub">Ω_Λ = gauss/(gauss+χ) = 13/19 — Ω_m = χ/(gauss+χ) = 6/19 — the universe accelerates because 13 > 6</div>
+  <div class="chips">
+    <span class="chip"><b>Ω_Λ</b>=13/19</span>
+    <span class="chip"><b>Ω_m</b>=6/19</span>
+    <span class="chip"><b>H₀</b>=gauss+χ/β₀</span>
+    <span class="chip"><b>T_CMB</b>=19/7</span>
+  </div>
+</div>
+<div id="stats">
+  a(t) = <b id="sa">1.00</b> · z = <b id="sz">0.00</b><br>
+  Phase: <em id="sph">matter dominated</em>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 2000);
+camera.position.set(0, 30, 50);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setClearColor(0x000005);
+document.body.appendChild(renderer.domElement);
+addEventListener('resize', () => { camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
+
+// "Galaxies" as instanced small groups
+const N_GAL = 400;
+const galGeo = new THREE.SphereGeometry(0.3, 6, 6);
+const galMat = new THREE.MeshBasicMaterial();
+const gals = new THREE.InstancedMesh(galGeo, galMat, N_GAL);
+scene.add(gals);
+
+// Glow layer
+const glowGeo2 = new THREE.SphereGeometry(0.8, 6, 6);
+const glowMat2 = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.15, blending: THREE.AdditiveBlending, depthWrite: false });
+const glowMesh = new THREE.InstancedMesh(glowGeo2, glowMat2, N_GAL);
+scene.add(glowMesh);
+
+// Comoving coordinates (fixed)
+const comovX = new Float32Array(N_GAL);
+const comovY = new Float32Array(N_GAL);
+const comovZ = new Float32Array(N_GAL);
+const galColors = [];
+
+for (let i = 0; i < N_GAL; i++) {
+  comovX[i] = (Math.random() - 0.5) * 60;
+  comovY[i] = (Math.random() - 0.5) * 60;
+  comovZ[i] = (Math.random() - 0.5) * 60;
+  // Random galaxy colors: blue, white, yellow, red
+  const t = Math.random();
+  const c = new THREE.Color();
+  if (t < 0.3) c.setRGB(0.3, 0.5, 1);       // blue spiral
+  else if (t < 0.6) c.setRGB(1, 0.95, 0.8);  // white elliptical
+  else if (t < 0.8) c.setRGB(1, 0.8, 0.3);   // yellow
+  else c.setRGB(1, 0.4, 0.2);                  // red dwarf galaxy
+  galColors.push(c);
+}
+
+// CMB sphere (distant background)
+const cmbGeo = new THREE.SphereGeometry(300, 32, 32);
+const cmbMat = new THREE.MeshBasicMaterial({ color: 0x110808, side: THREE.BackSide });
+const cmb = new THREE.Mesh(cmbGeo, cmbMat);
+scene.add(cmb);
+
+// Friedmann: H(a) = H0 × sqrt(Ωm/a³ + ΩΛ)
+const OMEGA_M = 6/19;  // χ/(gauss+χ)
+const OMEGA_L = 13/19; // gauss/(gauss+χ)
+
+let a = 0.3; // start in matter-dominated era
+const dummy = new THREE.Object3D();
+
+function updateGalaxies() {
+  for (let i = 0; i < N_GAL; i++) {
+    const px = comovX[i] * a;
+    const py = comovY[i] * a;
+    const pz = comovZ[i] * a;
+    dummy.position.set(px, py, pz);
+    dummy.scale.setScalar(0.5 + a * 0.5);
+    dummy.updateMatrix();
+    gals.setMatrixAt(i, dummy.matrix);
+    glowMesh.setMatrixAt(i, dummy.matrix);
+
+    // Redshift color: as a decreases, galaxies blueshift; as a increases, redshift
+    const dist = Math.sqrt(px*px + py*py + pz*pz);
+    const redshift = Math.min(1, dist * 0.01 / a);
+    const col = galColors[i].clone();
+    col.r = Math.min(1, col.r + redshift * 0.3);
+    col.g = Math.max(0, col.g - redshift * 0.2);
+    col.b = Math.max(0, col.b - redshift * 0.4);
+    gals.setColorAt(i, col);
+    glowMesh.setColorAt(i, col);
+  }
+  gals.instanceMatrix.needsUpdate = true;
+  gals.instanceColor.needsUpdate = true;
+  glowMesh.instanceMatrix.needsUpdate = true;
+  glowMesh.instanceColor.needsUpdate = true;
+}
+
+let frame = 0;
+function animate() {
+  requestAnimationFrame(animate);
+  frame++;
+
+  // Friedmann integration: da/dt = a × H(a)
+  const H = Math.sqrt(OMEGA_M / (a*a*a) + OMEGA_L);
+  const da = a * H * 0.0003;
+  a += da;
+
+  // Reset cycle
+  if (a > 3.0) a = 0.3;
+
+  updateGalaxies();
+
+  // CMB temperature fades as universe expands
+  const T_cmb = 19/7 / a; // T = T0/a
+  const cmbBright = Math.min(0.15, 0.5 / (a * a));
+  cmb.material.color.setRGB(cmbBright, cmbBright * 0.6, cmbBright * 0.4);
+
+  // Camera
+  const ct = frame * 0.0008;
+  camera.position.x = 50 * Math.cos(ct * 0.2);
+  camera.position.z = 50 * Math.sin(ct * 0.2);
+  camera.position.y = 25 + 15 * Math.sin(ct * 0.1);
+  camera.lookAt(0, 0, 0);
+
+  // Stats
+  if (frame % 10 === 0) {
+    const z = 1/a - 1;
+    document.getElementById('sa').textContent = a.toFixed(3);
+    document.getElementById('sz').textContent = z.toFixed(2);
+    const decel = OMEGA_M / (2 * a*a*a) - OMEGA_L;
+    const ph = document.getElementById('sph');
+    if (decel > 0) { ph.textContent = 'matter dominated (decelerating)'; ph.style.color = '#3498db'; }
+    else { ph.textContent = 'Λ dominated (accelerating)'; ph.style.color = '#e74c3c'; }
+  }
+
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>

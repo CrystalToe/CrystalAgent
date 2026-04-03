@@ -1,0 +1,369 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Crystal Topos — Quantum Gravity Unification</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#060612;color:#ccc;font-family:'Segoe UI',system-ui,sans-serif}
+  h1{text-align:center;padding:14px;font-size:1.2em;color:#7ec8e3;letter-spacing:3px;text-transform:uppercase}
+  h1 span{color:#e74c3c}
+  .sub{text-align:center;color:#444;font-size:0.78em;margin-top:-8px;margin-bottom:10px}
+  .chips{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
+  .chip{background:rgba(126,200,227,0.07);border:1px solid rgba(126,200,227,0.12);border-radius:14px;
+        padding:2px 10px;font-size:0.65em;color:#5a9;font-family:monospace}
+  .chip b{color:#7ec8e3}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 14px;max-width:1440px;margin:auto}
+  .panel{background:#0c0c22;border:1px solid #1a1a3a;border-radius:10px;padding:12px;position:relative}
+  .panel h2{font-size:0.85em;color:#7ec8e3;margin-bottom:6px;letter-spacing:1px}
+  .panel h2 em{color:#e74c3c;font-style:normal}
+  svg{width:100%;display:block}
+  .axis text{fill:#555;font-size:9px}
+  .axis path,.axis line{stroke:#1a1a3a}
+  canvas{width:100%;border-radius:6px;display:block}
+  .note{font-size:0.72em;color:#444;margin-top:6px;line-height:1.5;font-family:monospace}
+  .note b{color:#7ec8e3}
+  .note em{color:#e74c3c;font-style:normal}
+  .bridge{grid-column:1/-1;background:linear-gradient(90deg,#0c0c22,#120c22,#0c0c22);
+          border:1px solid #2a1a3a;border-radius:10px;padding:14px;text-align:center}
+  .bridge h2{color:#e74c3c;font-size:0.95em;letter-spacing:2px;margin-bottom:8px}
+  .bridge p{font-size:0.8em;color:#777;line-height:1.7;max-width:900px;margin:auto}
+  .bridge code{color:#7ec8e3;background:#0a0a1a;padding:1px 6px;border-radius:3px;font-size:0.95em}
+  .eq{font-family:monospace;font-size:1.1em;color:#7ec8e3;margin:8px 0}
+</style>
+</head>
+<body>
+
+<h1>QUANTUM <span>GRAVITY</span> UNIFICATION</h1>
+<p class="sub">General relativity and quantum mechanics from the same algebra — A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ)</p>
+<div class="chips" id="chips"></div>
+
+<div class="grid">
+  <!-- Panel 1: GR geodesic -->
+  <div class="panel">
+    <h2>GENERAL RELATIVITY — <em>Schwarzschild geodesic</em></h2>
+    <canvas id="cv-gr" height="280"></canvas>
+    <div class="note">
+      Orbit precesses by <b>δφ = 6πGM/a</b> — the <b>6 = χ</b> is the bond dimension.<br>
+      ISCO at <b>r = 6GM = χ·GM</b>. Black hole at <b>r_s = 2GM = N_w·GM</b>.<br>
+      Spacetime dimensions: <b>N_c + 1 = 4</b>. Force: <b>1/r^(N_c−1) = 1/r²</b>.
+    </div>
+  </div>
+
+  <!-- Panel 2: Quantum monad -->
+  <div class="panel">
+    <h2>QUANTUM MECHANICS — <em>Monad S = W∘U</em></h2>
+    <div id="svg-monad"></div>
+    <div class="note">
+      Four truth values: <b>{1, 1/N_w, 1/N_c, 1/χ}</b> = {1, 1/2, 1/3, 1/6}.<br>
+      Singlet (λ=1) = <b>dark matter</b>. Mixed (λ=1/6) = <b>quarks+leptons</b>.<br>
+      Measurement = truth climbing: <b>1/6 → 1/3 → 1/2 → 1</b>.
+    </div>
+  </div>
+
+  <!-- Panel 3: Gravitational wave -->
+  <div class="panel">
+    <h2>GRAVITATIONAL WAVES — <em>inspiral chirp</em></h2>
+    <div id="svg-gw"></div>
+    <div class="note">
+      Quadrupole radiation: <b>P = (32/5)·G⁴m⁵/r⁵</b> where <b>32/5 = N_w⁵/(χ−1)</b>.<br>
+      <b>2</b> polarizations = <b>N_c − 1</b>. Chirp frequency doubles: <b>f_GW = N_w·f_orb</b>.<br>
+      ISCO cutoff: <b>f_ISCO ∝ 1/(χ·M)</b>.
+    </div>
+  </div>
+
+  <!-- Panel 4: Effective potential -->
+  <div class="panel">
+    <h2>V_EFF — <em>where GR meets quantum</em></h2>
+    <div id="svg-veff"></div>
+    <div class="note">
+      The effective potential has a <b>barrier</b> — classically forbidden region.<br>
+      Quantum tunneling through it: truth value <b>1/6</b> ("a little true").<br>
+      The barrier height is set by <b>angular momentum</b> from χ = 6 phase space.
+    </div>
+  </div>
+
+  <!-- Bridge: the unification -->
+  <div class="bridge">
+    <h2>THE UNIFICATION</h2>
+    <p class="eq">S = W ∘ U &nbsp;&nbsp;·&nbsp;&nbsp; W = isometry (Higgs, vertical) &nbsp;&nbsp;·&nbsp;&nbsp; U = disentangler (gravity, horizontal)</p>
+    <p>
+      The monad <code>S = W∘U</code> IS quantum mechanics (sector amplitudes decay as λ^t)
+      AND general relativity (Jacobson chain: δS = δ⟨H_A⟩ → Einstein equation).<br><br>
+      GR uses <code>χ = 6</code> for ISCO, <code>N_c − 1 = 2</code> for polarizations, <code>N_w⁴ = 16</code> for 16πG.<br>
+      QM uses <code>{1, 1/2, 1/3, 1/6}</code> for truth values, <code>χ² = 36</code> for channels, <code>ln(χ)</code> for entropy.<br><br>
+      Same algebra. Same two primes. Same monad. <em>One framework.</em><br><br>
+      <code>δS/δ⟨H_A⟩ = 1.0001 ± 0.0004</code> — the first law of entanglement IS the linearized Einstein equation.
+    </p>
+  </div>
+</div>
+
+<script type="module">
+// ══════════════════════════════════════════════════════════════
+// Load WASM
+// ══════════════════════════════════════════════════════════════
+let W = {};
+try {
+  const m = await import('./pkg/crystal_toe.js');
+  await m.default();
+  W.gr = new m.WasmGR();
+  W.gw = new m.WasmGW();
+  W.monad = new m.WasmMonad();
+  W.dump = m.crystal_dump();
+  W.ok = true;
+  console.log('✓ WASM: GR + GW + Monad loaded');
+} catch(e) { W.ok = false; console.warn('JS fallback:', e.message); }
+
+const C = W.dump || { n_w:2, n_c:3, chi:6, beta0:7, sigma_d:36, tower_d:42 };
+
+document.getElementById('chips').innerHTML = [
+  ['N_w',C.n_w],['N_c',C.n_c],['χ',C.chi],['β₀',C.beta0],['D',C.tower_d],
+  ['ISCO','χ·GM = 6GM'],['16πG','N_w⁴·π·G'],['Polarizations','N_c−1 = 2'],
+  ['Truth values','{1, ½, ⅓, ⅙}'],['δS=δ⟨H⟩','1.0001'],
+  ['Engine', W.ok ? 'WASM ✓' : 'JS'],
+].map(([k,v]) => `<span class="chip"><b>${k}</b>=${v}</span>`).join('');
+
+// ══════════════════════════════════════════════════════════════
+// Panel 1: GR Geodesic (Canvas)
+// ══════════════════════════════════════════════════════════════
+const cvGR = document.getElementById('cv-gr');
+const ctxGR = cvGR.getContext('2d');
+
+function sizeGR() {
+  const rect = cvGR.getBoundingClientRect();
+  cvGR.width = rect.width * 2; cvGR.height = 560;
+}
+sizeGR();
+
+// Get geodesic from WASM or compute JS fallback
+let geodesicPts;
+if (W.ok) {
+  geodesicPts = W.gr.geodesic(1.0, 4.2, 0.965, 0.5, 8000);
+} else {
+  // JS precessing ellipse approximation
+  geodesicPts = [];
+  const a = 15, e = 0.6, prec = 0.03;
+  for (let i = 0; i < 8000; i++) {
+    const th = i * 0.002;
+    const r = a * (1 - e*e) / (1 + e * Math.cos(th * (1 - prec)));
+    geodesicPts.push([r * Math.cos(th), r * Math.sin(th)]);
+  }
+}
+
+function drawGR() {
+  const W2 = cvGR.width, H2 = cvGR.height;
+  const ctx = ctxGR;
+  ctx.fillStyle = '#060612'; ctx.fillRect(0, 0, W2, H2);
+  const cx = W2/2, cy = H2/2, scale = W2 * 0.018;
+
+  // Black hole
+  const rs = 1.0;
+  const bhR = rs * scale;
+  const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, bhR * 8);
+  grad.addColorStop(0, '#000');
+  grad.addColorStop(0.15, '#0a0510');
+  grad.addColorStop(0.4, 'rgba(100,40,150,0.1)');
+  grad.addColorStop(1, 'transparent');
+  ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(cx, cy, bhR*8, 0, 6.283); ctx.fill();
+
+  // Event horizon
+  ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(cx, cy, bhR, 0, 6.283); ctx.fill();
+  ctx.strokeStyle = '#e74c3c44'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.arc(cx, cy, bhR, 0, 6.283); ctx.stroke();
+
+  // ISCO ring
+  ctx.strokeStyle = '#7ec8e322'; ctx.lineWidth = 0.5; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.arc(cx, cy, 6*rs*scale, 0, 6.283); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Photon sphere
+  ctx.strokeStyle = '#f39c1215'; ctx.lineWidth = 0.5; ctx.setLineDash([2,6]);
+  ctx.beginPath(); ctx.arc(cx, cy, 3*rs*scale, 0, 6.283); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Geodesic trail
+  const pts = geodesicPts;
+  for (let i = 1; i < pts.length; i++) {
+    const alpha = (i / pts.length) * 0.8;
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = '#7ec8e3';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(cx + pts[i-1][0]*scale, cy - pts[i-1][1]*scale);
+    ctx.lineTo(cx + pts[i][0]*scale, cy - pts[i][1]*scale);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
+  // Current position
+  const last = pts[pts.length - 1];
+  const sx = cx + last[0]*scale, sy = cy - last[1]*scale;
+  const g2 = ctx.createRadialGradient(sx, sy, 0, sx, sy, 12);
+  g2.addColorStop(0, '#7ec8e388'); g2.addColorStop(1, 'transparent');
+  ctx.fillStyle = g2; ctx.beginPath(); ctx.arc(sx, sy, 12, 0, 6.283); ctx.fill();
+  ctx.fillStyle = '#7ec8e3'; ctx.beginPath(); ctx.arc(sx, sy, 3, 0, 6.283); ctx.fill();
+
+  // Labels
+  ctx.fillStyle = '#e74c3c66'; ctx.font = '10px monospace';
+  ctx.fillText('r_s = N_w·GM', cx + bhR + 4, cy - 4);
+  ctx.fillStyle = '#7ec8e333';
+  ctx.fillText('ISCO = χ·GM', cx + 6*rs*scale + 4, cy - 4);
+}
+drawGR();
+
+// ══════════════════════════════════════════════════════════════
+// Panel 2: Monad sector evolution (D3)
+// ══════════════════════════════════════════════════════════════
+let monadData;
+if (W.ok) {
+  monadData = W.monad.history(40);
+} else {
+  monadData = [];
+  const lam = [1, 0.5, 1/3, 1/6], dim = [1,3,8,24];
+  for (let t = 0; t <= 40; t++) {
+    const a = lam.map(l => Math.pow(l, t));
+    const tw = a.reduce((s,v,i) => s + dim[i]*v, 0);
+    let ent = 0;
+    a.forEach((v,i) => { const p = dim[i]*v/tw; if(p>1e-30) ent -= p*Math.log(p); });
+    monadData.push({ tick:t, singlet:a[0], weak:a[1], colour:a[2], mixed:a[3], entropy:ent });
+  }
+}
+
+{
+  const MW=560, MH=180, MM={t:12,r:15,b:28,l:40};
+  const mw=MW-MM.l-MM.r, mh=MH-MM.t-MM.b;
+  const svg = d3.select('#svg-monad').append('svg').attr('viewBox',`0 0 ${MW} ${MH}`);
+  const g = svg.append('g').attr('transform',`translate(${MM.l},${MM.t})`);
+  const x = d3.scaleLinear().domain([0,40]).range([0,mw]);
+  const y = d3.scaleLinear().domain([-0.05,1.05]).range([mh,0]);
+  g.append('g').attr('class','axis').attr('transform',`translate(0,${mh})`).call(d3.axisBottom(x).ticks(5));
+  g.append('g').attr('class','axis').call(d3.axisLeft(y).ticks(5));
+  g.append('text').attr('x',mw/2).attr('y',mh+24).attr('text-anchor','middle').attr('fill','#444').attr('font-size',9).text('tick t');
+
+  const sectors = [
+    {key:'singlet',color:'#2ecc71',label:'λ=1 (singlet)'},
+    {key:'weak',color:'#3498db',label:'λ=1/N_w (weak)'},
+    {key:'colour',color:'#e74c3c',label:'λ=1/N_c (colour)'},
+    {key:'mixed',color:'#9b59b6',label:'λ=1/χ (mixed)'},
+  ];
+  const line = d3.line().x(d=>x(d.tick)).y(d=>y(d.v)).curve(d3.curveMonotoneX);
+  sectors.forEach(({key,color,label},i) => {
+    const data = monadData.map(d => ({tick:d.tick, v:d[key]}));
+    g.append('path').datum(data).attr('d',line).attr('fill','none').attr('stroke',color).attr('stroke-width',2);
+    g.append('rect').attr('x',mw-115).attr('y',5+i*14).attr('width',10).attr('height',3).attr('fill',color);
+    g.append('text').attr('x',mw-101).attr('y',10+i*14).attr('fill','#666').attr('font-size',7.5).text(label);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// Panel 3: Gravitational waveform (D3)
+// ══════════════════════════════════════════════════════════════
+let gwData;
+if (W.ok) {
+  gwData = W.gw.waveform(30.0, 30.0, 100.0, 0.0, 30.0, 0.001);
+} else {
+  gwData = [];
+  for (let i = 0; i < 3000; i++) {
+    const t = i * 0.001;
+    const f = 30 + 200 * t * t;
+    const a = 0.5 * (1 + 5*t);
+    gwData.push([t, a*Math.cos(2*Math.PI*f*t), a*Math.sin(2*Math.PI*f*t), f]);
+  }
+}
+
+{
+  const GW=560, GH=180, GM2={t:12,r:15,b:28,l:40};
+  const gw=GW-GM2.l-GM2.r, gh=GH-GM2.t-GM2.b;
+  const svg = d3.select('#svg-gw').append('svg').attr('viewBox',`0 0 ${GW} ${GH}`);
+  const g = svg.append('g').attr('transform',`translate(${GM2.l},${GM2.t})`);
+
+  const tMax = gwData[gwData.length-1][0];
+  const hMax = d3.max(gwData, d => Math.abs(d[1])) || 1;
+  const x = d3.scaleLinear().domain([0, tMax]).range([0, gw]);
+  const y = d3.scaleLinear().domain([-hMax*1.1, hMax*1.1]).range([gh, 0]);
+  g.append('g').attr('class','axis').attr('transform',`translate(0,${gh})`).call(d3.axisBottom(x).ticks(5));
+  g.append('g').attr('class','axis').call(d3.axisLeft(y).ticks(4));
+  g.append('line').attr('x1',0).attr('x2',gw).attr('y1',y(0)).attr('y2',y(0)).attr('stroke','#1a1a3a');
+  g.append('text').attr('x',gw/2).attr('y',gh+24).attr('text-anchor','middle').attr('fill','#444').attr('font-size',9).text('time');
+
+  // h+ (cyan)
+  const line = d3.line().x(d=>x(d[0])).y(d=>y(d[1])).curve(d3.curveMonotoneX);
+  g.append('path').datum(gwData).attr('d',line).attr('fill','none').attr('stroke','#7ec8e3').attr('stroke-width',1.5);
+
+  // h× (red, faint)
+  const line2 = d3.line().x(d=>x(d[0])).y(d=>y(d[2])).curve(d3.curveMonotoneX);
+  g.append('path').datum(gwData).attr('d',line2).attr('fill','none').attr('stroke','#e74c3c').attr('stroke-width',0.8).attr('opacity',0.4);
+
+  g.append('rect').attr('x',gw-80).attr('y',5).attr('width',10).attr('height',2).attr('fill','#7ec8e3');
+  g.append('text').attr('x',gw-66).attr('y',9).attr('fill','#666').attr('font-size',8).text('h+ (pol 1)');
+  g.append('rect').attr('x',gw-80).attr('y',17).attr('width',10).attr('height',2).attr('fill','#e74c3c');
+  g.append('text').attr('x',gw-66).attr('y',21).attr('fill','#666').attr('font-size',8).text('h× (pol 2)');
+}
+
+// ══════════════════════════════════════════════════════════════
+// Panel 4: V_eff (D3)
+// ══════════════════════════════════════════════════════════════
+let veffData;
+if (W.ok) {
+  veffData = W.gr.veff_curve(1.0, 4.2, 2.5, 40.0, 300);
+} else {
+  veffData = [];
+  const L = 4.2, rs = 1.0;
+  for (let i = 0; i < 300; i++) {
+    const r = 2.5 + i * 0.125;
+    const v = -1/r + L*L/(2*r*r) - rs*L*L/(r*r*r);
+    veffData.push([r, v]);
+  }
+}
+
+{
+  const VW=560, VH=180, VM={t:12,r:15,b:28,l:45};
+  const vw=VW-VM.l-VM.r, vh=VH-VM.t-VM.b;
+  const svg = d3.select('#svg-veff').append('svg').attr('viewBox',`0 0 ${VW} ${VH}`);
+  const g = svg.append('g').attr('transform',`translate(${VM.l},${VM.t})`);
+
+  const xD = d3.extent(veffData, d=>d[0]);
+  const yD = d3.extent(veffData, d=>d[1]);
+  const x = d3.scaleLinear().domain(xD).range([0,vw]);
+  const y = d3.scaleLinear().domain([yD[0]*1.05, yD[1]*1.2]).range([vh,0]);
+  g.append('g').attr('class','axis').attr('transform',`translate(0,${vh})`).call(d3.axisBottom(x).ticks(5));
+  g.append('g').attr('class','axis').call(d3.axisLeft(y).ticks(4));
+  g.append('text').attr('x',vw/2).attr('y',vh+24).attr('text-anchor','middle').attr('fill','#444').attr('font-size',9).text('r / r_s');
+  g.append('text').attr('transform','rotate(-90)').attr('x',-vh/2).attr('y',-35).attr('text-anchor','middle').attr('fill','#444').attr('font-size',9).text('V_eff');
+
+  const line = d3.line().x(d=>x(d[0])).y(d=>y(d[1])).curve(d3.curveMonotoneX);
+  g.append('path').datum(veffData).attr('d',line).attr('fill','none').attr('stroke','#f39c12').attr('stroke-width',2);
+
+  // ISCO marker
+  g.append('line').attr('x1',x(6)).attr('x2',x(6)).attr('y1',0).attr('y2',vh).attr('stroke','#7ec8e333').attr('stroke-dasharray','3,3');
+  g.append('text').attr('x',x(6)+3).attr('y',12).attr('fill','#7ec8e344').attr('font-size',8).text('ISCO=χ');
+
+  // Energy level (particle)
+  const peakIdx = veffData.reduce((best,d,i) => d[1] > veffData[best][1] ? i : best, 0);
+  const E_particle = veffData[peakIdx][1] * 0.85;
+  g.append('line').attr('x1',0).attr('x2',vw).attr('y1',y(E_particle)).attr('y2',y(E_particle))
+    .attr('stroke','#2ecc7144').attr('stroke-dasharray','4,4');
+  g.append('text').attr('x',vw-50).attr('y',y(E_particle)-4).attr('fill','#2ecc7144').attr('font-size',8).text('E_particle');
+
+  // Barrier region shading
+  const barrier = veffData.filter(d => d[1] > E_particle);
+  if (barrier.length > 1) {
+    g.append('rect')
+      .attr('x', x(barrier[0][0]))
+      .attr('y', y(veffData[peakIdx][1]))
+      .attr('width', x(barrier[barrier.length-1][0]) - x(barrier[0][0]))
+      .attr('height', y(E_particle) - y(veffData[peakIdx][1]))
+      .attr('fill', 'rgba(231,76,60,0.06)');
+    g.append('text')
+      .attr('x', x((barrier[0][0]+barrier[barrier.length-1][0])/2))
+      .attr('y', y(veffData[peakIdx][1])-4)
+      .attr('text-anchor','middle').attr('fill','#e74c3c44').attr('font-size',8)
+      .text('tunneling: truth value 1/χ');
+  }
+}
+</script>
+</body>
+</html>

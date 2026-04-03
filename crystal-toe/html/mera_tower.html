@@ -1,0 +1,241 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Crystal Topos — MERA Tensor Network</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#000;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif}
+  #hud{position:absolute;top:0;left:0;right:0;padding:10px 16px;background:linear-gradient(180deg,rgba(0,0,0,0.85) 60%,transparent);z-index:10;pointer-events:none}
+  h1{font-size:1em;color:#7ec8e3;letter-spacing:3px}
+  h1 span{color:#e74c3c}
+  .sub{color:#444;font-size:0.65em}
+  .chips{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap}
+  .chip{background:rgba(126,200,227,0.06);border:1px solid rgba(126,200,227,0.1);border-radius:14px;padding:2px 9px;font-size:0.58em;color:#5a9;font-family:monospace}
+  .chip b{color:#7ec8e3}
+  #info{position:absolute;bottom:10px;left:16px;font-family:monospace;font-size:0.6em;color:#333;z-index:10;max-width:400px;line-height:1.5}
+  #info b{color:#5a9}
+  #info em{color:#e74c3c;font-style:normal}
+  #layer{position:absolute;bottom:10px;right:16px;font-family:monospace;font-size:1.5em;color:#7ec8e3;z-index:10}
+</style>
+</head>
+<body>
+<div id="hud">
+  <h1>MERA <span>TENSOR NETWORK</span></h1>
+  <div class="sub">42 layers = D = χ × β₀ — bond dimension χ = 6 — Σ_d = 36 boundary sites → 1 bulk site</div>
+  <div class="chips">
+    <span class="chip"><b>D</b>=42 layers</span>
+    <span class="chip"><b>χ</b>=6 bond dim</span>
+    <span class="chip"><b>Σ_d</b>=36 boundary</span>
+    <span class="chip"><b>β₀</b>=7 conformal</span>
+    <span class="chip"><b>W</b>=isometry (Higgs)</span>
+    <span class="chip"><b>U</b>=disentangler (gravity)</span>
+  </div>
+</div>
+<div id="info">
+  <b>Boundary</b> (bottom) = Σ_d = 36 sites = the UV / high energy.<br>
+  <b>Bulk</b> (top) = 1 site = the IR / low energy.<br>
+  <b>Isometries W</b> (vertical bonds) = Higgs mechanism, compresses χ → 1.<br>
+  <b>Disentanglers U</b> (horizontal bonds) = gravity, entangles adjacent sites.<br>
+  <b>Causal cone</b>: each boundary site connects to the bulk through <em>exactly one path</em>.<br>
+  This IS the holographic principle: boundary encodes bulk.
+</div>
+<div id="layer">Layer: <span id="cl">0</span> / 42</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const D = 42;       // tower depth
+const CHI = 6;      // bond dimension
+const SIGMA_D = 36; // boundary sites
+const BETA0 = 7;    // conformal temperature
+const N_LAYERS = 20; // render 20 representative layers (42 is too dense visually)
+const LAYER_SPACING = 3.0;
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x020210, 0.008);
+const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 500);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setClearColor(0x020210);
+document.body.appendChild(renderer.domElement);
+addEventListener('resize', () => { camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
+
+// Lighting
+scene.add(new THREE.AmbientLight(0x111133, 0.5));
+const pl1 = new THREE.PointLight(0x7ec8e3, 0.5, 100);
+pl1.position.set(0, N_LAYERS*LAYER_SPACING/2, 20);
+scene.add(pl1);
+const pl2 = new THREE.PointLight(0xe74c3c, 0.3, 100);
+pl2.position.set(0, N_LAYERS*LAYER_SPACING, 0);
+scene.add(pl2);
+
+// Generate MERA tower
+// Each layer l has n(l) = max(1, SIGMA_D * (1 - l/D)) sites (approximately)
+// Arranged in a circle at height l * LAYER_SPACING
+
+const nodesByLayer = [];
+const allNodes = [];
+const allBonds = [];
+
+for (let l = 0; l < N_LAYERS; l++) {
+  const progress = l / (N_LAYERS - 1);
+  const actualLayer = Math.floor(progress * D);
+  // Nodes per layer: boundary has SIGMA_D, bulk has 1
+  // Exponential coarse-graining: n(l) ~ SIGMA_D / chi^(l * D/N_LAYERS / some_scale)
+  const nSites = Math.max(1, Math.round(SIGMA_D * Math.pow(0.85, l)));
+  const radius = Math.max(0.5, nSites * 0.5);
+  const y = l * LAYER_SPACING;
+  const layerNodes = [];
+
+  for (let i = 0; i < nSites; i++) {
+    const angle = (i / nSites) * Math.PI * 2;
+    const x = radius * Math.cos(angle);
+    const z = radius * Math.sin(angle);
+    const node = { x, y, z, layer: l, actualLayer, idx: allNodes.length };
+    layerNodes.push(node);
+    allNodes.push(node);
+  }
+  nodesByLayer.push(layerNodes);
+
+  // Horizontal bonds (disentanglers U) within layer
+  for (let i = 0; i < nSites; i++) {
+    const j = (i + 1) % nSites;
+    allBonds.push({ from: layerNodes[i], to: layerNodes[j], type: 'U' });
+  }
+
+  // Vertical bonds (isometries W) to next layer
+  if (l > 0) {
+    const prevLayer = nodesByLayer[l-1];
+    for (let i = 0; i < nSites; i++) {
+      // Connect to closest node(s) in previous layer
+      const pi = Math.floor(i * prevLayer.length / nSites);
+      allBonds.push({ from: prevLayer[pi], to: layerNodes[i], type: 'W' });
+      // Extra connections for coarse-graining
+      const pi2 = (pi + 1) % prevLayer.length;
+      if (prevLayer.length > nSites) {
+        allBonds.push({ from: prevLayer[pi2], to: layerNodes[i], type: 'W' });
+      }
+    }
+  }
+}
+
+// Render nodes as spheres (instanced)
+const nodeGeo = new THREE.SphereGeometry(0.15, 8, 8);
+const nodeMat = new THREE.MeshStandardMaterial({ metalness: 0.6, roughness: 0.3 });
+const nodeMesh = new THREE.InstancedMesh(nodeGeo, nodeMat, allNodes.length);
+scene.add(nodeMesh);
+
+const dummy = new THREE.Object3D();
+const colorBoundary = new THREE.Color(0x7ec8e3);  // cyan = UV
+const colorBulk = new THREE.Color(0xe74c3c);       // red = IR
+const colorMid = new THREE.Color(0x9b59b6);         // purple = mid
+
+allNodes.forEach((n, i) => {
+  dummy.position.set(n.x, n.y, n.z);
+  const s = 0.8 + 0.4 * (1 - n.layer / N_LAYERS); // bigger at boundary
+  dummy.scale.setScalar(s);
+  dummy.updateMatrix();
+  nodeMesh.setMatrixAt(i, dummy.matrix);
+  const t = n.layer / (N_LAYERS - 1);
+  const col = new THREE.Color().copy(colorBoundary).lerp(colorBulk, t);
+  nodeMesh.setColorAt(i, col);
+});
+nodeMesh.instanceMatrix.needsUpdate = true;
+nodeMesh.instanceColor.needsUpdate = true;
+
+// Render bonds as lines
+allBonds.forEach(b => {
+  const geo = new THREE.BufferGeometry();
+  const pts = new Float32Array([b.from.x, b.from.y, b.from.z, b.to.x, b.to.y, b.to.z]);
+  geo.setAttribute('position', new THREE.BufferAttribute(pts, 3));
+  const color = b.type === 'W' ? 0x7ec8e3 : 0x9b59b6; // W=cyan(Higgs), U=purple(gravity)
+  const opacity = b.type === 'W' ? 0.15 : 0.25;
+  const mat = new THREE.LineBasicMaterial({ color, transparent: true, opacity });
+  scene.add(new THREE.Line(geo, mat));
+});
+
+// Add glow at boundary (bottom)
+const boundaryGlow = new THREE.Mesh(
+  new THREE.TorusGeometry(SIGMA_D * 0.5, 0.5, 8, 64),
+  new THREE.MeshBasicMaterial({ color: 0x7ec8e3, transparent: true, opacity: 0.05 })
+);
+boundaryGlow.rotation.x = Math.PI / 2;
+scene.add(boundaryGlow);
+
+// Add glow at bulk (top)
+const bulkGlow = new THREE.Mesh(
+  new THREE.SphereGeometry(1.5, 16, 16),
+  new THREE.MeshBasicMaterial({ color: 0xe74c3c, transparent: true, opacity: 0.08 })
+);
+bulkGlow.position.y = (N_LAYERS - 1) * LAYER_SPACING;
+scene.add(bulkGlow);
+
+// Entanglement "energy" flowing up (particles)
+const flowN = 200;
+const flowGeo = new THREE.BufferGeometry();
+const flowPos = new Float32Array(flowN * 3);
+const flowVel = new Float32Array(flowN);
+for (let i = 0; i < flowN; i++) {
+  const a = Math.random() * Math.PI * 2;
+  const r = 1 + Math.random() * SIGMA_D * 0.4;
+  flowPos[i*3] = r * Math.cos(a);
+  flowPos[i*3+1] = Math.random() * N_LAYERS * LAYER_SPACING;
+  flowPos[i*3+2] = r * Math.sin(a);
+  flowVel[i] = 0.02 + Math.random() * 0.05;
+}
+flowGeo.setAttribute('position', new THREE.BufferAttribute(flowPos, 3));
+const flowMat = new THREE.PointsMaterial({ color: 0xf39c12, size: 0.1, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending });
+const flowPts = new THREE.Points(flowGeo, flowMat);
+scene.add(flowPts);
+
+let frame = 0;
+const towerH = (N_LAYERS - 1) * LAYER_SPACING;
+
+function animate() {
+  requestAnimationFrame(animate);
+  frame++;
+
+  // Camera: spiral fly-through
+  const t = frame * 0.002;
+  const camY = (towerH * 0.5) + towerH * 0.4 * Math.sin(t * 0.3);
+  const camR = 25 + 10 * Math.sin(t * 0.2);
+  camera.position.x = camR * Math.cos(t * 0.4);
+  camera.position.z = camR * Math.sin(t * 0.4);
+  camera.position.y = camY;
+  camera.lookAt(0, towerH * 0.4, 0);
+
+  // Flow particles (entanglement energy moving upward)
+  for (let i = 0; i < flowN; i++) {
+    flowPos[i*3+1] += flowVel[i];
+    // Spiral inward as they rise
+    const h = flowPos[i*3+1] / towerH;
+    const shrink = 1 - h * 0.8;
+    flowPos[i*3] *= 0.999;
+    flowPos[i*3+2] *= 0.999;
+    if (flowPos[i*3+1] > towerH) {
+      const a = Math.random() * Math.PI * 2;
+      const r = 1 + Math.random() * SIGMA_D * 0.4;
+      flowPos[i*3] = r * Math.cos(a);
+      flowPos[i*3+1] = 0;
+      flowPos[i*3+2] = r * Math.sin(a);
+    }
+  }
+  flowGeo.attributes.position.needsUpdate = true;
+
+  // Pulse effects
+  boundaryGlow.material.opacity = 0.04 + 0.02 * Math.sin(frame * 0.03);
+  bulkGlow.material.opacity = 0.06 + 0.04 * Math.sin(frame * 0.02);
+
+  // Current layer indicator
+  const currentLayer = Math.floor(((camera.position.y / towerH) * D + D) % D);
+  document.getElementById('cl').textContent = Math.min(42, Math.max(0, currentLayer));
+
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>

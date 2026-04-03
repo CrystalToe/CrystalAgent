@@ -1,0 +1,173 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Crystal Topos — Stellar Interior</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#000;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif}
+  #panel{position:absolute;top:10px;left:10px;width:230px;background:rgba(10,10,30,0.9);border:1px solid #1a1a3a;border-radius:8px;padding:10px;z-index:10}
+  h1{font-size:0.85em;color:#7ec8e3;letter-spacing:2px;margin-bottom:4px}h1 span{color:#e74c3c}
+  .sub{color:#444;font-size:0.55em;margin-bottom:6px}
+  .row{display:flex;gap:6px;align-items:center;margin-bottom:5px}
+  label{color:#555;font-size:0.62em;white-space:nowrap}
+  input[type=range]{flex:1;height:12px}
+  .val{color:#7ec8e3;font-family:monospace;font-size:0.7em;min-width:30px}
+  .stat{font-family:monospace;font-size:0.6em;color:#444;margin:2px 0}
+  .stat b{color:#7ec8e3}
+  .note{font-size:0.55em;color:#333;margin-top:6px;border-top:1px solid #1a1a3a;padding-top:5px;line-height:1.4}
+  .note b{color:#5a9}
+</style>
+</head>
+<body>
+<div id="panel">
+  <h1>STELLAR <span>INTERIOR</span></h1>
+  <div class="sub">Lane-Emden polytrope — density = θ^n — cutoff at stellar surface θ=0</div>
+  <div class="row"><label>Polytrope n:</label><input type="range" id="sn" min="0.5" max="4.5" value="1.5" step="0.1"><span class="val" id="vn">1.5</span></div>
+  <div class="stat">n = <b id="stype">1.5 (white dwarf)</b></div>
+  <div class="stat">L ∝ M^<b>N_c+1 = 4</b></div>
+  <div class="stat">τ ∝ M^<b>−(N_c−1) = −2</b></div>
+  <div class="note">
+    <b>n = 3/2 = N_c/N_w</b>: white dwarf (degenerate electron gas).<br>
+    <b>n = 3 = N_c</b>: Eddington standard model (Chandrasekhar).<br>
+    <b>n = 5 = χ−1</b>: Plummer sphere (infinite radius).<br>
+    Luminosity: <b>L ∝ M^(N_c+1)</b> = M⁴.<br>
+    Lifetime: <b>τ ∝ M^(−(N_c−1))</b> = M⁻².<br>
+    Stars die because <b>N_c = 3</b>.
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 200);
+camera.position.set(0, 5, 20);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setClearColor(0x020208);
+document.body.appendChild(renderer.domElement);
+addEventListener('resize', () => { camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
+
+scene.add(new THREE.AmbientLight(0x111122, 0.2));
+
+// Stars background
+const sGeo = new THREE.BufferGeometry();
+const sp2 = new Float32Array(3000);
+for(let i=0;i<3000;i+=3){const th=Math.random()*6.28,ph=Math.acos(2*Math.random()-1),r=60+Math.random()*80;sp2[i]=r*Math.sin(ph)*Math.cos(th);sp2[i+1]=r*Math.sin(ph)*Math.sin(th);sp2[i+2]=r*Math.cos(ph)}
+sGeo.setAttribute('position',new THREE.BufferAttribute(sp2,3));
+scene.add(new THREE.Points(sGeo, new THREE.PointsMaterial({color:0xffffff,size:0.2})));
+
+// Lane-Emden solver
+function laneEmden(n) {
+  let theta = 1, dtheta = 0, xi = 0.001;
+  const dxi = 0.01;
+  const profile = [[0, 1]];
+  while (theta > 0 && xi < 50) {
+    const d2theta = -2 * dtheta / xi - Math.pow(Math.max(0, theta), n);
+    dtheta += d2theta * dxi;
+    theta += dtheta * dxi;
+    xi += dxi;
+    if (theta > 0) profile.push([xi, theta]);
+  }
+  return profile;
+}
+
+// Shells
+const N_SHELLS = 15;
+let shells = [];
+
+function buildStar() {
+  // Remove old
+  shells.forEach(s => scene.remove(s));
+  shells = [];
+
+  const n = +document.getElementById('sn').value;
+  const profile = laneEmden(n);
+  const xiMax = profile[profile.length - 1][0];
+
+  for (let i = 0; i < N_SHELLS; i++) {
+    const frac = (i + 1) / N_SHELLS;
+    const r = frac * 7; // visual radius
+    const xi = frac * xiMax;
+
+    // Find density at this radius
+    const idx = Math.min(profile.length - 1, Math.floor(xi / 0.01));
+    const theta = profile[idx] ? profile[idx][1] : 0;
+    const density = Math.pow(Math.max(0, theta), n);
+
+    const geo = new THREE.SphereGeometry(r, 32, 32);
+    const brightness = density;
+    const col = new THREE.Color();
+
+    // Core: white-blue, outer: red-orange
+    if (frac < 0.3) col.setRGB(0.9 + brightness*0.1, 0.85 + brightness*0.15, 0.7 + brightness*0.3);
+    else if (frac < 0.6) col.setRGB(1, 0.6 + brightness*0.3, 0.2 + brightness*0.2);
+    else col.setRGB(0.8 + brightness*0.2, 0.2 + brightness*0.3, 0.05);
+
+    const mat = new THREE.MeshBasicMaterial({
+      color: col,
+      transparent: true,
+      opacity: Math.max(0.02, brightness * 0.25),
+      side: THREE.FrontSide,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    });
+
+    const mesh = new THREE.Mesh(geo, mat);
+    scene.add(mesh);
+    shells.push(mesh);
+  }
+
+  // Core glow
+  const coreGeo = new THREE.SphereGeometry(1.5, 32, 32);
+  const coreMat = new THREE.MeshBasicMaterial({ color: 0xffeedd, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending });
+  const core = new THREE.Mesh(coreGeo, coreMat);
+  scene.add(core);
+  shells.push(core);
+
+  // Point light from core
+  const coreLight = new THREE.PointLight(0xffaa44, 1.0, 20);
+  scene.add(coreLight);
+  shells.push(coreLight);
+
+  // Update label
+  document.getElementById('vn').textContent = n.toFixed(1);
+  let type = '';
+  if (Math.abs(n-1.5)<0.1) type = '1.5 = N_c/N_w (white dwarf)';
+  else if (Math.abs(n-3)<0.1) type = '3 = N_c (Eddington/Chandra)';
+  else if (Math.abs(n-5)<0.1) type = '5 = χ−1 (Plummer, infinite)';
+  else type = n.toFixed(1);
+  document.getElementById('stype').textContent = type;
+}
+
+buildStar();
+document.getElementById('sn').oninput = buildStar;
+
+let frame = 0;
+function animate() {
+  requestAnimationFrame(animate);
+  frame++;
+
+  // Shells pulsate slightly (stellar oscillation)
+  shells.forEach((s, i) => {
+    if (s.scale) {
+      const pulse = 1 + 0.01 * Math.sin(frame * 0.02 + i * 0.5);
+      s.scale.setScalar(pulse);
+    }
+  });
+
+  const t = frame * 0.001;
+  camera.position.x = 20 * Math.cos(t * 0.3);
+  camera.position.z = 20 * Math.sin(t * 0.3);
+  camera.position.y = 5 + 3 * Math.sin(t * 0.15);
+  camera.lookAt(0, 0, 0);
+
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>
