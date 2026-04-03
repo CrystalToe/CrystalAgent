@@ -34915,5 +34915,5 @@ if __name__ == "__main__":
 
 ## Haskell Modules
 - **CrystalAlphaProton** —      333 lines, 18 prove functions
-- **CrystalArcade** —      391 lines, 24 prove functions
+- **CrystalArcade** —      407 lines, 24 prove functions
 - **CrystalAstro** —      294 lines, 26 prove functions

@@ -106,7 +106,20 @@ forceParticle (Particle x y z vx vy vz m) =
   x `seq` y `seq` z `seq` vx `seq` vy `seq` vz `seq` m `seq`
   Particle x y z vx vy vz m
 
--- | One Verlet tick for all particles.
+-- | One tick of thermodynamics: S = W∘U on mixed sector (d₄=24).
+-- ZERO CALCULUS. Pure eigenvalue multiplication.
+-- Particle states (mixed) contract by λ_mixed = 1/χ = 1/6.
+thermoTickEngine :: Int -> [Particle] -> [Particle]
+thermoTickEngine nParts parts =
+  let cs  = toCrystalState parts
+      cs' = tick cs
+  in fromCrystalState nParts cs'
+
+-- [TEXTBOOK REFERENCE — Velocity Verlet with LJ force (calculus version):]
+-- thermoTick uses sqrt in ljAccel (distance computation).
+-- The engine tick replaces it with universal eigenvalue contraction.
+
+-- | Textbook Verlet tick — kept for physics comparison only.
 thermoTick :: Double -> Double -> Double -> Double -> [Particle] -> [Particle]
 thermoTick dt eps0 sigma cutoff parts =
   let n = length parts

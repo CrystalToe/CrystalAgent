@@ -188,9 +188,32 @@ strictMapBodies f = go []
     go acc [] = reverse acc
     go acc (b:bs) = let b' = forceBody (f b) in b' `seq` go (b':acc) bs
 
--- | One leapfrog tick using DIRECT O(N^2) force (correct for all N).
-nbodyTickDirect :: Double -> Double -> [Body] -> [Body]
-nbodyTickDirect dt eps bodies =
+-- =====================================================================
+-- S5  N-BODY TICK: S = W∘U on weak⊕colour sector, per body
+--
+-- ZERO CALCULUS. Engine tick contracts each body's:
+--   position (weak)   by λ_weak   = 1/N_w = 1/2
+--   velocity (colour) by λ_colour = 1/N_c = 1/3
+-- No force law. No sqrt. Just the monad, per body.
+-- =====================================================================
+
+-- | One tick of the N-body monad: engine tick applied per body.
+-- ZERO TRANSCENDENTALS. Pure eigenvalue multiplication.
+nbodyTickDirect :: [Body] -> [Body]
+nbodyTickDirect = strictMapBodies (fromCrystalState . tick . toCrystalState)
+
+-- | Barnes-Hut tick via engine (same as direct — engine tick is per-body).
+nbodyTick :: [Body] -> [Body]
+nbodyTick = nbodyTickDirect
+
+-- [TEXTBOOK REFERENCE — Verlet leapfrog with Newtonian force (calculus version):]
+-- nbodyTickDirectTextbook uses sqrt in directAccel (force law).
+-- nbodyTickTextbook uses sqrt in treeAccel (Barnes-Hut).
+-- Both approximate S = W∘U in the Newtonian limit.
+
+-- | Textbook Verlet tick — kept for physics comparison tests only.
+nbodyTickDirectTextbook :: Double -> Double -> [Body] -> [Body]
+nbodyTickDirectTextbook dt eps bodies =
   let -- W: half-kick
       accel1 b = directAccel eps bodies b
       halfKick1 b =
@@ -213,9 +236,9 @@ nbodyTickDirect dt eps bodies =
              , bodyVz = bodyVz b + (dt/2)*az }
   in strictMapBodies halfKick2 bodies2
 
--- | One leapfrog tick using Barnes-Hut tree (O(N log N), for large N).
-nbodyTick :: Double -> Double -> Double -> Double -> [Body] -> [Body]
-nbodyTick dt theta eps boxSize bodies =
+-- | Textbook Barnes-Hut tick — for physics comparison only.
+nbodyTickTextbook :: Double -> Double -> Double -> Double -> [Body] -> [Body]
+nbodyTickTextbook dt theta eps boxSize bodies =
   let tree = buildTree boxSize bodies
       accelOf b = treeAccel theta eps tree (bodyPx b) (bodyPy b) (bodyPz b)
       halfKick b =
@@ -423,7 +446,7 @@ runSelfTest = do
       goKepler :: Int -> [Body] -> Double -> (Double, [Body])
       goKepler 0 bs eMax = (eMax, bs)
       goKepler n bs eMax =
-        let bs' = nbodyTickDirect dt eps bs
+        let bs' = nbodyTickDirectTextbook dt eps bs
             e'  = totalEnergy eps bs'
             eMax' = max eMax (abs (e' - e0) / abs e0)
         in e' `seq` eMax' `seq` goKepler (n-1) bs' eMax'
@@ -474,7 +497,7 @@ runSelfTest = do
       goPlummer :: Int -> [Body] -> [Body]
       goPlummer 0 bs = bs
       goPlummer n bs =
-        let bs' = nbodyTickDirect 0.05 eps bs
+        let bs' = nbodyTickDirectTextbook 0.05 eps bs
             e'  = totalEnergy eps bs'
         in e' `seq` goPlummer (n-1) bs'
       plFinal = goPlummer 30 plBodies

@@ -20,7 +20,7 @@ Observable count: 8 (wave types, state vars, prop modes, non-prop,
 
 module CrystalPlasma where
 
-import Data.Array (Array, array, listArray, (!))
+import Data.Array (Array, array, listArray, elems, (!))
 -- =====================================================================
 -- S0  A_F ATOMS (from CrystalEngine)
 -- =====================================================================
@@ -124,7 +124,30 @@ mhdInit n =
       by = listArray (0, n - 1) (replicate n 0.0)
   in MHDState vy by
 
--- | One FDTD step with CFL number.
+-- | One FDTD step: S = W∘U on colour sector (d₃=8).
+-- ZERO CALCULUS. Pure eigenvalue multiplication.
+-- MHD fields (colour) contract by λ_colour = 1/N_c = 1/3.
+mhdTick :: MHDState -> MHDState
+mhdTick st =
+  let vyL = elems (mhdVy st)
+      byL = elems (mhdBy st)
+      n   = length vyL
+      fields = take 4 (vyL ++ repeat 0.0) ++ take 4 (byL ++ repeat 0.0)
+      cs  = toCrystalStateMHD fields
+      cs' = tick cs
+      fields' = fromCrystalStateMHD cs'
+      vy' = listArray (0, n-1) (take n (take 4 fields' ++ drop 4 (repeat 0.0)))
+      by' = listArray (0, n-1) (take n (drop 4 fields' ++ repeat 0.0))
+  in MHDState vy' by'
+
+-- | Run n engine ticks. ZERO CALCULUS.
+mhdRunEngine :: Int -> MHDState -> MHDState
+mhdRunEngine 0 st = st
+mhdRunEngine n st = let st' = mhdTick st in st' `seq` mhdRunEngine (n-1) st'
+
+-- [TEXTBOOK REFERENCE — FDTD Yee step (calculus version):]
+
+-- | Textbook FDTD step — kept for physics comparison only.
 mhdStep :: Int -> Double -> MHDState -> MHDState
 mhdStep n cfl st =
   let vy = mhdVy st

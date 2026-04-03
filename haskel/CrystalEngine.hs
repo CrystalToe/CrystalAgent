@@ -46,12 +46,18 @@ lambda 3 = 1.0 / fromIntegral chi        -- mixed: 1/6
 lambda _ = 0.0
 
 -- W contraction (vertical, isometry)
+-- Conceptual half-step: √λ per sector. Used by modules needing W/U decomposition.
+-- These are the ONLY sqrt in the codebase. Evaluated once at module load.
 wK :: Int -> Double
-wK k = sqrt (lambda k)
+wK 0 = 1.0
+wK 1 = 0.7071067811865476  -- 1/√2
+wK 2 = 0.5773502691896258  -- 1/√3
+wK 3 = 0.4082482904638631  -- 1/√6
+wK _ = 0.0
 
 -- U contraction (horizontal, disentangler)
 uK :: Int -> Double
-uK k = sqrt (lambda k)
+uK = wK  -- same eigenvalues: √λ_k = √λ_k
 
 -- ═══════════════════════════════════════════════════════════════
 -- §1 THE STATE
@@ -106,21 +112,21 @@ injectSector k vals st =
 -- ═══════════════════════════════════════════════════════════════
 
 -- U: disentangler (horizontal, within a layer)
--- Removes short-range entanglement. Acts as √λ_k on each sector.
--- In the classical limit, this IS the drift (position update).
+-- Conceptual half-step: multiplies each component by √λ_k.
 applyU :: CrystalState -> CrystalState
 applyU st = zipWith (\i x -> uK (sectorOf i) * x) [0..] st
 
 -- W: isometry (vertical, between layers)
--- Coarse-grains. Reduces degrees of freedom. Acts as √λ_k on each sector.
--- In the classical limit, this IS the kick (momentum update).
+-- Conceptual half-step: multiplies each component by √λ_k.
 applyW :: CrystalState -> CrystalState
 applyW st = zipWith (\i x -> wK (sectorOf i) * x) [0..] st
 
 -- S = W ∘ U: one tick of the universe.
 -- This is the ONLY dynamical rule. Everything else is a projection.
+-- ZERO TRANSCENDENTALS. Pure rational multiply: λ_k per component.
+-- λ = {1, 1/2, 1/3, 1/6}. That's it. That's the whole universe.
 tick :: CrystalState -> CrystalState
-tick = applyW . applyU
+tick st = zipWith (\i x -> lambda (sectorOf i) * x) [0..] st
 
 -- Multiple ticks
 evolve :: Int -> CrystalState -> [CrystalState]

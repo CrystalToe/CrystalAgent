@@ -110,8 +110,28 @@ data CosmoState = CosmoState
   , csZ    :: Double   -- ^ redshift = 1/a - 1
   } deriving (Show)
 
+-- | One tick of cosmological evolution: S = W∘U on weak⊕colour sector.
+-- ZERO CALCULUS. Pure eigenvalue multiplication.
+-- Geometry (weak) contracts by λ_weak = 1/2.
+-- Matter/radiation (colour) contracts by λ_colour = 1/3.
+cosmoTick :: CosmoState -> CosmoState
+cosmoTick (CosmoState a t z) =
+  let cs  = toCrystalStateCosmo [a, t, z] [0, 0, 0, 0, 0, 0, 0, 0]
+      cs' = tick cs
+      (geo, _) = fromCrystalStateCosmo cs'
+  in CosmoState (geo!!0) (geo!!1) (geo!!2)
+
+-- | Evolve cosmology via engine. ZERO CALCULUS.
+evolveCosmo :: Int -> CosmoState -> [CosmoState]
+evolveCosmo n cs0 = take (n + 1) $ iterate cosmoTick cs0
+
+-- [TEXTBOOK REFERENCE — Friedmann integration with sqrt in Hubble rate:]
+-- integrateFriedmann uses hubbleNorm which has sqrt (Ω_r/a⁴ + Ω_m/a³ + Ω_Λ).
+-- The engine tick replaces it with universal eigenvalue contraction.
+
 -- | Integrate Friedmann from a_init to a_final (or until max steps).
 -- Returns final state. Strict loop — no list accumulation.
+-- TEXTBOOK VERSION — kept for physics comparison only.
 integrateFriedmann :: Double -> Double -> Double -> Int -> CosmoState
 integrateFriedmann aInit aFinal dt maxSteps =
   let go :: Int -> Double -> Double -> CosmoState

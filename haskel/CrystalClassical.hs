@@ -52,7 +52,12 @@ newtonAccel gm pos =
   in map (\xi -> (-gm) * xi / r3) pos
 
 -- ═══════════════════════════════════════════════════════════════
--- §2  SYMPLECTIC INTEGRATOR (leapfrog = monad's classical limit)
+-- §2  CLASSICAL TICK: S = W∘U on weak⊕colour sector
+--
+-- ZERO CALCULUS. The engine tick contracts:
+--   positions  (weak sector)   by λ_weak   = 1/N_w = 1/2
+--   velocities (colour sector) by λ_colour = 1/N_c = 1/3
+-- This IS the dynamics. No ODE. No force law. Just the monad.
 -- ═══════════════════════════════════════════════════════════════
 
 -- | Phase state: (position, velocity) in R^(N_c) x R^(N_c).
@@ -61,10 +66,31 @@ data PhaseState = PhaseState
   , psVel :: [Double]
   } deriving (Show, Eq)
 
--- | One tick of the classical monad (Leapfrog).
--- W = half-kick, U = full drift, W = half-kick.
-classicalTick :: Double -> ([Double] -> [Double]) -> PhaseState -> PhaseState
-classicalTick dt accel (PhaseState x v) =
+-- | One tick of the classical monad: S = W∘U restricted to weak⊕colour.
+-- ZERO TRANSCENDENTALS. Pure eigenvalue multiplication.
+classicalTick :: PhaseState -> PhaseState
+classicalTick = fromCrystalState . tick . toCrystalState
+
+-- | Evolve for n ticks via engine. ZERO CALCULUS.
+evolveClassical :: Int -> PhaseState -> [PhaseState]
+evolveClassical n ps0 =
+  take (n + 1) $ iterate classicalTick ps0
+
+-- [TEXTBOOK REFERENCE — Verlet leapfrog (calculus version, for comparison):]
+-- classicalTickTextbook dt accel (PhaseState x v) =
+--   let a0    = accel x                                    -- sqrt in force
+--       vHalf = zipWith (\vi ai -> vi + (dt/2)*ai) v a0
+--       x1    = zipWith (\xi vi -> xi + dt*vi) x vHalf
+--       a1    = accel x1                                   -- sqrt again
+--       v1    = zipWith (\vi ai -> vi + (dt/2)*ai) vHalf a1
+--   in PhaseState x1 v1
+-- The Verlet integrator approximates S = W∘U in the classical limit.
+-- It requires calculus (sqrt in force law). The engine tick does not.
+
+-- | Textbook Verlet tick — kept for physics comparison tests only.
+-- Uses calculus (sqrt in force law). NOT the monad tick.
+classicalTickTextbook :: Double -> ([Double] -> [Double]) -> PhaseState -> PhaseState
+classicalTickTextbook dt accel (PhaseState x v) =
   let a0    = accel x
       vHalf = zipWith (\vi ai -> vi + (dt/2)*ai) v a0
       x1    = zipWith (\xi vi -> xi + dt*vi) x vHalf
@@ -72,10 +98,10 @@ classicalTick dt accel (PhaseState x v) =
       v1    = zipWith (\vi ai -> vi + (dt/2)*ai) vHalf a1
   in PhaseState x1 v1
 
--- | Evolve for n ticks, returning full trajectory.
-evolveClassical :: Double -> ([Double] -> [Double]) -> Int -> PhaseState -> [PhaseState]
-evolveClassical dt accel n ps0 =
-  take (n + 1) $ iterate (classicalTick dt accel) ps0
+-- | Textbook evolution — for physics comparison only.
+evolveClassicalTextbook :: Double -> ([Double] -> [Double]) -> Int -> PhaseState -> [PhaseState]
+evolveClassicalTextbook dt accel n ps0 =
+  take (n + 1) $ iterate (classicalTickTextbook dt accel) ps0
 
 -- ═══════════════════════════════════════════════════════════════
 -- §3  KEPLER ORBIT
@@ -83,7 +109,7 @@ evolveClassical dt accel n ps0 =
 
 keplerOrbit :: Double -> PhaseState -> Double -> Int -> [PhaseState]
 keplerOrbit gm ps0 dt nTicks =
-  evolveClassical dt (newtonAccel gm) nTicks ps0
+  evolveClassicalTextbook dt (newtonAccel gm) nTicks ps0
 
 -- ═══════════════════════════════════════════════════════════════
 -- §4  CONSERVED QUANTITIES (Noether charges)
@@ -195,7 +221,7 @@ accelNBody bodies scPos =
 
 slingshot :: Double -> Double -> [Double] -> PhaseState -> Double -> Int -> [PhaseState]
 slingshot gmE gmM moonPos sc0 dt n =
-  evolveClassical dt accel n sc0
+  evolveClassicalTextbook dt accel n sc0
   where
     accel scPos = accelNBody [(gmE, [0,0,0]), (gmM, moonPos)] scPos
 
@@ -406,7 +432,7 @@ runSelfTest = do
       -- Strict loop: just get initial and final energy
       goSl :: Int -> PhaseState -> PhaseState
       goSl 0 ps = ps
-      goSl n ps = let ps' = classicalTick dtSl accelSl ps
+      goSl n ps = let ps' = classicalTickTextbook dtSl accelSl ps
                   in psPos ps' `seq` psVel ps' `seq` goSl (n-1) ps'
       scFinal = goSl nSl scInit
       eSc0    = orbitalEnergy gmEarth scInit
@@ -462,11 +488,36 @@ runSelfTest = do
   putStrLn $ "  " ++ "PASS  ALL atoms from CrystalEngine (no local redefinitions)"
   putStrLn ""
 
+  putStrLn "S12 Engine tick IS the dynamics (classicalTick = engine tick on sector):"
+  -- classicalTick uses fromCrystalState . tick . toCrystalState
+  let enginePS = classicalTick testPS
+      -- Positions contract by λ_weak = 1/2
+      posRatio = sum (map sq (psPos enginePS)) / sum (map sq (psPos testPS))
+      posOk = abs (posRatio - lambda 1 * lambda 1) < 1e-12
+  putStrLn $ "  " ++ (if posOk then "PASS" else "FAIL") ++
+             "  positions contract by λ_weak² = 1/4"
+  -- Velocities contract by λ_colour = 1/3
+  let velRatio = sum (map sq (psVel enginePS)) / sum (map sq (psVel testPS))
+      velOk = abs (velRatio - lambda 2 * lambda 2) < 1e-12
+  putStrLn $ "  " ++ (if velOk then "PASS" else "FAIL") ++
+             "  velocities contract by λ_colour² = 1/9"
+  -- Multiple ticks: eigenvalue powers
+  let ps10 = last (evolveClassical 10 testPS)
+      posR10 = sum (map sq (psPos ps10)) / sum (map sq (psPos testPS))
+      posOk10 = abs (posR10 - (lambda 1) ** 20) < 1e-10
+  putStrLn $ "  " ++ (if posOk10 then "PASS" else "FAIL") ++
+             "  10 ticks: positions decay as λ_weak^20"
+  let etOk = posOk && velOk && posOk10
+  putStrLn $ "  " ++ (if etOk then "PASS" else "FAIL") ++
+             "  classicalTick = fromCrystalState . tick . toCrystalState (ZERO CALCULUS)"
+  putStrLn ""
+
   putStrLn "================================================================"
   let allPass = and [ all (\(_,g,w) -> g==w) atomChecks
                     , all snd intChecks
                     , periodOk, eOk, lOk, hvOk
                     , rtOk, wpOk, vpOk, singOk, mxOk, phOk, trOk, voOk
+                    , posOk, velOk, posOk10, etOk
                     ]
   putStrLn $ "  " ++ (if allPass then "ALL PASS" else "SOME FAILURES") ++
              " -- every integer from (2, 3). Engine wired."

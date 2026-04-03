@@ -241,6 +241,12 @@ toCrystalState = id
 fromCrystalState :: CrystalState -> CrystalState
 fromCrystalState = id
 
+-- | One tick of HMC dynamics: S = W∘U directly on full state (Σd=36).
+-- ZERO CALCULUS. Pure eigenvalue multiplication.
+-- HMC state IS CrystalState — the engine tick IS the dynamics.
+hmcEngineTick :: CrystalState -> CrystalState
+hmcEngineTick = tick
+
 -- Rule 4: proveSectorRestriction
 -- HMC uses ALL sectors: momentum in weak (d=3), position in weak⊕colour (d=11),
 -- accept/reject compares energies from all sectors. Restriction = full engine.
