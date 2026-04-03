@@ -151,7 +151,7 @@ Core physics derivations. Comments explain WHY each formula works.
 
 ```
 
-## §Haskell: CrystalArcade (     391 lines)
+## §Haskell: CrystalArcade (     407 lines)
 ```haskell
 
 {- | Module: CrystalArcade -- Approximation Layers from (2,3).
@@ -1657,7 +1657,7 @@ Observable count: 14. Every number from (2,3).
 
 ```
 
-## §Haskell: CrystalClassical (     476 lines)
+## §Haskell: CrystalClassical (     527 lines)
 ```haskell
 
 {- | Module: CrystalClassical — From Monad to Orbits.
@@ -2466,7 +2466,7 @@ Every number from (2,3).
 
 ```
 
-## §Haskell: CrystalEM (     412 lines)
+## §Haskell: CrystalEM (     422 lines)
 ```haskell
 
 {- | Module: CrystalEM -- Electromagnetic Field Evolution from (2,3).
@@ -2487,7 +2487,7 @@ Observable count: 0 new (infrastructure). Every number from (2,3).
 
 ```
 
-## §Haskell: CrystalEngine (     341 lines)
+## §Haskell: CrystalEngine (     347 lines)
 ```haskell
 
 {- | CrystalEngine.hs — The native dynamics engine.
@@ -2506,7 +2506,7 @@ Observable count: 0 new (infrastructure). Every number from (2,3).
 
 ```
 
-## §Haskell: CrystalFriedmann (     385 lines)
+## §Haskell: CrystalFriedmann (     405 lines)
 ```haskell
 
 {- | Module: CrystalFriedmann -- Cosmological Expansion from (2,3).
@@ -2556,7 +2556,7 @@ Observable count: 0 new (infrastructure). Every number from (2,3).
 {- | Module: CrystalGauge — α, sin²θ_W, Higgs, VEV, Koide, τ mass, generations -}
 ```
 
-## §Haskell: CrystalGR (     557 lines)
+## §Haskell: CrystalGR (     573 lines)
 ```haskell
 
 {- | Module: CrystalGR — General Relativistic Orbits from (2,3).
@@ -2606,7 +2606,7 @@ See mera_gravity_closed.py for the computation.
 
 ```
 
-## §Haskell: CrystalGW (     468 lines)
+## §Haskell: CrystalGW (     489 lines)
 ```haskell
 
 {- | Module: CrystalGW — Gravitational Waveforms from (2,3).
@@ -3376,7 +3376,7 @@ main = do
   putStrLn $ "  ✓ All match: " ++ show allMatch
 ```
 
-## §Haskell: CrystalHMC (     389 lines)
+## §Haskell: CrystalHMC (     395 lines)
 ```haskell
 
 {- | CrystalHMC.hs — Hamiltonian Monte Carlo on the MERA.
@@ -3400,7 +3400,7 @@ main = do
 
 ```
 
-## §Haskell: CrystalHologron (     485 lines)
+## §Haskell: CrystalHologron (     499 lines)
 ```haskell
 
 {- | Module: CrystalHologron — Emergent gravity from hologron dynamics in χ=6 MERA.
@@ -3801,7 +3801,7 @@ Proves 38 properties:
 -}
 ```
 
-## §Haskell: CrystalMD (     387 lines)
+## §Haskell: CrystalMD (     400 lines)
 ```haskell
 
 {- | Module: CrystalMD -- Molecular Dynamics from (2,3).
@@ -4124,7 +4124,7 @@ QED.
 
 ```
 
-## §Haskell: CrystalNBody (     530 lines)
+## §Haskell: CrystalNBody (     553 lines)
 ```haskell
 
 {- | Module: CrystalNBody -- N-Body Gravitational Dynamics from (2,3).
@@ -4208,7 +4208,7 @@ Every number from (2,3).
 
 ```
 
-## §Haskell: CrystalPlasma (     425 lines)
+## §Haskell: CrystalPlasma (     448 lines)
 ```haskell
 
 {- | Module: CrystalPlasma -- Magnetohydrodynamics (EM + CFD) from (2,3).
@@ -4277,7 +4277,7 @@ VEV: Toe() default = crystal derived 245.17 GeV (ground truth).
 
 ```
 
-## §Haskell: CrystalQAlgorithms (     320 lines)
+## §Haskell: CrystalQAlgorithms (     326 lines)
 ```haskell
 
 {- |
@@ -4507,6 +4507,12 @@ toCrystalState vals =
 
 fromCrystalState :: CE.CrystalState -> [Double]
 fromCrystalState cs = CE.extractSector 3 cs  -- mixed sector = 24
+
+-- | One tick of quantum algorithm dynamics: S = W∘U on mixed sector.
+-- ZERO CALCULUS. Pure eigenvalue multiplication.
+-- Mixed sector contracts by λ_mixed = 1/χ = 1/6.
+qAlgoTick :: [Double] -> [Double]
+qAlgoTick = fromCrystalState . CE.tick . toCrystalState
 
 -- ═══════════════════════════════════════════════════════════════
 -- Rule 4: proveSectorRestriction
@@ -5987,7 +5993,7 @@ proveDecupletSpacingCorrected c r =
 
 ```
 
-## §Haskell: CrystalQChannels (     290 lines)
+## §Haskell: CrystalQChannels (     296 lines)
 ```haskell
 
 {- |
@@ -6188,6 +6194,12 @@ toCrystalState vals =
 
 fromCrystalState :: CE.CrystalState -> [Double]
 fromCrystalState cs = CE.extractSector 3 cs  -- mixed sector = 24
+
+-- | One tick of quantum channel dynamics: S = W∘U on mixed sector.
+-- ZERO CALCULUS. Pure eigenvalue multiplication.
+-- Mixed sector contracts by λ_mixed = 1/χ = 1/6.
+qChannelTick :: [Double] -> [Double]
+qChannelTick = fromCrystalState . CE.tick . toCrystalState
 
 -- ═══════════════════════════════════════════════════════════════
 -- Rule 4: proveSectorRestriction
@@ -6713,7 +6725,7 @@ applyTwo :: Mat -> Vec -> Vec
 applyTwo = mApply
 ```
 
-## §Haskell: CrystalQHamiltonians (     295 lines)
+## §Haskell: CrystalQHamiltonians (     301 lines)
 ```haskell
 
 {- |
@@ -6905,6 +6917,12 @@ toCrystalState vals =
 
 fromCrystalState :: CE.CrystalState -> [Double]
 fromCrystalState cs = CE.extractSector 3 cs  -- mixed sector = 24
+
+-- | One tick of Hamiltonian dynamics: S = W∘U on mixed sector.
+-- ZERO CALCULUS. Pure eigenvalue multiplication.
+-- Mixed sector contracts by λ_mixed = 1/χ = 1/6.
+qHamTick :: [Double] -> [Double]
+qHamTick = fromCrystalState . CE.tick . toCrystalState
 
 -- ═══════════════════════════════════════════════════════════════
 -- Rule 4: proveSectorRestriction
@@ -7140,7 +7158,7 @@ sectorProbs psi
       [sum [cxNorm2 (psi !! (i * chi + j)) | j <- [0..chi-1]] | i <- [0..min 3 (chi-1)]]
 ```
 
-## §Haskell: CrystalQSimulation (     336 lines)
+## §Haskell: CrystalQSimulation (     342 lines)
 ```haskell
 
 {- |
@@ -7362,6 +7380,12 @@ toCrystalState vals =
 fromCrystalState :: CE.CrystalState -> [Double]
 fromCrystalState cs = CE.extractSector 3 cs  -- mixed sector = 24
 
+-- | One tick of quantum simulation dynamics: S = W∘U on mixed sector.
+-- ZERO CALCULUS. Pure eigenvalue multiplication.
+-- Mixed sector contracts by λ_mixed = 1/χ = 1/6.
+qSimTick :: [Double] -> [Double]
+qSimTick = fromCrystalState . CE.tick . toCrystalState
+
 -- ═══════════════════════════════════════════════════════════════
 -- Rule 4: proveSectorRestriction
 -- ═══════════════════════════════════════════════════════════════
@@ -7452,7 +7476,7 @@ main = do
   putStrLn "================================================================"
 ```
 
-## §Haskell: CrystalQuantum (     475 lines)
+## §Haskell: CrystalQuantum (     481 lines)
 ```haskell
 
 {- |
@@ -7713,6 +7737,12 @@ toCrystalState vals =
 fromCrystalState :: CE.CrystalState -> [Double]
 fromCrystalState cs =
   CE.extractSector 2 cs ++ CE.extractSector 3 cs  -- 8 + 24 = 32
+
+-- | One tick of quantum dynamics: S = W∘U on colour⊕mixed sector.
+-- ZERO CALCULUS. Pure eigenvalue multiplication.
+-- Colour contracts by λ_colour = 1/3, mixed by λ_mixed = 1/6.
+quantumTick :: [Double] -> [Double]
+quantumTick = fromCrystalState . CE.tick . toCrystalState
 
 -- | Sector restriction round-trip test.
 proveSectorRestriction :: [Double] -> Bool
@@ -8323,7 +8353,7 @@ Observable count: 11. Every number from (2,3).
 
 ```
 
-## §Haskell: CrystalThermo (     434 lines)
+## §Haskell: CrystalThermo (     447 lines)
 ```haskell
 
 {- | Module: CrystalThermo -- Thermodynamic Dynamics from (2,3).

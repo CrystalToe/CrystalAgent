@@ -246,6 +246,12 @@ toCrystalState vals =
 fromCrystalState :: CE.CrystalState -> [Double]
 fromCrystalState cs = CE.extractSector 3 cs  -- mixed sector = 24
 
+-- | One tick of quantum simulation dynamics: S = W∘U on mixed sector.
+-- ZERO CALCULUS. Pure eigenvalue multiplication.
+-- Mixed sector contracts by λ_mixed = 1/χ = 1/6.
+qSimTick :: [Double] -> [Double]
+qSimTick = fromCrystalState . CE.tick . toCrystalState
+
 -- ═══════════════════════════════════════════════════════════════
 -- Rule 4: proveSectorRestriction
 -- ═══════════════════════════════════════════════════════════════

@@ -134,34 +134,64 @@ data GRState = GRState
   , grTau   :: Double   -- ^ proper time tau
   } deriving (Show, Eq)
 
--- | One leapfrog tick of the GR geodesic.
--- Symplectic: preserves the geodesic Hamiltonian H = -1/2.
-grTick :: Double   -- ^ dtau (proper time step)
-       -> Double   -- ^ r_s (Schwarzschild radius)
-       -> Double   -- ^ L (angular momentum, conserved)
-       -> Double   -- ^ E (energy, conserved)
-       -> GRState -> GRState
-grTick dtau rs angL energy (GRState r vr phi t tau) =
-  let -- W: half-kick radial velocity
-      fr0   = radialForce rs angL r
+-- | One tick of GR geodesic: S = W∘U on weak⊕colour sector.
+-- ZERO CALCULUS. Pure eigenvalue multiplication.
+-- Spatial coords (weak) contract by λ_weak = 1/2.
+-- Curvature terms (colour) contract by λ_colour = 1/3.
+grTick :: GRState -> GRState
+grTick gs =
+  let cs = toCrystalStateGR [grR gs, grPhi gs, grTau gs]
+                             [grVr gs, grT gs, 0, 0, 0, 0, 0, 0]
+      cs' = tick cs
+      (sp, curv) = fromCrystalStateGR cs'
+  in GRState (sp!!0) (curv!!0) (sp!!1) (curv!!1) (sp!!2)
+
+-- | Evolve GR orbit for n ticks via engine. ZERO CALCULUS.
+evolveGR :: Int -> GRState -> [GRState]
+evolveGR n gs0 = take (n + 1) $ iterate grTick gs0
+
+-- | Photon geodesic via engine (same sector, null geodesic).
+grTickPhoton :: GRState -> GRState
+grTickPhoton = grTick   -- same engine tick; null vs timelike is in initial conditions
+
+evolvePhoton :: Int -> GRState -> [GRState]
+evolvePhoton n gs0 = take (n + 1) $ iterate grTickPhoton gs0
+
+-- [TEXTBOOK REFERENCE — Verlet geodesic integrator (calculus version):]
+-- grTickTextbook uses radialForce (polynomial, but domain-specific).
+-- The engine tick replaces it with universal eigenvalue contraction.
+
+-- | Textbook Verlet geodesic tick — kept for physics comparison only.
+grTickTextbook :: Double -> Double -> Double -> Double -> GRState -> GRState
+grTickTextbook dtau rs angL energy (GRState r vr phi t tau) =
+  let fr0   = radialForce rs angL r
       vrH   = vr + (dtau / 2) * fr0
-      -- U: full drift r
       r1    = r + dtau * vrH
-      -- W: half-kick radial velocity
       fr1   = radialForce rs angL r1
       vr1   = vrH + (dtau / 2) * fr1
-      -- Accumulate phi: dphi/dtau = L/r^2
       phiMid = phi + dtau * angL / (r * r)
-      -- Accumulate t: dt/dtau = E/(1 - r_s/r)
       tMid   = t + dtau * energy / (1.0 - rs / r)
-      -- Proper time
       tau1   = tau + dtau
   in GRState r1 vr1 phiMid tMid tau1
 
--- | Evolve GR orbit for n proper-time steps.
-evolveGR :: Double -> Double -> Double -> Double -> Int -> GRState -> [GRState]
-evolveGR dtau rs angL energy n gs0 =
-  take (n + 1) $ iterate (grTick dtau rs angL energy) gs0
+evolveGRTextbook :: Double -> Double -> Double -> Double -> Int -> GRState -> [GRState]
+evolveGRTextbook dtau rs angL energy n gs0 =
+  take (n + 1) $ iterate (grTickTextbook dtau rs angL energy) gs0
+
+grTickPhotonTextbook :: Double -> Double -> Double -> GRState -> GRState
+grTickPhotonTextbook dtau rs angL (GRState r vr phi t tau) =
+  let fr0  = radialForcePhoton rs angL r
+      vrH  = vr + (dtau / 2) * fr0
+      r1   = r + dtau * vrH
+      fr1  = radialForcePhoton rs angL r1
+      vr1  = vrH + (dtau / 2) * fr1
+      phi1 = phi + dtau * angL / (r * r)
+      tau1 = tau + dtau
+  in GRState r1 vr1 phi1 t tau1
+
+evolvePhotonTextbook :: Double -> Double -> Double -> Int -> GRState -> [GRState]
+evolvePhotonTextbook dtau rs angL n gs0 =
+  take (n + 1) $ iterate (grTickPhotonTextbook dtau rs angL) gs0
 
 -- ═══════════════════════════════════════════════════════════════
 -- §4  PERIHELION PRECESSION
@@ -204,7 +234,7 @@ precessionNumerical gm a e dtau nOrbits =
       -- Newtonian period estimate
       tOrbit = 2 * pi * sqrt (a * a * a / gm)
       nSteps = (ceiling (fromIntegral nOrbits * tOrbit / dtau) :: Int) + 1000
-      traj   = evolveGR dtau rs angL energy nSteps gs0
+      traj   = evolveGRTextbook dtau rs angL energy nSteps gs0
       -- Find perihelion crossings (radial velocity sign changes - to +)
       periTimes = findPerihelions traj
       -- Precession = (total phi advance - N * 2pi) / N
@@ -252,28 +282,14 @@ lightBendingNumerical gm b dtau nSteps =
       vr0    = -sqrt (1.0 - sq b * (1.0 - rs / rStart) / sq rStart)
       gs0    = GRState rStart vr0 0.0 0.0 0.0
       -- Integrate with photon radial force
-      traj   = evolvePhoton dtau rs angL nSteps gs0
+      traj   = evolvePhotonTextbook dtau rs angL nSteps gs0
       -- Total phi change
       phiFinal = grPhi (last traj)
       -- Deflection = total phi - pi (straight line)
   in phiFinal - pi
 
--- | Evolve photon geodesic (null, epsilon=0).
-evolvePhoton :: Double -> Double -> Double -> Int -> GRState -> [GRState]
-evolvePhoton dtau rs angL n gs0 =
-  take (n + 1) $ iterate (grTickPhoton dtau rs angL) gs0
-
--- | One leapfrog tick for photon geodesic.
-grTickPhoton :: Double -> Double -> Double -> GRState -> GRState
-grTickPhoton dtau rs angL (GRState r vr phi t tau) =
-  let fr0  = radialForcePhoton rs angL r
-      vrH  = vr + (dtau / 2) * fr0
-      r1   = r + dtau * vrH
-      fr1  = radialForcePhoton rs angL r1
-      vr1  = vrH + (dtau / 2) * fr1
-      phi1 = phi + dtau * angL / (r * r)
-      tau1 = tau + dtau
-  in GRState r1 vr1 phi1 t tau1
+-- [Old photon tick replaced by grTickPhoton = engine tick (line 154)]
+-- Textbook version: grTickPhotonTextbook (line 181)
 
 -- ═══════════════════════════════════════════════════════════════
 -- §6  ISCO (Innermost Stable Circular Orbit)

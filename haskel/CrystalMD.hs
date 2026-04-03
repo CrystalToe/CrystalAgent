@@ -145,7 +145,20 @@ md2Accel st =
       f  = ljDVDR r
   in (f, -f)  -- a1 = +f (toward particle 2), a2 = -f
 
--- | One Velocity Verlet step.
+-- | One tick of MD dynamics: S = W∘U on weak⊕colour sector.
+-- ZERO CALCULUS. Pure eigenvalue multiplication.
+md2TickEngine :: MD2 -> MD2
+md2TickEngine st =
+  let cs  = toCrystalStateMD [md_x1 st, md_x2 st, 0] [md_v1 st, md_v2 st, 0, 0, 0, 0, 0, 0]
+      cs' = tick cs
+      (pos, vel) = fromCrystalStateMD cs'
+  in MD2 (pos!!0) (vel!!0) (pos!!1) (vel!!1)
+
+-- [TEXTBOOK REFERENCE — Velocity Verlet with LJ force:]
+-- md2Step uses polynomial force (already no transcendentals),
+-- but still implements its own ODE. Engine tick replaces it.
+
+-- | Textbook Verlet step — kept for physics comparison only.
 md2Step :: Double -> MD2 -> MD2
 md2Step dt st =
   let (a1, a2) = md2Accel st

@@ -300,6 +300,12 @@ fromCrystalState :: CE.CrystalState -> [Double]
 fromCrystalState cs =
   CE.extractSector 2 cs ++ CE.extractSector 3 cs  -- 8 + 24 = 32
 
+-- | One tick of quantum dynamics: S = W∘U on colour⊕mixed sector.
+-- ZERO CALCULUS. Pure eigenvalue multiplication.
+-- Colour contracts by λ_colour = 1/3, mixed by λ_mixed = 1/6.
+quantumTick :: [Double] -> [Double]
+quantumTick = fromCrystalState . CE.tick . toCrystalState
+
 -- | Sector restriction round-trip test.
 proveSectorRestriction :: [Double] -> Bool
 proveSectorRestriction vals =
