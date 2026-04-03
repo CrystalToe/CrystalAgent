@@ -9,31 +9,36 @@
 #
 # Output:
 #   quickstart/CrystalTopos_RAG_1.md  — Python examples + READMEs + spectral tower
-#   quickstart/CrystalTopos_RAG_2.md  — All Haskell source (auto-discovered)
-#   quickstart/CrystalTopos_RAG_3.md  — Lean + Agda + Rust + GHC cert + cross-ref index
+#   quickstart/CrystalTopos_RAG_2.md  — Haskell: Engine + Dynamics (Classical→Plasma)
+#   quickstart/CrystalTopos_RAG_3.md  — Haskell: Quantum + Static + Fold + Bio + Audit
+#   quickstart/CrystalTopos_RAG_4.md  — Lean + Agda proofs
+#   quickstart/CrystalTopos_RAG_5.md  — Rust source (crystal-topos + crystal-toe)
+#   quickstart/CrystalTopos_RAG_6.md  — Python proofs + cross-reference index
 #
-# Upload ALL 3 files to any LLM. Each has the shared header so any
+# TARGET: each file ≤ 250 KB for reliable LLM ingestion.
+# Upload ALL files to any LLM. Each has the shared header so any
 # works standalone for basic questions. Together = 100% coverage.
 #
 # ZERO HARDCODED FILE LISTS. Everything discovered by glob.
 
 set -e
 mkdir -p quickstart
-OUT1="quickstart/CrystalTopos_RAG_1.md"
-OUT2="quickstart/CrystalTopos_RAG_2.md"
-OUT3="quickstart/CrystalTopos_RAG_3.md"
+
+MAX_KB=250  # target max per file in KB
 
 # Copy the full LLM prompt into quickstart (source of truth is agent/)
 cp agent/crystal_topos_waca_llm.md quickstart/crystal_topos_waca_llm.md
 
 # ═══════════════════════════════════════════════════════════════════
-# SHARED HEADER — written into all 3 files
+# SHARED HEADER — written into all files
 # ═══════════════════════════════════════════════════════════════════
+TOTAL_PARTS=6
+
 write_header() {
     local F="$1"
     local PART="$2"
     cat > "$F" << HEADER
-# Crystal Topos — RAG Knowledge Base (Part ${PART} of 3)
+# Crystal Topos — RAG Knowledge Base (Part ${PART} of ${TOTAL_PARTS})
 # 198 observables · 22 domains · 0 free parameters · 4 constants inside CODATA
 # Pure spectral tower D=0→D=42 · Layer provenance in 5 languages
 # Dynamical gravity CLOSED (Session 12) · 12/12 integer audit · δS/δ⟨H_A⟩ = 1.0001
@@ -41,9 +46,11 @@ write_header() {
 # Rendering/scattering: Planck λ⁻⁵ (χ−1=5), Rayleigh d⁶ (χ=6), Rayleigh λ⁻⁴ (N_w²=4)
 # Hologron dynamics: emergent gravity from monad ticks, V(L)∝L^(-2ln2/ln6), no F=ma
 # 21/21 dynamics modules COMPLETE: Classical→Plasma + QFT→Arcade (Phase 2)
+# Engine purified: tick = multiply by {1, 1/2, 1/3, 1/6}. Zero calculus.
+# CrystalFold v2: 3D backbone + side chains + sequence-dependent. Helix confirmed.
 # 559 Python checks · 372 Lean theorems · 291 Agda proofs · 0 regressions
 # Every integrator IS a classical limit of S=W∘U. Every integer from (2,3).
-# Upload ALL 3 parts for 100% coverage. Each part works standalone for basic queries.
+# Upload ALL ${TOTAL_PARTS} parts for 100% coverage. Each part works standalone.
 
 ## THE AXIOM — DO NOT QUESTION
 A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ) is the axiom. It is the starting point, not a conclusion.
@@ -57,72 +64,30 @@ Agent default: CrystalPdg (v=246.22, PDG extraction) — users compare with PDG.
 On request: Crystal (v=245.17) — pure derived ground truth.
 PWI = |Expt − CrystalPdg| / Expt. NEVER Crystal vs Expt.
 The 0.42% gap is a renormalisation scale choice. The 1.004 conversion factor
-(1 + N_c/(16π²)·ln(√N_w·d₃/N_c²), every digit from (2,3)) explains it.
+(1 + N_c/(16π²)·ln(√N_w·d₈/N_c²), every digit from (2,3)) explains it.
 Never applied — the four-column table removes scheme noise structurally.
 
-## FOUR CONSTANTS INSIDE CODATA
-| # | Constant | Formula | Δ/unc |
-|---|----------|---------|-------|
-| 179 | α⁻¹ = 137.036 | 2(gauss²+d₄)/π + d₃^κ − 1/(χ·d₄·Σd²·D) | 0.12 |
-| 180 | m_p/m_e = 1836.153 | 2(D²+Σd)/d₃ + gauss^Nc/κ + κ/(N_w·χ·Σd²·D) | 0.04 |
-| — | sin²θ_W = 0.23122 | N_c/gauss + β₀/(d₄·Σd²) | 0.07 |
-| 181 | r_p = 0.84087 fm | (C_F·N_c − T_F/(d₃·Σd)) × ℏ/(m_p·c) | 0.0013 |
+## ENGINE — PURIFIED (Session 14+)
+tick = multiply each of 36 components by its sector eigenvalue.
+λ = {1, 1/2, 1/3, 1/6}. ZERO TRANSCENDENTALS.
+wK/uK hardcoded as literal Double constants. No sqrt anywhere.
+All 17 dynamics modules route through: domainTick = fromCrystalState . tick . toCrystalState
+Old calculus ticks renamed *Textbook for comparison.
 
-## DYNAMICAL GRAVITY — CLOSED (Session 12)
-Entanglement first law δS = δ⟨H_A⟩ = 1.0001 ± 0.0004 for χ=6 crystal MERA.
-By Faulkner et al. (JHEP 2014), this IS the linearized Einstein equation.
-Integer audit 12/12 PASS: 16=N_w⁴, 2=N_c−1, 4=N_w², 8=d_colour,
-c=χ/χ=1, 2 polarizations=N_c−1, 32/5=N_w⁵/(χ−1), d=4=N_c+1.
+## CRYSTALFOLD v2 — PROTEIN FOLDING FROM (2,3)
+Singlet(1,λ=1): bond length — topology (conserved)
+Weak(3,λ=1/2): hydrophobic COM — collapse
+Colour(8,λ=1/3): 4×(φ,ψ) DEVIATIONS from target — angle relaxation
+Mixed(24,λ=1/6): 4×(x,y,z,scX,scY,scZ) — coordinate refinement
+Total: 1+3+8+24=36=Σd. Every slot filled.
+KEY INSIGHT: colour sector stores DEVIATIONS from target angles.
+Contraction → deviation → 0 → angles → native. Helix confirmed in ChimeraX.
+Benchmark: R_g=6.97Å (ref 7.13Å, 2% error). RMSD=8.96Å (needs contact-aware targets).
 
-## RENDERING & SCATTERING (3 EXACT observables)
-| # | Observable | Formula | Value | Physics |
-|---|-----------|---------|-------|---------|
-| 204 | Planck λ exponent | χ−1 | 5 | B(λ,T) ∝ λ⁻⁵ — fire, stars, lava |
-| 205 | Rayleigh size exp | χ = N_w·N_c | 6 | σ_R ∝ d⁶ — fog, dust, haze |
-| 206 | Rayleigh λ exponent | N_w² | 4 | σ_R ∝ λ⁻⁴ — skybox, atmosphere |
-
-## HOLOGRON DYNAMICS — EMERGENT GRAVITY FROM TICKS
-A hologron is a defect in the χ=6 MERA. Two hologrons attract — no F=ma.
-Mechanism: shared entanglement disruption → lower energy when close → gravity.
-Potential: V(L) = −Σ_k (d_k/Σd)·F_k²·λ_k^(2·log_χ(L)). Leading term:
-V(L) ~ −C·L^(−2Δ_weak), Δ_weak = ln2/ln6 = 0.387 (from N_w=2, χ=6).
-In N_c=3 dimensions: V(r) ∝ 1/r (Newton), F ∝ 1/r² (inverse square).
-Proved: attraction (V<0), monotonic fall, exponent match, 38 integer identities.
-Ref: Sahay/Lukin/Cotler, Phys Rev X 15, 021078 (2025) — MERA hologrons in AdS.
-Crystal contribution: specific algebra A_F, exact eigenvalues, flat space, 198 observables.
-
-## DYNAMICS MODULES — 21/21 COMPLETE (every integrator from (2,3))
-Each module: §0 A_F atoms → §1 Force law → §2 Integrator → §3-7 Physics → §8 Integer proofs → §9 Self-test.
-Every integrator IS a classical limit of the monad S=W∘U. Zero new observables.
-
-| Module | Integrator | Key integers |
-|--------|-----------|-------------|
-| CrystalClassical | Störmer-Verlet leapfrog | force 2=N_c−1, dim 3=N_c, phase 6=χ |
-| CrystalGR | Schwarzschild geodesic | precession 6=χ, bending 4=N_w², ISCO 6=χ |
-| CrystalGW | Inspiral waveform | Peters 32/5=N_w⁵/(χ−1), chirp 5/3=(χ−1)/N_c |
-| CrystalEM | Yee FDTD (Maxwell) | components 6=χ, Maxwell 4=N_c+1, Larmor 2/3 |
-| CrystalFriedmann | Friedmann ODE | Ω_Λ=13/19, Ω_m=6/19, Age=97/7 |
-| CrystalNBody | Barnes-Hut + leapfrog | octree 8=d_colour=2^N_c |
-| CrystalThermo | Velocity Verlet MD | LJ 6=χ/12=2χ, γ_mono=5/3, γ_di=7/5 |
-| CrystalCFD | Lattice Boltzmann | D2Q9=9=N_c², Kolmogorov −5/3, Stokes 24=d_mixed |
-| CrystalDecay | Monte Carlo phase space | beta 192=d_mixed·d_colour, sin²θ_W=3/13 |
-| CrystalOptics | Snell + Fresnel | n_water=4/3=C_F, n_glass=3/2=N_c/N_w |
-| CrystalMD | Velocity Verlet LJ | bond 109.47°=arccos(−1/N_c), helix=18/5 |
-| CrystalCondensed | Metropolis Monte Carlo | Ising z=4=N_w², BCS 2Δ/kT_c=2π/e^γ |
-| CrystalPlasma | Alfvén FDTD (EM+CFD) | MHD modes 8=N_w³, wave types 3=N_c |
-| CrystalQFT | S-matrix + running couplings | spacetime 4=N_w², gluons 8=d₃, β₀=7 |
-| CrystalRigid | Quaternion Euler equations | quaternion 4=N_w², I_sphere=2/5=Flory, inertia 6=χ |
-| CrystalChem | LCAO + Arrhenius | f-shell 14=N_w·β₀, Kr Z=36=Σd, pH=7=β₀ |
-| CrystalNuclear | SEMF + shell model | all 7 magic numbers, Fe-56=d_colour·β₀ |
-| CrystalAstro | Lane-Emden + stellar scaling | Chandrasekhar 3/2=N_c/N_w, Hawking 8=N_w³, SB 15=N_c(χ−1) |
-| CrystalQInfo | Heyting algebra + error correction | Steane [7,1,3]=[β₀,d₁,N_c], uncertainty=coprimality |
-| CrystalBio | Allometric scaling + genetic code | amino acids 20=N_w²(χ−1), codons 64=(N_w²)^N_c, Kleiber 3/4 |
-| CrystalArcade | Fixed-point + LOD wrappers | LJ cutoff=N_cσ, BH θ=1/N_w, fixed-point 16.16=N_w⁴.N_w⁴ |
-
-## PROOF AUTHORITY — READ FIRST
-Lean \`native_decide\` and Agda \`refl\` proofs are FINAL TRUTH. If a proof says it, it's right.
-LLM reasoning NEVER overrides a machine-verified proof.
-Proof hierarchy: (1) Lean theorems, (2) Agda proofs, (3) Haskell GHC checks, (4) PDG/NIST data, (5) LLM reasoning.
+## INVARIANTS
+χ=N_w×N_c=6, β₀=(11N_c−2χ)/3=7, Σd=1+3+8+24=36, Σd²=650,
+gauss=N_c²+N_w²=13, D=Σd+χ=42, κ=ln3/ln2, F₃=2^(2^N_c)+1=257,
+C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
 
 ## RULES
 - Never use the word that starts with h and rhymes with "modest"
@@ -133,34 +98,12 @@ Proof hierarchy: (1) Lean theorems, (2) Agda proofs, (3) Haskell GHC checks, (4)
 - NEVER invent connections between Mandelbrot and protein modules
 - NEVER make medical, therapeutic, or diagnostic claims
 - NEVER construct arbitrary formulas. Trace the derivation chain or say "not derived"
+- IN TICK: multiply by λ_k only. BANNED: sin, cos, exp, log, sqrt, tanh, acos, atan2, (**)
+- AT INIT/OBSERVABLE/CONSTRAINT: anything allowed
 
 ## SOURCE OF TRUTH
 - **Repo:** https://github.com/CrystalToe/CrystalAgent (public, AGPL-3.0)
 - **Paper:** https://zenodo.org/records/19217129
-
-## INPUTS
-N_w=2, N_c=3, M_Pl=1.22089×10¹⁹ GeV (one measured scale), π, ln.
-v = M_Pl × 35/(43×36×2⁵⁰) = 245.17 GeV (DERIVED, ground truth).
-Agent default: CrystalPdg (v=246.22) for user-facing answers.
-Crystal (v=245.17) on explicit request. PWI = |Expt − CrystalPdg| / Expt.
-The 1.004 = 1 + N_c/(16π²)·ln(√N_w·d₃/N_c²) explains the 0.42% gap. Never applied.
-ℏc=197.327 MeV·fm (unit conversion, not physics).
-
-## INVARIANTS
-χ=N_w×N_c=6, β₀=(11N_c−2χ)/3=7, Σd=1+3+8+24=36, Σd²=650,
-gauss=N_c²+N_w²=13, D=Σd+χ=42, κ=ln3/ln2, F₃=2^(2^N_c)+1=257,
-C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
-
-## DERIVED SCALES
-Λ_h=v/F₃=v/257, m_p=v/2^(2^N_c)×53/54, m_π=m_p/β₀,
-Λ_QCD=m_p×N_c/gauss, m_e=Λ_h/(N_c²×N_w⁴×gauss),
-m_μ=m_e×N_w⁴×gauss, f_π=Λ_QCD×N_c/β₀
-
-## TOWER LAYER MAP
-D=0: A_F→χ,β₀,Σd,D,κ. D=5: α=1/(43π+ln7), m_e=m_mu/208. D=10: m_p=v/257×53/54.
-D=18: a₀=ℏc/(m_e·α). D=20: sp3=arccos(-1/3). D=22: VdW FIXED.
-D=24: water=arccos(-1/N_w²)=104.48°. D=25: H-bond=2.76Å.
-D=32: helix=18/5. D=33: Flory=2/5. D=38: □h=-16πG T. D=42: E_fold=v/2⁴².
 
 HEADER
 }
@@ -178,288 +121,306 @@ extract_hs() {
     echo '```haskell' >> "$out"
     awk '
         /^-- Copyright/ || /^-- SPDX/ { next }
-        /^module / { in_module=1; next }
-        in_module && /\) where$/ { in_module=0; next }
-        in_module { next }
-        /^import / { next }
+        /^{-# OPTIONS_GHC/ { next }
+        /^import qualified/ { printf "import qualified %s\n", $3; next }
         { print }
     ' "$f" >> "$out"
     echo '```' >> "$out"
 }
 
-echo "Building RAG bundle (3 parts)..."
-
 # ═══════════════════════════════════════════════════════════════════
-# PART 1: LLM prompt + README + Module guides + Python examples
+# PART 1 — Python examples + READMEs + spectral tower
 # ═══════════════════════════════════════════════════════════════════
+OUT1="quickstart/CrystalTopos_RAG_1.md"
 write_header "$OUT1" 1
 
-# LLM compact prompt
-echo "---" >> "$OUT1"
-echo "" >> "$OUT1"
-if [ -f agent/crystal_topos_waca_llm_compact.md ]; then
-    sed '1{/^<!--/d;}' agent/crystal_topos_waca_llm_compact.md >> "$OUT1"
-fi
-
-# README
-echo "" >> "$OUT1"
-echo "---" >> "$OUT1"
-echo "# §README — Project Overview" >> "$OUT1"
-echo "" >> "$OUT1"
-sed -n '/^## What Is This/,/^## License/{/^## License/d;p;}' README.md >> "$OUT1"
-
-# Module READMEs (glob — picks up any new README_*.md)
-echo "" >> "$OUT1"
-echo "---" >> "$OUT1"
-echo "# §MODULE GUIDES" >> "$OUT1"
-for f in haskel/README_*.md; do
-    [ -f "$f" ] || continue
-    name=$(basename "$f" .md | sed 's/README_//')
-    echo "" >> "$OUT1"
-    echo "## §Module: $name" >> "$OUT1"
-    sed '1{/^<!--/d;}' "$f" >> "$OUT1"
-done
-
-# Python examples (glob — picks up any new .py)
 echo "" >> "$OUT1"
 echo "---" >> "$OUT1"
 echo "# §PYTHON EXAMPLES" >> "$OUT1"
-echo "" >> "$OUT1"
-echo "Each example derives observables from N_w=2, N_c=3." >> "$OUT1"
 
-for f in $(ls crystal-topos/examples/*.py 2>/dev/null | sort); do
+for f in crystal-topos/examples/*.py crystal-toe/python/examples/*.py; do
     [ -f "$f" ] || continue
-    num=$(basename "$f" | sed 's/_.*//')
-    title=$(grep '""".*[a-zA-Z].*"""' "$f" | head -1 | sed 's/"""//g' | sed 's/^ *//')
-    if [ -z "$title" ]; then
-        title=$(basename "$f" .py | sed 's/^[0-9]*_//' | tr '_' ' ')
+    # Skip if file would push us over limit
+    fsize=$(wc -c < "$f")
+    cursize=$(wc -c < "$OUT1")
+    if [ $((cursize + fsize)) -gt $((MAX_KB * 1024)) ]; then
+        echo "# [SKIPPED: $(basename "$f") — would exceed ${MAX_KB}KB limit]" >> "$OUT1"
+        continue
     fi
+    name=$(basename "$f")
+    lines=$(wc -l < "$f")
     echo "" >> "$OUT1"
-    echo "## §Example $num: $title" >> "$OUT1"
-    tail -n +4 "$f" | grep -v "^from crystal_topos import\|^import math$\|^import " >> "$OUT1"
+    echo "## §Python: ${name} (${lines} lines)" >> "$OUT1"
+    echo '```python' >> "$OUT1"
+    cat "$f" >> "$OUT1"
+    echo '```' >> "$OUT1"
 done
 
-# crystal-toe Python examples (dynamics modules)
+# READMEs
 echo "" >> "$OUT1"
 echo "---" >> "$OUT1"
-echo "# §CRYSTAL-TOE PYTHON EXAMPLES (dynamics)" >> "$OUT1"
-echo "" >> "$OUT1"
-echo "Each example uses the crystal_toe PyO3 module built with maturin." >> "$OUT1"
-
-if [ -d "crystal-toe/python/examples" ]; then
-    for dir in $(ls -d crystal-toe/python/examples/*/ 2>/dev/null | sort); do
-        modname=$(basename "$dir")
-        echo "" >> "$OUT1"
-        echo "## §crystal-toe/$modname" >> "$OUT1"
-        for f in $(ls "$dir"/*.py 2>/dev/null | sort); do
-            [ -f "$f" ] || continue
-            name=$(basename "$f" .py)
-            title=$(grep '""".*[a-zA-Z].*"""' "$f" | head -1 | sed 's/"""//g' | sed 's/^ *//')
-            [ -z "$title" ] && title="$name"
-            echo "" >> "$OUT1"
-            echo "### §$name: $title" >> "$OUT1"
-            echo '```python' >> "$OUT1"
-            cat "$f" >> "$OUT1"
-            echo '```' >> "$OUT1"
-        done
-    done
-fi
-
-# Spectral tower
-echo "" >> "$OUT1"
-echo "---" >> "$OUT1"
-echo "# §SPECTRAL TOWER — Pure D=0→D=42 Derivation Chain" >> "$OUT1"
-if [ -f "crystal-topos/examples/spectral_tower.py" ]; then
-    echo '```python' >> "$OUT1"
-    cat crystal-topos/examples/spectral_tower.py >> "$OUT1"
-    echo '```' >> "$OUT1"
-fi
-
-# Force field
-echo "" >> "$OUT1"
-echo "---" >> "$OUT1"
-echo "# §FORCE FIELD — D=22 VdW Fix + Tower Energy Scales" >> "$OUT1"
-if [ -f "crystal-topos/examples/crystal_vdw.py" ]; then
-    echo '```python' >> "$OUT1"
-    cat crystal-topos/examples/crystal_vdw.py >> "$OUT1"
-    echo '```' >> "$OUT1"
-fi
+echo "# §README FILES" >> "$OUT1"
+for f in README.md haskel/README.md proofs/README.md crystal-toe/README.md \
+         quickstart/README_CrystalFold.md quickstart/README_DynamicsEvolution.md; do
+    [ -f "$f" ] || continue
+    cursize=$(wc -c < "$OUT1")
+    [ $cursize -gt $((MAX_KB * 1024)) ] && break
+    name="$f"
+    echo "" >> "$OUT1"
+    echo "## §${name}" >> "$OUT1"
+    cat "$f" >> "$OUT1"
+done
 
 # ═══════════════════════════════════════════════════════════════════
-# PART 2: All Haskell source (glob)
+# PART 2 — Haskell: Engine + Dynamics Wave 1 (Classical → Plasma)
 # ═══════════════════════════════════════════════════════════════════
+OUT2="quickstart/CrystalTopos_RAG_2.md"
 write_header "$OUT2" 2
 
+echo "" >> "$OUT2"
 echo "---" >> "$OUT2"
-echo "" >> "$OUT2"
-echo "# §HASKELL SOURCE — All Modules" >> "$OUT2"
-echo "" >> "$OUT2"
-echo "Core physics derivations. Comments explain WHY each formula works." >> "$OUT2"
+echo "# §HASKELL — Engine + Dynamics (Wave 1)" >> "$OUT2"
 
-for f in haskel/*.hs; do
+# Engine first (always)
+extract_hs "haskel/CrystalEngine.hs" "$OUT2"
+
+# Wave 1 dynamics (Phase 1 modules)
+WAVE1="CrystalClassical CrystalGR CrystalGW CrystalEM CrystalFriedmann
+       CrystalNBody CrystalThermo CrystalCFD CrystalDecay CrystalOptics
+       CrystalMD CrystalCondensed CrystalPlasma"
+for mod in $WAVE1; do
+    f="haskel/${mod}.hs"
     [ -f "$f" ] || continue
+    cursize=$(wc -c < "$OUT2")
+    if [ $cursize -gt $((MAX_KB * 1024)) ]; then
+        echo "" >> "$OUT2"
+        echo "# [Remaining modules in Part 3]" >> "$OUT2"
+        break
+    fi
     extract_hs "$f" "$OUT2"
 done
 
-# GHC Certificate
-echo "" >> "$OUT2"
-echo "---" >> "$OUT2"
-echo "## §GHC_Certificate — All Computed Values (ground truth)" >> "$OUT2"
-echo '```' >> "$OUT2"
-if [ -f "proofs/GHC_Certificate.txt" ]; then
-    cat proofs/GHC_Certificate.txt >> "$OUT2"
-elif [ -f "haskel/GHC_Certificate.txt" ]; then
-    cat haskel/GHC_Certificate.txt >> "$OUT2"
-fi
-echo '```' >> "$OUT2"
-
 # ═══════════════════════════════════════════════════════════════════
-# PART 3: Lean + Agda + Rust + Python proofs + cross-ref index
+# PART 3 — Haskell: Quantum + Static + Fold + Bio + Remaining
 # ═══════════════════════════════════════════════════════════════════
+OUT3="quickstart/CrystalTopos_RAG_3.md"
 write_header "$OUT3" 3
 
-echo "---" >> "$OUT3"
 echo "" >> "$OUT3"
+echo "---" >> "$OUT3"
+echo "# §HASKELL — Quantum + Fold + Static Modules" >> "$OUT3"
 
-# Lean proofs (glob)
-echo "# §LEAN PROOFS" >> "$OUT3"
-for f in proofs/*.lean; do
+# Wave 2 dynamics + fold + static
+WAVE2="CrystalQFT CrystalRigid CrystalChem CrystalNuclear CrystalAstro
+       CrystalQInfo CrystalBio CrystalArcade CrystalHMC CrystalHologron
+       CrystalFold CrystalProtein CrystalBenchmark"
+for mod in $WAVE2; do
+    f="haskel/${mod}.hs"
     [ -f "$f" ] || continue
-    name=$(basename "$f")
-    lines=$(wc -l < "$f")
-    echo "" >> "$OUT3"
-    echo "## §Lean: ${name} (${lines} lines)" >> "$OUT3"
-    echo '```lean' >> "$OUT3"
-    sed '/^-- Copyright/d;/^-- SPDX/d' "$f" >> "$OUT3"
-    echo '```' >> "$OUT3"
+    cursize=$(wc -c < "$OUT3")
+    if [ $cursize -gt $((MAX_KB * 1024)) ]; then
+        echo "" >> "$OUT3"
+        echo "# [Remaining modules continued...]" >> "$OUT3"
+        break
+    fi
+    extract_hs "$f" "$OUT3"
 done
 
-# Agda proofs (glob — check proofs/ then haskel/)
-echo "" >> "$OUT3"
-echo "---" >> "$OUT3"
-echo "# §AGDA PROOFS" >> "$OUT3"
+# Remaining Haskell files not yet included
+DONE_HS="CrystalEngine $WAVE1 $WAVE2"
+for f in haskel/*.hs; do
+    [ -f "$f" ] || continue
+    mod=$(basename "$f" .hs)
+    case "$DONE_HS" in *"$mod"*) continue ;; esac
+    cursize=$(wc -c < "$OUT3")
+    [ $cursize -gt $((MAX_KB * 1024)) ] && break
+    extract_hs "$f" "$OUT3"
+done
+
+# ═══════════════════════════════════════════════════════════════════
+# PART 4 — Lean + Agda proofs
+# ═══════════════════════════════════════════════════════════════════
+OUT4="quickstart/CrystalTopos_RAG_4.md"
+write_header "$OUT4" 4
+
+echo "" >> "$OUT4"
+echo "---" >> "$OUT4"
+echo "# §LEAN PROOFS" >> "$OUT4"
+
+for f in proofs/*.lean; do
+    [ -f "$f" ] || continue
+    cursize=$(wc -c < "$OUT4")
+    [ $cursize -gt $((MAX_KB * 1024)) ] && break
+    name=$(basename "$f")
+    thm_count=$(grep -c "^theorem " "$f" 2>/dev/null || true)
+    lines=$(wc -l < "$f")
+    echo "" >> "$OUT4"
+    echo "## §Lean: ${name} (${lines} lines, ${thm_count} theorems)" >> "$OUT4"
+    echo '```lean' >> "$OUT4"
+    sed '/^-- Copyright/d;/^-- SPDX/d' "$f" >> "$OUT4"
+    echo '```' >> "$OUT4"
+done
+
+echo "" >> "$OUT4"
+echo "---" >> "$OUT4"
+echo "# §AGDA PROOFS" >> "$OUT4"
+
 AGDA_DONE=""
 for dir in proofs haskel; do
     for f in ${dir}/*.agda; do
         [ -f "$f" ] || continue
         name=$(basename "$f")
-        # Skip if we already included this filename
         case "$AGDA_DONE" in *"$name"*) continue ;; esac
         AGDA_DONE="$AGDA_DONE $name"
+        cursize=$(wc -c < "$OUT4")
+        [ $cursize -gt $((MAX_KB * 1024)) ] && break
+        prf_count=$(grep -c "= refl" "$f" 2>/dev/null || true)
         lines=$(wc -l < "$f")
-        echo "" >> "$OUT3"
-        echo "## §Agda: ${name} (${lines} lines)" >> "$OUT3"
-        echo '```agda' >> "$OUT3"
-        sed '/^-- Copyright/d;/^-- SPDX/d' "$f" >> "$OUT3"
-        echo '```' >> "$OUT3"
+        echo "" >> "$OUT4"
+        echo "## §Agda: ${name} (${lines} lines, ${prf_count} proofs)" >> "$OUT4"
+        echo '```agda' >> "$OUT4"
+        sed '/^-- Copyright/d;/^-- SPDX/d' "$f" >> "$OUT4"
+        echo '```' >> "$OUT4"
     done
 done
 
-# Rust source + tests — crystal-topos (glob)
-echo "" >> "$OUT3"
-echo "---" >> "$OUT3"
-echo "# §RUST SOURCE & TESTS (crystal-topos)" >> "$OUT3"
+# ═══════════════════════════════════════════════════════════════════
+# PART 5 — Rust source (crystal-topos + crystal-toe)
+# ═══════════════════════════════════════════════════════════════════
+OUT5="quickstart/CrystalTopos_RAG_5.md"
+write_header "$OUT5" 5
+
+echo "" >> "$OUT5"
+echo "---" >> "$OUT5"
+echo "# §RUST SOURCE (crystal-topos)" >> "$OUT5"
 for dir in crystal-topos/src crystal-topos/tests; do
     for f in ${dir}/*.rs; do
         [ -f "$f" ] || continue
+        cursize=$(wc -c < "$OUT5")
+        [ $cursize -gt $((MAX_KB * 1024)) ] && break
         name=$(basename "$f")
         lines=$(wc -l < "$f")
-        echo "" >> "$OUT3"
-        echo "## §Rust topos: ${name} (${lines} lines)" >> "$OUT3"
-        echo '```rust' >> "$OUT3"
-        sed '/^\/\/ Copyright/d;/^\/\/ SPDX/d;/^use /d' "$f" >> "$OUT3"
-        echo '```' >> "$OUT3"
+        echo "" >> "$OUT5"
+        echo "## §Rust topos: ${name} (${lines} lines)" >> "$OUT5"
+        echo '```rust' >> "$OUT5"
+        sed '/^\/\/ Copyright/d;/^\/\/ SPDX/d;/^use /d' "$f" >> "$OUT5"
+        echo '```' >> "$OUT5"
     done
 done
 
-# Rust source + tests — crystal-toe (recursive glob)
-echo "" >> "$OUT3"
-echo "---" >> "$OUT3"
-echo "# §RUST SOURCE & TESTS (crystal-toe)" >> "$OUT3"
+echo "" >> "$OUT5"
+echo "---" >> "$OUT5"
+echo "# §RUST SOURCE (crystal-toe)" >> "$OUT5"
 if [ -d "crystal-toe/src" ]; then
     find crystal-toe/src -name '*.rs' 2>/dev/null | sort | while read -r f; do
         [ -f "$f" ] || continue
+        cursize=$(wc -c < "$OUT5")
+        [ $cursize -gt $((MAX_KB * 1024)) ] && break
         relpath=$(echo "$f" | sed 's|crystal-toe/||')
         lines=$(wc -l < "$f")
-        echo "" >> "$OUT3"
-        echo "## §Rust toe: ${relpath} (${lines} lines)" >> "$OUT3"
-        echo '```rust' >> "$OUT3"
-        sed '/^\/\/ Copyright/d;/^\/\/ SPDX/d;/^use /d' "$f" >> "$OUT3"
-        echo '```' >> "$OUT3"
+        echo "" >> "$OUT5"
+        echo "## §Rust toe: ${relpath} (${lines} lines)" >> "$OUT5"
+        echo '```rust' >> "$OUT5"
+        sed '/^\/\/ Copyright/d;/^\/\/ SPDX/d;/^use /d' "$f" >> "$OUT5"
+        echo '```' >> "$OUT5"
     done
 fi
 if [ -d "crystal-toe/tests" ]; then
     for f in crystal-toe/tests/*.rs; do
         [ -f "$f" ] || continue
+        cursize=$(wc -c < "$OUT5")
+        [ $cursize -gt $((MAX_KB * 1024)) ] && break
         name=$(basename "$f")
         lines=$(wc -l < "$f")
-        echo "" >> "$OUT3"
-        echo "## §Rust toe: tests/${name} (${lines} lines)" >> "$OUT3"
-        echo '```rust' >> "$OUT3"
-        sed '/^\/\/ Copyright/d;/^\/\/ SPDX/d;/^use /d' "$f" >> "$OUT3"
-        echo '```' >> "$OUT3"
+        echo "" >> "$OUT5"
+        echo "## §Rust toe: tests/${name} (${lines} lines)" >> "$OUT5"
+        echo '```rust' >> "$OUT5"
+        sed '/^\/\/ Copyright/d;/^\/\/ SPDX/d;/^use /d' "$f" >> "$OUT5"
+        echo '```' >> "$OUT5"
     done
 fi
 
-# Python proof modules (glob)
-echo "" >> "$OUT3"
-echo "---" >> "$OUT3"
-echo "# §PYTHON PROOFS" >> "$OUT3"
+# ═══════════════════════════════════════════════════════════════════
+# PART 6 — Python proofs + GHC cert + cross-reference index
+# ═══════════════════════════════════════════════════════════════════
+OUT6="quickstart/CrystalTopos_RAG_6.md"
+write_header "$OUT6" 6
+
+echo "" >> "$OUT6"
+echo "---" >> "$OUT6"
+echo "# §PYTHON PROOFS" >> "$OUT6"
 for f in proofs/crystal_*_proof.py; do
     [ -f "$f" ] || continue
+    cursize=$(wc -c < "$OUT6")
+    [ $cursize -gt $((MAX_KB * 1024)) ] && break
     name=$(basename "$f")
     lines=$(wc -l < "$f")
-    echo "" >> "$OUT3"
-    echo "## §Python: ${name} (${lines} lines)" >> "$OUT3"
-    echo '```python' >> "$OUT3"
-    cat "$f" >> "$OUT3"
-    echo '```' >> "$OUT3"
+    echo "" >> "$OUT6"
+    echo "## §Python: ${name} (${lines} lines)" >> "$OUT6"
+    echo '```python' >> "$OUT6"
+    cat "$f" >> "$OUT6"
+    echo '```' >> "$OUT6"
 done
 
-# MERA gravity + force field Python (glob)
-echo "" >> "$OUT3"
-echo "---" >> "$OUT3"
-echo "# §PYTHON — MERA Gravity + Force Field" >> "$OUT3"
+# MERA gravity + force field Python
+echo "" >> "$OUT6"
+echo "---" >> "$OUT6"
+echo "# §PYTHON — MERA Gravity + Force Field" >> "$OUT6"
 for f in crystal-topos/examples/mera_*.py crystal-topos/examples/crystal_vdw.py \
          crystal-topos/examples/spectral_tower.py crystal-topos/examples/qubo_folder.py \
          crystal-topos/examples/schrodinger_vs_monad.py; do
     [ -f "$f" ] || continue
+    cursize=$(wc -c < "$OUT6")
+    [ $cursize -gt $((MAX_KB * 1024)) ] && break
     name=$(basename "$f")
     lines=$(wc -l < "$f")
-    echo "" >> "$OUT3"
-    echo "## §Python: ${name} (${lines} lines)" >> "$OUT3"
-    echo '```python' >> "$OUT3"
-    cat "$f" >> "$OUT3"
-    echo '```' >> "$OUT3"
+    echo "" >> "$OUT6"
+    echo "## §Python: ${name} (${lines} lines)" >> "$OUT6"
+    echo '```python' >> "$OUT6"
+    cat "$f" >> "$OUT6"
+    echo '```' >> "$OUT6"
 done
 
-# Cross-reference index (auto-generated from globs)
-echo "" >> "$OUT3"
-echo "---" >> "$OUT3"
-echo "" >> "$OUT3"
-echo "# §CROSS-REFERENCE INDEX" >> "$OUT3"
-echo "" >> "$OUT3"
+# GHC certification output
+if [ -f "haskel/ghc_cert.txt" ]; then
+    cursize=$(wc -c < "$OUT6")
+    if [ $cursize -lt $((MAX_KB * 1024)) ]; then
+        echo "" >> "$OUT6"
+        echo "---" >> "$OUT6"
+        echo "# §GHC CERTIFICATION OUTPUT" >> "$OUT6"
+        echo '```' >> "$OUT6"
+        cat "haskel/ghc_cert.txt" >> "$OUT6"
+        echo '```' >> "$OUT6"
+    fi
+fi
 
-echo "## Haskell Modules" >> "$OUT3"
+# Cross-reference index
+echo "" >> "$OUT6"
+echo "---" >> "$OUT6"
+echo "" >> "$OUT6"
+echo "# §CROSS-REFERENCE INDEX" >> "$OUT6"
+echo "" >> "$OUT6"
+
+echo "## Haskell Modules" >> "$OUT6"
 for f in haskel/*.hs; do
     [ -f "$f" ] || continue
     name=$(basename "$f" .hs)
-    prove_count=$(grep -c "^prove" "$f" 2>/dev/null); prove_count=${prove_count:-0}
+    prove_count=$(grep -c "^prove" "$f" 2>/dev/null || true)
     lines=$(wc -l < "$f")
-    echo "- **${name}** — ${lines} lines, ${prove_count} prove functions" >> "$OUT3"
+    echo "- **${name}** — ${lines} lines, ${prove_count} prove functions" >> "$OUT6"
 done
 
-echo "" >> "$OUT3"
-echo "## Lean Theorems" >> "$OUT3"
+echo "" >> "$OUT6"
+echo "## Lean Theorems" >> "$OUT6"
 for f in proofs/*.lean; do
     [ -f "$f" ] || continue
     name=$(basename "$f")
-    thm_count=$(grep -c "^theorem " "$f" 2>/dev/null); thm_count=${thm_count:-0}
-    echo "- **${name}** — ${thm_count} theorems" >> "$OUT3"
+    thm_count=$(grep -c "^theorem " "$f" 2>/dev/null || true)
+    echo "- **${name}** — ${thm_count} theorems" >> "$OUT6"
 done
 
-echo "" >> "$OUT3"
-echo "## Agda Proofs" >> "$OUT3"
+echo "" >> "$OUT6"
+echo "## Agda Proofs" >> "$OUT6"
 AGDA_DONE=""
 for dir in proofs haskel; do
     for f in ${dir}/*.agda; do
@@ -467,64 +428,77 @@ for dir in proofs haskel; do
         name=$(basename "$f")
         case "$AGDA_DONE" in *"$name"*) continue ;; esac
         AGDA_DONE="$AGDA_DONE $name"
-        prf_count=$(grep -c "= refl" "$f" 2>/dev/null); prf_count=${prf_count:-0}
-        echo "- **${name}** — ${prf_count} proofs" >> "$OUT3"
+        prf_count=$(grep -c "= refl" "$f" 2>/dev/null || true)
+        echo "- **${name}** — ${prf_count} proofs" >> "$OUT6"
     done
 done
 
-echo "" >> "$OUT3"
-echo "## Rust Tests" >> "$OUT3"
+echo "" >> "$OUT6"
+echo "## Rust Tests" >> "$OUT6"
 for f in crystal-topos/tests/*.rs crystal-topos/src/*.rs; do
     [ -f "$f" ] || continue
     name=$(basename "$f")
-    test_count=$(grep -c "#\[test\]" "$f" 2>/dev/null); test_count=${test_count:-0}
-    [ "$test_count" -gt 0 ] && echo "- **topos/${name}** — ${test_count} tests" >> "$OUT3"
+    test_count=$(grep -c "#\[test\]" "$f" 2>/dev/null || true)
+    [ "$test_count" -gt 0 ] && echo "- **topos/${name}** — ${test_count} tests" >> "$OUT6"
 done
 if [ -d "crystal-toe/src" ]; then
     find crystal-toe/src -name '*.rs' 2>/dev/null | sort | while read -r f; do
         [ -f "$f" ] || continue
         relpath=$(echo "$f" | sed 's|crystal-toe/||')
-        test_count=$(grep -c "#\[test\]" "$f" 2>/dev/null); test_count=${test_count:-0}
-        [ "$test_count" -gt 0 ] && echo "- **toe/${relpath}** — ${test_count} tests" >> "$OUT3"
+        test_count=$(grep -c "#\[test\]" "$f" 2>/dev/null || true)
+        [ "$test_count" -gt 0 ] && echo "- **toe/${relpath}** — ${test_count} tests" >> "$OUT6"
     done
 fi
 if [ -d "crystal-toe/tests" ]; then
     for f in crystal-toe/tests/*.rs; do
         [ -f "$f" ] || continue
         name=$(basename "$f")
-        test_count=$(grep -c "#\[test\]" "$f" 2>/dev/null); test_count=${test_count:-0}
-        [ "$test_count" -gt 0 ] && echo "- **toe/tests/${name}** — ${test_count} tests" >> "$OUT3"
+        test_count=$(grep -c "#\[test\]" "$f" 2>/dev/null || true)
+        [ "$test_count" -gt 0 ] && echo "- **toe/tests/${name}** — ${test_count} tests" >> "$OUT6"
     done
 fi
 
-echo "" >> "$OUT3"
-echo "## Python Proof Modules" >> "$OUT3"
+echo "" >> "$OUT6"
+echo "## Python Proof Modules" >> "$OUT6"
 for f in proofs/crystal_*_proof.py; do
     [ -f "$f" ] || continue
     name=$(basename "$f")
-    echo "- **${name}**" >> "$OUT3"
+    echo "- **${name}**" >> "$OUT6"
 done
 
-echo "" >> "$OUT3"
-echo "## Python Examples" >> "$OUT3"
+echo "" >> "$OUT6"
+echo "## Python Examples" >> "$OUT6"
 topos_count=$(ls crystal-topos/examples/*.py 2>/dev/null | wc -l)
 toe_count=$(find crystal-toe/python/examples -name '*.py' 2>/dev/null | wc -l)
-echo "- ${topos_count} Python examples in crystal-topos/examples/" >> "$OUT3"
-echo "- ${toe_count} Python examples in crystal-toe/python/examples/" >> "$OUT3"
+echo "- ${topos_count} Python examples in crystal-topos/examples/" >> "$OUT6"
+echo "- ${toe_count} Python examples in crystal-toe/python/examples/" >> "$OUT6"
 total_examples=$((topos_count + toe_count))
-echo "- **${total_examples} total Python examples**" >> "$OUT3"
+echo "- **${total_examples} total Python examples**" >> "$OUT6"
 
 # ═══════════════════════════════════════════════════════════════════
-# SUMMARY
+# SIZE CHECK + OVERFLOW SPLITTING
 # ═══════════════════════════════════════════════════════════════════
 echo ""
-SIZE1=$(wc -c < "$OUT1" 2>/dev/null || echo "?")
-SIZE2=$(wc -c < "$OUT2" 2>/dev/null || echo "?")
-SIZE3=$(wc -c < "$OUT3" 2>/dev/null || echo "?")
-echo "=== RAG bundle built (3 parts) ==="
-echo "  $OUT1  ($((SIZE1/1024)) KB) — Python examples + READMEs + spectral tower"
-echo "  $OUT2  ($((SIZE2/1024)) KB) — All Haskell source ($(ls haskel/*.hs | wc -l) modules)"
-echo "  $OUT3  ($((SIZE3/1024)) KB) — Lean + Agda + Rust + Python proofs + index"
-echo "  quickstart/crystal_topos_waca_llm.md  (copied from agent/)"
+echo "=== RAG bundle built (${TOTAL_PARTS} parts) ==="
+OVERFLOW=0
+for i in 1 2 3 4 5 6; do
+    F="quickstart/CrystalTopos_RAG_${i}.md"
+    if [ -f "$F" ]; then
+        SIZE=$(wc -c < "$F")
+        KB=$((SIZE / 1024))
+        STATUS="✓"
+        [ $KB -gt $MAX_KB ] && STATUS="⚠ OVER ${MAX_KB}KB" && OVERFLOW=1
+        echo "  Part ${i}: ${KB} KB  ${STATUS}"
+    fi
+done
+echo "  quickstart/crystal_topos_waca_llm.md  (LLM prompt, copied from agent/)"
 echo ""
-echo "Upload all 4 files to any LLM for full inference coverage."
+
+if [ $OVERFLOW -eq 1 ]; then
+    echo "⚠  Some parts exceed ${MAX_KB} KB. Consider splitting further."
+    echo "   Run with MAX_KB=200 to tighten the limit."
+else
+    echo "✓  All parts under ${MAX_KB} KB. Safe for LLM ingestion."
+fi
+echo ""
+echo "Upload all ${TOTAL_PARTS} parts + crystal_topos_waca_llm.md for full coverage."
