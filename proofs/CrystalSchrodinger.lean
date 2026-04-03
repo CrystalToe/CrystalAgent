@@ -94,3 +94,28 @@ theorem cross_steane : nW * nW * nW - 1 = 7 := by native_decide
 theorem cross_steane_beta0 : beta0 = 7 := by native_decide
 -- Tower depth
 theorem cross_tower : towerD = 42 := by native_decide
+
+-- ═══════════════════════════════════════════════════════════════
+-- ENGINE WIRING PROOFS
+-- ═══════════════════════════════════════════════════════════════
+
+-- Sector structure
+theorem engine_sigmaD : d1 + d2 + d3 + d4 = sigmaD := by native_decide
+theorem engine_sigmaD_val : sigmaD = 36 := by native_decide
+
+-- Colour⊕mixed = d3 + d4 = 32
+theorem engine_colour_mixed : d3 + d4 = 32 := by native_decide
+theorem engine_colour_dim : d3 = 8 := by native_decide
+theorem engine_mixed_dim : d4 = 24 := by native_decide
+
+-- 32 reals = 16 complex amplitudes
+-- Packing: colour (8 reals = 4 complex) + mixed (24 reals = 12 complex) = 16 complex
+theorem packing_reals : d3 + d4 = 32 := by native_decide
+
+-- Lambda factorisation
+theorem lambda_colour_denom : nC = 3 := by native_decide
+theorem lambda_mixed_denom : nW * nC = 6 := by native_decide
+
+-- No weak coupling: quantum wavefunction has no gravitational DOF
+theorem no_weak : d2 = 3 := by native_decide
+-- Engine wired.

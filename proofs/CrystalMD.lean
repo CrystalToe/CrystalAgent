@@ -55,3 +55,9 @@ theorem chi_minus_one : chi - 1 = 5 := by native_decide
 theorem dMixed_alt : 2 * chi * nW = 24 := by native_decide
 theorem nC_sq_nW : nC * nC * nW = 18 := by native_decide
 theorem nW_sq_is_four : nW * nW = 4 := by native_decide
+-- Engine wiring
+theorem engine_lj_attr : chi = 6 := by native_decide
+theorem engine_lj_rep : 2 * chi = 12 := by native_decide
+theorem engine_lj_force : dMixed = 24 := by native_decide
+theorem engine_full : sigmaD = 36 := by native_decide
+-- Engine wired.

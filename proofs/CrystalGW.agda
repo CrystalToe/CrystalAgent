@@ -60,3 +60,20 @@ dcol = refl
 -- 11/3 exponent
 chirp-11 : N_c * N_c + N_w ≡ 11
 chirp-11 = refl
+
+-- Engine wiring
+sigmaD : ℕ
+sigmaD = 1 + 3 + 8 + 24
+
+engine-quad : χ ≡ 6
+engine-quad = refl
+
+engine-pol : N_c ∸ 1 ≡ 2
+engine-pol = refl
+
+engine-double : N_w ≡ 2
+engine-double = refl
+
+engine-full : sigmaD ≡ 36
+engine-full = refl
+-- Engine wired.

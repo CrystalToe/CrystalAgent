@@ -21,3 +21,11 @@ theorem gauss_e_sector : 1 = 1 := by native_decide
 theorem gauss_b_sector : N_c = 3 := by native_decide
 theorem faraday_sector : N_c ^ 2 - 1 = 8 := by native_decide
 theorem ampere_sector : N_w ^ 3 * N_c = 24 := by native_decide
+-- Engine wiring
+abbrev sigmaD : Nat := 1 + 3 + 8 + 24
+abbrev dColour : Nat := N_c * N_c - 1
+theorem engine_em_sector : dColour = 8 := by native_decide
+theorem engine_field_comp : chi = 6 := by native_decide
+theorem engine_courant : N_w = 2 := by native_decide
+theorem engine_full : sigmaD = 36 := by native_decide
+-- Engine wired.

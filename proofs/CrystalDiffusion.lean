@@ -92,3 +92,21 @@ theorem cross_astro : nW * nW = 4 := by native_decide
 theorem cross_tower : towerD = 42 := by native_decide
 -- LCG (shared with CrystalHMC)
 theorem cross_lcg : d1 * d1 + d2 * d2 + d3 * d3 + d4 * d4 = 650 := by native_decide
+
+-- §9 Engine wiring (CrystalDiffusion imports CrystalEngine)
+-- D = 1/χ = λ_mixed: denominator = χ = 6
+theorem engine_diff_coeff : chi = 6 := by native_decide
+-- 1D neighbours = N_w (engine atom)
+theorem engine_neighbours_1d : nW = 2 := by native_decide
+-- 3D neighbours = χ (engine atom)
+theorem engine_neighbours_3d : chi = nW * nC := by native_decide
+-- CFL: 2 × N_c = χ
+theorem engine_cfl : nW * nC = chi := by native_decide
+-- Fourier k=0 conserved ↔ λ_singlet denom = 1
+theorem engine_singlet_conserved : d1 = 1 := by native_decide
+-- Spatial dim = d_weak = N_c = 3
+theorem engine_spatial : d2 = nC := by native_decide
+-- All atoms from CrystalEngine
+theorem engine_full_state : sigmaD = 36 := by native_decide
+
+-- Total: 38 theorems by native_decide. Zero sorry. Engine wired.

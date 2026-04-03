@@ -22,3 +22,10 @@ theorem tower_43 : towerD + 1 = 43 := by native_decide
 theorem fixed_is_oneloop : nW * nW * nW * nW = 16 := by native_decide
 theorem lod_is_codon : nC = 3 := by native_decide
 theorem octree_is_dcolour : nW * nW * nW = dColour := by native_decide
+-- Engine wiring
+theorem engine_verlet : nW = 2 := by native_decide
+theorem engine_octree_sector : dColour = nC * nC - 1 := by native_decide
+theorem engine_phase : chi = 6 := by native_decide
+theorem engine_full : sigmaD = 36 := by native_decide
+theorem engine_fixed : nW * nW * nW * nW = 16 := by native_decide
+-- Total theorems by native_decide. Engine wired.

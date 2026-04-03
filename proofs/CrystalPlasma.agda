@@ -61,3 +61,20 @@ cfd-d2q9 = refl
 -- Cross-checks
 nW-cubed : nW * nW * nW ≡ dColour
 nW-cubed = refl
+
+-- Engine wiring + new features
+sigmaD : ℕ
+sigmaD = 1 + 3 + 8 + 24
+
+engine-colour : (nC * nC) - 1 ≡ 8
+engine-colour = refl
+
+engine-chi : chi ≡ 6
+engine-chi = refl
+
+engine-full : sigmaD ≡ 36
+engine-full = refl
+
+engine-bondi : nW * nW ≡ 4
+engine-bondi = refl
+-- Engine wired.

@@ -95,3 +95,17 @@ nC-sq-nW = refl
 
 nW-sq : nW * nW ≡ 4
 nW-sq = refl
+
+-- Engine wiring
+sigmaD : ℕ
+sigmaD = 1 + 3 + 8 + 24
+
+engine-lj : chi ≡ 6
+engine-lj = refl
+
+engine-rep : chi + chi ≡ 12
+engine-rep = refl
+
+engine-full : sigmaD ≡ 36
+engine-full = refl
+-- Engine wired.

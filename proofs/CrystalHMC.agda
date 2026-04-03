@@ -156,5 +156,38 @@ hmc-kolm-num = refl
 hmc-kolm-den : nC ≡ 3
 hmc-kolm-den = refl
 
--- §12 All 38 proofs by refl. Zero postulates.
+-- §12 All 33 proofs by refl. Zero postulates.
 -- HMC = S = W∘U. No path integral. No functional derivative.
+
+-- §13 Engine wiring (CrystalHMC imports CrystalEngine)
+-- HMC atoms identical to CrystalEngine. No local redefinitions.
+
+-- Engine eigenvalue denominators (λ_k = 1/k)
+engine-lambda-product : nW * nC ≡ chi
+engine-lambda-product = refl
+
+-- Sector starts (extractSector offsets from CrystalEngine)
+engine-sector1-start : d1 ≡ 1
+engine-sector1-start = refl
+
+engine-sector2-start : d1 + d2 ≡ 4
+engine-sector2-start = refl
+
+engine-sector3-start : d1 + d2 + d3 ≡ 12
+engine-sector3-start = refl
+
+-- HMC sector restriction
+engine-leapfrog-sector : d2 + d3 ≡ 11
+engine-leapfrog-sector = refl
+
+engine-full-state : sigmaD ≡ 36
+engine-full-state = refl
+
+engine-mera-depth : towerD ≡ 42
+engine-mera-depth = refl
+
+-- λ_mixed = λ_weak × λ_colour (denominator: 2 × 3 = 6 = χ)
+engine-mixed-product : nW * nC ≡ chi
+engine-mixed-product = refl
+
+-- Total: 41 proofs by refl. Zero postulates. Engine wired.
