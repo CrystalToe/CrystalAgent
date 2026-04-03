@@ -27,3 +27,23 @@ mf-tc : nW * nW ≡ 4
 mf-tc = refl
 newton : nW ≡ 2
 newton = refl
+
+-- Engine wiring
+sigmaD : ℕ
+sigmaD = 1 + 3 + 8 + 24
+
+engine-phase : chi ≡ 6
+engine-phase = refl
+
+engine-full : sigmaD ≡ 36
+engine-full = refl
+
+engine-octree : dColour ≡ 8
+engine-octree = refl
+
+engine-verlet : nW ≡ 2
+engine-verlet = refl
+
+engine-fixed : nW * nW * nW * nW ≡ 16
+engine-fixed = refl
+-- Engine wired.

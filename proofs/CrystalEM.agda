@@ -29,3 +29,20 @@ faraday-sector : (N_c * N_c) ∸ 1 ≡ 8
 faraday-sector = refl
 ampere-sector : N_w * N_w * N_w * N_c ≡ 24
 ampere-sector = refl
+
+-- Engine wiring
+sigmaD : ℕ
+sigmaD = 1 + 3 + 8 + 24
+
+engine-em-sector : (N_c * N_c) ∸ 1 ≡ 8
+engine-em-sector = refl
+
+engine-field-comp : χ ≡ 6
+engine-field-comp = refl
+
+engine-courant : N_w ≡ 2
+engine-courant = refl
+
+engine-full : sigmaD ≡ 36
+engine-full = refl
+-- Engine wired.

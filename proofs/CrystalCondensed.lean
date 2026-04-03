@@ -42,3 +42,9 @@ theorem z_diff : chi - nW * nW = nW := by native_decide
 theorem nW_cubed : nW * nW * nW = 8 := by native_decide
 theorem z_square_val : nW * nW = 4 := by native_decide
 theorem z_cubic_val : chi = 6 := by native_decide
+-- Engine wiring
+theorem engine_metropolis : nW = 2 := by native_decide
+theorem engine_mixed : (nW * nW - 1) * (nC * nC - 1) = 24 := by native_decide
+theorem engine_cubic : chi = 6 := by native_decide
+theorem engine_full : sigmaD = 36 := by native_decide
+-- Engine wired.

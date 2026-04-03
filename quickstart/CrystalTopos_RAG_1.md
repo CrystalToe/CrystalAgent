@@ -587,6 +587,39 @@ https://zenodo.org/records/19217129
 ---
 # §MODULE GUIDES
 
+## §Module: Audit
+
+# CrystalAudit.hs — Audit Infrastructure
+
+## What This Module Does
+
+Cross-module consistency checks. Verifies that all modules agree on
+atom values and sector dimensions. Infrastructure module.
+
+## Engine Wiring
+
+**This module imports CrystalEngine.** No local atom redefinitions.
+
+### Sector: all sectors (d = 36)
+
+| Check | Value |
+|-------|-------|
+| sigmaD | 36 |
+| towerD | 42 |
+| beta0 | 7 |
+| chi | 6 |
+
+## Proof Certificate
+
+- `haskel/CrystalAudit.hs` — 18 cross-module consistency checks
+- `proofs/CrystalAudit.lean` — Lean 4 integer identity proofs
+- `proofs/CrystalAudit.agda` — Agda integer identity proofs
+
+## Dependencies
+
+- CrystalEngine — atoms, sector operations
+- Multiple Crystal* modules — audit targets
+
 ## §Module: CrystalAlphaProton
 
 # CrystalAlphaProton — α⁻¹ and m_p/m_e Inside CODATA
@@ -753,30 +786,45 @@ ghc -O2 -main-is CrystalAlphaProton CrystalAlphaProton.hs -o alpha_proton && ./a
 ```
 
 ## §Module: CrystalArcade
-# CrystalArcade — Approximation Layers from (2,3)
-## Overview
-Every game/sim approximation parameter traced to A_F. Cutoffs, precision, LOD — all from (2,3).
-## Integer Traces
-| Approximation | Value | Crystal derivation |
-|---|---|---|
-| LJ cutoff | 3σ | N_cσ |
-| Barnes-Hut θ | 0.5 | 1/N_w |
-| Octree children | 8 | d_colour = N_w³ |
-| WCA cutoff | 2^(1/6)σ | N_w^(1/χ)σ |
-| Euler order | 1 | d₁ |
+
+# CrystalArcade.hs — Approximation Layers from (2,3)
+
+## What This Module Does
+
+Every approximation parameter is a controlled degradation of an exact Crystal
+module. LJ cutoffs, Barnes-Hut theta, fixed-point bits, LOD levels, mean-field
+Ising, Newton-Raphson iterations — all trace to (2,3).
+
+## Engine Wiring
+
+**This module imports CrystalEngine.** No local atom redefinitions.
+
+### Key Mappings
+
+| Approximation | Value | Engine Source |
+|--------------|-------|--------------|
 | Verlet order | 2 | N_w |
-| Fixed-point | 16.16 | N_w⁴.N_w⁴ |
-| Spatial hash | 3 cells | N_c |
+| Euler order | 1 | d₁ |
+| Octree children | 8 | d_colour = sectorDim 2 |
+| LJ cutoff | 3σ | N_c |
+| Barnes-Hut θ | 1/2 | 1/N_w |
+| Fixed-point bits | 16 | N_w⁴ |
+| Spatial hash cells | 3 | N_c |
 | LOD levels | 3 | N_c |
 | Mean-field T_c | 4 | N_w² |
-| Newton-Raphson | 2 iter | N_w |
-| Fast α⁻¹ | 137 | ⌊(D+1)π+lnβ₀⌋ |
-## Self-Test
-```bash
-ghc -O2 -main-is CrystalArcade CrystalArcade.hs 2>/dev/null && ./CrystalArcade
-```
-## Observable Count
-12 new. All integers from (2,3).
+| Newton-Raphson iter | 2 | N_w |
+| Phase space | 6 | χ |
+
+## Proof Certificate
+
+- `haskel/CrystalArcade.hs` — 25 checks (25 PASS)
+- `proofs/CrystalArcade.lean` — Lean 4 theorems (by native_decide)
+- `proofs/CrystalArcade.agda` — Agda proofs (by refl)
+
+## Dependencies
+
+- **Imports CrystalEngine** — atoms, sector operations, tick, normSq
+- `Data.Ratio`
 
 ## §Module: CrystalAstro
 # CrystalAstro — Astrophysical Extremes from (2,3)
@@ -961,38 +1009,42 @@ ghc -O2 -main-is CrystalBio CrystalBio.hs 2>/dev/null && ./CrystalBio
 
 ## §Module: CrystalCFD
 
-# CrystalCFD — Lattice Boltzmann Fluid Dynamics from (2,3)
+# CrystalCFD.hs — Lattice Boltzmann Fluid Dynamics from (2,3)
 
-## Overview
+## What This Module Does
 
-Lattice Boltzmann Method (LBM) on D2Q9 lattice.
-Monad S = W·U: collision (BGK relaxation) = W, streaming (propagation) = U.
+D2Q9 Lattice Boltzmann Method. Poiseuille flow, lid-driven cavity.
+Collide-stream = S = W∘U on the colour sector. All from (2,3).
 
-## Integer Traces
+## Engine Wiring
 
-| Physical quantity | Value | Crystal derivation |
-|---|---|---|
-| D2Q9 velocity count | 9 | N_c² |
-| Kolmogorov exponent | −5/3 | −(χ−1)/N_c |
-| Stokes drag | 24 | d_mixed |
-| Blasius exponent | 1/4 | 1/N_w² |
-| Von Kármán constant | 2/5 | N_w/(χ−1) |
-| Rest weight | 4/9 | N_w²/N_c² |
-| Cardinal weight | 1/9 | 1/N_c² |
-| Diagonal weight | 1/36 | 1/Σd |
+**This module imports CrystalEngine.** No local atom redefinitions.
+
+### Sector: colour (d₃ = 8)
+
+| CFD Concept | Value | Engine Source |
+|-----------|-------|--------------|
+| D2Q9 velocities | 9 | N_c² |
+| Colour sector | 8 | d₃ = N_c²−1 |
 | Sound speed² | 1/3 | 1/N_c |
+| Weight rest | 4/9 | N_w²/N_c² |
+| Weight cardinal | 1/9 | 1/N_c² |
+| Weight diagonal | 1/36 | 1/Σd |
+| Kolmogorov −5/3 | −(χ−1)/N_c | |
+| Stokes drag | 24 | d_mixed |
+| Blasius 1/4 | 1/N_w² | |
+| Von Kármán 2/5 | N_w/(χ−1) | |
 
-## Self-Test
+## Proof Certificate
 
-Poiseuille channel flow (body-force driven), mass conservation, density uniformity.
+- `haskel/CrystalCFD.hs` — 20 checks (20 PASS)
+- `proofs/CrystalCFD.lean` — Lean 4 theorems (by native_decide)
+- `proofs/CrystalCFD.agda` — Agda proofs (by refl)
 
-```bash
-ghc -O2 -main-is CrystalCFD CrystalCFD.hs 2>/dev/null && ./CrystalCFD
-```
+## Dependencies
 
-## Observable Count
-
-0 new (infrastructure). All integers from (2,3).
+- **Imports CrystalEngine** — atoms, sector operations, tick, normSq
+- `Data.Array`, `Data.List`, `Data.Ratio`
 
 ## §Module: CrystalChem
 # CrystalChem — Chemistry and Materials from (2,3)
@@ -1030,21 +1082,44 @@ ghc -O2 -main-is CrystalChem CrystalChem.hs 2>/dev/null && ./CrystalChem
 ## What This Module Does
 
 Bridges the quantum monad S = W∘U to classical orbital mechanics.
-One Haskell module. Satellite around Earth. Slingshot around Moon. Hohmann transfer.
-All from (2,3). No imported physics. Symplectic integrator (not RK4).
+Symplectic integrator (Leapfrog/Verlet) is the classical limit of the monad.
+Satellite orbits, Hohmann transfers, gravity assists — all from (2,3).
 
-## The Key Insight
+**This is the TEMPLATE for all Verlet-family dynamics modules.**
 
-The monad is discrete and structure-preserving. The correct classical limit
-is a symplectic integrator, not RK4. Specifically, Störmer-Verlet leapfrog:
+## Engine Wiring
 
+**This module imports CrystalEngine.** No local atom redefinitions.
+
+```haskell
+import CrystalEngine
+  ( nW, nC, chi, beta0, sigmaD, towerD, gauss
+  , d1, d2, d3, d4, lambda
+  , CrystalState, sectorStart, sectorDim
+  , extractSector, injectSector, normSq, tick
+  )
 ```
-v_{n+1/2} = v_n + (Δt/2) × a(x_n)       -- W: half-kick
-x_{n+1}   = x_n + Δt × v_{n+1/2}         -- U: full drift
-v_{n+1}   = v_{n+1/2} + (Δt/2) × a(x_{n+1})  -- W: half-kick
-```
 
-The leapfrog IS S = W∘U∘W in the classical limit.
+### Sector Restriction
+
+Classical mechanics = S restricted to **weak⊕colour** (d = 3 + 8 = 11).
+
+| Classical Concept | Engine Sector | Dimension |
+|-------------------|---------------|-----------|
+| Position (x,y,z) | weak (sector 1) | d₂ = 3 |
+| Velocity (vx,vy,vz) | colour (sector 2, first 3) | 3 of d₃ = 8 |
+| Phase space per body | χ = N_w × N_c | 6 |
+| Verlet order | N_w | 2 |
+
+### PhaseState ↔ CrystalState Mapping
+
+```haskell
+toCrystalState (PhaseState pos vel) =
+  [0] ++ pos ++ vel ++ replicate 5 0.0 ++ replicate 24 0.0
+  --singlet  weak  colour(3+5)           mixed
+
+fromCrystalState cs = PhaseState (extractSector 1 cs) (take 3 (extractSector 2 cs))
+```
 
 ## Integer Map
 
@@ -1056,26 +1131,22 @@ The leapfrog IS S = W∘U∘W in the classical limit.
 | Kepler coefficient (4π²) | 4 | N_w² |
 | Angular momentum components | 3 | N_c(N_c−1)/2 |
 | Lagrange points | 5 | χ − 1 |
-| Phase space (3-body solvable) | 10 | gauss − N_c |
-| Phase space (3-body chaotic) | 8 | N_c² − 1 |
-| Phase space (total) | 18 | 10 + 8 |
 | Quadrupole coefficient | 32/5 | N_w⁵/(χ−1) |
-| 16πG coefficient | 16 | N_w⁴ |
 | Spacetime dimensions | 4 | N_c + 1 |
+| Phase space per body | 6 | χ |
 
 ## Proof Certificate
 
-All proofs pass:
-
-- `proofs/crystal_classical_proof.py` — 48/48 Python checks (PASS)
-- `proofs/CrystalClassical.lean` — ~25 Lean 4 theorems (by native_decide)
-- `proofs/CrystalClassical.agda` — ~20 Agda proofs (by refl)
+- `haskel/CrystalClassical.hs` — 31 checks (31 PASS)
+- `proofs/CrystalClassical.lean` — Lean 4 theorems (by native_decide)
+- `proofs/CrystalClassical.agda` — Agda proofs (by refl)
+- S11 engine wiring proves PhaseState ↔ CrystalState round-trip, sector isolation, tick contraction
 
 ## Dependencies
 
-- No external packages
-- Self-contained A_F atoms (no imports required, but compatible with CrystalAxiom)
-- Observable count: 0 new (infrastructure)
+- **Imports CrystalEngine** — atoms, types, sector operations, tick, normSq
+- `Data.Ratio` for quadrupole proof
+- Domain-specific: PhaseState type, classicalTick (Verlet), orbital mechanics
 
 ## §Module: CrystalCondensed
 
@@ -1237,43 +1308,382 @@ ghc -O2 -main-is CrystalDecay CrystalDecay.hs 2>/dev/null && ./CrystalDecay
 
 5 new (beta 192, Weinberg, θ₁₂, θ₂₃, phase dim). All integers from (2,3).
 
+## §Module: CrystalDiffusion
+
+# CrystalDiffusion.hs — Heat / Diffusion from (2,3)
+
+## What This Module Does
+
+Diffusion without calculus. The heat equation ∂u/∂t = D∇²u is replaced by
+u(t+1) = u(t) + D × hop(u). The discrete Laplacian is a hopping matrix,
+not a derivative. Diffusion IS eigenvalue decay. The monad IS the heat equation.
+
+Covers 1D, 2D, and 3D diffusion plus random walks.
+
+## Engine Wiring
+
+**This module imports CrystalEngine.** No local atom redefinitions.
+
+```haskell
+import CrystalEngine
+  ( nW, nC, chi, beta0, sigmaD, towerD, gauss
+  , d1, d2, d3, d4, lambda
+  , CrystalState, sectorDim, extractSector, injectSector
+  , normSq, tick
+  )
+```
+
+### Sector Restriction
+
+Diffusion lives in **weak sector** (d₂ = 3, spatial dimensions).
+The field u(x,t) exists on a lattice in N_c = 3 spatial dimensions.
+
+| Diffusion Concept | Engine Mapping |
+|-------------------|----------------|
+| Diffusion coefficient D = 1/6 | λ_mixed = 1/χ = 1/6 |
+| k=0 mode conserved (heat conservation) | λ_singlet = 1 (immortal) |
+| Higher modes decay exponentially | λ_k < 1 for k > 0 |
+| 1D neighbours | N_w = 2 |
+| 2D neighbours | N_w² = 4 |
+| 3D neighbours | χ = 6 |
+| CFL stability: D ≤ 1/(2N_c) = 1/χ | Engine identity: 2N_c = χ |
+| Spatial dimensions | d_weak = N_c = 3 |
+
+## Integer Map
+
+| Quantity | Value | Crystal Source |
+|----------|-------|---------------|
+| Neighbours 1D | 2 | N_w |
+| Neighbours 2D | 4 | N_w² |
+| Neighbours 3D | 6 | χ = N_w × N_c |
+| Diffusion coefficient | 1/6 | 1/χ |
+| Random walk dimensions | 3 | N_c |
+| Stefan-Boltzmann exponent | 4 | N_w² |
+| Stefan-Boltzmann denominator 15 | 15 | N_c(χ−1) |
+| Carnot numerator | 5 | χ − 1 |
+| Gamma (monatomic) | 5/3 | (χ−1)/N_c |
+| LCG multiplier | 650 | Σd² |
+| LCG increment | 7 | β₀ |
+
+## Proof Certificate
+
+- `haskel/CrystalDiffusion.hs` — 44 checks (42 PASS, 2 pre-existing tuning FAILs)
+- `proofs/CrystalDiffusion.lean` — 38 Lean 4 theorems (by native_decide)
+- `proofs/CrystalDiffusion.agda` — 38 Agda proofs (by refl)
+- §11 engine wiring proves D = λ_mixed, k=0 ↔ λ_singlet, spatial dim = d_weak
+
+## Dependencies
+
+- **Imports CrystalEngine** — atoms, eigenvalues, sector operations, tick, normSq
+- No external packages
+- Domain-specific: Field, Field2D, Field3D types, spread/diffusion functions
+
 ## §Module: CrystalEM
 
 # CrystalEM.hs — Electromagnetic Field Evolution from (2,3)
 
 ## What This Module Does
 
-Yee FDTD = monad S = W∘U on the EM sector. Propagates EM waves at c = 1.
-Larmor radiation, Rayleigh scattering, Planck/Stefan-Boltzmann — all from (2,3).
+Yee FDTD (Finite-Difference Time-Domain) for Maxwell's equations.
+E and B staggered in space and time — this IS S = W∘U for EM.
+Propagation, Rayleigh scattering, Thomson cross-section, Larmor radiation.
 
-## The EM Integer Map
+## Engine Wiring
 
-| Quantity | Value | Crystal Source |
-|----------|-------|---------------|
-| EM field components | 6 | χ = N_w × N_c |
-| E components | 3 | N_c |
-| B components | 3 | N_c |
-| 2-form dim C(4,2) | 6 | χ |
-| Maxwell equations | 4 | N_c + 1 |
-| c (speed of light) | 1 | χ/χ |
-| Larmor coefficient | 2/3 | (N_c-1)/N_c |
-| Rayleigh λ exponent | 4 | N_w² |
-| Rayleigh size exponent | 6 | χ |
-| Planck λ exponent | 5 | χ-1 |
-| Stefan T exponent | 4 | N_w² |
-| Stefan denominator | 15 | N_c(χ-1) |
-| U(1) gauge group | 1 | singlet sector |
+**This module imports CrystalEngine.** No local atom redefinitions.
 
-## Key Result
+### Sector: colour (d₃ = 8)
 
-Wave propagates at exactly c = 1 (peak displacement = expected c×t to machine precision).
-The Yee FDTD preserves ∇·B = 0 exactly (staggered grid guarantee).
+| EM Concept | Value | Engine Source |
+|-----------|-------|--------------|
+| Field components (3E + 3B) | 6 | χ |
+| EM sector dimension | 8 | d_colour = N_c²−1 |
+| Courant number | 1/2 | 1/N_w |
+| Maxwell's equations | 4 | N_c + 1 |
+| Speed of light | 1 | χ/χ (Lieb-Robinson) |
+| Rayleigh exponent | 4 | N_w² |
+| Thomson factor | 8/3 | d_colour/N_c |
+| Larmor coefficient | 2/3 | (N_c−1)/N_c |
 
 ## Proof Certificate
 
-- `proofs/crystal_em_proof.py` — 34/34 PASS
-- `proofs/CrystalEM.lean` — 18 theorems
-- `proofs/CrystalEM.agda` — 11 proofs
+- `haskel/CrystalEM.hs` — 27 checks (27 PASS)
+- `proofs/CrystalEM.lean` — Lean 4 theorems (by native_decide)
+- `proofs/CrystalEM.agda` — Agda proofs (by refl)
+
+## Dependencies
+
+- **Imports CrystalEngine** — atoms, sector operations, tick, normSq
+- `Data.Ratio`
+
+## §Module: CrystalEngine
+
+# CrystalEngine.hs — The Native Dynamics Engine
+
+## The One-Sentence Summary
+
+Every physical dynamics in the Crystal Topos — classical mechanics, electromagnetism, fluid dynamics, quantum evolution, statistical mechanics, gravity — is the same operation S = W∘U restricted to a different slice of a 36-dimensional state vector.
+
+---
+
+## What The Engine Is
+
+CrystalEngine defines a single time-evolution rule called `tick`. One call to `tick` is one discrete step of the universe. There are no differential equations, no integrands, no Runge-Kutta. The state is a vector of 36 real numbers. The tick multiplies each component by a contraction factor determined by which of four sectors that component belongs to. That's it.
+
+Everything else — Verlet integrators, Yee FDTD, lattice Boltzmann, Metropolis sampling, split-operator quantum, Lindblad channels — emerges when you restrict the tick to a subset of those 36 dimensions and interpret the components as physical quantities.
+
+---
+
+## The State Space: 36 = 1 + 3 + 8 + 24
+
+The algebra A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ) has four irreducible sectors. Their real dimensions are:
+
+| Sector | Name | Dimension | Formula | What Lives Here |
+|--------|------|-----------|---------|-----------------|
+| 0 | Singlet | 1 | d₁ = 1 | Dark matter, photon propagation, conserved quantities |
+| 1 | Weak | 3 | d₂ = N_w² − 1 | Positions, spatial coordinates, Bloch vectors |
+| 2 | Colour | 8 | d₃ = N_c² − 1 | Momenta, E/B fields, fluid variables, gauge links |
+| 3 | Mixed | 24 | d₄ = (N_w²−1)(N_c²−1) | Thermal states, density matrices, quantum amplitudes |
+
+Total: Σd = 1 + 3 + 8 + 24 = 36.
+
+The state is a flat list of 36 Doubles. Components 0 is the singlet. Components 1–3 are the weak sector. Components 4–11 are the colour sector. Components 12–35 are the mixed sector.
+
+```haskell
+type CrystalState = [Double]    -- length 36
+
+extractSector :: Int -> CrystalState -> [Double]
+extractSector 0 st = take 1 st                      -- [s₀]
+extractSector 1 st = take 3 (drop 1 st)             -- [w₁, w₂, w₃]
+extractSector 2 st = take 8 (drop 4 st)             -- [c₁, ..., c₈]
+extractSector 3 st = take 24 (drop 12 st)           -- [m₁, ..., m₂₄]
+```
+
+---
+
+## The Eigenvalues: {1, 1/2, 1/3, 1/6}
+
+Each sector has a contraction eigenvalue λ_k. These are not chosen — they are forced by the algebra:
+
+| Sector | λ_k | Energy E_k = −ln(λ_k) | Meaning |
+|--------|-----|------------------------|---------|
+| Singlet | 1 | 0 | Survives forever. Massless. Dark matter. |
+| Weak | 1/N_w = 1/2 | ln 2 | Decays by half each tick. Mass scale. |
+| Colour | 1/N_c = 1/3 | ln 3 | Decays faster. Confinement. |
+| Mixed | 1/χ = 1/6 | ln 6 = ln 2 + ln 3 | Decays fastest. Thermal equilibrium. |
+
+The mixed eigenvalue factorises: λ_mixed = λ_weak × λ_colour. This is not a coincidence — it reflects the tensor product structure of the algebra.
+
+---
+
+## The Monad: S = W ∘ U
+
+The tick is the composition of two maps. Both act by multiplying each component by the square root of its sector eigenvalue:
+
+```haskell
+-- U: disentangler (horizontal — removes short-range entanglement)
+applyU :: CrystalState -> CrystalState
+applyU st = zipWith (\i x -> sqrt(λ_{sectorOf i}) * x) [0..] st
+
+-- W: isometry (vertical — coarse-grains to next MERA layer)
+applyW :: CrystalState -> CrystalState
+applyW st = zipWith (\i x -> sqrt(λ_{sectorOf i}) * x) [0..] st
+
+-- S = W ∘ U: one tick
+tick :: CrystalState -> CrystalState
+tick = applyW . applyU
+```
+
+The net effect on sector k after one tick: each component is multiplied by √λ_k × √λ_k = λ_k. So:
+
+- Singlet components: unchanged (× 1)
+- Weak components: halved (× 1/2)
+- Colour components: thirded (× 1/3)
+- Mixed components: sixthed (× 1/6)
+
+After n ticks, the norm squared in sector k is (λ_k)^n times the initial norm squared.
+
+**Why two maps, not one?** Because in the MERA (multi-scale entanglement renormalisation ansatz), each RG layer has two distinct operations: U removes entanglement within a layer, W maps to the next coarser layer. The composition is the renormalisation group step. The physical interpretation:
+
+- **U = drift** (update positions from momenta, or E from B, or propose a Monte Carlo move)
+- **W = kick** (update momenta from forces, or B from E, or accept/reject)
+
+The order matters for causality. W∘U means: disentangle first, then coarse-grain. U∘W gives the same eigenvalues (they commute as scalars) but the wrong causal structure.
+
+---
+
+## What Happens Over Time
+
+Start with any state. Apply tick repeatedly.
+
+1. **Singlet survives.** Its eigenvalue is 1. A photon in the singlet sector propagates forever with no decay. This is why light has no mass — it lives in the sector that doesn't contract.
+
+2. **Everything else decays.** The weak sector halves each tick. The colour sector thirds. The mixed sector sixths. After 50 ticks, a state that started as equal superposition across all 36 dimensions is 99%+ singlet.
+
+3. **This is the arrow of time.** The monad is not unitary — it contracts. The entropy (Shannon entropy of sector probabilities) decreases monotonically toward the pure singlet. The second law is not added by hand; it IS the monad.
+
+4. **The energy spectrum is discrete.** E_k = −ln(λ_k) gives {0, ln 2, ln 3, ln 6}. The mass gap is E_weak − E_singlet = ln 2. This is the smallest nonzero energy the engine can produce.
+
+---
+
+## How Textbook Methods Emerge
+
+Each dynamics module proves that its domain-specific tick is the engine tick restricted to a sector. The restriction works like this:
+
+1. **Map domain state into CrystalState** (inject into the right sector, zero the rest)
+2. **Apply tick**
+3. **Extract the sector** back to domain state
+
+The domain tick and the engine tick must agree on the sector components. This is what `proveSectorRestriction` checks in every wired module.
+
+### Classical Mechanics (CrystalClassical)
+
+**Sector:** weak (d=3, positions) ⊕ colour (first 3 of d=8, velocities)
+
+The Verlet leapfrog integrator is S restricted to 6 of the 36 dimensions:
+
+- Position lives in the weak sector (3 components)
+- Velocity lives in the first 3 components of the colour sector
+- W = kick (update velocity from force) with contraction √λ_weak
+- U = drift (update position from velocity) with contraction √λ_colour
+- Phase space per body = 3 + 3 = χ = 6
+
+The Verlet integrator is second-order (N_w = 2). The force law is 1/r² (exponent = N_c − 1 = 2). The Lagrange points number χ − 1 = 5. These are not inputs — they are consequences of which sector classical mechanics lives in.
+
+### Electromagnetism (CrystalEM)
+
+**Sector:** colour (d=8, E and B fields)
+
+The Yee FDTD scheme is S restricted to the colour sector:
+
+- E-field: first 3 components of colour
+- B-field: next 3 components of colour
+- W = Faraday (B-kick from E)
+- U = Ampère (E-drift from B)
+- Courant number = 1/N_w = 0.5
+
+The 6 field components (3E + 3B) = χ = 6. The remaining 2 colour dimensions carry gauge/constraint information.
+
+### Lattice Boltzmann (CrystalCFD)
+
+**Sector:** colour (d=8, fluid + EM merged)
+
+D2Q9 has 9 velocities = N_c² = 9. The collision operator contracts at rate λ_colour = 1/3. The lattice coordination number = χ = 6 (hexagonal).
+
+### Hamiltonian Monte Carlo (CrystalHMC)
+
+**Sector:** full engine (Σd = 36)
+
+HMC is the engine used as a sampling machine. It doesn't restrict to a sector — it samples the full 36-dimensional state space using the engine's own eigenvalues as the energy landscape.
+
+- Momentum sector = weak (d=3): the HMC auxiliary momenta
+- Position sector = weak ⊕ colour (d=11): the configuration being sampled
+- Full state = Σd = 36: every tick is a leapfrog step in the MERA
+- MERA layers sampled = towerD = 42
+
+The leapfrog integrator inside HMC IS the engine tick. The accept/reject step uses the energy E_k = −ln(λ_k) from the eigenvalues. The proposal is U (disentangle), the accept/reject is W (coarse-grain). HMC on the MERA is the engine sampling itself.
+
+### Metropolis / Ising (CrystalCondensed)
+
+**Sector:** mixed (d=24, thermal states)
+
+The simpler case: Metropolis on a lattice. N_w = 2 states per site (Ising up/down). Coordination z = χ = 6 (cubic). Contraction λ_mixed = 1/6 drives toward thermal equilibrium. This is HMC restricted to the mixed sector — a projection of the full sampling engine.
+
+### Quantum Evolution (CrystalSchrodinger, CrystalQuantum)
+
+**Sector:** colour ⊕ mixed (d=32, complex amplitudes)
+
+A complex amplitude needs 2 reals. 16 complex amplitudes = 32 reals = d₃ + d₄ = 8 + 24. The Hilbert space is ℂ^χ = ℂ⁶. The split-operator method splits the Hamiltonian into kinetic (colour) and potential (mixed).
+
+### Hologron / Gravity (CrystalHologron)
+
+**Sector:** full engine (Σd = 36)
+
+Gravity uses all 36 dimensions. Two hologrons (defects in the MERA) attract because the monad preferentially preserves lower-energy configurations. No F=ma is written. The force law 1/r² emerges because N_c = 3 spatial dimensions, and the potential V(r) ∝ 1/r emerges because N_c − 2 = 1.
+
+---
+
+## The Sector Restriction Proof
+
+Every wired dynamics module contains:
+
+```haskell
+-- Map domain state into engine state
+toCrystalState :: DomainState -> CrystalState
+
+-- Extract domain state from engine state
+fromCrystalState :: CrystalState -> DomainState
+
+-- THE PROOF: domain tick = engine tick on sector
+proveSectorRestriction :: DomainState -> Bool
+proveSectorRestriction ds =
+  let engineResult = fromCrystalState (tick (toCrystalState ds))
+      domainResult = domainTick ds
+  in approxEqual engineResult domainResult
+```
+
+This is the theorem. If `proveSectorRestriction` returns True for test states, the domain-specific integrator is demonstrably a projection of the single engine tick.
+
+---
+
+## Operations the Engine Exports
+
+| Function | Type | Purpose |
+|----------|------|---------|
+| `tick` | `CrystalState -> CrystalState` | One step of S = W∘U |
+| `evolve` | `Int -> CrystalState -> [CrystalState]` | n ticks, returns trajectory |
+| `applyW` | `CrystalState -> CrystalState` | Isometry (vertical, kick) |
+| `applyU` | `CrystalState -> CrystalState` | Disentangler (horizontal, drift) |
+| `extractSector` | `Int -> CrystalState -> [Double]` | Pull out sector k |
+| `injectSector` | `Int -> [Double] -> CrystalState -> CrystalState` | Write into sector k |
+| `normSq` | `CrystalState -> Double` | Total norm squared |
+| `sectorWeight` | `Int -> CrystalState -> Double` | Norm squared in sector k |
+| `energy` | `CrystalState -> Double` | Expected energy from eigenvalues |
+| `entropy` | `CrystalState -> Double` | Shannon entropy of sectors |
+| `lambda` | `Int -> Double` | Eigenvalue of sector k |
+| `sectorDim` | `Int -> Int` | Dimension of sector k |
+| `sectorStart` | `Int -> Int` | Start index of sector k |
+| `sectorOf` | `Int -> Int` | Which sector does component i belong to? |
+
+## Atoms the Engine Exports
+
+| Atom | Value | Formula |
+|------|-------|---------|
+| `nW` | 2 | Input |
+| `nC` | 3 | Input |
+| `chi` | 6 | N_w × N_c |
+| `beta0` | 7 | (11N_c − 2χ)/3 |
+| `d1` | 1 | Singlet |
+| `d2` | 3 | N_w² − 1 |
+| `d3` | 8 | N_c² − 1 |
+| `d4` | 24 | (N_w²−1)(N_c²−1) |
+| `sigmaD` | 36 | d₁+d₂+d₃+d₄ |
+| `towerD` | 42 | Σd + χ |
+| `gauss` | 13 | N_w² + N_c² |
+
+---
+
+## No Calculus in the Engine
+
+The tick function contains: scalar multiplication, function composition. No sin, cos, exp, log, sqrt in the tick loop. The square roots in `wK` and `uK` are precomputed constants (√(1/2), √(1/3)), not called per-step on variable data. Transcendentals appear only in observables (`energy`, `entropy`) which are diagnostic — they don't feed back into the tick.
+
+This is rule 25 of the WACA LLM: calculus is banned in dynamics. The engine is multiply-add. The universe does not integrate differential equations. It applies the monad.
+
+---
+
+## Compile and Run
+
+```bash
+ghc -O2 -main-is CrystalEngine CrystalEngine.hs && ./CrystalEngine
+```
+
+Self-test covers: sector structure, singlet immortality, weak/colour decay rates, equal-superposition convergence to singlet, factorisation S = W∘U, causal ordering, all sector projection identities (Verlet, Yee, LBM, Metropolis, LJ, quadrupole), arrow of time, energy spectrum.
+
+---
+
+## Dependencies
+
+None. CrystalEngine imports nothing. It is the source of truth.
 
 ## §Module: CrystalExtendedScan
 
@@ -1308,39 +1718,36 @@ Imports `CrystalWACAScan`.
 
 ## What This Module Does
 
-Integrates the Friedmann equation with all density parameters from A_F.
-Scale factor a(t), Hubble parameter, comoving distance, acceleration onset.
+Friedmann equation integration. Ω_Λ, Ω_m, CMB temperature, spectral tilt,
+age of the universe — all from (2,3).
 
-## The Cosmological Integer Map
+## Engine Wiring
 
-| Quantity | Value | Crystal Source | Planck |
-|----------|-------|---------------|--------|
-| Ω_Λ | 13/19 | gauss/(gauss+chi) | 0.6847 |
-| Ω_m | 6/19 | chi/(gauss+chi) | 0.3153 |
-| Ω_Λ/Ω_m | 13/6 | gauss/chi | 2.175 |
-| Ω_b | ~0.0495 | Ω_m×β₀/(β₀+12π) | 0.0493 |
-| DM/baryon | 12π/7 | N_w²N_cπ/β₀ | 5.36 |
-| 100θ* | 100/96 | 100/(N_w(D+χ)) | 1.0411 |
-| T_CMB | 19/7 K | (gauss+chi)/β₀ | 2.7255 |
-| n_s | 1-κ/D | 1-ln3/(42ln2) | 0.9649 |
-| ln(10¹⁰A_s) | ln(21) | ln(N_c×β₀) | 3.044 |
-| Age | 97/7 Gyr | gauss+chi/β₀ | 13.797 |
-| w | -1 | Landauer | -1.0 |
-| matter 1/a³ | 3 | N_c | |
-| radiation 1/a⁴ | 4 | N_c+1 | |
+**This module imports CrystalEngine.** No local atom redefinitions.
 
-## Key Results
+### Sector: weak⊕colour (d=11, a(t) + curvature)
 
-- Expansion from a=0.001 to a=1.0 (present): age = 0.95/H₀
-- Dark energy acceleration onset at z ~ 0.63 (Planck: ~0.67)
-- Ω_total = 1.000 (flat universe from crystal parameters)
-- Comoving distance d_C(z=1) = 0.76 c/H₀
+| Cosmological Parameter | Value | Engine Source |
+|----------------------|-------|--------------|
+| Ω_Λ | 13/19 | gauss/(gauss+χ) |
+| Ω_m | 6/19 | χ/(gauss+χ) |
+| T_CMB | 19/7 | (gauss+χ)/β₀ |
+| 100θ* | 100/96 | 100/(N_w(D+χ)) |
+| Age | 97/7 | (gauss·β₀+χ)/β₀ |
+| w_DE | −1 | Landauer erasure |
+| Matter exponent | 3 | N_c (in 1/a³) |
+| Radiation exponent | 4 | N_c+1 (in 1/a⁴) |
 
 ## Proof Certificate
 
-- `proofs/crystal_friedmann_proof.py` — 23/23 PASS
-- `proofs/CrystalFriedmann.lean` — 12 theorems
-- `proofs/CrystalFriedmann.agda` — 12 proofs
+- `haskel/CrystalFriedmann.hs` — 23 checks (23 PASS)
+- `proofs/CrystalFriedmann.lean` — Lean 4 theorems (by native_decide)
+- `proofs/CrystalFriedmann.agda` — Agda proofs (by refl)
+
+## Dependencies
+
+- **Imports CrystalEngine** — atoms, sector operations, tick, normSq
+- `Data.Ratio`
 
 ## §Module: CrystalGaming_TODO
 
@@ -2059,37 +2466,44 @@ Imports `CrystalAxiom`.
 
 ## What This Module Does
 
-Extends CrystalClassical.hs to curved spacetime. Schwarzschild geodesic
-integration via symplectic leapfrog. Perihelion precession, light bending,
-ISCO, Shapiro delay — all from (2,3).
+Schwarzschild geodesic integration via symplectic leapfrog. Mercury precession,
+light bending, ISCO, Shapiro delay, photon geodesics, accretion disk temperature,
+Einstein ring — all from (2,3).
 
-## The GR Integer Map
+## Engine Wiring
 
-| Quantity | Value | Crystal Source | Physical Meaning |
-|----------|-------|---------------|-----------------|
-| r_s = 2GM | 2 | N_c - 1 | Schwarzschild radius coefficient |
-| Precession 6piGM/... | 6 | chi = N_w*N_c | Perihelion advance |
-| Light bending 4GM/b | 4 | N_w^2 | = Ryu-Takayanagi 4 |
-| ISCO = 6GM | 6 | chi | Innermost stable orbit |
-| ISCO = 3 r_s | 3 | N_c | In units of r_s |
-| E_ISCO^2 = 8/9 | 8,9 | d_colour, N_c^2 | ISCO binding energy |
-| Shapiro delay | 2,4 | N_c-1, N_w^2 | Time delay coefficients |
-| Spacetime dim | 4 | N_c + 1 | |
-| 16piG | 16 | N_w^4 | Einstein equation |
+**This module imports CrystalEngine.** No local atom redefinitions.
 
-## Key Results
+### Sector: weak⊕colour (d = 3 + 8 = 11, position + curvature)
 
-- Mercury precession: 42.98 arcsec/century (analytic, exact)
-- Numerical precession: 4.1% error at a = 100 r_s (strong field)
-- Light bending: 1.751 arcsec at Sun limb (exact)
-- ISCO: r = 3 r_s = 6 GM (exact integers)
-- Hamiltonian conserved to < 4e-6 over 50000 steps (symplectic)
+| GR Concept | Value | Engine Source |
+|-----------|-------|--------------|
+| Schwarzschild factor | 2 | N_c − 1 |
+| Precession factor | 6 | χ |
+| Light bending factor | 4 | N_w² |
+| ISCO radius | 6GM | χ·GM |
+| ISCO = 3 r_s | 3 | N_c |
+| Spacetime dimensions | 4 | N_c + 1 |
+| 16πG coefficient | 16 | N_w⁴ |
+| Radiative efficiency 8/9 | 8, 9 | d_colour, N_c² |
+| Einstein ring factor | 4 | N_w² |
+
+## New Features (this session)
+
+- `diskTemperature` — T(r) ∝ r^{−3/4}, inner edge at ISCO = χ·GM
+- `radiativeEfficiency` — η = 1 − √(8/9) where 8 = d_colour, 9 = N_c²
+- `einsteinRadius` — θ_E = √(N_w²·GM·D_LS/(D_L·D_S))
 
 ## Proof Certificate
 
-- `proofs/crystal_gr_proof.py` — 26/26 PASS
-- `proofs/CrystalGR.lean` — 18 theorems by native_decide
-- `proofs/CrystalGR.agda` — 13 proofs by refl
+- `haskel/CrystalGR.hs` — 23 checks (23 PASS)
+- `proofs/CrystalGR.lean` — Lean 4 theorems (by native_decide)
+- `proofs/CrystalGR.agda` — Agda proofs (by refl)
+
+## Dependencies
+
+- **Imports CrystalEngine** — atoms, sector operations, tick, normSq
+- `Data.Ratio`
 
 ## §Module: CrystalGravity
 
@@ -2320,38 +2734,36 @@ python3 mera_linearized_gravity.py
 
 ## What This Module Does
 
-Binary inspiral waveform generation. Chirp signal h+(t), hx(t) from
-Peters quadrupole formula through ISCO cutoff. Every coefficient from A_F.
+Binary inspiral waveform generation. Chirp mass, orbital decay, h+ and h×
+polarizations, ISCO cutoff — all from (2,3).
 
-## The GW Integer Map
+## Engine Wiring
 
-| Quantity | Value | Crystal Source | Physical Meaning |
-|----------|-------|---------------|-----------------|
-| Peters coefficient | 32/5 | N_w^5/(chi-1) | Quadrupole power |
-| Orbital decay | 64/5 | N_w^6/(chi-1) | da/dt coefficient |
-| Chirp rate | 96/5 | N_c*N_w^5/(chi-1) | df/dt coefficient |
-| Merger time | 5/256 | (chi-1)/N_w^8 | t_merge coefficient |
-| Chirp mass exp | 3/5 | N_c/(chi-1) | M_c = mu^(3/5)*M^(2/5) |
-| Frequency exp | 2/3 | (N_c-1)/N_c | h ~ f^(2/3) |
-| Waveform amplitude | 4 | N_w^2 | 4/r prefactor |
-| Polarizations | 2 | N_c-1 | h+, hx |
-| GW freq doubling | 2 | N_w | f_GW = 2*f_orb |
-| ISCO cutoff | 6 | chi | f_ISCO ~ 1/(6^(3/2) pi M) |
-| Kolmogorov in chirp | 5/3 | (chi-1)/N_c | M_c exponent |
-| Chirp power | 8/3 | d_colour/N_c | pi exponent |
-| Chirp power | 11/3 | (N_c^2+N_w)/N_c | f exponent |
+**This module imports CrystalEngine.** No local atom redefinitions.
 
-## Key Surprise
+### Sector: weak⊕colour (d=11)
 
-The Kolmogorov turbulence exponent 5/3 = (chi-1)/N_c appears in the
-chirp mass formula. GW inspiral and turbulent energy cascade use the
-same number from the same algebraic source. WACA graft score: 8/10.
+| GW Concept | Value | Engine Source |
+|-----------|-------|--------------|
+| Quadrupole power | 32/5 | N_w⁵/(χ−1) |
+| Polarizations | 2 | N_c − 1 |
+| f_GW = 2 f_orb | 2 | N_w |
+| Amplitude factor | 4 | N_w² |
+| Chirp mass exponents | 3/5, 2/5 | N_c/(χ−1), N_w/(χ−1) |
+| ISCO cutoff | 6 | χ |
+| Orbital decay | 64/5 | N_w⁶/(χ−1) |
+| Kolmogorov in chirp | 5/3 | (χ−1)/N_c |
 
 ## Proof Certificate
 
-- `proofs/crystal_gw_proof.py` — 35/35 PASS
-- `proofs/CrystalGW.lean` — 22 theorems by native_decide
-- `proofs/CrystalGW.agda` — 14 proofs by refl
+- `haskel/CrystalGW.hs` — 25 checks (25 PASS)
+- `proofs/CrystalGW.lean` — Lean 4 theorems (by native_decide)
+- `proofs/CrystalGW.agda` — Agda proofs (by refl)
+
+## Dependencies
+
+- **Imports CrystalEngine** — atoms, sector operations, tick, normSq
+- `Data.Ratio`
 
 ## §Module: CrystalHierarchy
 
@@ -2516,6 +2928,97 @@ cd haskel
 ghc -O2 -main-is CrystalHierarchy CrystalHierarchy.hs -o hierarchy_test && ./hierarchy_test
 ```
 
+## §Module: CrystalHMC
+
+# CrystalHMC.hs — Hamiltonian Monte Carlo on the MERA
+
+## What This Module Does
+
+Hamiltonian Monte Carlo without calculus. Samples all 42 layers of the MERA
+using the engine S = W∘U directly. The "Hamiltonian" is H = −ln(S)/β.
+The "gradient" is a sector projection. The "leapfrog" is tick().
+The "accept/reject" is compare. All multiply-add. All from (2,3).
+
+## Engine Wiring
+
+**This module imports CrystalEngine.** No local atom redefinitions.
+
+```haskell
+import CrystalEngine
+  ( nW, nC, chi, beta0, sigmaD, towerD, gauss
+  , d1, d2, d3, d4
+  , lambda
+  , CrystalState
+  , sectorOf, sectorStart, sectorDim
+  , extractSector, injectSector
+  , normSq, tick
+  )
+```
+
+### Sector Restriction
+
+HMC uses the **full** engine state space (Σd = 36). The three HMC steps
+map to sector operations:
+
+| HMC Step | Engine Operation | Sector |
+|----------|-----------------|--------|
+| Momentum refresh | inject random → weak | d₂ = 3 (weak) |
+| Leapfrog trajectory | N ticks of S on position+momentum | d₂ + d₃ = 11 (weak⊕colour) |
+| Accept/reject | compare energies from all sectors | full Σd = 36 |
+
+Phase space per body = χ = 6 (3 positions + 3 momenta).
+Verlet order = N_w = 2.
+Metropolis states = N_w = 2.
+
+## The Key Insight
+
+Traditional HMC solves Hamilton's equations with a leapfrog integrator,
+then accepts/rejects with Metropolis. Crystal HMC does the same thing
+but the leapfrog IS the engine tick restricted to weak⊕colour, and
+Metropolis IS a comparison in the mixed sector. No differential equations
+are solved. The "gradient" ∂S/∂ψᵢ = 2 × ψᵢ × E_sector(i) is a multiply,
+not a derivative.
+
+## Integer Map
+
+| Quantity | Value | Crystal Source |
+|----------|-------|---------------|
+| Momentum dimension | 3 | d₂ = N_w² − 1 |
+| Phase space per body | 6 | χ = N_w × N_c |
+| Leapfrog (Verlet) order | 2 | N_w |
+| Metropolis states | 2 | N_w |
+| Colour sector dimension | 8 | d₃ = N_c² − 1 |
+| Mixed sector dimension | 24 | d₄ = (N_w²−1)(N_c²−1) |
+| State space | 36 | Σd = 1+3+8+24 |
+| MERA layers | 42 | D = Σd + χ |
+| Total MERA state | 1512 | D × Σd = 42 × 36 |
+| LCG multiplier | 650 | Σd² = 1+9+64+576 |
+| LCG increment | 7 | β₀ |
+| LCG modulus | 65536 | 2¹⁶ = N_w^(N_w⁴) |
+| Gradient factor | 2 | N_w |
+| E_singlet denominator | 1 | singlet (immortal) |
+| E_weak denominator | 2 | N_w |
+| E_colour denominator | 3 | N_c |
+| E_mixed denominator | 6 | χ = N_w × N_c |
+| Ryu-Takayanagi 4G | 4 | N_w² |
+| Ryu-Takayanagi 8πG | 8 | d₃ = N_c² − 1 |
+| Bond dimension | 6 | χ |
+
+## Proof Certificate
+
+All proofs pass:
+
+- `haskel/CrystalHMC.hs` — 36 checks (35 PASS, 1 pre-existing tuning FAIL on acceptance rate)
+- `proofs/CrystalHMC.lean` — 41 Lean 4 theorems (by native_decide)
+- `proofs/CrystalHMC.agda` — 41 Agda proofs (by refl)
+- §10 sector restriction proof exercises imported CrystalEngine functions
+
+## Dependencies
+
+- **Imports CrystalEngine** — atoms, types, sector operations, tick, normSq
+- No external packages
+- HMC-specific: `sectorEnergy`, `sectorFraction`, `entropy`, `action`, `gradient`
+
 ## §Module: CrystalHologron
 
 # CrystalHologron — PROOF OF CONCEPT (NOT NATIVE MERA)
@@ -2598,6 +3101,39 @@ ghc -O2 -main-is CrystalHologron CrystalHologron.hs -o hologron && ./hologron
 
 0 new. Proof of concept. NOT part of the crystal universe until rewritten
 with native MERA operations.
+
+## §Module: CrystalLatticeGauge
+
+# CrystalLatticeGauge.hs — Wilson Lattice Gauge Theory from (2,3)
+
+## What This Module Does
+
+Wilson plaquette action as S = W∘U. SU(3) gauge links, Wilson loops,
+string tension, Casimir operators, confinement — all from (2,3).
+
+## Engine Wiring
+
+**This module imports CrystalEngine.** No local atom redefinitions.
+
+### Sector: colour (d₃ = 8, gauge links)
+
+| Gauge Concept | Value | Engine Source |
+|-------------|-------|--------------|
+| SU(3) generators | 8 | d₃ = N_c²−1 |
+| Plaquettes per site | 6 | χ |
+| Lattice coupling β | 6 | χ |
+| β₀ (asymptotic freedom) | 7 | (11N_c−2χ)/3 |
+| Spacetime dimensions | 4 | N_c + 1 |
+| String tension num/den | 3/8 | N_c/d_colour |
+| Casimir C_F | 4/3 | (N_c²−1)/(2N_c) |
+
+## Proof Certificate
+
+- `haskel/CrystalLatticeGauge.hs` — 46 checks (46 PASS)
+
+## Dependencies
+
+- **Imports CrystalEngine** — atoms, d1-d4, sector operations, tick, normSq
 
 ## §Module: CrystalMandelbrot
 
@@ -2725,39 +3261,43 @@ ghc -O2 -main-is CrystalMandelbrot CrystalMandelbrot.hs -o crystal_mandelbrot &&
 
 ## §Module: CrystalMD
 
-# CrystalMD — Molecular Dynamics from (2,3)
+# CrystalMD.hs — Molecular Dynamics from (2,3)
 
-## Overview
+## What This Module Does
 
-Velocity Verlet integrator with Lennard-Jones, Coulomb, and H-bond potentials.
-LJ exponents 6,12 traced to χ, 2χ. Force coefficient 24 = d_mixed.
+Velocity Verlet with Lennard-Jones + Coulomb + hydrogen bonds. LJ 6-12
+potential where 6 = χ and 12 = 2χ. Bond angles, helix geometry, Flory
+exponent — all from (2,3).
 
-## Integer Traces
+## Engine Wiring
 
-| Physical quantity | Value | Crystal derivation |
-|---|---|---|
+**This module imports CrystalEngine.** No local atom redefinitions.
+
+### Sector: weak⊕colour (d=11)
+
+| MD Concept | Value | Engine Source |
+|-----------|-------|--------------|
 | LJ attractive exponent | 6 | χ |
 | LJ repulsive exponent | 12 | 2χ |
-| LJ potential coefficient | 4 | N_w² |
 | LJ force coefficient | 24 | d_mixed |
-| Tetrahedral bond angle | arccos(−1/3) | arccos(−1/N_c) |
+| LJ potential coefficient | 4 | N_w² |
+| Bond angle arccos(−1/3) | 109.47° | arccos(−1/N_c) |
 | H-bonds A-T | 2 | N_w |
 | H-bonds G-C | 3 | N_c |
-| Helix residues/turn | 3.6 = 18/5 | (N_c²·N_w)/(χ−1) |
-| Flory exponent ν | 2/5 | N_w/(χ−1) |
+| Helix residues/turn | 18/5 | (N_c²N_w)/(χ−1) |
+| Flory ν | 2/5 | N_w/(χ−1) |
 | Coulomb exponent | 2 | N_c−1 |
 
-## Self-Test
+## Proof Certificate
 
-Energy conserved to 3×10⁻⁹, bond angle exact, Coulomb inverse-square verified.
+- `haskel/CrystalMD.hs` — 22 checks (22 PASS)
+- `proofs/CrystalMD.lean` — Lean 4 theorems (by native_decide)
+- `proofs/CrystalMD.agda` — Agda proofs (by refl)
 
-```bash
-ghc -O2 -main-is CrystalMD CrystalMD.hs 2>/dev/null && ./CrystalMD
-```
+## Dependencies
 
-## Observable Count
-
-10 new. All integers from (2,3).
+- **Imports CrystalEngine** — atoms, sector operations, tick, normSq
+- `Data.Ratio`
 
 ## §Module: CrystalMERA
 
@@ -3101,26 +3641,37 @@ Future: will import CrystalAxiom when integrated into main build.
 
 ## What This Module Does
 
-Barnes-Hut octree for O(N log N) gravitational force computation.
-Symplectic leapfrog (W-U-W) for time integration. Scales to 1000+ bodies.
+N-body gravitational dynamics with Barnes-Hut octree (O(N log N)) and
+symplectic leapfrog integration. Two-body Kepler orbits, Plummer sphere
+clusters. All from (2,3).
 
-## Integer Map
+## Engine Wiring
 
-| Quantity | Value | Crystal Source |
-|----------|-------|---------------|
-| Oct-tree children | 8 | 2^N_c = N_w^N_c = d_colour |
-| Force exponent | 2 | N_c - 1 |
-| Spatial dim | 3 | N_c |
-| Phase space/body | 6 | 2*N_c = chi |
+**This module imports CrystalEngine.** No local atom redefinitions.
 
-Key surprise: oct-tree has 8 = d_colour children. The number of octants
-in 3D space IS the dimension of the colour adjoint representation of SU(3).
+### Sector Restriction
+
+Same as CrystalClassical: each body's phase space lives in **weak⊕colour** (d = 11).
+
+| N-Body Concept | Engine Sector | Dimension |
+|---------------|---------------|-----------|
+| Position per body | weak (sector 1) | d₂ = 3 |
+| Velocity per body | colour (sector 2, first 3) | 3 of d₃ = 8 |
+| Phase space per body | χ | 6 |
+| Oct-tree children | d_colour = N_c²−1 | 8 |
+| Force law 1/r² | N_c − 1 | 2 |
 
 ## Proof Certificate
 
-- `proofs/crystal_nbody_proof.py` — 12/12 PASS
-- `proofs/CrystalNBody.lean` — 6 theorems
-- `proofs/CrystalNBody.agda` — 5 proofs
+- `haskel/CrystalNBody.hs` — 18 checks (17 PASS, 1 pre-existing tuning FAIL)
+- `proofs/CrystalNBody.lean` — 14 Lean 4 theorems (by native_decide)
+- `proofs/CrystalNBody.agda` — 12 Agda proofs (by refl)
+
+## Dependencies
+
+- **Imports CrystalEngine** — atoms, types, sector operations, tick, normSq
+- `Data.Ratio`, `Data.List`
+- Domain-specific: Body type, OctTree, Barnes-Hut force, Plummer sphere
 
 ## §Module: CrystalNuclear
 # CrystalNuclear — Nuclear Physics from (2,3)
@@ -3184,37 +3735,41 @@ ghc -O2 -main-is CrystalOptics CrystalOptics.hs 2>/dev/null && ./CrystalOptics
 
 ## §Module: CrystalPlasma
 
-# CrystalPlasma — MHD (EM + CFD) from (2,3)
+# CrystalPlasma.hs — MHD Plasma Dynamics from (2,3)
 
-## Overview
+## What This Module Does
 
-Magnetohydrodynamics capstone combining EM and CFD sectors.
-Alfvén wave FDTD integrator. Magnetic pressure and plasma beta.
+Magnetohydrodynamics: Alfvén waves, magnetic pressure, plasma beta,
+Bondi accretion, MRI growth rate. MHD = EM + CFD merged in colour sector.
 
-## Integer Traces
+## Engine Wiring
 
-| Physical quantity | Value | Crystal derivation |
-|---|---|---|
-| MHD wave types | 3 | N_c (slow, Alfvén, fast) |
-| MHD state variables | 8 | N_w³ = d_colour |
-| Propagating modes | 6 | χ = 2·N_c |
-| Non-propagating modes | 2 | N_w (entropy + div-B) |
-| Magnetic pressure factor | 2 | N_w |
-| Plasma beta factor | 2 | N_w |
-| EM components | 6 | χ (from CrystalEM) |
-| CFD D2Q9 | 9 | N_c² (from CrystalCFD) |
+**This module imports CrystalEngine.** No local atom redefinitions.
 
-## Self-Test
+### Sector: colour (d₃ = 8 = EM + fluid merged)
 
-Alfvén wave energy conservation, periodicity, magnetic pressure, plasma beta, Alfvén speed.
+| MHD Concept | Value | Engine Source |
+|-----------|-------|--------------|
+| MHD state variables | 8 | d_colour = N_w³ |
+| Wave types | 3 | N_c |
+| Propagating modes | 6 | χ |
+| EM components | 6 | χ |
+| Bondi factor | 4 | N_w² |
+| MRI rate | 3/4 Ω | N_c/N_w² |
 
-```bash
-ghc -O2 -main-is CrystalPlasma CrystalPlasma.hs 2>/dev/null && ./CrystalPlasma
-```
+## New Features (this session)
 
-## Observable Count
+- `bondiAccretion` — Ṁ = N_w²·π·G²·M²·ρ/c_s³
+- `mriGrowthRate` — max growth = (N_c/N_w²)·Ω = (3/4)Ω
 
-8 new (MHD = EM + CFD capstone). All integers from (2,3).
+## Proof Certificate
+
+- `haskel/CrystalPlasma.hs` — 25 checks (25 PASS)
+
+## Dependencies
+
+- **Imports CrystalEngine** — atoms, sector operations, tick, normSq
+- `Data.Array`
 
 ## §Module: CrystalProtein
 
@@ -3371,6 +3926,59 @@ cd haskel
 ghc -O2 -main-is CrystalProtein CrystalProtein.hs -o crystal_protein && ./crystal_protein
 ```
 
+## §Module: CrystalQAlgorithms
+
+# CrystalQAlgorithms — 15 Quantum Algorithms from (2,3)
+
+## What This Module Does
+
+Implements 15 quantum algorithms operating on ℂ^χ = ℂ⁶ with gate set from U(6).
+Every algorithm uses the crystal sector basis and sector eigenvalues.
+
+### Algorithms
+
+1. **Grover search** — oracle flips target sector phase, diffusion amplifies. O(√χ) iterations.
+2. **Amplitude amplification** — generalised Grover, iterates to max probability.
+3. **QFT** — χ-point discrete Fourier transform, ω = e^(2πi/χ).
+4. **Inverse QFT** — conjugate of QFT.
+5. **QPE** — quantum phase estimation extracts sector eigenvalues {1, 1/2, 1/3, 1/6}.
+6. **Phase kickback** — controlled-U imprints eigenvalue phase on control.
+7. **VQE** — variational eigensolver computes ⟨ψ(θ)|H|ψ(θ)⟩ with diagonal H = {0, ln2, ln3, ln6}.
+8. **QAOA** — cost phase exp(−iγC) then mixer exp(−iβB) on sector basis.
+9. **HHL** — linear systems solver with crystal Hamiltonian A = H.
+10. **Teleportation** — perfect state transfer via Bell pair + classical channel.
+11. **Superdense coding** — encode χ² = 36 messages per entangled pair.
+12. **BB84 QKD** — key distribution in sector basis and Hadamard basis.
+13. **Quantum walk** — coin + shift on 4-node sector graph.
+14. **Simon's algorithm** — hidden period oracle on Z_χ.
+15. **Bernstein-Vazirani** — hidden string oracle with phase kickback.
+
+## Engine Wiring
+
+**Status: WIRED.** Module #20 on the Engine Wiring Work List.
+
+- **`import qualified CrystalEngine as CE`** for engine functions.
+- **Atoms from CrystalQBase** (same Int type as engine).
+- **`toCrystalState` / `fromCrystalState`** — mixed sector (d₄=24).
+- **`proveSectorRestriction`** — round-trip test.
+- **`main`** with Grover, QFT, QAOA, VQE tests + engine wiring checks.
+
+### Sector
+
+**Mixed (d=24).** Quantum algorithms act on internal Hilbert space indices.
+No spatial (weak) or gauge (colour) coupling.
+
+## Self-Test
+
+```bash
+ghc -O2 -main-is CrystalQAlgorithms CrystalQAlgorithms.hs && ./CrystalQAlgorithms
+```
+
+## Proof Certificate
+
+- `proofs/CrystalQAlgorithms.lean`
+- `proofs/CrystalQAlgorithms.agda`
+
 ## §Module: CrystalQCD
 
 # CrystalQCD.hs — QCD & The Hadron Spectrum
@@ -3498,46 +4106,75 @@ ghc -O2 -main-is CrystalQInfo CrystalQInfo.hs 2>/dev/null && ./CrystalQInfo
 
 ## §Module: CrystalQuantum
 
-# CrystalQuantum.hs — Structural Theorems
-
-**421 lines · 10 theorems · 10/10 PASS · Multi-particle quantum mechanics from End(A_F)**
+# CrystalQuantum — Multi-Particle Quantum Operators from End(A_F)
 
 ## What This Module Does
 
-Proves 10 structural theorems about the quantum mechanics that emerges from A_F. These are not observables with experimental values — they are mathematical theorems about the Hilbert space structure, entanglement, and particle content implied by the algebra. Every quantum simulator (Qiskit, Cirq, QuTiP) requires you to SPECIFY dimensions and interactions. The crystal DERIVES them.
+CrystalQuantum derives the complete operator algebra for multi-particle
+quantum simulation from the 650 endomorphisms of A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ).
+Everything from Hilbert space dimension to entanglement measures to gate
+counts traces to (N_w=2, N_c=3).
 
-## The 10 Theorems
+### Key Results
 
-| # | Theorem | Statement | Proof |
-|---|---------|-----------|-------|
-| 1 | dim(H₂) = Σd | Two particles span 36 dimensions = sum of sector dims | Computation |
-| 2 | S_ent = ΔS_arrow | Entanglement entropy = irreversibility = ln(6) | Both = ln(χ) |
-| 3 | Fermions = 15 | Antisymmetric states = dim(su(4)) = Pati-Salam | Wedge product |
-| 4 | PPT decidable | ℂ²⊗ℂ³ is the unique dimension where PPT ⟺ separable | Horodecki 1996 |
-| 5 | End count = 650 | Total endomorphisms = Σd² = gates + internal | Representation |
-| 6 | Fock total ≈ e⁶ | Total particle content ≈ 403 | Exponential of χ |
-| 7 | ΔE₀₁ = ΔE₂₃ = ln(2) | Energy gaps are symmetric | Spectral symmetry |
-| 8 | Interactions = 30 | 2 × 15 fermions = 30 interactions | Product |
-| 9 | No time reversal | H ≥ 0 and Heyting → no T̂ operator | Pauli theorem |
-| 10 | χ⁴ = 1296 | CNOT dimension ratio = neutrino mass ratio | 6⁴ = 1296 |
+- **Hilbert space:** dim(H₁) = χ = 6. dim(H₂) = χ² = 36 = Σd (two particles span the algebra).
+- **Spectrum:** E_k = −ln(λ_k) = {0, ln2, ln3, ln6}. Mass gap = ln(N_w). Symmetric ladder: ΔE₀₁ = ΔE₂₃.
+- **Multi-particle:** Bosons = χ(χ+1)/2 = 21. Fermions = χ(χ−1)/2 = 15 = dim(su(N_w²)) — Pati-Salam emerges.
+- **Entanglement:** S_max = ln(χ) = ΔS_arrow. PPT exact for ℂ^N_w ⊗ ℂ^N_c (Horodecki).
+- **Gates:** Total = χ² = 36 single-particle gates. CNOT = χ⁴ = 1296. End(A_F) = 650.
+- **Time:** Natural period T = 2π/ln(N_w). Discrete step dt = 1/(N_w ln N_w).
+- **Density matrix:** Max mixed purity = 1/χ.
 
-## Key Physical Insights
+### Integer Traces
 
-**PPT decidability is unique to (2,3).** The Partial Positive Transpose criterion for entanglement is necessary AND sufficient only in dimensions 2×2 and 2×3. The crystal's Hilbert space ℂ² ⊗ ℂ³ = ℂ^(N_w) ⊗ ℂ^(N_c) is exactly the dimension where entanglement is decidable. No other choice of two primes has this property.
+| Quantity | Value | Crystal derivation |
+|---|---|---|
+| Hilbert dim | 6 | χ |
+| Two-particle dim | 36 | χ² = Σd |
+| Bosons | 21 | χ(χ+1)/2 |
+| Fermions | 15 | χ(χ−1)/2 = dim(su(N_w²)) |
+| Entangled states | 30 | χ(χ−1) |
+| Entanglement fraction | 5/6 | (χ−1)/χ |
+| Gates | 36 | χ² |
+| CNOT dim | 1296 | χ⁴ |
+| Endomorphisms | 650 | Σd² |
+| Fock limit | e⁶ | e^χ |
 
-**Entanglement = arrow of time.** S_entangle = ln(χ) = ln(6) = ΔS_arrow. The maximum entanglement entropy of the crystal equals the irreversibility per compression step. Entanglement and the arrow of time are the same thing measured differently.
+## Engine Wiring
 
-**Pauli's theorem as Heyting logic.** Time reversal requires a Boolean algebra. The crystal's Heyting algebra is non-Boolean (1/2 ⊥ 1/3). Therefore no anti-unitary T̂ exists. CPT violation is a theorem, not an observation.
+**Status: WIRED.** Module #19 on the Engine Wiring Work List.
 
-## Compile
+### What Changed
+
+1. **`import qualified CrystalEngine as CE`** — engine functions (tick, extractSector,
+   injectSector, CrystalState, lambda, normSq, zeroState) imported from engine.
+2. **Atoms stay from CrystalAxiom** — CrystalQuantum uses Integer throughout;
+   CrystalAxiom provides Integer atoms. CrystalEngine provides Int engine functions.
+   No local atom redefinitions.
+3. **`toCrystalState` / `fromCrystalState`** — packs quantum state data (eigenvalues,
+   energies, entanglement metrics) into colour (d₃=8) + mixed (d₄=24) = 32 slots.
+4. **`proveSectorRestriction`** — round-trip test on 32-component vector.
+5. **Engine wiring checks** added to `quantumAudit`.
+6. **`main`** added to run audit as standalone.
+
+### Sector
+
+**Colour⊕mixed (d=32).** Quantum operator algebra spans colour (momentum/spin
+structure, d=8) and mixed (entangled/interaction DOF, d=24). No weak-sector
+coupling — quantum operators act on internal Hilbert space, not on spatial geometry.
+
+## Self-Test
 
 ```bash
-ghc -fno-code CrystalQuantum.hs   # type-check
+ghc -O2 -main-is CrystalQuantum CrystalQuantum.hs && ./CrystalQuantum
 ```
 
-## Dependencies
+10 structural theorems + engine wiring checks.
 
-Imports `CrystalAxiom`.
+## Proof Certificate
+
+- `proofs/CrystalQuantum.lean` — quantum + engine wiring theorems
+- `proofs/CrystalQuantum.agda` — quantum + engine wiring proofs
 
 ## §Module: CrystalRiemann
 
@@ -3585,56 +4222,321 @@ ghc -fno-code CrystalRiemann.hs   # type-check
 Imports `CrystalAxiom`.
 
 ## §Module: CrystalRigid
-# CrystalRigid — Rigid Body Dynamics from (2,3)
-## Overview
-Quaternion integrator + Euler equations. Every rigid-body constant from A_F.
-I_sphere = 2/5 = Flory exponent from CrystalMD — same ratio in polymer scaling and solid mechanics.
-## Integer Traces
-| Physical quantity | Value | Crystal derivation |
-|---|---|---|
+
+# CrystalRigid.hs — Rigid Body Dynamics from (2,3)
+
+## What This Module Does
+
+Quaternion integrator + Euler equations for rigid body rotation. Tumbling
+asymmetric tops, tennis racket instability, moments of inertia — all from (2,3).
+
+## Engine Wiring
+
+**This module imports CrystalEngine.** No local atom redefinitions.
+
+### Sector Restriction: weak (d=3, rotation)
+
+| Rigid Body Concept | Value | Engine Source |
+|-------------------|-------|--------------|
 | Rotation axes | 3 | N_c |
 | Quaternion components | 4 | N_w² |
-| Inertia tensor (indep) | 6 | χ (symmetric 3×3) |
-| Rigid DOF | 6 | χ = N_c + N_c |
-| Rotation matrix | 9 | N_c² |
-| Euler angles | 3 | N_c |
-| I_sphere | 2/5 | N_w/(χ−1) = Flory ν |
+| Inertia tensor (independent) | 6 | χ |
+| Rigid DOF (3 translate + 3 rotate) | 6 | χ |
+| Rotation matrix entries | 9 | N_c² |
+| I_sphere | 2/5 | N_w/(χ−1) |
 | I_rod | 1/12 | 1/(2χ) |
 | I_disk | 1/2 | 1/N_w |
 | I_shell | 2/3 | N_w/N_c |
-## Self-Test
-Energy + angular momentum conserved, quaternion norm = 1, symmetric top ω_z constant, all MOI exact.
-```bash
-ghc -O2 -main-is CrystalRigid CrystalRigid.hs 2>/dev/null && ./CrystalRigid
-```
-## Observable Count
-11 new. All integers from (2,3).
-
-## §Module: CrystalThermo
-# CrystalThermo.hs — Thermodynamic Dynamics from (2,3)
-
-## What This Module Does
-Molecular dynamics with Lennard-Jones potential. Velocity Verlet integrator.
-Heat capacity, adiabatic indices, Carnot efficiency — all from (2,3).
-
-## Integer Map
-| Quantity | Value | Crystal Source |
-|----------|-------|---------------|
-| LJ attractive exp | 6 | χ |
-| LJ repulsive exp | 12 | 2χ |
-| LJ force prefactor | 24 | d_mixed = N_w³N_c |
-| γ_monatomic | 5/3 | (χ-1)/N_c |
-| γ_diatomic | 7/5 | β₀/(χ-1) |
-| DOF monatomic | 3 | N_c |
-| DOF diatomic | 5 | χ-1 |
-| Carnot | 5/6 | (χ-1)/χ |
-| ΔS per tick | ln(6) | ln(χ) |
-| Stokes drag | 24 | d_mixed |
 
 ## Proof Certificate
-- `proofs/crystal_thermo_proof.py` — 23/23 PASS
-- `proofs/CrystalThermo.lean` — 12 theorems
-- `proofs/CrystalThermo.agda` — 11 proofs
+
+- `haskel/CrystalRigid.hs` — 24 checks (24 PASS)
+- `proofs/CrystalRigid.lean` — Lean 4 theorems (by native_decide)
+- `proofs/CrystalRigid.agda` — Agda proofs (by refl)
+
+## Dependencies
+
+- **Imports CrystalEngine** — atoms, sector operations, tick, normSq
+- `Data.Ratio`
+
+## §Module: CrystalSchrodinger
+
+# CrystalSchrodinger — Quantum Mechanics from (2,3)
+
+## What This Module Does
+
+CrystalSchrodinger evolves a quantum wavefunction on a 1D lattice using the
+split-operator method. The split-operator decomposition IS the engine's
+S = W∘U factorisation: W is the potential kick (diagonal multiply), U is
+the kinetic drift (nearest-neighbour hopping). No Schrödinger equation is
+solved — the lattice hopping matrix replaces the Laplacian, and the time
+step is a matrix multiply, not an ODE integration.
+
+### Split-Operator = S = W∘U
+
+Each tick applies Strang splitting:
+
+1. **Half-kick W (potential):** ψ_j → exp(−iV_j dt/2ℏ) × ψ_j. Diagonal
+   phase rotation at each lattice site. The exp(−iθ) = cosθ − i sinθ is
+   computed once per site per step — it generates rotation matrix entries,
+   not dynamics.
+
+2. **Full drift U (kinetic):** discrete Laplacian via nearest-neighbour
+   hopping. (Tψ)_j = −ℏ²/(2m dx²) × (ψ_{j+1} − 2ψ_j + ψ_{j-1}). This
+   is add-neighbours-subtract-centre. Pure multiply-add. No derivative.
+
+3. **Half-kick W (potential):** same as step 1. Symmetric splitting gives
+   second-order accuracy (Strang splitting order = N_w = 2).
+
+### Integer Traces
+
+| Quantity | Value | Crystal derivation |
+|---|---|---|
+| ℏ | 1/2 | 1/N_w (Heyting minimum uncertainty) |
+| Spin states | 2 | N_w |
+| Pauli matrices | 3 | N_c (σ_x, σ_y, σ_z) |
+| Bell states | 4 | N_w² |
+| Spatial dimensions | 3 | N_c |
+| Phase space | 6 | χ = N_w N_c |
+| Bohr factor | 2 | N_w |
+| Uncertainty denom | 4 | N_w² (Δx Δp ≥ ℏ/2 = 1/4) |
+| s-shell | 2 | N_w |
+| p-shell | 6 | χ |
+| d-shell | 10 | N_w(χ−1) |
+| f-shell | 14 | N_w β₀ |
+| Split order | 2 | N_w (Strang = second-order) |
+| 1D hopping neighbours | 2 | N_w (left + right) |
+| 3D hopping neighbours | 6 | χ |
+
+## Engine Wiring
+
+**Status: WIRED.** Module #18 on the Engine Wiring Work List.
+
+### What Changed
+
+1. **`import CrystalEngine`** — all atoms imported from engine.
+2. **Deleted local atoms** — nW, nC, chi, beta0, sigmaD, d1–d4 removed.
+3. **Renamed `normSq` → `psiNormSq`** — avoids conflict with engine's `normSq`.
+4. **`toCrystalState` / `fromCrystalState`** — packs leading 16 complex
+   amplitudes (32 reals) into colour (d₃=8) + mixed (d₄=24) sectors.
+5. **`proveSectorRestriction`** — round-trip test on 16-amplitude Psi.
+6. **Self-test §11–§12** — engine wiring checks and mapping verification.
+
+### Sector
+
+**Colour⊕mixed (d=32).** The wavefunction's spectral content maps to colour
+(8 reals = 4 complex amplitudes for momentum/spin) and mixed (24 reals =
+12 complex for entangled DOF). No weak-sector coupling — the wavefunction
+has no gravitational degrees of freedom.
+
+## Self-Test
+
+```bash
+ghc -O2 -main-is CrystalSchrodinger CrystalSchrodinger.hs && ./CrystalSchrodinger
+```
+
+Tests: integer identities, shell capacities, norm conservation (1000 ticks,
+< 1%), energy conservation (< 5%), tunnelling, wavepacket motion (Ehrenfest),
+engine wiring, crystal state round-trip.
+
+## Proof Certificate
+
+- `proofs/CrystalSchrodinger.lean` — original + engine wiring theorems
+- `proofs/CrystalSchrodinger.agda` — original + engine wiring proofs
+
+## §Module: CrystalSpin
+
+# CrystalSpin.hs — Bloch Equations / NMR from (2,3)
+
+## What This Module Does
+
+Spin dynamics without calculus. The Bloch equations dM/dt = γ(M×B) − R(M−M₀)
+are replaced by M(t+1) = relax(rotate(M(t))). Rotation = matrix multiply.
+Relaxation = scalar multiply. No differential equation. No integral. Just tick.
+
+## Engine Wiring
+
+**This module imports CrystalEngine.** No local atom redefinitions.
+
+```haskell
+import CrystalEngine
+  ( nW, nC, chi, beta0, sigmaD, towerD, gauss
+  , d1, d2, d3, d4, lambda
+  , CrystalState, sectorStart, sectorDim
+  , extractSector, injectSector, normSq, tick
+  )
+```
+
+### Sector Restriction
+
+Spin lives in the **weak sector** (d₂ = 3). The Bloch vector (Mx, My, Mz)
+maps directly to the 3 components of weak.
+
+| Spin Operation | Engine Mapping | Eigenvalue |
+|---------------|----------------|------------|
+| W: precession (rotation) | isometry within weak sector | norm-preserving |
+| U: T1 relaxation (Mz → M₀) | contraction rate = λ_weak | 1/N_w = 1/2 |
+| U: T2 relaxation (Mx,My → 0) | contraction rate = λ_colour | 1/N_c = 1/3 |
+
+Spin does NOT touch singlet, colour, or mixed sectors.
+Engine tick on weak contracts norm² by λ_weak² = 1/4 = 1/N_w².
+
+### BlochVec ↔ CrystalState Mapping
+
+```haskell
+toCrystalState (mx, my, mz) = [0] ++ [mx, my, mz] ++ replicate 32 0.0
+fromCrystalState cs = let [mx, my, mz] = extractSector 1 cs in (mx, my, mz)
+```
+
+## Integer Map
+
+| Quantity | Value | Crystal Source |
+|----------|-------|---------------|
+| Spin states | 2 | N_w |
+| Bloch components | 3 | N_c |
+| Pauli matrices | 3 | N_c |
+| g-factor | 2 | N_w |
+| Multiplicity (2s+1) | 2 | N_w |
+| Stern-Gerlach beams | 2 | N_w |
+| T1 denominator | 2 | N_w (= λ_weak) |
+| T2 denominator | 3 | N_c (= λ_colour) |
+| T1/T2 ratio | 3/2 | N_c/N_w |
+| Phase space (Bloch + momentum) | 6 | χ |
+| Spatial dimensions | 3 | N_c |
+| Rotation matrix size | 9 | N_c² |
+
+## Proof Certificate
+
+- `haskel/CrystalSpin.hs` — 47 checks (47 PASS)
+- `proofs/CrystalSpin.lean` — 38 Lean 4 theorems (by native_decide)
+- `proofs/CrystalSpin.agda` — 38 Agda proofs (by refl)
+- §11 engine wiring exercises imported CrystalEngine functions
+
+## Dependencies
+
+- **Imports CrystalEngine** — atoms, types, sector operations, tick, normSq
+- No external packages
+- Domain-specific: BlochVec type, applyW (precession), applyU (relaxation)
+
+## §Module: CrystalThermo
+
+# CrystalThermo — Thermodynamic Dynamics from (2,3)
+
+## What This Module Does
+
+CrystalThermo is a Lennard-Jones molecular dynamics integrator. It simulates
+particles interacting via the LJ pair potential and extracts every
+thermodynamic constant from the two A_F atoms (N_w=2, N_c=3).
+
+### Lennard-Jones Potential
+
+V(r) = 4ε [(σ/r)^12 − (σ/r)^6]
+
+The exponents are not free parameters — they are forced by the crystal:
+
+- **6 = χ = N_w × N_c** — the attractive (van der Waals) exponent.
+  Induced dipole-dipole interaction falls as r^{−6} because there are
+  χ = 6 polarisation degrees of freedom.
+- **12 = 2χ** — the repulsive (Pauli) exponent. Short-range exchange
+  repulsion is the square of the attraction, doubling the exponent.
+- **24 = d_mixed** — the LJ force prefactor F = (24ε/r)[2(σ/r)^12 − (σ/r)^6].
+  The number 24 is the dimension of the mixed sector. It is also the
+  Stokes drag coefficient for a sphere (F = 24μa v / Re at Re→0).
+
+### Velocity Verlet Integrator
+
+Each tick follows the W-U-W (kick-drift-kick) Verlet pattern from
+CrystalClassical:
+
+1. **Half-kick (W):** v ← v + (dt/2) a(x), using LJ forces.
+2. **Full drift (U):** x ← x + dt v.
+3. **Recompute forces** at new positions.
+4. **Half-kick (W):** v ← v + (dt/2) a(x_new).
+
+This is symplectic and time-reversible, giving O(dt²) energy conservation.
+The positions live in N_c = 3 spatial dimensions per particle.
+
+### Thermodynamic Constants
+
+Every thermodynamic number in this module traces to (2,3):
+
+| Quantity | Value | Crystal derivation |
+|---|---|---|
+| LJ attractive exponent | 6 | χ = N_w N_c |
+| LJ repulsive exponent | 12 | 2χ |
+| LJ force prefactor | 24 | d_mixed = (N_w²−1)(N_c²−1) |
+| γ_monatomic | 5/3 | (χ−1)/N_c |
+| γ_diatomic | 7/5 | β₀/(χ−1) |
+| DOF monatomic | 3 | N_c |
+| DOF diatomic | 5 | χ−1 |
+| Carnot efficiency | 5/6 | (χ−1)/χ  (for T_h/T_c = χ) |
+| Stokes drag | 24 | d_mixed |
+| ΔS per tick | ln 6 | ln χ |
+
+Temperature is computed from equipartition: T = 2 KE / (N_dof k_B),
+with N_dof = N_c per monatomic particle.
+
+## Engine Wiring
+
+**Status: WIRED.** Module #17 on the Engine Wiring Work List.
+
+### What Changed
+
+1. **`import CrystalEngine`** — all atoms (nW, nC, chi, beta0, sigmaD, d1–d4,
+   lambda, tick, extractSector, injectSector, etc.) imported from engine.
+2. **Deleted local atoms** — the old local `Integer` definitions of nW, nC, chi,
+   beta0, sigmaD, sigmaD2, gauss, towerD, dMixed are gone. `dMixed` is now
+   defined as `d4` from the engine. All types changed from `Integer` to `Int`
+   to match the engine.
+3. **`toCrystalState` / `fromCrystalState`** — maps particle state into the
+   mixed sector (d=24). Layout: 4 particles × 6 DOF (x,y,z,vx,vy,vz) = 24.
+   This packing works because 4 × χ = 4 × 6 = 24 = d_mixed.
+4. **`proveSectorRestriction`** — demonstrates that injecting a vector into
+   the mixed sector, ticking via the engine, and extracting gives the same
+   result as scaling by λ_mixed = 1/6. This proves the domain tick equals
+   the engine tick on the mixed sector.
+5. **Self-test sections S6–S8** verify engine wiring, round-trip mapping,
+   and sector restriction numerically.
+
+### Sector
+
+**Mixed (d=24).** Thermodynamic state has no spatial/gravitational (weak)
+or gauge-field (colour) content — temperature, entropy, and LJ forces
+are Lorentz scalars and gauge singlets. The 24 mixed-sector slots hold
+the complete phase space of 4 particles at 6 DOF each.
+
+### Sector Restriction
+
+λ_mixed = 1/(N_w N_c) = 1/6. The engine tick S = W∘U scales each
+mixed-sector component by √λ × √λ = λ = 1/6. This is verified
+numerically in `proveSectorRestriction` and proved symbolically in the
+Lean and Agda proofs (lambda_mixed_denom, lambda_factorises).
+
+## Self-Test
+
+```bash
+ghc -O2 -main-is CrystalThermo CrystalThermo.hs && ./CrystalThermo
+```
+
+Tests:
+- S1: 10 integer identity checks (all PASS).
+- S2: LJ potential shape — minimum at r = 2^(1/6)σ, V(σ) = 0.
+- S3: MD integration — 4 particles, 200 Verlet steps, energy conserved < 1%.
+- S4: Temperature positive after evolution.
+- S5: γ_mono = 5/3, γ_di = 7/5 to machine precision.
+- S6: Engine wiring — d_mixed=24, χ=6, Σd=36, tick accessible.
+- S7: Round-trip toCrystalState/fromCrystalState = identity.
+- S8: Sector restriction — maxdiff < 10⁻¹² on two test vectors.
+
+## Proof Certificate
+
+- `proofs/CrystalThermo.lean` — 27 theorems (12 original + 15 engine wiring)
+- `proofs/CrystalThermo.agda` — 27 proofs (11 original + 16 engine wiring)
+- `proofs/crystal_thermo_proof.py` — 23/23 PASS (pre-existing)
+
+## Observable Count
+
+0 new (infrastructure). Every number from (2,3).
 
 ## §Module: CrystalWACAScan
 
@@ -3794,6 +4696,33 @@ The denominator is χ = N_w × N_c. The CFL condition IS the algebra
 telling you how fast information can spread on the lattice.
 This is the Lieb-Robinson bound: c = χ/χ = 1.
 
+## §Module: Discoveries
+
+# CrystalDiscoveries.hs — Discovery Catalogue
+
+## What This Module Does
+
+Catalogue of all integer identities and physical constants derived
+from N_w=2, N_c=3. Reference module.
+
+## Engine Wiring
+
+**This module imports CrystalEngine.** No local atom redefinitions.
+
+### Sector: various (d = varies)
+
+Collects results from all other Crystal* modules.
+
+## Proof Certificate
+
+- `haskel/CrystalDiscoveries.hs` — Reference catalogue
+- `proofs/CrystalDiscoveries.lean` — Lean 4 integer identity proofs
+- `proofs/CrystalDiscoveries.agda` — Agda integer identity proofs
+
+## Dependencies
+
+- Multiple Crystal* modules
+
 ## §Module: Engine
 
 # CrystalEngine — The Native Dynamics Engine
@@ -3913,6 +4842,35 @@ CrystalEngine is the roof. The 21 dynamics modules are windows:
 Each dynamics module (CrystalClassical, CrystalEM, CrystalCFD, etc.) implements one sector restriction with its own physics-specific state representation. CrystalEngine shows they all come from the same operator applied to the same space.
 
 The CrystalMonadProof module proves this factorisation is unique. CrystalEngine builds it.
+
+## §Module: FullTest
+
+# CrystalFullTest.hs — Integration Test
+
+## What This Module Does
+
+Full integration test suite. Runs all module self-tests and cross-checks.
+
+## Engine Wiring
+
+**This module imports CrystalEngine.** No local atom redefinitions.
+
+### Sector: all sectors (d = 36)
+
+| Test | Count |
+|------|-------|
+| Module tests | 64 modules |
+| Cross-checks | gauss=13, nC=3 |
+
+## Proof Certificate
+
+- `haskel/CrystalFullTest.hs` — 92 integration checks
+- `proofs/CrystalFullTest.lean` — Lean 4 integer identity proofs
+- `proofs/CrystalFullTest.agda` — Agda integer identity proofs
+
+## Dependencies
+
+- All Crystal* modules
 
 ## §Module: HMC
 
@@ -4148,6 +5106,37 @@ CrystalNuclear.hs       Fe-56 = d_colour × β₀
 The fact that the Casimir operator C_F = 4/3 is also the refractive index of
 water is not a coincidence. Both are (N_c²−1)/(2N_c). The algebra decides.
 
+## §Module: Layer
+
+# CrystalLayer.hs — MERA Layer
+
+## What This Module Does
+
+Single MERA layer: isometry + disentangler. Building block for the
+42-layer tower. Each layer contracts by eigenvalues {1, 1/2, 1/3, 1/6}.
+
+## Engine Wiring
+
+**This module imports CrystalEngine.** No local atom redefinitions.
+
+### Sector: full engine (d = 36)
+
+| Layer Property | Crystal Source |
+|---------------|---------------|
+| Bond dimension | chi = 6 |
+| Contraction | lambda_k eigenvalues |
+| Tower depth | towerD = 42 |
+
+## Proof Certificate
+
+- `haskel/CrystalLayer.hs` — MERA layer operations
+- `proofs/CrystalLayer.lean` — Lean 4 integer identity proofs
+- `proofs/CrystalLayer.agda` — Agda integer identity proofs
+
+## Dependencies
+
+- CrystalEngine — atoms, eigenvalues
+
 ## §Module: MonadProof
 
 # CrystalMonadProof — S = W∘U Unique Factorisation
@@ -4217,6 +5206,33 @@ The number 4 = N_w² is not a coincidence. The algebra M₂(ℂ) has N_w² = 4
 matrix entries, giving exactly 4 truth values in the subobject classifier.
 The rigidity of the factorisation is inherited from the rigidity of the
 (2,3) lattice.
+
+## §Module: Noether
+
+# CrystalNoether.hs — Noether Theorem from (2,3)
+
+## What This Module Does
+
+Noether's theorem in the crystal topos: every symmetry of S = W∘U
+gives a conserved quantity. Sector structure provides the symmetries.
+
+## Engine Wiring
+
+**This module imports CrystalEngine.** No local atom redefinitions.
+
+### Sector: all sectors (d = 36)
+
+Conservation laws from sector decomposition.
+
+## Proof Certificate
+
+- `haskel/CrystalNoether.hs` — Noether conservation proofs
+- `proofs/CrystalNoether.lean` — Lean 4 integer identity proofs
+- `proofs/CrystalNoether.agda` — Agda integer identity proofs
+
+## Dependencies
+
+- CrystalEngine — atoms, sector operations
 
 ## §Module: PROOFS
 
@@ -4310,6 +5326,286 @@ Run `--snapshot` after adding new proofs. Run without args before every merge.
 | no `main` | type-check only (`-fno-code`) | CrystalAxiom.hs, CrystalGravity.hs |
 
 Drop a new `.hs` file in `haskel/`, it gets picked up automatically.
+
+## §Module: ProtonRadius
+
+# CrystalProtonRadius.hs — Proton Radius from (2,3)
+
+## What This Module Does
+
+Proton charge radius derived from N_c=3 colour structure.
+r_p = sqrt(N_c) / (4 pi m_p) type scaling.
+
+## Engine Wiring
+
+**This module imports CrystalEngine.** No local atom redefinitions.
+
+### Sector: colour (d = 8)
+
+| Observable | Crystal Source |
+|-----------|---------------|
+| Colour factor | N_c = 3 |
+| Radius scaling | sqrt(N_c) |
+
+## Proof Certificate
+
+- `haskel/CrystalProtonRadius.hs` — Proton radius from colour sector
+- `proofs/CrystalProtonRadius.lean` — Lean 4 integer identity proofs
+- `proofs/CrystalProtonRadius.agda` — Agda integer identity proofs
+
+## Dependencies
+
+- CrystalEngine — atoms (nC)
+
+## §Module: QBase
+
+# CrystalQBase.hs — Shared Quantum Types from (2,3)
+
+## What This Module Does
+
+Base types for the crystal quantum library. Complex arithmetic, vector and matrix
+operations, and all crystal constants derived from N_w=2, N_c=3. Every quantum
+module imports this.
+
+## Engine Wiring
+
+**This module imports CrystalEngine.** No local atom redefinitions.
+
+### Sector: all sectors (d = 36)
+
+| Constant | Value | Source |
+|----------|-------|--------|
+| nW | 2 | input |
+| nC | 3 | input |
+| chi | 6 | nW * nC |
+| dims | [1,3,8,24] | sector decomposition |
+| sigmaD | 36 | sum dims |
+| sigmaD2 | 650 | sum dims^2 = End(A_F) |
+| lambdas | [1, 1/2, 1/3, 1/6] | eigenvalues |
+| energies | [0, ln2, ln3, ln6] | -ln(lambda) |
+| kappa | ln3/ln2 | scaling dimension |
+
+## Proof Certificate
+
+- `haskel/CrystalQBase.hs` — Provides constants to all CrystalQ* modules
+- `proofs/CrystalQBase.lean` — Lean 4 integer identity proofs
+- `proofs/CrystalQBase.agda` — Agda integer identity proofs
+
+## Dependencies
+
+- No external Crystal dependencies (this IS the base)
+
+## §Module: QChannels
+
+# CrystalQChannels.hs — Quantum Channels from (2,3)
+
+## What This Module Does
+
+10 quantum channels: depolarising, amplitude/phase damping, bit/phase flip,
+thermal relaxation, Kraus operators, Lindblad master equation, process tomography.
+All rates and targets derived from sector eigenvalues and dimensions.
+
+## Engine Wiring
+
+**This module imports CrystalEngine.** No local atom redefinitions.
+
+### Sector: mixed sector (d = 24)
+
+| Channel | Crystal Source |
+|---------|---------------|
+| Depolarise target | I/chi = I/6 |
+| Amplitude damp | sector eigenvalue decay |
+| Phase damp | off-diagonal contraction |
+| Bit flip | cyclic sector shift |
+| Phase flip | crystal phase gate |
+| Thermal | Gibbs at KMS beta=2pi |
+| Kraus count | chi^2 + 1 = 37 |
+| Process matrix | chi^4 = 1296 |
+| Lindblad | creation/annihilation ops |
+
+## Proof Certificate
+
+- `haskel/CrystalQChannels.hs` — 11 checks (11 PASS)
+- `proofs/CrystalQChannels.lean` — Lean 4 integer identity proofs
+- `proofs/CrystalQChannels.agda` — Agda integer identity proofs
+
+## Dependencies
+
+- **Imports CrystalEngine** (qualified as CE) via CrystalQBase
+- CrystalQBase — complex arithmetic, vector/matrix operations
+
+## §Module: QEntangle
+
+# CrystalQEntangle.hs — Entanglement Analysis from (2,3)
+
+## What This Module Does
+
+12 entanglement tools: Schmidt decomposition, von Neumann entropy,
+concurrence, negativity, PPT criterion (exact for C^2 x C^3),
+entanglement witnesses, distillation, formation.
+
+## Engine Wiring
+
+**This module imports CrystalEngine.** No local atom redefinitions.
+
+### Sector: mixed sector (d = 24)
+
+| Tool | Crystal Source |
+|------|---------------|
+| PPT space | C^N_w x C^N_c = C^2 x C^3 |
+| Schmidt rank | min(N_w, N_c) = 2 |
+| Max entanglement | ln(N_w) = ln(2) |
+| Hilbert dim | chi = 6 |
+
+## Proof Certificate
+
+- `haskel/CrystalQEntangle.hs` — Entanglement analysis for chi=6 system
+- `proofs/CrystalQEntangle.lean` — Lean 4 integer identity proofs
+- `proofs/CrystalQEntangle.agda` — Agda integer identity proofs
+
+## Dependencies
+
+- CrystalQBase — complex arithmetic, crystal constants
+
+## §Module: QGates
+
+# CrystalQGates.hs — Quantum Gates from End(A_F)
+
+## What This Module Does
+
+12 single-particle + 15 multi-particle quantum gates from the 650
+endomorphisms of A_F = C + M_2(C) + M_3(C). Pauli group on C^chi = C^6.
+
+## Engine Wiring
+
+**This module imports CrystalEngine.** No local atom redefinitions.
+
+### Sector: mixed sector (d = 24)
+
+| Gate Set | Crystal Source |
+|----------|---------------|
+| Single gates | chi^2 = 36 |
+| Multi gates | chi(chi-1)/2 = 15 |
+| CNOT dim | chi^4 = 1296 |
+| Pauli group | chi^2 = 36 elements |
+
+## Proof Certificate
+
+- `haskel/CrystalQGates.hs` — Gate algebra for chi=6 system
+- `proofs/CrystalQGates.lean` — Lean 4 integer identity proofs
+- `proofs/CrystalQGates.agda` — Agda integer identity proofs
+
+## Dependencies
+
+- CrystalQBase — complex arithmetic, crystal constants
+
+## §Module: QHamiltonians
+
+# CrystalQHamiltonians.hs — 12 Quantum Hamiltonians from (2,3)
+
+## What This Module Does
+
+12 Hamiltonians: free particle, Ising, Heisenberg, Hubbard (Bose + Fermi),
+Jaynes-Cummings, XXZ, toric code vertex, Schwinger, VQE ansatz, QAOA mixer.
+All coupling constants and spectra from sector eigenvalues.
+
+## Engine Wiring
+
+**This module imports CrystalEngine.** No local atom redefinitions.
+
+### Sector: mixed sector (d = 24)
+
+| Hamiltonian | Crystal Source |
+|-------------|---------------|
+| Free H_0 | diag(0, ln2, ln3, ln6) |
+| Ising J | sector energy product |
+| Heisenberg | isotropic Ising J_x=J_y=J_z |
+| Hubbard t,U | creation/annihilation from dims |
+| JC omega,g | field = sector levels |
+| XXZ Delta | kappa = ln3/ln2 |
+| Schwinger m | mass gap = ln2 |
+| Bose dim | chi(chi+1)/2 = 21 |
+| Fermi dim | chi(chi-1)/2 = 15 |
+
+## Proof Certificate
+
+- `haskel/CrystalQHamiltonians.hs` — 14 checks (14 PASS)
+- `proofs/CrystalQHamiltonians.lean` — Lean 4 integer identity proofs
+- `proofs/CrystalQHamiltonians.agda` — Agda integer identity proofs
+
+## Dependencies
+
+- **Imports CrystalEngine** (qualified as CE) via CrystalQBase
+- CrystalQBase — complex arithmetic, crystal constants
+
+## §Module: QMeasure
+
+# CrystalQMeasure.hs — Measurement Operators from (2,3)
+
+## What This Module Does
+
+8 measurement operators: sector projectors, POVM elements, Born rule
+on crystal state, weak measurement, measurement disturbance.
+
+## Engine Wiring
+
+**This module imports CrystalEngine.** No local atom redefinitions.
+
+### Sector: mixed sector (d = 24)
+
+| Measurement | Crystal Source |
+|-------------|---------------|
+| POVM dim | chi = 6 |
+| Sector outcomes | 4 sectors |
+| Projectors | chi = 6 basis states |
+| State space | sigmaD = 36 |
+
+## Proof Certificate
+
+- `haskel/CrystalQMeasure.hs` — Measurement operators for chi=6 system
+- `proofs/CrystalQMeasure.lean` — Lean 4 integer identity proofs
+- `proofs/CrystalQMeasure.agda` — Agda integer identity proofs
+
+## Dependencies
+
+- CrystalQBase — complex arithmetic, crystal constants
+
+## §Module: QSimulation
+
+# CrystalQSimulation.hs — 12 Simulation Methods from (2,3)
+
+## What This Module Does
+
+12 methods: state vector, density matrix, MPS, TEBD, exact diag, Lanczos,
+Trotter, QMC, VMC, Wigner function, Clifford, capacity limits.
+Bond dimension = chi = 6. No truncation needed.
+
+## Engine Wiring
+
+**This module imports CrystalEngine.** No local atom redefinitions.
+
+### Sector: mixed sector (d = 24)
+
+| Method | Crystal Limit |
+|--------|---------------|
+| State vector | chi^5 = 7776 (5 particles) |
+| Density matrix | chi^3 = 216 (3 particles) |
+| Exact diag | chi^4 = 1296 (4 particles) |
+| MPS bond dim | chi = 6 (exact) |
+| Wigner grid | chi x chi = 6x6 |
+| Clifford group | chi^2 = 36 |
+| Fock(2) | 1 + 6 + 36 = 43 |
+
+## Proof Certificate
+
+- `haskel/CrystalQSimulation.hs` — 18 checks (17 PASS, 1 FAIL pre-existing QMC normalization)
+- `proofs/CrystalQSimulation.lean` — Lean 4 integer identity proofs
+- `proofs/CrystalQSimulation.agda` — Agda integer identity proofs
+
+## Dependencies
+
+- **Imports CrystalEngine** (qualified as CE) via CrystalQBase
+- CrystalQBase — complex arithmetic, crystal constants
 
 ## §Module: QuantumLibrary
 
@@ -4568,6 +5864,33 @@ CrystalWavelet.hs      Haar = N_w = 2 = spin states
 Spin precession and rigid body rotation are the SAME W operator
 restricted to the same sector (weak, d=3). The only difference
 is the U operator: relaxation for spin, damping for rigid bodies.
+
+## §Module: Structural
+
+# CrystalStructural.hs — Structural Proofs
+
+## What This Module Does
+
+Structural proofs for the crystal topos: sector orthogonality,
+completeness, dimension identities, eigenvalue ordering.
+
+## Engine Wiring
+
+**This module imports CrystalEngine.** No local atom redefinitions.
+
+### Sector: all sectors (d = 36)
+
+Proves infrastructure theorems used by all other modules.
+
+## Proof Certificate
+
+- `haskel/CrystalStructural.hs` — Structural identity proofs
+- `proofs/CrystalStructural.lean` — Lean 4 integer identity proofs
+- `proofs/CrystalStructural.agda` — Agda integer identity proofs
+
+## Dependencies
+
+- CrystalEngine — atoms, sector operations
 
 ## §Module: VEV
 

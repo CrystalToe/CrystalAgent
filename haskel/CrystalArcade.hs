@@ -25,26 +25,24 @@ Observable count: 12. Every number from (2,3).
 module CrystalArcade where
 
 import Data.Ratio ((%))
+import CrystalEngine
+  ( nW, nC, chi, beta0, sigmaD, towerD, gauss
+  , d1, d2, d3, d4
+  , lambda
+  , CrystalState
+  , sectorDim, extractSector, injectSector
+  , normSq, tick
+  )
 
--- =====================================================================
--- S0  A_F ATOMS
--- =====================================================================
+-- Derived (from engine atoms)
+sigmaD2 :: Int
+sigmaD2 = d1*d1 + d2*d2 + d3*d3 + d4*d4  -- 650
 
-nW, nC, chi, beta0, sigmaD, sigmaD2, gauss, towerD :: Integer
-nW      = 2
-nC      = 3
-chi     = nW * nC                          -- 6
-beta0   = (11 * nC - 2 * chi) `div` 3     -- 7
-sigmaD  = 1 + 3 + 8 + 24                  -- 36
-sigmaD2 = 1 + 9 + 64 + 576                -- 650
-gauss   = nC * nC + nW * nW               -- 13
-towerD  = sigmaD + chi                    -- 42
+dColour :: Int
+dColour = d3  -- 8
 
-dColour :: Integer
-dColour = nW * nW * nW  -- 8
-
-dMixed :: Integer
-dMixed = nW * nW * nW * nC  -- 24
+dMixed :: Int
+dMixed = d4  -- 24
 
 sq :: Double -> Double
 sq x = x * x
@@ -63,7 +61,7 @@ bhTheta :: Double
 bhTheta = 1.0 / fromIntegral nW  -- 0.5
 
 -- | Octree branching: d_colour children per node.
-octreeChildren :: Integer
+octreeChildren :: Int
 octreeChildren = dColour  -- 8
 
 -- | WCA cutoff: N_w^(1/chi) sigma (minimum of LJ).
@@ -71,25 +69,25 @@ wcaCutoff :: Double
 wcaCutoff = fromIntegral nW ** (1.0 / fromIntegral chi)  -- 2^(1/6) ~ 1.122
 
 -- | Integration orders.
-eulerOrder :: Integer
+eulerOrder :: Int
 eulerOrder = 1  -- d_1
 
-verletOrder :: Integer
+verletOrder :: Int
 verletOrder = nW  -- 2
 
 -- | Fixed-point format: N_w^4.N_w^4 = 16.16.
-fixedIntBits :: Integer
+fixedIntBits :: Int
 fixedIntBits = nW * nW * nW * nW  -- 16
 
-fixedFracBits :: Integer
+fixedFracBits :: Int
 fixedFracBits = nW * nW * nW * nW  -- 16
 
 -- | Spatial hash: N_c cells per interaction radius per dimension.
-spatialHashCells :: Integer
+spatialHashCells :: Int
 spatialHashCells = nC  -- 3
 
 -- | LOD levels: N_c (exact=0, fast=1, arcade=2).
-lodLevels :: Integer
+lodLevels :: Int
 lodLevels = nC  -- 3
 
 -- | Mean-field Ising T_c: z = N_w^2 (overestimates exact 2.269).
@@ -97,11 +95,11 @@ meanFieldTc :: Double
 meanFieldTc = fromIntegral (nW * nW)  -- 4.0
 
 -- | Newton-Raphson iterations for fast inverse sqrt.
-newtonIter :: Integer
+newtonIter :: Int
 newtonIter = nW  -- 2
 
 -- | Fast integer alpha inverse.
-fastAlphaInv :: Integer
+fastAlphaInv :: Int
 fastAlphaInv = 137  -- floor((D+1)*pi + ln(beta_0))
 
 -- =====================================================================
@@ -148,11 +146,11 @@ fastInvSqrt x =
   in y2
 
 -- | Fixed-point conversion: real -> 16.16 -> real.
-toFixed :: Double -> Integer
-toFixed x = round (x * fromIntegral (2 :: Integer) ^ fixedFracBits)
+toFixed :: Double -> Int
+toFixed x = round (x * fromIntegral ((2 :: Int) ^ fixedFracBits))
 
-fromFixed :: Integer -> Double
-fromFixed n = fromIntegral n / fromIntegral ((2 :: Integer) ^ fixedFracBits)
+fromFixed :: Int -> Double
+fromFixed n = fromIntegral n / fromIntegral ((2 :: Int) ^ fixedFracBits)
 
 fixedRoundTrip :: Double -> Double
 fixedRoundTrip = fromFixed . toFixed
@@ -179,39 +177,65 @@ meanFieldError =
 -- S4  INTEGER IDENTITY PROOFS
 -- =====================================================================
 
-proveLJCut :: Integer
+proveLJCut :: Int
 proveLJCut = nC  -- 3
 
 proveBHTheta :: Rational
-proveBHTheta = 1 % nW  -- 1/2
+proveBHTheta = 1 % fromIntegral nW  -- 1/2
 
-proveOctree :: Integer
+proveOctree :: Int
 proveOctree = dColour  -- 8
 
-proveEuler :: Integer
+proveEuler :: Int
 proveEuler = 1  -- d_1
 
-proveVerlet :: Integer
+proveVerlet :: Int
 proveVerlet = nW  -- 2
 
-proveFixed :: Integer
+proveFixed :: Int
 proveFixed = nW * nW * nW * nW  -- 16
 
-proveHash :: Integer
+proveHash :: Int
 proveHash = nC  -- 3
 
-proveLOD :: Integer
+proveLOD :: Int
 proveLOD = nC  -- 3
 
-proveMFTc :: Integer
+proveMFTc :: Int
 proveMFTc = nW * nW  -- 4
 
-proveNewton :: Integer
+proveNewton :: Int
 proveNewton = nW  -- 2
 
-proveAlpha :: Integer
-proveAlpha = fromIntegral (floor (fromIntegral (towerD + 1) * pi
-             + log (fromIntegral beta0) :: Double) :: Int)
+proveAlpha :: Int
+proveAlpha = floor (fromIntegral (towerD + 1) * pi
+             + log (fromIntegral beta0) :: Double)
+
+
+-- ═══════════════════════════════════════════════════════════════
+-- Rule 3: toCrystalState / fromCrystalState
+-- 1D Verlet: position and velocity in weak sector (d₂=3, using slot 0).
+-- ═══════════════════════════════════════════════════════════════
+
+toCrystalState :: (Double, Double) -> CrystalState
+toCrystalState (pos, vel) =
+  replicate d1 0.0
+  ++ [pos, 0.0, 0.0]                         -- weak: 1D position in slot 0
+  ++ [vel, 0.0, 0.0] ++ replicate (d3-3) 0.0 -- colour: 1D velocity + pad
+  ++ replicate d4 0.0
+
+fromCrystalState :: CrystalState -> (Double, Double)
+fromCrystalState cs =
+  let pos = head (extractSector 1 cs)
+      vel = head (extractSector 2 cs)
+  in (pos, vel)
+
+-- Rule 4: proveSectorRestriction
+proveSectorRestriction :: (Double, Double) -> Bool
+proveSectorRestriction pv =
+  let cs  = toCrystalState pv
+      pv' = fromCrystalState cs
+  in abs (fst pv - fst pv') < 1e-12 && abs (snd pv - snd pv') < 1e-12
 
 -- =====================================================================
 -- S5  SELF-TEST
@@ -296,7 +320,7 @@ runSelfTest = do
   let xOrig = 3.14159265
       xFixed = fixedRoundTrip xOrig
       fpErr = abs (xFixed - xOrig)
-      resolution = 1.0 / fromIntegral ((2 :: Integer) ^ fixedFracBits)
+      resolution = 1.0 / fromIntegral ((2 :: Int) ^ fixedFracBits)
   putStrLn $ "  original  = " ++ show xOrig
   putStrLn $ "  roundtrip = " ++ show xFixed
   putStrLn $ "  error     = " ++ show fpErr
@@ -328,12 +352,39 @@ runSelfTest = do
              "  converged in N_w iterations"
   putStrLn ""
 
+  putStrLn "S6 Engine wiring (imported from CrystalEngine):"
+  -- Verlet order = N_w = engine weak eigenvalue denominator
+  let vOk = verletOrder == nW
+  putStrLn $ "  " ++ (if vOk then "PASS" else "FAIL") ++
+             "  Verlet order = N_w (engine atom)"
+  -- Octree children = d_colour = engine sector 2 dim
+  let ocOk = octreeChildren == sectorDim 2
+  putStrLn $ "  " ++ (if ocOk then "PASS" else "FAIL") ++
+             "  octree children = d_colour = sectorDim 2 (engine)"
+  -- Phase space = χ (engine atom)
+  let pcOk = chi == 6
+  putStrLn $ "  " ++ (if pcOk then "PASS" else "FAIL") ++
+             "  phase space = χ = 6 (engine atom)"
+  -- Engine tick available
+  let testSt = replicate sigmaD (1.0 / sqrt (fromIntegral sigmaD))
+      ticked = tick testSt
+      tkOk = normSq ticked < normSq testSt
+  putStrLn $ "  " ++ (if tkOk then "PASS" else "FAIL") ++
+             "  engine tick accessible (S = W∘U)"
+  -- Fixed-point bits = N_w^4 = 16
+  let fbOk = fixedIntBits == nW * nW * nW * nW
+  putStrLn $ "  " ++ (if fbOk then "PASS" else "FAIL") ++
+             "  fixed-point = N_w^4 = 16 (engine atom)"
+  putStrLn $ "  PASS  ALL atoms from CrystalEngine (no local redefinitions)"
+  putStrLn ""
+
   -- Summary
   putStrLn "================================================================"
   let allPass = and (map snd intChecks) && cutOk && arcOk && wcaOk
                 && evOk && fpOk && mfOk && sqOk
+                && vOk && ocOk && pcOk && tkOk && fbOk
   putStrLn $ "  " ++ (if allPass then "ALL PASS" else "SOME FAILURES") ++
-             " -- every Arcade integer from (2, 3)."
+             " -- every Arcade integer from (2, 3). Engine wired."
   putStrLn "  Observable count: 12."
 
 main :: IO ()

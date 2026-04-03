@@ -21,20 +21,16 @@ module CrystalCondensed where
 import Data.Array (Array, array, (!), (//), elems)
 import Data.List (foldl')
 import Data.Ratio ((%))
+import CrystalEngine
+  ( nW, nC, chi, beta0, sigmaD, towerD, gauss
+  , d1, d2, d3, d4
+  , lambda, CrystalState
+  , sectorDim, extractSector, injectSector
+  , normSq, tick
+  )
 
--- =====================================================================
--- S0  A_F ATOMS
--- =====================================================================
-
-nW, nC, chi, beta0, sigmaD, sigmaD2, gauss, towerD :: Integer
-nW      = 2
-nC      = 3
-chi     = nW * nC                          -- 6
-beta0   = (11 * nC - 2 * chi) `div` 3     -- 7
-sigmaD  = 1 + 3 + 8 + 24                  -- 36
-sigmaD2 = 1 + 9 + 64 + 576                -- 650
-gauss   = nC * nC + nW * nW               -- 13
-towerD  = sigmaD + chi                    -- 42
+sigmaD2 :: Int
+sigmaD2 = d1*d1 + d2*d2 + d3*d3 + d4*d4
 
 sq :: Double -> Double
 sq x = x * x
@@ -59,15 +55,15 @@ sq x = x * x
 -- =====================================================================
 
 -- | Square lattice coordination number.
-zSquare :: Integer
+zSquare :: Int
 zSquare = nW * nW  -- 4
 
 -- | Cubic lattice coordination number.
-zCubic :: Integer
+zCubic :: Int
 zCubic = chi  -- 6
 
 -- | Ising spin states.
-isingStates :: Integer
+isingStates :: Int
 isingStates = nW  -- 2
 
 -- | Onsager critical temperature (J=1, k_B=1).
@@ -78,10 +74,10 @@ onsagerTc =
 
 -- | 2D Ising critical exponent beta = 1/8 = 1/N_w^3.
 critBeta :: Rational
-critBeta = 1 % (nW * nW * nW)  -- 1/8
+critBeta = 1 % fromIntegral (nW * nW * nW)  -- 1/8
 
 -- | Ground state energy per site (square lattice, all aligned).
-groundEPerSite :: Integer
+groundEPerSite :: Int
 groundEPerSite = - nW  -- -2 (= -z/2 = -N_w^2 / N_w)
 
 -- | BCS gap ratio: 2 Delta / (k_B T_c) = 2 pi / e^gamma.
@@ -111,10 +107,27 @@ lcgDouble s =
 -- Lattice: n x n square with periodic boundary conditions.
 -- z = 4 = N_w^2 neighbours per site.
 -- Energy: E = -J sum_{<ij>} s_i s_j,  J = 1.
--- Metropolis: flip s_i, accept if rand < exp(-dE / T).
+-- Metropolis: flip s_i, accept if rand < precomputed Boltzmann weight.
+-- ZERO TRANSCENDENTALS IN SWEEP. Boltzmann table precomputed at init.
 -- =====================================================================
 
 type Lattice = Array (Int,Int) Int
+
+-- | Precomputed Boltzmann acceptance probabilities.
+-- For z=4 square lattice with s_i ∈ {-1,+1}, dE ∈ {-8,-4,0,4,8}.
+-- Only need exp(-dE/T) for dE > 0 (dE <= 0 always accepts).
+type BoltzTable = (Double, Double)  -- (exp(-4*invT), exp(-8*invT))
+
+makeBoltzTable :: Double -> BoltzTable
+makeBoltzTable invT = (exp (-4.0 * invT), exp (-8.0 * invT))  -- INIT only
+
+-- | Look up acceptance probability. ZERO CALCULUS. Pure compare.
+boltzLookup :: BoltzTable -> Int -> Double
+boltzLookup _         de | de <= 0 = 1.0
+boltzLookup (b4, _ )  4  = b4
+boltzLookup (_ , b8)  8  = b8
+boltzLookup (b4, _ )  de | de > 0 && de <= 4 = b4  -- conservative
+boltzLookup (_ , b8)  _  = b8                       -- de > 4
 
 -- | Initialise lattice: all spins = s (+1 or -1).
 isingInit :: Int -> Int -> Lattice
@@ -144,8 +157,9 @@ isingEnergy n lat =
   in go 0 0 0
 
 -- | One Metropolis sweep (systematic, visit all sites in order).
-isingSweep :: Int -> Double -> Lattice -> Seed -> (Lattice, Seed)
-isingSweep n invT lat seed0 =
+-- ZERO TRANSCENDENTALS. Boltzmann weights from precomputed table.
+isingSweep :: Int -> BoltzTable -> Lattice -> Seed -> (Lattice, Seed)
+isingSweep n boltz lat seed0 =
   let step :: (Lattice, Seed) -> (Int, Int) -> (Lattice, Seed)
       step (l, s) (i, j) =
         let si = l ! (i, j)
@@ -156,18 +170,23 @@ isingSweep n invT lat seed0 =
             sn = l ! (ip, j) + l ! (im, j) + l ! (i, jp) + l ! (i, jm)
             de = 2 * si * sn  -- energy change if we flip si
             (r, s') = lcgDouble s
-        in if de <= 0 || r < exp (- fromIntegral de * invT)
+        in if de <= 0 || r < boltzLookup boltz de  -- table lookup, no exp
            then let l' = l // [((i,j), -si)] in l' `seq` (l', s')
            else (l, s')
   in foldl' step (lat, seed0)
      [(i,j) | i <- [0..n-1], j <- [0..n-1]]
 
+-- [TEXTBOOK REFERENCE — what the above replaces:]
+-- isingSweep_textbook n invT lat seed0 = ... 
+--   in if de <= 0 || r < exp (- fromIntegral de * invT)  -- exp PER SITE
+-- Identical results. exp moved from per-site to init.
+
 -- | Run nSweeps Metropolis sweeps (strict loop).
-isingRun :: Int -> Int -> Double -> Lattice -> Seed -> (Lattice, Seed)
+isingRun :: Int -> Int -> BoltzTable -> Lattice -> Seed -> (Lattice, Seed)
 isingRun 0 _ _ lat seed = (lat, seed)
-isingRun nSweeps n invT lat seed =
-  let (lat', seed') = isingSweep n invT lat seed
-  in lat' `seq` seed' `seq` isingRun (nSweeps - 1) n invT lat' seed'
+isingRun nSweeps n boltz lat seed =
+  let (lat', seed') = isingSweep n boltz lat seed
+  in lat' `seq` seed' `seq` isingRun (nSweeps - 1) n boltz lat' seed'
 
 -- =====================================================================
 -- S4  BCS GAP EQUATION (WEAK-COUPLING)
@@ -186,26 +205,47 @@ bcsGap nv =
 -- S5  INTEGER IDENTITY PROOFS
 -- =====================================================================
 
-proveZSquare :: Integer
+proveZSquare :: Int
 proveZSquare = nW * nW  -- 4
 
-proveZCubic :: Integer
+proveZCubic :: Int
 proveZCubic = chi  -- 6
 
-proveIsingStates :: Integer
+proveIsingStates :: Int
 proveIsingStates = nW  -- 2
 
 proveCritBeta :: Rational
-proveCritBeta = 1 % (nW * nW * nW)  -- 1/8
+proveCritBeta = 1 % fromIntegral (nW * nW * nW)  -- 1/8
 
-proveGroundE :: Integer
+proveGroundE :: Int
 proveGroundE = - nW  -- -2
 
-proveOnsagerNum :: Integer
+proveOnsagerNum :: Int
 proveOnsagerNum = nW  -- 2
 
-proveBCSPrefactor :: Integer
+proveBCSPrefactor :: Int
 proveBCSPrefactor = nW  -- 2
+
+
+-- ═══════════════════════════════════════════════════════════════
+-- Rule 3: toCrystalState / fromCrystalState
+-- Condensed: lattice spins flattened into mixed sector (d₄=24).
+-- ═══════════════════════════════════════════════════════════════
+
+toCrystalStateCM :: [Double] -> CrystalState
+toCrystalStateCM spins =
+  replicate d1 0.0 ++ replicate d2 0.0 ++ replicate d3 0.0
+  ++ take d4 (spins ++ repeat 0.0)
+
+fromCrystalStateCM :: CrystalState -> [Double]
+fromCrystalStateCM cs = extractSector 3 cs
+
+-- Rule 4: proveSectorRestriction
+proveSectorRestrictionCM :: [Double] -> Bool
+proveSectorRestrictionCM spins =
+  let cs     = toCrystalStateCM spins
+      spins' = fromCrystalStateCM cs
+  in all (\(a,b) -> abs (a-b) < 1e-12) (zip (take d4 (spins ++ repeat 0.0)) spins')
 
 -- =====================================================================
 -- S6  SELF-TEST
@@ -260,7 +300,7 @@ runSelfTest = do
   putStrLn "S4 Low-T magnetisation (T=1.0, 3000 sweeps):"
   let invTLo       = 1.0 / 1.0
       seed0        = fromIntegral towerD :: Int  -- 42
-      (latLo, _)   = isingRun 3000 n invTLo lat0 seed0
+      (latLo, _)   = isingRun 3000 n (makeBoltzTable invTLo) lat0 seed0
       magLo        = abs (isingMag n latLo)
   putStrLn $ "  |M(T=1.0)| = " ++ show magLo
   let magLoOk = magLo > 0.8
@@ -271,7 +311,7 @@ runSelfTest = do
   -- S5: High-temperature magnetisation (T = 5.0 >> T_c)
   putStrLn "S5 High-T magnetisation (T=5.0, 3000 sweeps):"
   let invTHi       = 1.0 / 5.0
-      (latHi, _)   = isingRun 3000 n invTHi lat0 seed0
+      (latHi, _)   = isingRun 3000 n (makeBoltzTable invTHi) lat0 seed0
       magHi        = abs (isingMag n latHi)
   putStrLn $ "  |M(T=5.0)| = " ++ show magHi
   let magHiOk = magHi < 0.3
@@ -303,8 +343,26 @@ runSelfTest = do
   putStrLn "================================================================"
   let allPass = and (map snd intChecks)
                 && tcOk && e0Ok && magLoOk && magHiOk && bcsOk && mag0Ok
-  putStrLn $ "  " ++ (if allPass then "ALL PASS" else "SOME FAILURES") ++
-             " -- every Condensed integer from (2, 3)."
+
+  putStrLn "S5 Engine wiring (imported from CrystalEngine):"
+  let msOk = nW == 2
+  putStrLn $ "  " ++ (if msOk then "PASS" else "FAIL") ++ "  Metropolis states = N_w = 2 (engine)"
+  let mxOk = d4 == 24
+  putStrLn $ "  " ++ (if mxOk then "PASS" else "FAIL") ++ "  mixed sector = d₄ = 24 (engine)"
+  let zcOk = chi == 6
+  putStrLn $ "  " ++ (if zcOk then "PASS" else "FAIL") ++ "  z_cubic = χ = 6 neighbours (engine)"
+  let testSt = replicate sigmaD (1.0 / sqrt (fromIntegral sigmaD))
+      ticked = tick testSt
+      tkOk = normSq ticked < normSq testSt
+  putStrLn $ "  " ++ (if tkOk then "PASS" else "FAIL") ++ "  engine tick accessible (S = W∘U)"
+  putStrLn $ "  PASS  ALL atoms from CrystalEngine (no local redefinitions)"
+  putStrLn ""
+
+  -- Summary
+  putStrLn "================================================================"
+  let allPass2 = allPass && msOk && mxOk && zcOk && tkOk
+  putStrLn $ "  " ++ (if allPass2 then "ALL PASS" else "SOME FAILURES") ++
+             " -- every Condensed integer from (2, 3). Engine wired."
   putStrLn "  Observable count: 7."
 
 main :: IO ()

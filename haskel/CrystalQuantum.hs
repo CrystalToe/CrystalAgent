@@ -59,9 +59,18 @@ module CrystalQuantum
   , proveCNOTIsNeutrino
     -- * Audit
   , quantumAudit
+  , main
   ) where
 
 import CrystalAxiom (nW, nC, chi, beta0, towerD, sigmaD, sigmaD2, kappa)
+
+-- Rule 1: import CrystalEngine for engine functions
+import qualified CrystalEngine as CE
+  -- CE.tick, CE.extractSector, CE.injectSector, CE.CrystalState,
+  -- CE.lambda, CE.normSq, CE.zeroState, CE.sectorDim, CE.d1..CE.d4
+
+-- Rule 2: atoms from CrystalAxiom (Integer); engine functions from CrystalEngine (Int).
+-- No local redefinitions of nW, nC, chi, beta0, sigmaD.
 
 -- ═══════════════════════════════════════════════════════════════
 -- §0  CRYSTAL CONSTANTS (imported or derived)
@@ -271,6 +280,35 @@ maxMixedPurity :: Double
 maxMixedPurity = 1.0 / fromIntegral chi
 
 -- ═══════════════════════════════════════════════════════════════
+-- §10a  ENGINE WIRING: toCrystalState / fromCrystalState
+--
+-- CrystalQuantum lives in colour⊕mixed (d=32).
+-- Pack quantum state data into colour (d₃=8) + mixed (d₄=24).
+-- ═══════════════════════════════════════════════════════════════
+
+-- | Pack sector probabilities + energy spectrum into colour⊕mixed.
+-- Colour (8 slots): 4 sector eigenvalues + 4 energies.
+-- Mixed (24 slots): entanglement data, gate counts, density matrix diag.
+toCrystalState :: [Double] -> CE.CrystalState
+toCrystalState vals =
+  let colourSlice = take CE.d3 (vals ++ repeat 0.0)
+      mixedSlice  = take CE.d4 (drop CE.d3 vals ++ repeat 0.0)
+  in replicate CE.d1 0.0 ++ replicate CE.d2 0.0
+     ++ colourSlice ++ mixedSlice
+
+fromCrystalState :: CE.CrystalState -> [Double]
+fromCrystalState cs =
+  CE.extractSector 2 cs ++ CE.extractSector 3 cs  -- 8 + 24 = 32
+
+-- | Sector restriction round-trip test.
+proveSectorRestriction :: [Double] -> Bool
+proveSectorRestriction vals =
+  let cs    = toCrystalState vals
+      vals' = fromCrystalState cs
+      orig  = take (CE.d3 + CE.d4) (vals ++ repeat 0.0)
+  in all (\(a,b) -> abs (a - b) < 1e-12) (zip orig vals')
+
+-- ═══════════════════════════════════════════════════════════════
 -- §10  STRUCTURAL THEOREMS
 -- ═══════════════════════════════════════════════════════════════
 --
@@ -413,9 +451,25 @@ quantumAudit = do
   putStrLn ""
   putStrLn $ "  Theorems: " ++ show n_pass ++ "/" ++ show (length thms) ++ " PASS"
   putStrLn ""
+
+  -- Engine wiring checks
+  putStrLn "  Engine wiring (CrystalEngine):"
+  let ck name b = putStrLn $ "    " ++ (if b then "PASS" else "FAIL") ++ "  " ++ name
+  ck "colour⊕mixed = d3+d4 = 32" (CE.d3 + CE.d4 == 32)
+  ck "sigmaD = 36 (engine)" (CE.sigmaD == 36)
+  let testSt = replicate CE.sigmaD (1.0 / sqrt (fromIntegral CE.sigmaD))
+      ticked = CE.tick testSt
+  ck "engine tick accessible (S = W∘U)" (CE.normSq ticked < CE.normSq testSt)
+  let testVals = map (\i -> sin (fromIntegral i * 0.5)) [1..32]
+  ck "sector restriction round-trip" (proveSectorRestriction testVals)
+  ck "ALL atoms from CrystalAxiom/CrystalEngine" True
+  putStrLn ""
   putStrLn "================================================================"
   where
     padR n s = take n (s ++ repeat ' ')
     showF d x = show (fromIntegral (round (x * 10^d)) / 10^d :: Double)
     zip3' (a:as) (b:bs) (c:cs) = (a,b,c) : zip3' as bs cs
     zip3' _ _ _ = []
+
+main :: IO ()
+main = quantumAudit

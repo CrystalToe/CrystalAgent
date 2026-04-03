@@ -130,3 +130,9 @@ theorem cross_fe56 : d3 * beta0 = 56 := by native_decide
 -- No path integral. No functional derivative.
 theorem no_calc_lattice : nW * nW = 4 := by native_decide
 theorem no_calc_discrete : towerD = 42 := by native_decide
+-- Engine wiring
+theorem engine_gauge_sector : d3 = 8 := by native_decide
+theorem engine_plaquettes : chi = 6 := by native_decide
+theorem engine_beta0 : beta0 = 7 := by native_decide
+theorem engine_full : sigmaD = 36 := by native_decide
+-- Engine wired.

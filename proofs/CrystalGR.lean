@@ -34,3 +34,16 @@ theorem quadrupole_num : N_w ^ 5 = 32 := by native_decide
 theorem quadrupole_den : chi - 1 = 5 := by native_decide
 -- Equivalence principle
 theorem equiv_principle : 1 + 9 + 64 + 576 = 650 := by native_decide
+-- Engine wiring + new features
+abbrev dColour : Nat := N_c * N_c - 1
+abbrev sigmaD : Nat := 1 + 3 + 8 + 24
+theorem engine_isco : chi = 6 := by native_decide
+theorem engine_bend : N_w * N_w = 4 := by native_decide
+theorem engine_spacetime : N_c + 1 = 4 := by native_decide
+theorem engine_full : sigmaD = 36 := by native_decide
+-- Disk: η = 1-√(8/9), 8 = d_colour, 9 = N_c²
+theorem engine_eff_num : dColour = 8 := by native_decide
+theorem engine_eff_den : N_c * N_c = 9 := by native_decide
+-- Einstein ring: factor = N_w² = 4
+theorem engine_einstein : N_w * N_w = 4 := by native_decide
+-- Engine wired.

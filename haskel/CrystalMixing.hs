@@ -11,6 +11,7 @@ module CrystalMixing
   , proveAdjunctionAngle, proveCos2PMNS, berryPhaseCheck
   ) where
 import CrystalAxiom
+import qualified CrystalEngine as CE  -- engine atoms
 import Data.Ratio ((%))
 
 proveVus :: Crystal Two Three -> Derived

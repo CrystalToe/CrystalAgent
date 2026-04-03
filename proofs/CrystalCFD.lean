@@ -59,3 +59,9 @@ theorem beta0_val : beta0 = 7 := by native_decide
 theorem sigmaD_val : sigmaD = 36 := by native_decide
 theorem gauss_val : gauss = 13 := by native_decide
 theorem towerD_val : towerD = 42 := by native_decide
+-- Engine wiring
+theorem engine_d2q9 : nC * nC = 9 := by native_decide
+theorem engine_colour : nC * nC - 1 = 8 := by native_decide
+theorem engine_chi : chi = 6 := by native_decide
+theorem engine_full : sigmaD = 36 := by native_decide
+-- Engine wired.

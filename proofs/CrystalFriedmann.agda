@@ -37,3 +37,17 @@ rad-exp : N_c + 1 ≡ 4
 rad-exp = refl
 tower : D ≡ 42
 tower = refl
+
+-- Engine wiring
+sigmaD : ℕ
+sigmaD = 1 + 3 + 8 + 24
+
+engine-gauss : gauss ≡ 13
+engine-gauss = refl
+
+engine-chi : χ ≡ 6
+engine-chi = refl
+
+engine-full : sigmaD ≡ 36
+engine-full = refl
+-- Engine wired.

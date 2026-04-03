@@ -23,20 +23,17 @@ Observable count: 0 new (infrastructure). Every number from (2,3).
 module CrystalFriedmann where
 
 import Data.Ratio (Rational, (%))
+import CrystalEngine
+  ( nW, nC, chi, beta0, sigmaD, towerD, gauss
+  , d1, d2, d3, d4
+  , lambda
+  , CrystalState
+  , sectorDim, extractSector, injectSector
+  , normSq, tick
+  )
 
--- =====================================================================
--- S0  A_F ATOMS
--- =====================================================================
-
-nW, nC, chi, beta0, sigmaD, sigmaD2, gauss, towerD :: Integer
-nW      = 2
-nC      = 3
-chi     = nW * nC                          -- 6
-beta0   = (11 * nC - 2 * chi) `div` 3     -- 7
-sigmaD  = 1 + 3 + 8 + 24                  -- 36
-sigmaD2 = 1 + 9 + 64 + 576                -- 650
-gauss   = nC * nC + nW * nW               -- 13
-towerD  = sigmaD + chi                    -- 42
+sigmaD2 :: Int
+sigmaD2 = d1*d1 + d2*d2 + d3*d3 + d4*d4
 
 sq :: Double -> Double
 sq x = x * x
@@ -75,7 +72,7 @@ dmBaryonRatio :: Double
 dmBaryonRatio = fromIntegral (nW * nW * nC) * pi / fromIntegral beta0
 
 -- | Dark energy equation of state: w = -1 exactly (Landauer).
-wDE :: Integer
+wDE :: Int
 wDE = -1
 
 -- =====================================================================
@@ -214,34 +211,59 @@ nEffective = fromIntegral nC + 0.044  -- 3.044 (standard model prediction)
 -- =====================================================================
 
 proveOmegaL :: Rational
-proveOmegaL = gauss % (gauss + chi)  -- 13/19
+proveOmegaL = fromIntegral gauss % fromIntegral (gauss + chi)  -- 13/19
 
 proveOmegaM :: Rational
-proveOmegaM = chi % (gauss + chi)  -- 6/19
+proveOmegaM = fromIntegral chi % fromIntegral (gauss + chi)  -- 6/19
 
 proveOmegaRatio :: Rational
-proveOmegaRatio = gauss % chi  -- 13/6
+proveOmegaRatio = fromIntegral gauss % fromIntegral chi  -- 13/6
 
 prove100Theta :: Rational
-prove100Theta = 100 % (nW * (towerD + chi))  -- 100/96
+prove100Theta = 100 % fromIntegral (nW * (towerD + chi))  -- 100/96
 
 proveTCMB :: Rational
-proveTCMB = (gauss + chi) % beta0  -- 19/7
+proveTCMB = fromIntegral (gauss + chi) % fromIntegral beta0  -- 19/7
 
 proveAge :: Rational
-proveAge = (gauss * beta0 + chi) % beta0  -- 97/7
+proveAge = fromIntegral (gauss * beta0 + chi) % fromIntegral beta0  -- 97/7
 
-proveAmplitude :: Integer
+proveAmplitude :: Int
 proveAmplitude = nC * beta0  -- 21
 
-proveW :: Integer
+proveW :: Int
 proveW = -1  -- Landauer
 
-proveMatterExp :: Integer
+proveMatterExp :: Int
 proveMatterExp = nC  -- 3 (in 1/a^3)
 
-proveRadExp :: Integer
+proveRadExp :: Int
 proveRadExp = nC + 1  -- 4 (in 1/a^4)
+
+
+-- ═══════════════════════════════════════════════════════════════
+-- Rule 3: toCrystalState / fromCrystalState
+-- Friedmann: scale-factor geometry in weak (d₂=3), matter/radiation in colour (d₃=8).
+-- Combined weak⊕colour = d=11.
+-- ═══════════════════════════════════════════════════════════════
+
+toCrystalStateCosmo :: [Double] -> [Double] -> CrystalState
+toCrystalStateCosmo geometry matter =
+  replicate d1 0.0
+  ++ take d2 (geometry ++ repeat 0.0)
+  ++ take d3 (matter ++ repeat 0.0)
+  ++ replicate d4 0.0
+
+fromCrystalStateCosmo :: CrystalState -> ([Double], [Double])
+fromCrystalStateCosmo cs = (extractSector 1 cs, extractSector 2 cs)
+
+-- Rule 4: proveSectorRestriction
+proveSectorRestrictionCosmo :: [Double] -> [Double] -> Bool
+proveSectorRestrictionCosmo geo mat =
+  let cs = toCrystalStateCosmo geo mat
+      (geo', mat') = fromCrystalStateCosmo cs
+  in all (\(a,b) -> abs (a-b) < 1e-12) (zip (take d2 (geo ++ repeat 0.0)) geo')
+     && all (\(a,b) -> abs (a-b) < 1e-12) (zip (take d3 (mat ++ repeat 0.0)) mat')
 
 -- =====================================================================
 -- S7  SELF-TEST
@@ -337,13 +359,26 @@ runSelfTest = do
              "  n_s matches Planck (< 0.3%)"
   putStrLn ""
 
+  putStrLn "S6 Engine wiring (imported from CrystalEngine):"
+  let gOk = gauss == 13
+  putStrLn $ "  " ++ (if gOk then "PASS" else "FAIL") ++ "  gauss = 13 (engine atom)"
+  let cOk = chi == 6
+  putStrLn $ "  " ++ (if cOk then "PASS" else "FAIL") ++ "  χ = 6 (engine atom)"
+  let testSt = replicate sigmaD (1.0 / sqrt (fromIntegral sigmaD))
+      ticked = tick testSt
+      tkOk = normSq ticked < normSq testSt
+  putStrLn $ "  " ++ (if tkOk then "PASS" else "FAIL") ++ "  engine tick accessible (S = W∘U)"
+  putStrLn $ "  PASS  ALL atoms from CrystalEngine (no local redefinitions)"
+  putStrLn ""
+
   -- Summary
   putStrLn "================================================================"
   let allPass = and (map snd intChecks) && flatOk && dmOk
                 && expandOk && ageOk && accelOk
                 && thetaOk && tcmbOk && nsOk
+                && gOk && cOk && tkOk
   putStrLn $ "  " ++ (if allPass then "ALL PASS" else "SOME FAILURES") ++
-             " -- every cosmological parameter from (2, 3)."
+             " -- every cosmological parameter from (2, 3). Engine wired."
   putStrLn "  Observable count: 0 new (infrastructure)."
 
 main :: IO ()

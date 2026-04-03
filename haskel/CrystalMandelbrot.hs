@@ -30,20 +30,14 @@ module CrystalMandelbrot where
 -- D=0: A_F ATOMS (standalone, no imports)
 -- ======================================================================
 
-nC, nW, chi, beta0 :: Int
-nC    = 3
-nW    = 2
-chi   = nW * nC              -- 6
-beta0 = (11 * nC - 2 * chi) `div` 3  -- 7
+-- Atoms from CrystalEngine (no local redefinitions)
+import CrystalEngine (nW, nC, chi, beta0, sigmaD, towerD, gauss, d1, d2, d3, d4)
 
-d1, d2, d3, d4 :: Int
-d1 = 1; d2 = nC; d3 = nC^(2::Int) - 1; d4 = nW^(3::Int) * nC
-
-sigmaD, sigmaD2, gauss, dMax :: Int
-sigmaD  = d1 + d2 + d3 + d4  -- 36
+sigmaD2 :: Int
 sigmaD2 = d1^(2::Int) + d2^(2::Int) + d3^(2::Int) + d4^(2::Int)  -- 650
-gauss   = nC^(2::Int) + nW^(2::Int)  -- 13
-dMax    = sigmaD + chi         -- 42
+
+dMax :: Int
+dMax = towerD  -- 42
 
 -- ======================================================================
 -- D=5: RUNNING ALPHA

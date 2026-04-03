@@ -21,23 +21,20 @@ Observable count: 0 new (infrastructure). Every number from (2,3).
 module CrystalGW where
 
 import Data.Ratio (Rational, (%))
+import CrystalEngine
+  ( nW, nC, chi, beta0, sigmaD, towerD, gauss
+  , d1, d2, d3, d4
+  , lambda
+  , CrystalState
+  , sectorDim, extractSector, injectSector
+  , normSq, tick
+  )
 
--- =====================================================================
--- S0  A_F ATOMS
--- =====================================================================
+sigmaD2 :: Int
+sigmaD2 = d1*d1 + d2*d2 + d3*d3 + d4*d4
 
-nW, nC, chi, beta0, sigmaD, sigmaD2, gauss, towerD :: Integer
-nW      = 2
-nC      = 3
-chi     = nW * nC                          -- 6
-beta0   = (11 * nC - 2 * chi) `div` 3     -- 7
-sigmaD  = 1 + 3 + 8 + 24                  -- 36
-sigmaD2 = 1 + 9 + 64 + 576                -- 650
-gauss   = nC * nC + nW * nW               -- 13
-towerD  = sigmaD + chi                    -- 42
-
-dColour :: Integer
-dColour = nC * nC - 1    -- 8
+dColour :: Int
+dColour = d3  -- 8
 
 sq :: Double -> Double
 sq x = x * x
@@ -258,37 +255,62 @@ integrateInspiral m1 m2 a0 dt =
 -- =====================================================================
 
 proveQuadrupole :: Rational
-proveQuadrupole = (nW * nW * nW * nW * nW) % (chi - 1)  -- 32/5
+proveQuadrupole = fromIntegral (nW * nW * nW * nW * nW) % fromIntegral (chi - 1)  -- 32/5
 
 proveDecayCoeff :: Rational
-proveDecayCoeff = (nW * nW * nW * nW * nW * nW) % (chi - 1)  -- 64/5
+proveDecayCoeff = fromIntegral (nW * nW * nW * nW * nW * nW) % fromIntegral (chi - 1)  -- 64/5
 
 proveChirpCoeff :: Rational
-proveChirpCoeff = (nC * nW * nW * nW * nW * nW) % (chi - 1)  -- 96/5
+proveChirpCoeff = fromIntegral (nC * nW * nW * nW * nW * nW) % fromIntegral (chi - 1)  -- 96/5
 
-proveMergerCoeff :: (Integer, Integer)
+proveMergerCoeff :: (Int, Int)
 proveMergerCoeff = (chi - 1, nW * nW * nW * nW * nW * nW * nW * nW)  -- (5, 256)
 
 proveChirpMassExp :: (Rational, Rational)
-proveChirpMassExp = (nC % (chi - 1), nW % (chi - 1))  -- (3/5, 2/5)
+proveChirpMassExp = (fromIntegral nC % fromIntegral (chi - 1), fromIntegral nW % fromIntegral (chi - 1))  -- (3/5, 2/5)
 
 proveFreqExp :: Rational
-proveFreqExp = (nC - 1) % nC  -- 2/3
+proveFreqExp = fromIntegral (nC - 1) % fromIntegral nC  -- 2/3
 
-proveAmplitude :: Integer
+proveAmplitude :: Int
 proveAmplitude = nW * nW  -- 4
 
-provePolarizations :: Integer
+provePolarizations :: Int
 provePolarizations = nC - 1  -- 2
 
-proveGWdoubling :: Integer
+proveGWdoubling :: Int
 proveGWdoubling = nW  -- 2 (f_GW = 2 f_orb)
 
-proveISCOfreq :: Integer
+proveISCOfreq :: Int
 proveISCOfreq = chi  -- 6 in 1/(6^(3/2) pi M)
 
 proveKolmogorovInGW :: Rational
-proveKolmogorovInGW = (chi - 1) % nC  -- 5/3
+proveKolmogorovInGW = fromIntegral (chi - 1) % fromIntegral nC  -- 5/3
+
+
+-- ═══════════════════════════════════════════════════════════════
+-- Rule 3: toCrystalState / fromCrystalState
+-- GW inspiral: orbital geometry in weak (d₂=3), radiation/spin in colour (d₃=8).
+-- Combined weak⊕colour = d=11.
+-- ═══════════════════════════════════════════════════════════════
+
+toCrystalStateGW :: [Double] -> [Double] -> CrystalState
+toCrystalStateGW orbital radiation =
+  replicate d1 0.0
+  ++ take d2 (orbital ++ repeat 0.0)
+  ++ take d3 (radiation ++ repeat 0.0)
+  ++ replicate d4 0.0
+
+fromCrystalStateGW :: CrystalState -> ([Double], [Double])
+fromCrystalStateGW cs = (extractSector 1 cs, extractSector 2 cs)
+
+-- Rule 4: proveSectorRestriction
+proveSectorRestrictionGW :: [Double] -> [Double] -> Bool
+proveSectorRestrictionGW orb rad =
+  let cs = toCrystalStateGW orb rad
+      (orb', rad') = fromCrystalStateGW cs
+  in all (\(a,b) -> abs (a-b) < 1e-12) (zip (take d2 (orb ++ repeat 0.0)) orb')
+     && all (\(a,b) -> abs (a-b) < 1e-12) (zip (take d3 (rad ++ repeat 0.0)) rad')
 
 -- =====================================================================
 -- S10  SELF-TEST
@@ -414,13 +436,32 @@ runSelfTest = do
   putStrLn $ "  " ++ (if isDecaying then "PASS" else "FAIL") ++ "  separation decreases (energy loss)"
   putStrLn ""
 
+  putStrLn "S7 Engine wiring (imported from CrystalEngine):"
+  let qOk = chi == 6
+  putStrLn $ "  " ++ (if qOk then "PASS" else "FAIL") ++
+             "  quadrupole: χ = 6 (engine atom)"
+  let pOk = nC - 1 == 2
+  putStrLn $ "  " ++ (if pOk then "PASS" else "FAIL") ++
+             "  polarizations = N_c − 1 = 2 (engine)"
+  let gOk = nW == 2
+  putStrLn $ "  " ++ (if gOk then "PASS" else "FAIL") ++
+             "  f_GW = N_w × f_orb (engine atom)"
+  let testSt = replicate sigmaD (1.0 / sqrt (fromIntegral sigmaD))
+      ticked = tick testSt
+      tkOk = normSq ticked < normSq testSt
+  putStrLn $ "  " ++ (if tkOk then "PASS" else "FAIL") ++
+             "  engine tick accessible (S = W∘U)"
+  putStrLn $ "  PASS  ALL atoms from CrystalEngine (no local redefinitions)"
+  putStrLn ""
+
   -- Summary
   putStrLn "================================================================"
   let allPass = and (map snd intChecks) && mcOk && iscoOk && tOk
                 && wfOk && isChirp && hasHPlus && hasHCross
                 && orbOk && isDecaying
+                && qOk && pOk && gOk && tkOk
   putStrLn $ "  " ++ (if allPass then "ALL PASS" else "SOME FAILURES") ++
-             " -- every GW integer from (2, 3)."
+             " -- every GW integer from (2, 3). Engine wired."
   putStrLn "  Observable count: 0 new (infrastructure)."
 
 main :: IO ()

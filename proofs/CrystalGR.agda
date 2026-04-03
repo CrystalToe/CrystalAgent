@@ -37,3 +37,26 @@ quad-32 : N_w * N_w * N_w * N_w * N_w ≡ 32
 quad-32 = refl
 quad-5 : χ ∸ 1 ≡ 5
 quad-5 = refl
+
+-- Engine wiring + new features
+sigmaD : ℕ
+sigmaD = 1 + 3 + 8 + 24
+
+engine-isco : χ ≡ 6
+engine-isco = refl
+
+engine-bend : N_w * N_w ≡ 4
+engine-bend = refl
+
+engine-spacetime : N_c + 1 ≡ 4
+engine-spacetime = refl
+
+engine-full : sigmaD ≡ 36
+engine-full = refl
+
+engine-eff-num : (N_c * N_c) ∸ 1 ≡ 8
+engine-eff-num = refl
+
+engine-eff-den : N_c * N_c ≡ 9
+engine-eff-den = refl
+-- Engine wired.

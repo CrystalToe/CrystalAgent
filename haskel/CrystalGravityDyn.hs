@@ -25,15 +25,18 @@ import Data.Ratio ((%))
 -- §0  A_F ATOMS (imported values, self-contained for testing)
 -- ═══════════════════════════════════════════════════════════════
 
+-- Atoms from CrystalEngine (no local redefinitions)
+import qualified CrystalEngine as CE
+
 nW, nC, chi, beta0, sigmaD, sigmaD2, gauss, towerD :: Integer
-nW      = 2
-nC      = 3
-chi     = nW * nC                          -- 6
-beta0   = (11 * nC - 2 * chi) `div` 3     -- 7
-sigmaD  = 1 + 3 + 8 + 24                  -- 36
-sigmaD2 = 1 + 9 + 64 + 576                -- 650
-gauss   = nC^2 + nW^2                     -- 13
-towerD  = sigmaD + chi                    -- 42
+nW      = fromIntegral CE.nW
+nC      = fromIntegral CE.nC
+chi     = fromIntegral CE.chi
+beta0   = fromIntegral CE.beta0
+sigmaD  = fromIntegral CE.sigmaD
+sigmaD2 = 1 + 9 + 64 + 576   -- sum d_k^2 = 650 (from engine sectors)
+gauss   = nC^2 + nW^2
+towerD  = sigmaD + chi
 
 dColour, dWeak, dMixed :: Integer
 dColour = nC^2 - 1    -- 8

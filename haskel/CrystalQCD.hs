@@ -61,6 +61,7 @@ module CrystalQCD
   ) where
 
 import CrystalAxiom
+import qualified CrystalEngine as CE  -- engine atoms
 import CrystalGauge (proveVEV)
 import Data.Ratio ((%))
 

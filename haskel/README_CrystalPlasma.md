@@ -1,33 +1,37 @@
 <!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
 
-# CrystalPlasma — MHD (EM + CFD) from (2,3)
+# CrystalPlasma.hs — MHD Plasma Dynamics from (2,3)
 
-## Overview
+## What This Module Does
 
-Magnetohydrodynamics capstone combining EM and CFD sectors.
-Alfvén wave FDTD integrator. Magnetic pressure and plasma beta.
+Magnetohydrodynamics: Alfvén waves, magnetic pressure, plasma beta,
+Bondi accretion, MRI growth rate. MHD = EM + CFD merged in colour sector.
 
-## Integer Traces
+## Engine Wiring
 
-| Physical quantity | Value | Crystal derivation |
-|---|---|---|
-| MHD wave types | 3 | N_c (slow, Alfvén, fast) |
-| MHD state variables | 8 | N_w³ = d_colour |
-| Propagating modes | 6 | χ = 2·N_c |
-| Non-propagating modes | 2 | N_w (entropy + div-B) |
-| Magnetic pressure factor | 2 | N_w |
-| Plasma beta factor | 2 | N_w |
-| EM components | 6 | χ (from CrystalEM) |
-| CFD D2Q9 | 9 | N_c² (from CrystalCFD) |
+**This module imports CrystalEngine.** No local atom redefinitions.
 
-## Self-Test
+### Sector: colour (d₃ = 8 = EM + fluid merged)
 
-Alfvén wave energy conservation, periodicity, magnetic pressure, plasma beta, Alfvén speed.
+| MHD Concept | Value | Engine Source |
+|-----------|-------|--------------|
+| MHD state variables | 8 | d_colour = N_w³ |
+| Wave types | 3 | N_c |
+| Propagating modes | 6 | χ |
+| EM components | 6 | χ |
+| Bondi factor | 4 | N_w² |
+| MRI rate | 3/4 Ω | N_c/N_w² |
 
-```bash
-ghc -O2 -main-is CrystalPlasma CrystalPlasma.hs 2>/dev/null && ./CrystalPlasma
-```
+## New Features (this session)
 
-## Observable Count
+- `bondiAccretion` — Ṁ = N_w²·π·G²·M²·ρ/c_s³
+- `mriGrowthRate` — max growth = (N_c/N_w²)·Ω = (3/4)Ω
 
-8 new (MHD = EM + CFD capstone). All integers from (2,3).
+## Proof Certificate
+
+- `haskel/CrystalPlasma.hs` — 25 checks (25 PASS)
+
+## Dependencies
+
+- **Imports CrystalEngine** — atoms, sector operations, tick, normSq
+- `Data.Array`

@@ -14,6 +14,7 @@ module CrystalCosmo
   , proveAmplitude
   ) where
 import CrystalAxiom
+import qualified CrystalEngine as CE  -- engine atoms
 import CrystalGauge (proveVEV, proveAlphaInv, proveSinSqThetaW_MS)
 import CrystalMixing (proveJarlskog)
 

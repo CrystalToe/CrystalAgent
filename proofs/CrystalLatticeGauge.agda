@@ -181,3 +181,17 @@ no-calc-discrete = refl
 
 -- §14 All 44 proofs by refl. Zero postulates.
 -- Wilson gauge = S = W∘U on colour⊕mixed. No path integral.
+
+-- Engine wiring
+engine-gauge-sector : d3 ≡ 8
+engine-gauge-sector = refl
+
+engine-plaquettes : chi ≡ 6
+engine-plaquettes = refl
+
+engine-beta0 : beta0 ≡ 7
+engine-beta0 = refl
+
+engine-full : sigmaD ≡ 36
+engine-full = refl
+-- Engine wired.
