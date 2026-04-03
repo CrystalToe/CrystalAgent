@@ -2426,6 +2426,34 @@ Every number from (2,3).
 
 ```
 
+## §Haskell: CrystalDiffusion (     369 lines)
+```haskell
+
+{- | CrystalDiffusion.hs — Diffusion / Heat Equation from (2,3)
+
+  Sector restriction: weak (d=3, spatial spreading)
+  Textbook method: Forward Euler heat equation = S = W∘U
+    W = source term (injection/absorption at each site)
+    U = spread (averaging over neighbours = discrete Laplacian)
+
+  Crystal constants:
+    Spatial dims       = N_c = 3
+    Neighbours (1D)    = N_w = 2  (left + right)
+    Neighbours (3D)    = N_w × N_c = χ = 6  (±x, ±y, ±z)
+    Diffusion coeff    = 1/χ = 1/6  (CFL-stable for 3D)
+    Random walk dim    = N_c = 3
+    Fourier decay      = λ_k^t  (= monad eigenvalue decay!)
+
+  NO CALCULUS. The heat equation ∂u/∂t = D∇²u is replaced by
+  u(t+1) = u(t) + D × hop(u). This is ADD + MULTIPLY on a lattice.
+  The discrete Laplacian is a HOPPING MATRIX, not a derivative.
+  Diffusion IS eigenvalue decay. The monad IS the heat equation.
+
+  Compile: ghc -O2 -main-is CrystalDiffusion CrystalDiffusion.hs && ./CrystalDiffusion
+-}
+
+```
+
 ## §Haskell: CrystalDiscoveries (     150 lines)
 ```haskell
 
@@ -3401,6 +3429,36 @@ WHAT THIS MODULE PROVES:
   5. After many ticks: hologrons MOVE TOWARD each other (no F=ma)
 
 Observable count: 0 new (infrastructure for dynamics).
+-}
+
+```
+
+## §Haskell: CrystalLatticeGauge (     399 lines)
+```haskell
+
+{- | CrystalLatticeGauge.hs — Wilson Lattice Gauge Theory from (2,3)
+
+  Sector restriction: colour (d=8) for SU(3) links, mixed (d=24) for full gauge
+  Textbook method: Wilson plaquette action + heat bath
+  Native engine: S = W∘U where
+    W = plaquette product (gauge transport around a face)
+    U = link update (staple sum + Metropolis accept/reject)
+
+  Crystal constants:
+    Plaquette links     = N_w² = 4  (4 links around a face)
+    SU(N_c) generators  = N_c² - 1 = 8 = d_colour
+    Wilson β at strong   = N_w × N_c = χ = 6
+    Lattice dimensions   = N_c + 1 = 4  (spacetime)
+    Directions           = N_w(N_c+1) = 8  (±μ)
+    Plaquettes per site  = C(4,2) = χ = 6
+    Fundamental rep dim  = N_c = 3
+    Link matrix entries  = N_c² = 9
+
+  NO CALCULUS. The Wilson action is a SUM over plaquettes.
+  Link updates are MATRIX MULTIPLY. No path integral, no
+  functional derivative. The lattice IS the physics.
+
+  Compile: ghc -O2 -main-is CrystalLatticeGauge CrystalLatticeGauge.hs && ./CrystalLatticeGauge
 -}
 
 ```
@@ -7748,6 +7806,66 @@ Observable count: 11. Every number from (2,3).
 
 ```
 
+## §Haskell: CrystalSchrodinger (     406 lines)
+```haskell
+
+{- | CrystalSchrodinger.hs — Quantum Mechanics from (2,3)
+
+  Sector restriction: all 4 sectors (wavefunction spans full Σd=36)
+  Textbook method: Split-operator = S = W∘U exactly
+    W = potential kick (V × ψ, diagonal multiply)
+    U = kinetic drift (T × ψ, nearest-neighbour hopping)
+
+  Crystal constants:
+    ℏ               = 1/N_w = 1/2  (Heyting minimum uncertainty)
+    Spin states      = N_w = 2
+    Pauli matrices   = N_c = 3
+    Spatial dims     = N_c = 3
+    Phase space      = χ = 6
+    Bohr: a₀ denom   = N_w = 2  (a₀ = ℏ²/(m×e²) = (1/N_w)²/...)
+    Rydberg: 1/N_w   = 1/2  (E_H = m×e⁴/(2ℏ²))
+    Principal q.n.   = n ∈ ℕ  (discrete, not continuous)
+    Orbitals per n   = n² (shell capacity = N_w×n²)
+
+  NO CALCULUS. The Laplacian is a HOPPING MATRIX (nearest-neighbour).
+  The potential is a DIAGONAL MULTIPLY. The time step is a MATRIX
+  MULTIPLY. No integrals. No derivatives. The lattice IS the physics.
+
+  Compile: ghc -O2 -main-is CrystalSchrodinger CrystalSchrodinger.hs && ./CrystalSchrodinger
+-}
+
+```
+
+## §Haskell: CrystalSpin (     348 lines)
+```haskell
+
+{- | CrystalSpin.hs — Spin Dynamics / Bloch Equations from (2,3)
+
+  Sector restriction: weak (d=3, Bloch vector Sx, Sy, Sz)
+  Textbook method: Bloch equations = S = W∘U
+    W = precession (rotation around B field, 3×3 matrix multiply)
+    U = relaxation (exponential decay toward equilibrium, diagonal)
+
+  Crystal constants:
+    Spin states       = N_w = 2  (up/down)
+    Bloch components  = N_c = 3  (Sx, Sy, Sz)
+    Pauli matrices    = N_c = 3  (σ_x, σ_y, σ_z)
+    Larmor rotation   = per tick (discrete, not continuous ω)
+    T1 relaxation     = λ_weak = 1/N_w = 1/2 (longitudinal)
+    T2 relaxation     = λ_colour = 1/N_c = 1/3 (transverse)
+    T1/T2 ratio       = N_c/N_w = 3/2 (forced by algebra)
+    Rabi states       = N_w = 2
+
+  NO CALCULUS. The Bloch equations dM/dt = γ(M×B) - R(M-M₀)
+  are replaced by: M(t+1) = relax(rotate(M(t))).
+  Rotation = matrix multiply. Relaxation = scalar multiply.
+  No differential equation. No integral. Just tick.
+
+  Compile: ghc -O2 -main-is CrystalSpin CrystalSpin.hs && ./CrystalSpin
+-}
+
+```
+
 ## §Haskell: CrystalStructural (     238 lines)
 ```haskell
 
@@ -9993,6 +10111,36 @@ proveRayleighWavelengthExp =
   let crystal = fromIntegral (n_w * n_w)                    -- 4
       expt    = 4.0
   in mkObs "Rayleigh λ exponent (N_w²)" crystal expt
+```
+
+## §Haskell: CrystalWavelet (     335 lines)
+```haskell
+
+{- | CrystalWavelet.hs — Discrete Wavelet Transform from (2,3)
+
+  The MERA tensor network IS a discrete wavelet transform.
+  This module makes the identification explicit.
+
+  Sector restriction: colour (d=8, signal decomposition)
+  Textbook method: Discrete Wavelet Transform = S = W∘U
+    U = disentangler = high-pass filter (detail extraction)
+    W = isometry = low-pass filter (coarse-graining / downsampling)
+
+  Crystal constants:
+    Haar coefficients   = N_w = 2  (simplest wavelet)
+    Downsample factor   = N_w = 2  (half the samples per level)
+    Daubechies order    = N_c = 3  (vanishing moments for Daub-χ)
+    Filter length       = χ = 6    (Daubechies-3 = 2 × N_c taps)
+    Decomposition levels= D = 42   (tower depth = MERA layers)
+    Bond dimension      = χ = 6    (MERA bond = filter length!)
+
+  NO CALCULUS. A wavelet transform is CONVOLVE + DOWNSAMPLE.
+  Convolution = multiply-add. Downsample = take every N_w-th.
+  No integrals. No Fourier transforms. Pure lattice operations.
+
+  Compile: ghc -O2 -main-is CrystalWavelet CrystalWavelet.hs && ./CrystalWavelet
+-}
+
 ```
 
 ## §Haskell: GravityDynTest (      27 lines)

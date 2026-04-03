@@ -95,10 +95,10 @@ The algebra alone gives you integers (χ=6, β₀=7, Σd=36, D=42). To get physi
 | Wall breaches | **0** (prime wall = 4.5%) |
 | CODATA precision | **4** (α⁻¹ Δ/unc=0.12, m_p/m_e=0.04, sin²θ_W=0.07, r_p=0.0013) |
 | First law δS/δ⟨H_A⟩ | **1.0001 ± 0.0004** (χ=6 crystal) |
-| Haskell modules | **36 + 21 dynamics** |
+| Haskell modules | **36 + 21 dynamics + 8 engine** |
 | Quantum operators | **96** |
-| Lean theorems | **1226+** (native_decide) |
-| Agda proofs | **991+** (refl) |
+| Lean theorems | **1528+** (native_decide) |
+| Agda proofs | **1292+** (refl) |
 | Rust tests | **568+** |
 
 ---
@@ -220,7 +220,7 @@ CrystalAgent/
 │   ├── crystal_*_proof.py             ← 7 Python proof modules
 │   └── GHC_Certificate.txt            ← Runtime output
 │
-└── haskel/                            ← All Haskell source (34 modules)
+└── haskel/                            ← All Haskell source (66 modules)
     │
     ├── ─── ORIGINAL CRYSTAL (92 observables) ───
     │   CrystalAxiom.hs               ← Foundation: one law, spectrum, types
@@ -312,9 +312,9 @@ Four independent proof systems verify the same identities:
 
 | System | Files | Count | Method |
 |--------|-------|-------|--------|
-| **GHC Haskell** | 36 + 21 dynamics `.hs` | 12/12 runners pass | Curry-Howard |
-| **Lean 4** | 36 `.lean` → `.olean` | **1226** theorems | `native_decide` |
-| **Agda** | 37 `.agda` → `.agdai` | **991** proofs | `refl` |
+| **GHC Haskell** | 66 `.hs` | 66/66 runners pass | Curry-Howard |
+| **Lean 4** | 44 `.lean` → `.olean` | **1528** theorems | `native_decide` |
+| **Agda** | 45 `.agda` → `.agdai` | **1292** proofs | `refl` |
 | **Rust** | crystal-topos + crystal-toe | **568** tests | `cargo test` |
 | **Python** | 135 modules | 24+ checks each | `assert` |
 

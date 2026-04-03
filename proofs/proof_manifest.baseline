@@ -211,6 +211,37 @@ LEAN CrystalDecay.lean gauss_decompose
 LEAN CrystalDecay.lean chi_minus_one
 LEAN CrystalDecay.lean beta_factor_colour
 LEAN CrystalDecay.lean beta_factor_mixed
+LEAN CrystalDiffusion.lean neighbours_1d
+LEAN CrystalDiffusion.lean neighbours_2d
+LEAN CrystalDiffusion.lean neighbours_3d
+LEAN CrystalDiffusion.lean neighbours_pattern_1
+LEAN CrystalDiffusion.lean neighbours_pattern_2
+LEAN CrystalDiffusion.lean neighbours_pattern_3
+LEAN CrystalDiffusion.lean cfl_denom
+LEAN CrystalDiffusion.lean cfl_twice_dim
+LEAN CrystalDiffusion.lean cfl_equals_chi
+LEAN CrystalDiffusion.lean walk_dim
+LEAN CrystalDiffusion.lean walk_dirs
+LEAN CrystalDiffusion.lean walk_einstein_denom
+LEAN CrystalDiffusion.lean fourier_zero
+LEAN CrystalDiffusion.lean max_decay_num
+LEAN CrystalDiffusion.lean max_decay_denom
+LEAN CrystalDiffusion.lean sector_weak
+LEAN CrystalDiffusion.lean sector_full
+LEAN CrystalDiffusion.lean stefan_exp
+LEAN CrystalDiffusion.lean stefan_denom
+LEAN CrystalDiffusion.lean carnot_num
+LEAN CrystalDiffusion.lean carnot_den
+LEAN CrystalDiffusion.lean gamma_mono_num
+LEAN CrystalDiffusion.lean gamma_mono_den
+LEAN CrystalDiffusion.lean lattice_full_3d
+LEAN CrystalDiffusion.lean cross_cfd
+LEAN CrystalDiffusion.lean cross_schrodinger
+LEAN CrystalDiffusion.lean cross_em
+LEAN CrystalDiffusion.lean cross_classical
+LEAN CrystalDiffusion.lean cross_astro
+LEAN CrystalDiffusion.lean cross_tower
+LEAN CrystalDiffusion.lean cross_lcg
 LEAN CrystalDiscoveries.lean dark_energy_eq
 LEAN CrystalDiscoveries.lean cdm_eq
 LEAN CrystalDiscoveries.lean baryons_eq
@@ -581,6 +612,49 @@ LEAN CrystalHologron.lean beta_zero
 LEAN CrystalHologron.lean four_sectors
 LEAN CrystalHologron.lean deg_sum
 LEAN CrystalHologron.lean type_II
+LEAN CrystalLatticeGauge.lean plaq_links
+LEAN CrystalLatticeGauge.lean plaq_per_site
+LEAN CrystalLatticeGauge.lean plaq_binomial
+LEAN CrystalLatticeGauge.lean su3_generators
+LEAN CrystalLatticeGauge.lean su3_fundamental
+LEAN CrystalLatticeGauge.lean link_entries
+LEAN CrystalLatticeGauge.lean adjoint_dim
+LEAN CrystalLatticeGauge.lean wilson_beta
+LEAN CrystalLatticeGauge.lean wilson_beta_product
+LEAN CrystalLatticeGauge.lean beta0_val
+LEAN CrystalLatticeGauge.lean spacetime
+LEAN CrystalLatticeGauge.lean directions
+LEAN CrystalLatticeGauge.lean sites_per_dir
+LEAN CrystalLatticeGauge.lean total_sites
+LEAN CrystalLatticeGauge.lean string_num
+LEAN CrystalLatticeGauge.lean string_den
+LEAN CrystalLatticeGauge.lean string_cross
+LEAN CrystalLatticeGauge.lean casimir_num
+LEAN CrystalLatticeGauge.lean casimir_den
+LEAN CrystalLatticeGauge.lean casimir_is_nwater
+LEAN CrystalLatticeGauge.lean gauge_dof
+LEAN CrystalLatticeGauge.lean gauge_nw5
+LEAN CrystalLatticeGauge.lean colour_sector
+LEAN CrystalLatticeGauge.lean mixed_sector
+LEAN CrystalLatticeGauge.lean mixed_decomp
+LEAN CrystalLatticeGauge.lean w_multiplies
+LEAN CrystalLatticeGauge.lean w_matrix_dim
+LEAN CrystalLatticeGauge.lean w_cost
+LEAN CrystalLatticeGauge.lean u_staples
+LEAN CrystalLatticeGauge.lean u_staple_mults
+LEAN CrystalLatticeGauge.lean u_metropolis
+LEAN CrystalLatticeGauge.lean confine_ward_num
+LEAN CrystalLatticeGauge.lean confine_ward_den
+LEAN CrystalLatticeGauge.lean deconfine_centre
+LEAN CrystalLatticeGauge.lean deconfine_beta
+LEAN CrystalLatticeGauge.lean cross_beta0
+LEAN CrystalLatticeGauge.lean cross_alphas_num
+LEAN CrystalLatticeGauge.lean cross_alphas_den
+LEAN CrystalLatticeGauge.lean cross_em
+LEAN CrystalLatticeGauge.lean cross_gr
+LEAN CrystalLatticeGauge.lean cross_fe56
+LEAN CrystalLatticeGauge.lean no_calc_lattice
+LEAN CrystalLatticeGauge.lean no_calc_discrete
 LEAN CrystalLayer.lean chi_eq
 LEAN CrystalLayer.lean beta0_eq
 LEAN CrystalLayer.lean towerD_eq
@@ -732,6 +806,12 @@ LEAN CrystalMonadProof.lean gw_quad_num
 LEAN CrystalMonadProof.lean gw_quad_den
 LEAN CrystalMonadProof.lean inertia_sphere_num
 LEAN CrystalMonadProof.lean inertia_sphere_den
+LEAN CrystalNBody.lean oct_children
+LEAN CrystalNBody.lean oct_is_dcolour
+LEAN CrystalNBody.lean force_exp
+LEAN CrystalNBody.lean spatial_dim
+LEAN CrystalNBody.lean phase_per_body
+LEAN CrystalNBody.lean chi_val
 LEAN CrystalNoether.lean generators_eq_12
 LEAN CrystalNoether.lean noether_currents
 LEAN CrystalNoether.lean rank_drop_eq
@@ -923,6 +1003,73 @@ LEAN CrystalRigid.lean lorentz_from_spacetime
 LEAN CrystalRigid.lean quat_is_spacetime
 LEAN CrystalRigid.lean inertia_is_lorentz
 LEAN CrystalRigid.lean d2q9_from_rot
+LEAN CrystalSchrodinger.lean hbar_denom
+LEAN CrystalSchrodinger.lean spin_states
+LEAN CrystalSchrodinger.lean pauli_count
+LEAN CrystalSchrodinger.lean bell_states
+LEAN CrystalSchrodinger.lean spatial_dim
+LEAN CrystalSchrodinger.lean phase_space
+LEAN CrystalSchrodinger.lean bohr_factor
+LEAN CrystalSchrodinger.lean uncertainty_denom
+LEAN CrystalSchrodinger.lean shell_s
+LEAN CrystalSchrodinger.lean shell_p
+LEAN CrystalSchrodinger.lean shell_d
+LEAN CrystalSchrodinger.lean shell_f
+LEAN CrystalSchrodinger.lean shell_sp_is_dcolour
+LEAN CrystalSchrodinger.lean shell_total
+LEAN CrystalSchrodinger.lean shell_nw5
+LEAN CrystalSchrodinger.lean rydberg_factor
+LEAN CrystalSchrodinger.lean balmer_denom
+LEAN CrystalSchrodinger.lean ground_degen
+LEAN CrystalSchrodinger.lean split_order
+LEAN CrystalSchrodinger.lean hopping_neighbours
+LEAN CrystalSchrodinger.lean hopping_3d
+LEAN CrystalSchrodinger.lean sector_total
+LEAN CrystalSchrodinger.lean sector_pos
+LEAN CrystalSchrodinger.lean sector_mom
+LEAN CrystalSchrodinger.lean sector_entangled
+LEAN CrystalSchrodinger.lean pauli_antisym
+LEAN CrystalSchrodinger.lean slater_size
+LEAN CrystalSchrodinger.lean entangle_bell
+LEAN CrystalSchrodinger.lean entangle_bond
+LEAN CrystalSchrodinger.lean entangle_ppt_nw
+LEAN CrystalSchrodinger.lean entangle_ppt_nc
+LEAN CrystalSchrodinger.lean cross_ising
+LEAN CrystalSchrodinger.lean cross_classical
+LEAN CrystalSchrodinger.lean cross_gauge
+LEAN CrystalSchrodinger.lean cross_em
+LEAN CrystalSchrodinger.lean cross_steane
+LEAN CrystalSchrodinger.lean cross_steane_beta0
+LEAN CrystalSchrodinger.lean cross_tower
+LEAN CrystalSpin.lean spin_states
+LEAN CrystalSpin.lean multiplicity
+LEAN CrystalSpin.lean stern_gerlach
+LEAN CrystalSpin.lean bloch_dim
+LEAN CrystalSpin.lean bloch_sector
+LEAN CrystalSpin.lean bloch_is_weak
+LEAN CrystalSpin.lean pauli_count
+LEAN CrystalSpin.lean pauli_dim
+LEAN CrystalSpin.lean pauli_trace
+LEAN CrystalSpin.lean g_factor
+LEAN CrystalSpin.lean g_anomalous_num
+LEAN CrystalSpin.lean g_anomalous_den
+LEAN CrystalSpin.lean t1_denom
+LEAN CrystalSpin.lean t2_denom
+LEAN CrystalSpin.lean relax_product
+LEAN CrystalSpin.lean larmor_dim
+LEAN CrystalSpin.lean rotation_matrix
+LEAN CrystalSpin.lean rabi_states
+LEAN CrystalSpin.lean mri_axes
+LEAN CrystalSpin.lean kspace_dim
+LEAN CrystalSpin.lean fine_structure
+LEAN CrystalSpin.lean zeeman
+LEAN CrystalSpin.lean cross_ising
+LEAN CrystalSpin.lean cross_classical
+LEAN CrystalSpin.lean cross_engine
+LEAN CrystalSpin.lean cross_phase
+LEAN CrystalSpin.lean cross_wavelet
+LEAN CrystalSpin.lean cross_bell
+LEAN CrystalSpin.lean cross_tower
 LEAN CrystalStructural.lean chi_eq
 LEAN CrystalStructural.lean beta_0_eq
 LEAN CrystalStructural.lean sigma_d_eq
@@ -968,6 +1115,18 @@ LEAN CrystalStructural.lean algebra_towerD
 LEAN CrystalStructural.lean sigma_d_eq_chi_sq
 LEAN CrystalStructural.lean sigma_d2_eq
 LEAN CrystalStructural.lean tau_n_ratio
+LEAN CrystalThermo.lean lj_attractive
+LEAN CrystalThermo.lean lj_repulsive
+LEAN CrystalThermo.lean lj_force_24
+LEAN CrystalThermo.lean gamma_mono_num
+LEAN CrystalThermo.lean gamma_mono_den
+LEAN CrystalThermo.lean gamma_di_num
+LEAN CrystalThermo.lean gamma_di_den
+LEAN CrystalThermo.lean dof_mono
+LEAN CrystalThermo.lean dof_di
+LEAN CrystalThermo.lean carnot_num
+LEAN CrystalThermo.lean carnot_den
+LEAN CrystalThermo.lean stokes
 LEAN CrystalTopos.lean the_one_law
 LEAN CrystalTopos.lean chi_eq
 LEAN CrystalTopos.lean beta0_eq
@@ -1368,7 +1527,7 @@ LEAN Main.lean id_sigma_chi_sq
 LEAN Main.lean id_sigma_d2
 LEAN Main.lean id_D_decomp
 LEAN Main.lean id_algebra_N_c
-LEAN_FILES 39
+LEAN_FILES 45
 # AGDA PROOFS
 AGDA CrystalAlphaProton.agda chi-eq
 AGDA CrystalAlphaProton.agda sigma-d-eq
@@ -1538,6 +1697,37 @@ AGDA CrystalDecay.agda phase-dim-4
 AGDA CrystalDecay.agda dColour-cubed
 AGDA CrystalDecay.agda dMixed-alt
 AGDA CrystalDecay.agda gauss-decompose
+AGDA CrystalDiffusion.agda neighbours-1d
+AGDA CrystalDiffusion.agda neighbours-2d
+AGDA CrystalDiffusion.agda neighbours-3d
+AGDA CrystalDiffusion.agda pattern-1
+AGDA CrystalDiffusion.agda pattern-2
+AGDA CrystalDiffusion.agda pattern-3
+AGDA CrystalDiffusion.agda cfl-denom
+AGDA CrystalDiffusion.agda cfl-twice
+AGDA CrystalDiffusion.agda cfl-chi
+AGDA CrystalDiffusion.agda walk-dim
+AGDA CrystalDiffusion.agda walk-dirs
+AGDA CrystalDiffusion.agda walk-einstein
+AGDA CrystalDiffusion.agda fourier-zero
+AGDA CrystalDiffusion.agda max-decay-num
+AGDA CrystalDiffusion.agda max-decay-denom
+AGDA CrystalDiffusion.agda sector-weak
+AGDA CrystalDiffusion.agda sector-full
+AGDA CrystalDiffusion.agda stefan-exp
+AGDA CrystalDiffusion.agda stefan-denom
+AGDA CrystalDiffusion.agda carnot-num
+AGDA CrystalDiffusion.agda carnot-den
+AGDA CrystalDiffusion.agda gamma-num
+AGDA CrystalDiffusion.agda gamma-den
+AGDA CrystalDiffusion.agda lattice-3d
+AGDA CrystalDiffusion.agda cross-cfd
+AGDA CrystalDiffusion.agda cross-schrodinger
+AGDA CrystalDiffusion.agda cross-em
+AGDA CrystalDiffusion.agda cross-classical
+AGDA CrystalDiffusion.agda cross-astro
+AGDA CrystalDiffusion.agda cross-tower
+AGDA CrystalDiffusion.agda cross-lcg
 AGDA CrystalDiscoveries.agda dark-energy-eq
 AGDA CrystalDiscoveries.agda cdm-eq
 AGDA CrystalDiscoveries.agda baryons-eq
@@ -1847,6 +2037,47 @@ AGDA CrystalHologron.agda four-sectors
 AGDA CrystalHologron.agda deg-sum
 AGDA CrystalHologron.agda type-II-lhs
 AGDA CrystalHologron.agda type-II-rhs
+AGDA CrystalLatticeGauge.agda plaq-links
+AGDA CrystalLatticeGauge.agda plaq-per-site
+AGDA CrystalLatticeGauge.agda su3-generators
+AGDA CrystalLatticeGauge.agda su3-fundamental
+AGDA CrystalLatticeGauge.agda link-entries
+AGDA CrystalLatticeGauge.agda adjoint-dim
+AGDA CrystalLatticeGauge.agda wilson-beta
+AGDA CrystalLatticeGauge.agda wilson-product
+AGDA CrystalLatticeGauge.agda beta0-val
+AGDA CrystalLatticeGauge.agda spacetime-dim
+AGDA CrystalLatticeGauge.agda directions
+AGDA CrystalLatticeGauge.agda sites-per-dir
+AGDA CrystalLatticeGauge.agda total-sites
+AGDA CrystalLatticeGauge.agda string-num
+AGDA CrystalLatticeGauge.agda string-den
+AGDA CrystalLatticeGauge.agda string-cross
+AGDA CrystalLatticeGauge.agda casimir-num
+AGDA CrystalLatticeGauge.agda casimir-den
+AGDA CrystalLatticeGauge.agda gauge-dof
+AGDA CrystalLatticeGauge.agda gauge-nw5
+AGDA CrystalLatticeGauge.agda colour-sector
+AGDA CrystalLatticeGauge.agda mixed-sector
+AGDA CrystalLatticeGauge.agda mixed-decomp
+AGDA CrystalLatticeGauge.agda w-multiplies
+AGDA CrystalLatticeGauge.agda w-matrix
+AGDA CrystalLatticeGauge.agda w-cost
+AGDA CrystalLatticeGauge.agda u-staples
+AGDA CrystalLatticeGauge.agda u-mults
+AGDA CrystalLatticeGauge.agda u-metropolis
+AGDA CrystalLatticeGauge.agda confine-ward-num
+AGDA CrystalLatticeGauge.agda confine-ward-den
+AGDA CrystalLatticeGauge.agda deconfine-centre
+AGDA CrystalLatticeGauge.agda deconfine-beta
+AGDA CrystalLatticeGauge.agda cross-beta0
+AGDA CrystalLatticeGauge.agda cross-alphas-num
+AGDA CrystalLatticeGauge.agda cross-alphas-den
+AGDA CrystalLatticeGauge.agda cross-em
+AGDA CrystalLatticeGauge.agda cross-gr
+AGDA CrystalLatticeGauge.agda cross-fe56
+AGDA CrystalLatticeGauge.agda no-calc-lattice
+AGDA CrystalLatticeGauge.agda no-calc-discrete
 AGDA CrystalLayer.agda chi-eq
 AGDA CrystalLayer.agda beta0-eq
 AGDA CrystalLayer.agda towerD-eq
@@ -1980,6 +2211,11 @@ AGDA CrystalMonadProof.agda gw-quad-num
 AGDA CrystalMonadProof.agda gw-quad-den
 AGDA CrystalMonadProof.agda inertia-sphere-num
 AGDA CrystalMonadProof.agda inertia-sphere-den
+AGDA CrystalNBody.agda oct
+AGDA CrystalNBody.agda dcolour
+AGDA CrystalNBody.agda force
+AGDA CrystalNBody.agda dim
+AGDA CrystalNBody.agda phase
 AGDA CrystalNoether.agda generators-eq-12
 AGDA CrystalNoether.agda lorentz-double
 AGDA CrystalNoether.agda poincare-eq-10
@@ -2159,6 +2395,71 @@ AGDA CrystalRigid.agda i-disk
 AGDA CrystalRigid.agda i-shell
 AGDA CrystalRigid.agda quat-spacetime
 AGDA CrystalRigid.agda chi-lorentz
+AGDA CrystalSchrodinger.agda hbar-denom
+AGDA CrystalSchrodinger.agda spin-states
+AGDA CrystalSchrodinger.agda pauli-count
+AGDA CrystalSchrodinger.agda bell-states
+AGDA CrystalSchrodinger.agda spatial-dim
+AGDA CrystalSchrodinger.agda phase-space
+AGDA CrystalSchrodinger.agda uncertainty
+AGDA CrystalSchrodinger.agda shell-s
+AGDA CrystalSchrodinger.agda shell-p
+AGDA CrystalSchrodinger.agda shell-d
+AGDA CrystalSchrodinger.agda shell-f
+AGDA CrystalSchrodinger.agda shell-sp
+AGDA CrystalSchrodinger.agda shell-total
+AGDA CrystalSchrodinger.agda shell-nw5
+AGDA CrystalSchrodinger.agda rydberg
+AGDA CrystalSchrodinger.agda balmer
+AGDA CrystalSchrodinger.agda ground-degen
+AGDA CrystalSchrodinger.agda split-order
+AGDA CrystalSchrodinger.agda hopping-1d
+AGDA CrystalSchrodinger.agda hopping-3d
+AGDA CrystalSchrodinger.agda sector-total
+AGDA CrystalSchrodinger.agda sector-pos
+AGDA CrystalSchrodinger.agda sector-mom
+AGDA CrystalSchrodinger.agda sector-entangled
+AGDA CrystalSchrodinger.agda pauli-antisym
+AGDA CrystalSchrodinger.agda entangle-bell
+AGDA CrystalSchrodinger.agda entangle-bond
+AGDA CrystalSchrodinger.agda entangle-ppt-nw
+AGDA CrystalSchrodinger.agda entangle-ppt-nc
+AGDA CrystalSchrodinger.agda cross-ising
+AGDA CrystalSchrodinger.agda cross-classical
+AGDA CrystalSchrodinger.agda cross-gauge
+AGDA CrystalSchrodinger.agda cross-em
+AGDA CrystalSchrodinger.agda cross-steane
+AGDA CrystalSchrodinger.agda cross-beta0
+AGDA CrystalSchrodinger.agda cross-tower
+AGDA CrystalSpin.agda spin-states
+AGDA CrystalSpin.agda multiplicity
+AGDA CrystalSpin.agda stern-gerlach
+AGDA CrystalSpin.agda bloch-dim
+AGDA CrystalSpin.agda bloch-sector
+AGDA CrystalSpin.agda bloch-is-weak
+AGDA CrystalSpin.agda pauli-count
+AGDA CrystalSpin.agda pauli-dim
+AGDA CrystalSpin.agda pauli-trace
+AGDA CrystalSpin.agda g-factor
+AGDA CrystalSpin.agda g-anomalous-num
+AGDA CrystalSpin.agda g-anomalous-den
+AGDA CrystalSpin.agda t1-denom
+AGDA CrystalSpin.agda t2-denom
+AGDA CrystalSpin.agda relax-product
+AGDA CrystalSpin.agda larmor-dim
+AGDA CrystalSpin.agda rotation-matrix
+AGDA CrystalSpin.agda rabi-states
+AGDA CrystalSpin.agda mri-axes
+AGDA CrystalSpin.agda kspace-dim
+AGDA CrystalSpin.agda fine-structure
+AGDA CrystalSpin.agda zeeman
+AGDA CrystalSpin.agda cross-ising
+AGDA CrystalSpin.agda cross-classical
+AGDA CrystalSpin.agda cross-engine
+AGDA CrystalSpin.agda cross-phase
+AGDA CrystalSpin.agda cross-wavelet
+AGDA CrystalSpin.agda cross-bell
+AGDA CrystalSpin.agda cross-tower
 AGDA CrystalStructural.agda chi-eq
 AGDA CrystalStructural.agda beta-0-eq
 AGDA CrystalStructural.agda sigma-d-eq
@@ -2208,6 +2509,16 @@ AGDA CrystalStructural.agda helix-residues
 AGDA CrystalStructural.agda helix-turns
 AGDA CrystalStructural.agda sheet-num
 AGDA CrystalStructural.agda sheet-den
+AGDA CrystalThermo.agda lj-attract
+AGDA CrystalThermo.agda lj-repulse
+AGDA CrystalThermo.agda lj-force
+AGDA CrystalThermo.agda gamma-mono-num
+AGDA CrystalThermo.agda dof-mono
+AGDA CrystalThermo.agda dof-di
+AGDA CrystalThermo.agda carnot-num
+AGDA CrystalThermo.agda carnot-den
+AGDA CrystalThermo.agda stokes
+AGDA CrystalThermo.agda beta0-val
 AGDA CrystalTopos.agda the-one-law
 AGDA CrystalTopos.agda chi-eq
 AGDA CrystalTopos.agda beta0-eq
@@ -2480,22 +2791,37 @@ AGDA CrystalTopos.agda bridge-string-den
 AGDA CrystalTopos.agda endomorphisms-bridge
 AGDA CrystalTopos.agda sector-sum-bridge
 AGDA CrystalTopos.agda spectral-dim-bridge
-AGDA CrystalNBody.agda oct
-AGDA CrystalNBody.agda dcolour
-AGDA CrystalNBody.agda force
-AGDA CrystalNBody.agda dim
-AGDA CrystalNBody.agda phase
-AGDA CrystalThermo.agda lj-attract
-AGDA CrystalThermo.agda lj-repulse
-AGDA CrystalThermo.agda lj-force
-AGDA CrystalThermo.agda gamma-mono-num
-AGDA CrystalThermo.agda dof-mono
-AGDA CrystalThermo.agda dof-di
-AGDA CrystalThermo.agda carnot-num
-AGDA CrystalThermo.agda carnot-den
-AGDA CrystalThermo.agda stokes
-AGDA CrystalThermo.agda beta0-val
-AGDA_FILES 40
+AGDA CrystalWavelet.agda haar-len
+AGDA CrystalWavelet.agda downsample
+AGDA CrystalWavelet.agda vanishing
+AGDA CrystalWavelet.agda filter-len
+AGDA CrystalWavelet.agda filter-taps
+AGDA CrystalWavelet.agda daub1
+AGDA CrystalWavelet.agda daub3
+AGDA CrystalWavelet.agda daub7
+AGDA CrystalWavelet.agda coiflet
+AGDA CrystalWavelet.agda bond-is-filter
+AGDA CrystalWavelet.agda tower-levels
+AGDA CrystalWavelet.agda disent-per-layer
+AGDA CrystalWavelet.agda pow2-8
+AGDA CrystalWavelet.agda pow2-10
+AGDA CrystalWavelet.agda cone-0
+AGDA CrystalWavelet.agda cone-1
+AGDA CrystalWavelet.agda cone-2
+AGDA CrystalWavelet.agda cone-2-mixed
+AGDA CrystalWavelet.agda cone-3
+AGDA CrystalWavelet.agda shell-s
+AGDA CrystalWavelet.agda shell-p
+AGDA CrystalWavelet.agda shell-d
+AGDA CrystalWavelet.agda shell-f
+AGDA CrystalWavelet.agda cross-mera
+AGDA CrystalWavelet.agda cross-em
+AGDA CrystalWavelet.agda cross-verlet
+AGDA CrystalWavelet.agda cross-fshell
+AGDA CrystalWavelet.agda cross-tower
+AGDA CrystalWavelet.agda cross-spin
+AGDA CrystalWavelet.agda cross-mixed
+AGDA_FILES 45
 # HASKELL MODULES
 HASKELL CrystalAlphaProton.hs
 HASKELL CrystalArcade.hs
@@ -2510,6 +2836,7 @@ HASKELL CrystalCondensed.hs
 HASKELL CrystalCosmo.hs
 HASKELL CrystalCrossDomain.hs
 HASKELL CrystalDecay.hs
+HASKELL CrystalDiffusion.hs
 HASKELL CrystalDiscoveries.hs
 HASKELL CrystalEM.hs
 HASKELL CrystalEngine.hs
@@ -2523,6 +2850,7 @@ HASKELL CrystalGW.hs
 HASKELL CrystalHierarchy.hs
 HASKELL CrystalHMC.hs
 HASKELL CrystalHologron.hs
+HASKELL CrystalLatticeGauge.hs
 HASKELL CrystalLayer.hs
 HASKELL CrystalMandelbrot.hs
 HASKELL CrystalMD.hs
@@ -2551,10 +2879,13 @@ HASKELL CrystalQSimulation.hs
 HASKELL CrystalQuantum.hs
 HASKELL CrystalRiemann.hs
 HASKELL CrystalRigid.hs
+HASKELL CrystalSchrodinger.hs
+HASKELL CrystalSpin.hs
 HASKELL CrystalStructural.hs
 HASKELL CrystalThermo.hs
 HASKELL CrystalVEV.hs
 HASKELL CrystalWACAScan.hs
+HASKELL CrystalWavelet.hs
 HASKELL GravityDynTest.hs
 HASKELL Main.hs
 HASKELL WACAScanTest.hs
@@ -3309,8 +3640,8 @@ PYTHON toe/python/examples/thermo/thermo_lattice.py
 PYTHON toe/python/examples/thermo/thermo_lj_potential.py
 PYTHON toe/python/examples/thermo/thermo_md_simulation.py
 # SUMMARY COUNTS
-TOTAL_LEAN_THEOREMS     1369
-TOTAL_AGDA_PROOFS     1125
+TOTAL_LEAN_THEOREMS     1528
+TOTAL_AGDA_PROOFS     1292
 TOTAL_RUST_TESTS      568
-TOTAL_HASKELL_MODULES       61
+TOTAL_HASKELL_MODULES       66
 TOTAL_PYTHON_MODULES      135
