@@ -4,23 +4,34 @@
 
 ## What This Module Does
 
-Barnes-Hut octree for O(N log N) gravitational force computation.
-Symplectic leapfrog (W-U-W) for time integration. Scales to 1000+ bodies.
+N-body gravitational dynamics with Barnes-Hut octree (O(N log N)) and
+symplectic leapfrog integration. Two-body Kepler orbits, Plummer sphere
+clusters. All from (2,3).
 
-## Integer Map
+## Engine Wiring
 
-| Quantity | Value | Crystal Source |
-|----------|-------|---------------|
-| Oct-tree children | 8 | 2^N_c = N_w^N_c = d_colour |
-| Force exponent | 2 | N_c - 1 |
-| Spatial dim | 3 | N_c |
-| Phase space/body | 6 | 2*N_c = chi |
+**This module imports CrystalEngine.** No local atom redefinitions.
 
-Key surprise: oct-tree has 8 = d_colour children. The number of octants
-in 3D space IS the dimension of the colour adjoint representation of SU(3).
+### Sector Restriction
+
+Same as CrystalClassical: each body's phase space lives in **weak⊕colour** (d = 11).
+
+| N-Body Concept | Engine Sector | Dimension |
+|---------------|---------------|-----------|
+| Position per body | weak (sector 1) | d₂ = 3 |
+| Velocity per body | colour (sector 2, first 3) | 3 of d₃ = 8 |
+| Phase space per body | χ | 6 |
+| Oct-tree children | d_colour = N_c²−1 | 8 |
+| Force law 1/r² | N_c − 1 | 2 |
 
 ## Proof Certificate
 
-- `proofs/crystal_nbody_proof.py` — 12/12 PASS
-- `proofs/CrystalNBody.lean` — 6 theorems
-- `proofs/CrystalNBody.agda` — 5 proofs
+- `haskel/CrystalNBody.hs` — 18 checks (17 PASS, 1 pre-existing tuning FAIL)
+- `proofs/CrystalNBody.lean` — 14 Lean 4 theorems (by native_decide)
+- `proofs/CrystalNBody.agda` — 12 Agda proofs (by refl)
+
+## Dependencies
+
+- **Imports CrystalEngine** — atoms, types, sector operations, tick, normSq
+- `Data.Ratio`, `Data.List`
+- Domain-specific: Body type, OctTree, Barnes-Hut force, Plummer sphere

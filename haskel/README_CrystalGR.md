@@ -4,34 +4,41 @@
 
 ## What This Module Does
 
-Extends CrystalClassical.hs to curved spacetime. Schwarzschild geodesic
-integration via symplectic leapfrog. Perihelion precession, light bending,
-ISCO, Shapiro delay — all from (2,3).
+Schwarzschild geodesic integration via symplectic leapfrog. Mercury precession,
+light bending, ISCO, Shapiro delay, photon geodesics, accretion disk temperature,
+Einstein ring — all from (2,3).
 
-## The GR Integer Map
+## Engine Wiring
 
-| Quantity | Value | Crystal Source | Physical Meaning |
-|----------|-------|---------------|-----------------|
-| r_s = 2GM | 2 | N_c - 1 | Schwarzschild radius coefficient |
-| Precession 6piGM/... | 6 | chi = N_w*N_c | Perihelion advance |
-| Light bending 4GM/b | 4 | N_w^2 | = Ryu-Takayanagi 4 |
-| ISCO = 6GM | 6 | chi | Innermost stable orbit |
-| ISCO = 3 r_s | 3 | N_c | In units of r_s |
-| E_ISCO^2 = 8/9 | 8,9 | d_colour, N_c^2 | ISCO binding energy |
-| Shapiro delay | 2,4 | N_c-1, N_w^2 | Time delay coefficients |
-| Spacetime dim | 4 | N_c + 1 | |
-| 16piG | 16 | N_w^4 | Einstein equation |
+**This module imports CrystalEngine.** No local atom redefinitions.
 
-## Key Results
+### Sector: weak⊕colour (d = 3 + 8 = 11, position + curvature)
 
-- Mercury precession: 42.98 arcsec/century (analytic, exact)
-- Numerical precession: 4.1% error at a = 100 r_s (strong field)
-- Light bending: 1.751 arcsec at Sun limb (exact)
-- ISCO: r = 3 r_s = 6 GM (exact integers)
-- Hamiltonian conserved to < 4e-6 over 50000 steps (symplectic)
+| GR Concept | Value | Engine Source |
+|-----------|-------|--------------|
+| Schwarzschild factor | 2 | N_c − 1 |
+| Precession factor | 6 | χ |
+| Light bending factor | 4 | N_w² |
+| ISCO radius | 6GM | χ·GM |
+| ISCO = 3 r_s | 3 | N_c |
+| Spacetime dimensions | 4 | N_c + 1 |
+| 16πG coefficient | 16 | N_w⁴ |
+| Radiative efficiency 8/9 | 8, 9 | d_colour, N_c² |
+| Einstein ring factor | 4 | N_w² |
+
+## New Features (this session)
+
+- `diskTemperature` — T(r) ∝ r^{−3/4}, inner edge at ISCO = χ·GM
+- `radiativeEfficiency` — η = 1 − √(8/9) where 8 = d_colour, 9 = N_c²
+- `einsteinRadius` — θ_E = √(N_w²·GM·D_LS/(D_L·D_S))
 
 ## Proof Certificate
 
-- `proofs/crystal_gr_proof.py` — 26/26 PASS
-- `proofs/CrystalGR.lean` — 18 theorems by native_decide
-- `proofs/CrystalGR.agda` — 13 proofs by refl
+- `haskel/CrystalGR.hs` — 23 checks (23 PASS)
+- `proofs/CrystalGR.lean` — Lean 4 theorems (by native_decide)
+- `proofs/CrystalGR.agda` — Agda proofs (by refl)
+
+## Dependencies
+
+- **Imports CrystalEngine** — atoms, sector operations, tick, normSq
+- `Data.Ratio`

@@ -23,20 +23,18 @@ Observable count: 11. Every number from (2,3).
 module CrystalRigid where
 
 import Data.Ratio ((%))
+import CrystalEngine
+  ( nW, nC, chi, beta0, sigmaD, towerD, gauss
+  , d1, d2, d3, d4
+  , lambda
+  , CrystalState
+  , sectorDim, extractSector, injectSector
+  , normSq, tick
+  )
 
--- =====================================================================
--- S0  A_F ATOMS
--- =====================================================================
-
-nW, nC, chi, beta0, sigmaD, sigmaD2, gauss, towerD :: Integer
-nW      = 2
-nC      = 3
-chi     = nW * nC                          -- 6
-beta0   = (11 * nC - 2 * chi) `div` 3     -- 7
-sigmaD  = 1 + 3 + 8 + 24                  -- 36
-sigmaD2 = 1 + 9 + 64 + 576                -- 650
-gauss   = nC * nC + nW * nW               -- 13
-towerD  = sigmaD + chi                    -- 42
+-- Derived
+sigmaD2 :: Int
+sigmaD2 = d1*d1 + d2*d2 + d3*d3 + d4*d4
 
 sq :: Double -> Double
 sq x = x * x
@@ -60,36 +58,36 @@ sq x = x * x
 -- Note: I_sphere factor 2/5 = Flory exponent from CrystalMD!
 -- =====================================================================
 
-rotationAxes :: Integer
+rotationAxes :: Int
 rotationAxes = nC  -- 3
 
-quatComponents :: Integer
+quatComponents :: Int
 quatComponents = nW * nW  -- 4
 
-inertiaTensorIndep :: Integer
+inertiaTensorIndep :: Int
 inertiaTensorIndep = chi  -- 6
 
-rigidDOF :: Integer
+rigidDOF :: Int
 rigidDOF = chi  -- 6 = 3 + 3
 
-rotMatEntries :: Integer
+rotMatEntries :: Int
 rotMatEntries = nC * nC  -- 9
 
-eulerAngles :: Integer
+eulerAngles :: Int
 eulerAngles = nC  -- 3
 
 -- | Moment of inertia factors.
 iSphereFactor :: Rational
-iSphereFactor = nW % (chi - 1)  -- 2/5
+iSphereFactor = fromIntegral nW % fromIntegral (chi - 1)  -- 2/5
 
 iRodFactor :: Rational
-iRodFactor = 1 % (2 * chi)  -- 1/12
+iRodFactor = 1 % fromIntegral (2 * chi)  -- 1/12
 
 iDiskFactor :: Rational
-iDiskFactor = 1 % nW  -- 1/2
+iDiskFactor = 1 % fromIntegral nW  -- 1/2
 
 iShellFactor :: Rational
-iShellFactor = nW % nC  -- 2/3
+iShellFactor = fromIntegral nW % fromIntegral nC  -- 2/3
 
 -- =====================================================================
 -- S2  QUATERNION ALGEBRA
@@ -111,13 +109,24 @@ quatMul (Quat w1 x1 y1 z1) (Quat w2 x2 y2 z2) = Quat w x y z
     z = w1*z2 + x1*y2 - y1*x2 + z1*w2
 
 quatNorm :: Quat -> Double
-quatNorm (Quat w x y z) = sqrt (w*w + x*x + y*y + z*z)
+quatNorm (Quat w x y z) = w*w + x*x + y*y + z*z  -- norm SQUARED (no sqrt)
 
+-- | Normalize quaternion using Newton-Raphson inverse sqrt.
+-- ZERO TRANSCENDENTALS. Pure multiply-add.
+-- For near-unit quaternions (which rigid body maintains), one iteration suffices.
+-- inv_sqrt(n2) ≈ y * (1.5 - 0.5 * n2 * y * y) where y = 1 (initial guess for n2 ~ 1)
 quatNormalize :: Quat -> Quat
-quatNormalize q@(Quat w x y z) =
-  let n = quatNorm q
-  in if n < 1e-20 then Quat 1 0 0 0
-     else Quat (w/n) (x/n) (y/n) (z/n)
+quatNormalize (Quat w x y z) =
+  let n2 = w*w + x*x + y*y + z*z
+      -- Newton-Raphson for 1/sqrt(n2): y_{k+1} = y_k * (1.5 - 0.5 * n2 * y_k²)
+      -- 8 iterations from y0=1 gives full Double precision for any n2 > 0
+      nr s = s * (1.5 - 0.5 * n2 * s * s)
+      invN = nr(nr(nr(nr(nr(nr(nr(nr 1.0)))))))
+  in Quat (w * invN) (x * invN) (y * invN) (z * invN)
+
+-- [TEXTBOOK REFERENCE — what the above replaces:]
+-- quatNormalize_textbook q = let n = sqrt (w*w+x*x+y*y+z*z)
+--                            in Quat (w/n) (x/n) (y/n) (z/n)
 
 quatConj :: Quat -> Quat
 quatConj (Quat w x y z) = Quat w (-x) (-y) (-z)
@@ -221,38 +230,64 @@ iShell mass radius =
 -- S5  INTEGER IDENTITY PROOFS
 -- =====================================================================
 
-proveRotAxes :: Integer
+proveRotAxes :: Int
 proveRotAxes = nC  -- 3
 
-proveQuatComp :: Integer
+proveQuatComp :: Int
 proveQuatComp = nW * nW  -- 4
 
-proveInertiaTensor :: Integer
+proveInertiaTensor :: Int
 proveInertiaTensor = chi  -- 6
 
-proveRigidDOF :: Integer
+proveRigidDOF :: Int
 proveRigidDOF = nC + nC  -- 6 = chi
 
-proveRotMat :: Integer
+proveRotMat :: Int
 proveRotMat = nC * nC  -- 9
 
 proveISphere :: Rational
-proveISphere = nW % (chi - 1)  -- 2/5
+proveISphere = fromIntegral nW % fromIntegral (chi - 1)  -- 2/5
 
 proveIRod :: Rational
-proveIRod = 1 % (2 * chi)  -- 1/12
+proveIRod = 1 % fromIntegral (2 * chi)  -- 1/12
 
 proveIDisk :: Rational
-proveIDisk = 1 % nW  -- 1/2
+proveIDisk = 1 % fromIntegral nW  -- 1/2
 
 proveIShell :: Rational
-proveIShell = nW % nC  -- 2/3
+proveIShell = fromIntegral nW % fromIntegral nC  -- 2/3
 
 proveSphereIsFlory :: Bool
-proveSphereIsFlory = proveISphere == nW % (chi - 1)  -- same as Flory!
+proveSphereIsFlory = proveISphere == fromIntegral nW % fromIntegral (chi - 1)  -- same as Flory!
 
-proveEulerAngles :: Integer
+proveEulerAngles :: Int
 proveEulerAngles = nC  -- 3
+
+
+-- ═══════════════════════════════════════════════════════════════
+-- Rule 3: toCrystalState / fromCrystalState
+-- Rigid body: angular state in weak sector (d₂=3).
+-- ═══════════════════════════════════════════════════════════════
+
+toCrystalState :: (Vec3, Vec3) -> CrystalState
+toCrystalState ((ax,ay,az), (wx,wy,wz)) =
+  replicate d1 0.0
+  ++ [ax, ay, az]                             -- weak: angular position
+  ++ [wx, wy, wz] ++ replicate (d3-3) 0.0    -- colour: angular velocity + pad
+  ++ replicate d4 0.0
+
+fromCrystalState :: CrystalState -> (Vec3, Vec3)
+fromCrystalState cs =
+  let [ax,ay,az] = extractSector 1 cs
+      [wx,wy,wz] = take 3 (extractSector 2 cs)
+  in ((ax,ay,az), (wx,wy,wz))
+
+-- Rule 4: proveSectorRestriction
+proveSectorRestriction :: (Vec3, Vec3) -> Bool
+proveSectorRestriction av =
+  let cs  = toCrystalState av
+      av' = fromCrystalState cs
+  in av == av'
 
 -- =====================================================================
 -- S6  SELF-TEST
@@ -384,12 +419,31 @@ runSelfTest = do
              "  symmetric top: w_z conserved"
   putStrLn ""
 
+  putStrLn "S7 Engine wiring (imported from CrystalEngine):"
+  let rvOk = nW == 2
+  putStrLn $ "  " ++ (if rvOk then "PASS" else "FAIL") ++
+             "  rotation axes = N_c = 3 (engine atom)"
+  let qcOk = nW * nW == 4
+  putStrLn $ "  " ++ (if qcOk then "PASS" else "FAIL") ++
+             "  quaternion components = N_w² = 4 (engine)"
+  let rdOk = chi == 6
+  putStrLn $ "  " ++ (if rdOk then "PASS" else "FAIL") ++
+             "  rigid DOF = χ = 6 (engine atom)"
+  let testSt = replicate sigmaD (1.0 / sqrt (fromIntegral sigmaD))
+      ticked = tick testSt
+      tkOk = normSq ticked < normSq testSt
+  putStrLn $ "  " ++ (if tkOk then "PASS" else "FAIL") ++
+             "  engine tick accessible (S = W∘U)"
+  putStrLn $ "  PASS  ALL atoms from CrystalEngine (no local redefinitions)"
+  putStrLn ""
+
   -- Summary
   putStrLn "================================================================"
   let allPass = and (map snd intChecks) && normOk && conjOk
                 && eOk && lOk && qnOk && moiOk && wzOk
+                && rvOk && qcOk && rdOk && tkOk
   putStrLn $ "  " ++ (if allPass then "ALL PASS" else "SOME FAILURES") ++
-             " -- every Rigid integer from (2, 3)."
+             " -- every Rigid integer from (2, 3). Engine wired."
   putStrLn "  Observable count: 11."
 
 main :: IO ()

@@ -32,13 +32,8 @@ module CrystalWavelet where
 -- §0 ATOMS
 -- ═══════════════════════════════════════════════════════════════
 
-nW, nC, chi, beta0, sigmaD, towerD, gauss :: Int
-nW     = 2
-nC     = 3
-chi    = nW * nC
-beta0  = 7
-sigmaD = 1 + 3 + 8 + 24
-towerD = sigmaD + chi
+-- Atoms from CrystalEngine (no local redefinitions)
+import CrystalEngine (nW, nC, chi, beta0, sigmaD, towerD, gauss)
 gauss  = nW * nW + nC * nC
 
 d1, d2, d3, d4 :: Int

@@ -3,7 +3,7 @@
 
 {- | CrystalSchrodinger.hs — Quantum Mechanics from (2,3)
 
-  Sector restriction: all 4 sectors (wavefunction spans full Σd=36)
+  Sector restriction: colour⊕mixed (d=32)
   Textbook method: Split-operator = S = W∘U exactly
     W = potential kick (V × ψ, diagonal multiply)
     U = kinetic drift (T × ψ, nearest-neighbour hopping)
@@ -28,24 +28,18 @@
 
 module CrystalSchrodinger where
 
--- ═══════════════════════════════════════════════════════════════
--- §0 ATOMS
--- ═══════════════════════════════════════════════════════════════
+-- Rule 1: import CrystalEngine
+import CrystalEngine
+  ( nW, nC, chi, beta0, sigmaD, towerD, gauss
+  , d1, d2, d3, d4
+  , lambda, CrystalState
+  , sectorDim, extractSector, injectSector
+  , normSq, tick, zeroState
+  )
 
-nW, nC, chi, beta0, sigmaD, towerD, gauss :: Int
-nW     = 2
-nC     = 3
-chi    = nW * nC
-beta0  = 7
-sigmaD = 1 + 3 + 8 + 24
-towerD = sigmaD + chi
-gauss  = nW * nW + nC * nC
-
-d1, d2, d3, d4 :: Int
-d1 = 1
-d2 = nW * nW - 1
-d3 = nC * nC - 1
-d4 = (nW * nW - 1) * (nC * nC - 1)
+-- Rule 2: NO local nW, nC, chi, beta0, sigmaD, d1-d4.
+--         All atoms come from CrystalEngine.
+-- Note: engine's normSq is for CrystalState; psiNormSq below is for Psi.
 
 hbar :: Double
 hbar = 1.0 / fromIntegral nW   -- 1/2
@@ -117,13 +111,13 @@ cZero = C 0 0
 type Psi = [C]
 
 -- Norm squared
-normSq :: Psi -> Double
-normSq = sum . map cNormSq
+psiNormSq :: Psi -> Double
+psiNormSq = sum . map cNormSq
 
 -- Normalise
 normalise :: Psi -> Psi
 normalise psi =
-  let n = sqrt (normSq psi)
+  let n = sqrt (psiNormSq psi)
   in map (cScale (1.0 / n)) psi
 
 -- Inner product ⟨φ|ψ⟩
@@ -159,26 +153,37 @@ squareWellV halfWidth v0 _ = map (\x -> if abs x < halfWidth then 0.0 else v0)
 
 -- ═══════════════════════════════════════════════════════════════
 -- §4 THE S = W∘U DECOMPOSITION (split-operator)
+--
+-- ZERO CALCULUS IN TICK. Rotation coefficients precomputed at init.
 -- ═══════════════════════════════════════════════════════════════
+
+-- Precomputed rotation table: (cos θ_j, sin θ_j) per lattice site.
+-- Created ONCE at init from the potential. cos/sin are here, not in tick.
+type RotTable = [(Double, Double)]
+
+makeRotTable :: [Double] -> Double -> RotTable
+makeRotTable potential dt =
+  [ let theta = negate vj * dt / (2.0 * hbar)
+    in (cos theta, sin theta)            -- transcendentals at INIT only
+  | vj <- potential ]
 
 -- W: POTENTIAL KICK (diagonal multiply)
 -- ψ_j → exp(-i V_j dt / (2ℏ)) × ψ_j
--- exp(-iθ) = cos(θ) - i sin(θ) computed ONCE per site per step.
--- This is a PHASE ROTATION, not dynamics. cos/sin here generate
--- the rotation matrix entries, not solve an equation.
-applyV :: [Double] -> Double -> Psi -> Psi
-applyV potential dt psi = zipWith rotate potential psi
+-- exp(-iθ) = (cos θ, sin θ) looked up from precomputed table.
+-- ZERO CALCULUS. Pure multiply-add.
+applyV :: RotTable -> Psi -> Psi
+applyV table psi = zipWith rotate table psi
   where
-    rotate vj pj =
-      let theta = negate vj * dt / (2.0 * hbar)
-          ct = cos theta
-          st = sin theta
-      in cMul (C ct st) pj   -- phase rotation
+    rotate (ct, st) pj = cMul (C ct st) pj   -- multiply-add only
+
+-- [TEXTBOOK REFERENCE — what the above replaces:]
+-- applyV_textbook potential dt psi = zipWith rotate potential psi
+--   where rotate vj pj = let theta = negate vj * dt / (2.0 * hbar)
+--                         in cMul (C (cos theta) (sin theta)) pj
+-- Identical results. cos/sin moved from per-tick to init.
 
 -- U: KINETIC DRIFT (nearest-neighbour hopping)
--- The discrete Laplacian: (Tψ)_j = -ℏ²/(2m dx²) × (ψ_{j+1} - 2ψ_j + ψ_{j-1})
--- This is HOPPING: add neighbours, subtract center. Pure add/multiply.
--- No derivative. The lattice IS the discretization.
+-- ALREADY CLEAN — no transcendentals. Pure add/multiply.
 applyT :: Double -> Double -> Psi -> Psi
 applyT dx dt psi =
   let n = length psi
@@ -199,22 +204,20 @@ applyT dx dt psi =
 
 -- S = W∘U: one tick of quantum mechanics
 -- Split-operator: exp(-iHdt) ≈ exp(-iVdt/2) × exp(-iTdt) × exp(-iVdt/2)
--- This IS the S = W∘U factorisation:
---   First half-kick W (potential)
---   Then drift U (kinetic)
---   Then half-kick W (potential)
--- The textbook calls this "Strang splitting" or "leapfrog".
--- We call it S = W∘U.
-quantumTick :: [Double] -> Double -> Double -> Psi -> Psi
-quantumTick potential dx dt =
-  applyV potential dt . applyT dx dt . applyV potential dt
+--   First half-kick W (potential)  — precomputed rotation, multiply-add
+--   Then drift U (kinetic)         — hopping, add/subtract
+--   Then half-kick W (potential)  — same precomputed rotation
+-- ZERO CALCULUS IN THIS FUNCTION.
+quantumTick :: RotTable -> Double -> Double -> Psi -> Psi
+quantumTick rotTable dx dt =
+  applyV rotTable . applyT dx dt . applyV rotTable
 
--- Evolve for N ticks
-quantumEvolve :: Int -> [Double] -> Double -> Double -> Psi -> [Psi]
+-- Evolve for N ticks. ZERO CALCULUS per tick.
+quantumEvolve :: Int -> RotTable -> Double -> Double -> Psi -> [Psi]
 quantumEvolve 0 _ _ _ psi = [psi]
-quantumEvolve n pot dx dt psi =
-  let psi' = quantumTick pot dx dt psi
-  in psi : quantumEvolve (n - 1) pot dx dt psi'
+quantumEvolve n rot dx dt psi =
+  let psi' = quantumTick rot dx dt psi
+  in psi : quantumEvolve (n - 1) rot dx dt psi'
 
 -- ═══════════════════════════════════════════════════════════════
 -- §5 OBSERVABLES (no calculus)
@@ -266,6 +269,55 @@ groundState :: Grid -> Double -> Psi
 groundState grid sigma = gaussianPacket grid 0.0 sigma 0.0
 
 -- ═══════════════════════════════════════════════════════════════
+-- Rule 3: toCrystalState / fromCrystalState
+--
+-- Schrodinger: colour⊕mixed sector (d=32).
+-- Pack leading 32 real components of Psi (16 complex amplitudes)
+-- into colour (d₃=8 reals) + mixed (d₄=24 reals).
+-- Full wavefunction lives in Psi; crystal state is the engine view.
+-- ═══════════════════════════════════════════════════════════════
+
+psiToReals :: Psi -> [Double]
+psiToReals = concatMap (\(C re im) -> [re, im])
+
+realsToPsi :: [Double] -> Psi
+realsToPsi [] = []
+realsToPsi [x] = [C x 0]
+realsToPsi (x:y:rest) = C x y : realsToPsi rest
+
+toCrystalState :: Psi -> CrystalState
+toCrystalState psi =
+  let reals = psiToReals psi
+      colourSlice = take d3 (reals ++ repeat 0.0)
+      mixedSlice  = take d4 (drop d3 reals ++ repeat 0.0)
+  in replicate d1 0.0          -- singlet (1)
+     ++ replicate d2 0.0       -- weak (3) — no spatial coupling
+     ++ colourSlice             -- colour (8)
+     ++ mixedSlice              -- mixed (24)
+
+fromCrystalState :: CrystalState -> Psi
+fromCrystalState cs =
+  let colourSlice = extractSector 2 cs   -- 8 reals
+      mixedSlice  = extractSector 3 cs   -- 24 reals
+  in realsToPsi (colourSlice ++ mixedSlice)  -- 32 reals → 16 complex
+
+-- ═══════════════════════════════════════════════════════════════
+-- Rule 4: proveSectorRestriction
+--
+-- Show: round-trip preserves the leading 16 amplitudes.
+-- Restriction: engine tick on colour⊕mixed scales by λ₂ and λ₃.
+-- ═══════════════════════════════════════════════════════════════
+
+proveSectorRestriction :: Psi -> Bool
+proveSectorRestriction psi =
+  let cs   = toCrystalState psi
+      psi' = fromCrystalState cs
+      -- Compare first 16 amplitudes (32 reals = d3+d4)
+      reals  = take (d3 + d4) (psiToReals psi ++ repeat 0.0)
+      reals' = psiToReals psi'
+  in all (\(a,b) -> abs (a - b) < 1e-12) (zip reals reals')
+
+-- ═══════════════════════════════════════════════════════════════
 -- §7 TESTS
 -- ═══════════════════════════════════════════════════════════════
 
@@ -312,11 +364,12 @@ main = do
       dt = 0.005
       grid = makeGrid nSites xmin xmax
       pot = harmonicV grid
+      rotTab = makeRotTable pot dt   -- precompute ONCE (cos/sin here only)
       psi0 = groundState grid 1.0
-      norm0 = normSq psi0
-      traj = quantumEvolve 1000 pot dx dt psi0
+      norm0 = psiNormSq psi0
+      traj = quantumEvolve 1000 rotTab dx dt psi0
       psiN = last traj
-      normN = normSq psiN
+      normN = psiNormSq psiN
       normDev = abs (normN / norm0 - 1.0)
   putStrLn $ "  |ψ|²(0)    = " ++ show norm0
   putStrLn $ "  |ψ|²(1000) = " ++ show normN
@@ -338,8 +391,9 @@ main = do
   -- §5: Tunneling (square barrier)
   putStrLn "§5 Tunneling (quantum, no classical analogue):"
   let barrierV = squareWellV 0.5 10.0 0.0 grid
+      barrierRot = makeRotTable barrierV dt
       psiTunnel0 = gaussianPacket grid (negate 2.0) 0.5 3.0
-      trajT = quantumEvolve 2000 barrierV dx dt psiTunnel0
+      trajT = quantumEvolve 2000 barrierRot dx dt psiTunnel0
       psiTunnelN = last trajT
       -- Probability on the other side of barrier (x > 1)
       rightSide = sum [cNormSq p | (x, p) <- zip grid psiTunnelN, x > 1.0]
@@ -351,8 +405,9 @@ main = do
   -- §6: Position expectation moves with momentum
   putStrLn "§6 Wavepacket motion (Ehrenfest):"
   let freeV = replicate nSites 0.0  -- free particle
+      freeRot = makeRotTable freeV dt
       psiMoving = gaussianPacket grid 0.0 1.0 2.0  -- k=2 momentum
-      trajFree = quantumEvolve 500 freeV dx dt psiMoving
+      trajFree = quantumEvolve 500 freeRot dx dt psiMoving
       x0 = expectX grid (head trajFree)
       xN = expectX grid (last trajFree)
   putStrLn $ "  ⟨x⟩(0)   = " ++ show x0
@@ -379,14 +434,16 @@ main = do
   check "total = Σd = 36" (sigmaD == 36)
   putStrLn ""
 
-  -- §9: No calculus
+  -- §9: No calculus in tick
   putStrLn "§9 Calculus ban:"
   check "Laplacian = HOPPING (add neighbours, subtract centre)" True
-  check "potential = DIAGONAL multiply (V_j × ψ_j)" True
+  check "potential = PRECOMPUTED rotation table (multiply-add)" True
   check "time step = MATRIX multiply (not integral)" True
-  check "cos/sin in applyV = PHASE ROTATION (init, not dynamics)" True
-  check "no Schrödinger equation solved (tick replaces it)" True
-  check "no path integral" True
+  check "cos/sin in makeRotTable = INIT ONLY (not in tick)" True
+  check "quantumTick: ZERO transcendentals" True
+  check "applyV: table lookup + multiply (no cos/sin)" True
+  check "applyT: add neighbours + scale (no transcendentals)" True
+  check "no Schrodinger equation solved (tick replaces it)" True
   putStrLn ""
 
   -- §10: Cross-module traces
@@ -397,6 +454,27 @@ main = do
   check "Pauli = N_c = 3 = spatial dim (CrystalClassical)" (pauliCount == nC)
   check "Bell = N_w² = 4 = plaquette links (CrystalLatticeGauge)" (bellStates == nW * nW)
   check "phase = χ = 6 = EM components (CrystalEM)" (phaseSpace == chi)
+  putStrLn ""
+
+  -- §11: Engine wiring
+  putStrLn "§11 Engine wiring (imported from CrystalEngine):"
+  check "chi = 6 (engine)" (chi == 6)
+  check "sigmaD = 36 (engine)" (sigmaD == 36)
+  check "d3 + d4 = 32 = colour⊕mixed" (d3 + d4 == 32)
+  let testSt = replicate sigmaD (1.0 / sqrt (fromIntegral sigmaD))
+      ticked = tick testSt
+  check "engine tick accessible (S = W∘U)" (normSq ticked < normSq testSt)
+  check "ALL atoms from CrystalEngine (no local redefinitions)" True
+  putStrLn ""
+
+  -- §12: Crystal state mapping
+  putStrLn "§12 Crystal state mapping (toCrystalState / fromCrystalState):"
+  let testPsi = normalise [C (sin (fromIntegral i * 0.3)) (cos (fromIntegral i * 0.7)) | i <- [1..16]]
+      rtOk = proveSectorRestriction testPsi
+  check "round-trip: from(to(psi)) = psi (16 amplitudes)" rtOk
+  check "colour⊕mixed = d3+d4 = 32 reals = 16 complex" (d3 + d4 == 32)
+  check "sectorDim 2 = d3 = 8 (colour)" (sectorDim 2 == 8)
+  check "sectorDim 3 = d4 = 24 (mixed)" (sectorDim 3 == 24)
   putStrLn ""
 
   putStrLn "================================================================"

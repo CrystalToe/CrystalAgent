@@ -4,35 +4,33 @@
 
 ## What This Module Does
 
-Binary inspiral waveform generation. Chirp signal h+(t), hx(t) from
-Peters quadrupole formula through ISCO cutoff. Every coefficient from A_F.
+Binary inspiral waveform generation. Chirp mass, orbital decay, h+ and h×
+polarizations, ISCO cutoff — all from (2,3).
 
-## The GW Integer Map
+## Engine Wiring
 
-| Quantity | Value | Crystal Source | Physical Meaning |
-|----------|-------|---------------|-----------------|
-| Peters coefficient | 32/5 | N_w^5/(chi-1) | Quadrupole power |
-| Orbital decay | 64/5 | N_w^6/(chi-1) | da/dt coefficient |
-| Chirp rate | 96/5 | N_c*N_w^5/(chi-1) | df/dt coefficient |
-| Merger time | 5/256 | (chi-1)/N_w^8 | t_merge coefficient |
-| Chirp mass exp | 3/5 | N_c/(chi-1) | M_c = mu^(3/5)*M^(2/5) |
-| Frequency exp | 2/3 | (N_c-1)/N_c | h ~ f^(2/3) |
-| Waveform amplitude | 4 | N_w^2 | 4/r prefactor |
-| Polarizations | 2 | N_c-1 | h+, hx |
-| GW freq doubling | 2 | N_w | f_GW = 2*f_orb |
-| ISCO cutoff | 6 | chi | f_ISCO ~ 1/(6^(3/2) pi M) |
-| Kolmogorov in chirp | 5/3 | (chi-1)/N_c | M_c exponent |
-| Chirp power | 8/3 | d_colour/N_c | pi exponent |
-| Chirp power | 11/3 | (N_c^2+N_w)/N_c | f exponent |
+**This module imports CrystalEngine.** No local atom redefinitions.
 
-## Key Surprise
+### Sector: weak⊕colour (d=11)
 
-The Kolmogorov turbulence exponent 5/3 = (chi-1)/N_c appears in the
-chirp mass formula. GW inspiral and turbulent energy cascade use the
-same number from the same algebraic source. WACA graft score: 8/10.
+| GW Concept | Value | Engine Source |
+|-----------|-------|--------------|
+| Quadrupole power | 32/5 | N_w⁵/(χ−1) |
+| Polarizations | 2 | N_c − 1 |
+| f_GW = 2 f_orb | 2 | N_w |
+| Amplitude factor | 4 | N_w² |
+| Chirp mass exponents | 3/5, 2/5 | N_c/(χ−1), N_w/(χ−1) |
+| ISCO cutoff | 6 | χ |
+| Orbital decay | 64/5 | N_w⁶/(χ−1) |
+| Kolmogorov in chirp | 5/3 | (χ−1)/N_c |
 
 ## Proof Certificate
 
-- `proofs/crystal_gw_proof.py` — 35/35 PASS
-- `proofs/CrystalGW.lean` — 22 theorems by native_decide
-- `proofs/CrystalGW.agda` — 14 proofs by refl
+- `haskel/CrystalGW.hs` — 25 checks (25 PASS)
+- `proofs/CrystalGW.lean` — Lean 4 theorems (by native_decide)
+- `proofs/CrystalGW.agda` — Agda proofs (by refl)
+
+## Dependencies
+
+- **Imports CrystalEngine** — atoms, sector operations, tick, normSq
+- `Data.Ratio`

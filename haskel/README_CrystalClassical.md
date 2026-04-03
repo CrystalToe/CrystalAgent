@@ -5,21 +5,44 @@
 ## What This Module Does
 
 Bridges the quantum monad S = W∘U to classical orbital mechanics.
-One Haskell module. Satellite around Earth. Slingshot around Moon. Hohmann transfer.
-All from (2,3). No imported physics. Symplectic integrator (not RK4).
+Symplectic integrator (Leapfrog/Verlet) is the classical limit of the monad.
+Satellite orbits, Hohmann transfers, gravity assists — all from (2,3).
 
-## The Key Insight
+**This is the TEMPLATE for all Verlet-family dynamics modules.**
 
-The monad is discrete and structure-preserving. The correct classical limit
-is a symplectic integrator, not RK4. Specifically, Störmer-Verlet leapfrog:
+## Engine Wiring
 
+**This module imports CrystalEngine.** No local atom redefinitions.
+
+```haskell
+import CrystalEngine
+  ( nW, nC, chi, beta0, sigmaD, towerD, gauss
+  , d1, d2, d3, d4, lambda
+  , CrystalState, sectorStart, sectorDim
+  , extractSector, injectSector, normSq, tick
+  )
 ```
-v_{n+1/2} = v_n + (Δt/2) × a(x_n)       -- W: half-kick
-x_{n+1}   = x_n + Δt × v_{n+1/2}         -- U: full drift
-v_{n+1}   = v_{n+1/2} + (Δt/2) × a(x_{n+1})  -- W: half-kick
-```
 
-The leapfrog IS S = W∘U∘W in the classical limit.
+### Sector Restriction
+
+Classical mechanics = S restricted to **weak⊕colour** (d = 3 + 8 = 11).
+
+| Classical Concept | Engine Sector | Dimension |
+|-------------------|---------------|-----------|
+| Position (x,y,z) | weak (sector 1) | d₂ = 3 |
+| Velocity (vx,vy,vz) | colour (sector 2, first 3) | 3 of d₃ = 8 |
+| Phase space per body | χ = N_w × N_c | 6 |
+| Verlet order | N_w | 2 |
+
+### PhaseState ↔ CrystalState Mapping
+
+```haskell
+toCrystalState (PhaseState pos vel) =
+  [0] ++ pos ++ vel ++ replicate 5 0.0 ++ replicate 24 0.0
+  --singlet  weak  colour(3+5)           mixed
+
+fromCrystalState cs = PhaseState (extractSector 1 cs) (take 3 (extractSector 2 cs))
+```
 
 ## Integer Map
 
@@ -31,23 +54,19 @@ The leapfrog IS S = W∘U∘W in the classical limit.
 | Kepler coefficient (4π²) | 4 | N_w² |
 | Angular momentum components | 3 | N_c(N_c−1)/2 |
 | Lagrange points | 5 | χ − 1 |
-| Phase space (3-body solvable) | 10 | gauss − N_c |
-| Phase space (3-body chaotic) | 8 | N_c² − 1 |
-| Phase space (total) | 18 | 10 + 8 |
 | Quadrupole coefficient | 32/5 | N_w⁵/(χ−1) |
-| 16πG coefficient | 16 | N_w⁴ |
 | Spacetime dimensions | 4 | N_c + 1 |
+| Phase space per body | 6 | χ |
 
 ## Proof Certificate
 
-All proofs pass:
-
-- `proofs/crystal_classical_proof.py` — 48/48 Python checks (PASS)
-- `proofs/CrystalClassical.lean` — ~25 Lean 4 theorems (by native_decide)
-- `proofs/CrystalClassical.agda` — ~20 Agda proofs (by refl)
+- `haskel/CrystalClassical.hs` — 31 checks (31 PASS)
+- `proofs/CrystalClassical.lean` — Lean 4 theorems (by native_decide)
+- `proofs/CrystalClassical.agda` — Agda proofs (by refl)
+- S11 engine wiring proves PhaseState ↔ CrystalState round-trip, sector isolation, tick contraction
 
 ## Dependencies
 
-- No external packages
-- Self-contained A_F atoms (no imports required, but compatible with CrystalAxiom)
-- Observable count: 0 new (infrastructure)
+- **Imports CrystalEngine** — atoms, types, sector operations, tick, normSq
+- `Data.Ratio` for quadrupole proof
+- Domain-specific: PhaseState type, classicalTick (Verlet), orbital mechanics

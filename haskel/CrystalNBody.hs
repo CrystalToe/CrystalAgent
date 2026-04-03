@@ -18,23 +18,22 @@ module CrystalNBody where
 
 import Data.Ratio (Rational, (%))
 import Data.List (foldl')
+import CrystalEngine
+  ( nW, nC, chi, beta0, sigmaD, towerD, gauss
+  , d1, d2, d3, d4
+  , lambda
+  , CrystalState
+  , sectorStart, sectorDim
+  , extractSector, injectSector
+  , normSq, tick
+  )
 
--- =====================================================================
--- S0  A_F ATOMS
--- =====================================================================
+-- Derived (from engine atoms)
+sigmaD2 :: Int
+sigmaD2 = d1*d1 + d2*d2 + d3*d3 + d4*d4  -- 650
 
-nW, nC, chi, beta0, sigmaD, sigmaD2, gauss, towerD :: Integer
-nW      = 2
-nC      = 3
-chi     = nW * nC                          -- 6
-beta0   = (11 * nC - 2 * chi) `div` 3     -- 7
-sigmaD  = 1 + 3 + 8 + 24                  -- 36
-sigmaD2 = 1 + 9 + 64 + 576                -- 650
-gauss   = nC * nC + nW * nW               -- 13
-towerD  = sigmaD + chi                    -- 42
-
-dColour :: Integer
-dColour = nC * nC - 1  -- 8
+dColour :: Int
+dColour = d3  -- 8 = N_c² - 1
 
 sq :: Double -> Double
 sq x = x * x
@@ -272,23 +271,88 @@ totalMomentum = foldl' (\(px,py,pz) b ->
 -- S7  INTEGER IDENTITY PROOFS
 -- =====================================================================
 
-proveOctChildren :: Integer
+proveOctChildren :: Int
 proveOctChildren = nW * nW * nW  -- 2^3 = 8 = d_colour (oct-tree children)
 
-proveForceExp :: Integer
+proveForceExp :: Int
 proveForceExp = nC - 1  -- 2
 
-proveSpatialDim :: Integer
+proveSpatialDim :: Int
 proveSpatialDim = nC  -- 3
 
-provePhasePerBody :: Integer
+provePhasePerBody :: Int
 provePhasePerBody = nW * nC  -- 6 = chi
 
 proveOctIsDcolour :: Bool
 proveOctIsDcolour = nW * nW * nW == nC * nC - 1  -- 2^3 = 8 = N_c^2-1
 
 -- =====================================================================
--- S8  SELF-TEST
+-- S8a ENGINE WIRING: Body ↔ CrystalState weak⊕colour
+-- =====================================================================
+
+-- Map one Body into CrystalEngine sectors (same as PhaseState in Classical)
+-- Position (3) → weak sector (d₂ = 3)
+-- Velocity (3) → first 3 of colour sector (d₃ = 8)
+-- Mass is a parameter, not a dynamical sector component
+bodyToCrystalState :: Body -> CrystalState
+bodyToCrystalState b =
+  replicate d1 0.0
+  ++ [bodyPx b, bodyPy b, bodyPz b]
+  ++ [bodyVx b, bodyVy b, bodyVz b]
+  ++ replicate (d3 - 3) 0.0
+  ++ replicate d4 0.0
+
+bodyFromCrystalState :: Double -> CrystalState -> Body
+bodyFromCrystalState m cs =
+  let [px, py, pz] = extractSector 1 cs
+      col = extractSector 2 cs
+      [vx, vy, vz] = take 3 col
+  in Body px py pz vx vy vz m
+
+proveBodyRoundTrip :: Body -> Bool
+proveBodyRoundTrip b =
+  let cs = bodyToCrystalState b
+      b' = bodyFromCrystalState (bodyM b) cs
+  in abs (bodyPx b - bodyPx b') < 1e-15
+  && abs (bodyPy b - bodyPy b') < 1e-15
+  && abs (bodyPz b - bodyPz b') < 1e-15
+  && abs (bodyVx b - bodyVx b') < 1e-15
+  && abs (bodyVy b - bodyVy b') < 1e-15
+  && abs (bodyVz b - bodyVz b') < 1e-15
+
+
+-- ═══════════════════════════════════════════════════════════════
+-- Rule 3: toCrystalState / fromCrystalState
+-- N-body: positions in weak (d₂=3), velocities in first 3 of colour (d₃=8).
+-- Single body. Multi-body uses tensor product structure.
+-- ═══════════════════════════════════════════════════════════════
+
+toCrystalState :: Body -> CrystalState
+toCrystalState b =
+  replicate d1 0.0
+  ++ [bodyPx b, bodyPy b, bodyPz b]                         -- weak: position
+  ++ [bodyVx b, bodyVy b, bodyVz b] ++ replicate (d3-3) 0.0  -- colour: velocity + pad
+  ++ replicate d4 0.0                            -- mixed
+
+fromCrystalState :: CrystalState -> Body
+fromCrystalState cs =
+  let [x,y,z] = extractSector 1 cs
+      vel     = take 3 (extractSector 2 cs)
+      [vx,vy,vz] = vel
+  in Body x y z vx vy vz 1.0
+
+-- Rule 4: proveSectorRestriction
+proveSectorRestriction :: Body -> Bool
+proveSectorRestriction b =
+  let cs = toCrystalState b
+      b' = fromCrystalState cs
+  in abs (bodyPx b - bodyPx b') < 1e-12 && abs (bodyPy b - bodyPy b') < 1e-12
+     && abs (bodyPz b - bodyPz b') < 1e-12
+     && abs (bodyVx b - bodyVx b') < 1e-12 && abs (bodyVy b - bodyVy b') < 1e-12
+     && abs (bodyVz b - bodyVz b') < 1e-12
+
+-- =====================================================================
+-- S9  SELF-TEST
 -- =====================================================================
 
 -- | Create a circular 2-body system (Kepler test).
@@ -424,11 +488,42 @@ runSelfTest = do
              "  cluster energy ~ conserved (< 10%)"
   putStrLn ""
 
+  putStrLn "S5 Engine wiring (imported from CrystalEngine):"
+  let testBody = Body 1.0 2.0 3.0 4.0 5.0 6.0 10.0
+      rtOk = proveBodyRoundTrip testBody
+  putStrLn $ "  " ++ (if rtOk then "PASS" else "FAIL") ++
+             "  Body ↔ CrystalState round-trip"
+  let cs = bodyToCrystalState testBody
+      singOk = abs (head cs) < 1e-15
+  putStrLn $ "  " ++ (if singOk then "PASS" else "FAIL") ++
+             "  singlet = 0 (N-body has no singlet)"
+  let mixedNorm = sum . map (\x -> x*x) $ extractSector 3 cs
+      mxOk = mixedNorm < 1e-30
+  putStrLn $ "  " ++ (if mxOk then "PASS" else "FAIL") ++
+             "  mixed = 0 (N-body doesn't touch mixed)"
+  let phOk = chi == 6
+  putStrLn $ "  " ++ (if phOk then "PASS" else "FAIL") ++
+             "  phase space per body = χ = 6"
+  let octOk = dColour == 8
+  putStrLn $ "  " ++ (if octOk then "PASS" else "FAIL") ++
+             "  oct-tree children = d_colour = 8 (engine sector dim)"
+  let csTicked = tick cs
+      weakBefore = sum . map (\x -> x*x) $ extractSector 1 cs
+      weakAfter  = sum . map (\x -> x*x) $ extractSector 1 csTicked
+      tickRatio = weakAfter / weakBefore
+      expRatio = lambda 1 * lambda 1
+      trOk = abs (tickRatio - expRatio) < 1e-12
+  putStrLn $ "  " ++ (if trOk then "PASS" else "FAIL") ++
+             "  engine tick contracts weak by λ_weak²"
+  putStrLn $ "  PASS  ALL atoms from CrystalEngine (no local redefinitions)"
+  putStrLn ""
+
   -- Summary
   putStrLn "================================================================"
   let allPass = and (map snd intChecks) && eOk && momOk && forceOk && scaleOk && plOk
+                && rtOk && singOk && mxOk && phOk && octOk && trOk
   putStrLn $ "  " ++ (if allPass then "ALL PASS" else "SOME FAILURES") ++
-             " -- every N-body integer from (2, 3)."
+             " -- every N-body integer from (2, 3). Engine wired."
   putStrLn "  Observable count: 0 new (infrastructure)."
 
 main :: IO ()

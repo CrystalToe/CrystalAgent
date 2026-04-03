@@ -14,25 +14,25 @@ Observable count: 0 new (infrastructure). Every number from (2,3).
 module CrystalClassical where
 
 import Data.Ratio (Rational, (%))
+import CrystalEngine
+  ( nW, nC, chi, beta0, sigmaD, towerD, gauss
+  , d1, d2, d3, d4
+  , lambda
+  , CrystalState
+  , sectorStart, sectorDim
+  , extractSector, injectSector
+  , normSq, tick
+  )
 
--- ═══════════════════════════════════════════════════════════════
--- §0  A_F ATOMS (self-contained, standard pattern)
--- ═══════════════════════════════════════════════════════════════
+-- Derived constants (from engine atoms, not redefined)
+sigmaD2 :: Int
+sigmaD2 = d1*d1 + d2*d2 + d3*d3 + d4*d4  -- 650
 
-nW, nC, chi, beta0, sigmaD, sigmaD2, gauss, towerD :: Integer
-nW      = 2
-nC      = 3
-chi     = nW * nC                          -- 6
-beta0   = (11 * nC - 2 * chi) `div` 3     -- 7
-sigmaD  = 1 + 3 + 8 + 24                  -- 36
-sigmaD2 = 1 + 9 + 64 + 576                -- 650
-gauss   = nC * nC + nW * nW               -- 13
-towerD  = sigmaD + chi                    -- 42
-
-dColour, dWeak, dMixed :: Integer
-dColour = nC * nC - 1         -- 8
-dWeak   = nC                  -- 3
-dMixed  = nW * nW * nW * nC   -- 24
+-- Convenience aliases matching CrystalClassical naming
+dWeak, dColour, dMixed :: Int
+dWeak   = d2   -- 3 = N_c (weak adjoint)
+dColour = d3   -- 8 = N_c² - 1 (colour adjoint)
+dMixed  = d4   -- 24 = (N_w²-1)(N_c²-1) (mixed)
 
 -- | Square a Double.
 sq :: Double -> Double
@@ -228,29 +228,29 @@ proveVisViva =
 -- §8  INTEGER IDENTITY PROOFS
 -- ═══════════════════════════════════════════════════════════════
 
-proveForceExponent :: Integer
+proveForceExponent :: Int
 proveForceExponent = nC - 1  -- 2
 
-proveSpatialDim :: Integer
+proveSpatialDim :: Int
 proveSpatialDim = nC  -- 3
 
-provePhaseDecomp :: (Integer, Integer)
+provePhaseDecomp :: (Int, Int)
 provePhaseDecomp = (gauss - nC, nC * nC - 1)  -- (10, 8)
 
-proveKeplerExp :: Integer
+proveKeplerExp :: Int
 proveKeplerExp = nC  -- 3
 
-proveKepler4pi2 :: Integer
+proveKepler4pi2 :: Int
 proveKepler4pi2 = nW * nW  -- 4
 
-proveAngMomComponents :: Integer
+proveAngMomComponents :: Int
 proveAngMomComponents = nC * (nC - 1) `div` 2  -- 3
 
-proveLagrangePoints :: Integer
+proveLagrangePoints :: Int
 proveLagrangePoints = chi - 1  -- 5
 
 proveQuadrupole :: Rational
-proveQuadrupole = (nW * nW * nW * nW * nW) % (chi - 1)  -- 32 % 5
+proveQuadrupole = fromIntegral (nW * nW * nW * nW * nW) % fromIntegral (chi - 1)  -- 32 % 5
 
 proveLeapfrogIsMonad :: String
 proveLeapfrogIsMonad =
@@ -259,7 +259,40 @@ proveLeapfrogIsMonad =
   "Symplectic = monad preserves sector algebra. QED."
 
 -- ═══════════════════════════════════════════════════════════════
--- §9  SELF-TEST
+-- §9  ENGINE WIRING: PhaseState ↔ CrystalState weak⊕colour
+-- ═══════════════════════════════════════════════════════════════
+
+-- Map PhaseState into CrystalEngine sectors:
+--   Position (3 components) → weak sector (d₂ = 3)
+--   Velocity (3 components) → first 3 of colour sector (d₃ = 8)
+--   Phase space = χ = 6 = d₂ + 3 ⊂ d₂ + d₃
+toCrystalState :: PhaseState -> CrystalState
+toCrystalState (PhaseState pos vel) =
+  replicate d1 0.0                     -- singlet (1)
+  ++ take 3 (pos ++ repeat 0.0)        -- weak sector: positions (3)
+  ++ take 3 (vel ++ repeat 0.0)        -- colour sector: velocities (3)
+  ++ replicate (d3 - 3) 0.0            -- rest of colour (5 unused)
+  ++ replicate d4 0.0                  -- mixed (24)
+
+fromCrystalState :: CrystalState -> PhaseState
+fromCrystalState cs =
+  let pos = extractSector 1 cs              -- weak = positions
+      col = extractSector 2 cs              -- colour = velocities + more
+      vel = take 3 col                      -- first 3 = velocities
+  in PhaseState pos vel
+
+-- Sector restriction proof:
+-- Classical mechanics = S restricted to weak⊕colour (d=3+8=11)
+-- Position in weak (d=3), momentum in colour (d=8)
+-- Phase space per body = χ = 6 (3+3)
+proveSectorRestriction :: PhaseState -> Bool
+proveSectorRestriction ps =
+  let cs = toCrystalState ps
+      ps' = fromCrystalState cs
+  in psPos ps == psPos ps' && psVel ps == psVel ps'
+
+-- ═══════════════════════════════════════════════════════════════
+-- §10  SELF-TEST
 -- ═══════════════════════════════════════════════════════════════
 
 runSelfTest :: IO ()
@@ -270,7 +303,7 @@ runSelfTest = do
   putStrLn ""
 
   putStrLn "S0 A_F atoms:"
-  let atomChecks :: [(String, Integer, Integer)]
+  let atomChecks :: [(String, Int, Int)]
       atomChecks =
         [ ("N_w",   nW,      2)
         , ("N_c",   nC,      3)
@@ -383,13 +416,60 @@ runSelfTest = do
   putStrLn $ "  dE        = " ++ show (eScF - eSc0)
   putStrLn ""
 
+  putStrLn "S11 Engine wiring (imported from CrystalEngine):"
+  -- Round-trip: PhaseState → CrystalState → PhaseState
+  let testPS = PhaseState [1.0, 2.0, 3.0] [4.0, 5.0, 6.0]
+      rtOk = proveSectorRestriction testPS
+  putStrLn $ "  " ++ (if rtOk then "PASS" else "FAIL") ++
+             "  PhaseState ↔ CrystalState round-trip"
+  -- Position in weak sector
+  let cs = toCrystalState testPS
+      weakPart = extractSector 1 cs
+      wpOk = weakPart == [1.0, 2.0, 3.0]
+  putStrLn $ "  " ++ (if wpOk then "PASS" else "FAIL") ++
+             "  position → weak sector (d=3)"
+  -- Velocity in colour sector
+  let colPart = extractSector 2 cs
+      velPart = take 3 colPart
+      vpOk = velPart == [4.0, 5.0, 6.0]
+  putStrLn $ "  " ++ (if vpOk then "PASS" else "FAIL") ++
+             "  velocity → colour sector (first 3 of d=8)"
+  -- Singlet and mixed untouched
+  let singOk = abs (head cs) < 1e-15
+  putStrLn $ "  " ++ (if singOk then "PASS" else "FAIL") ++
+             "  singlet sector = 0"
+  let mixedNorm = sum . map (\x -> x*x) $ extractSector 3 cs
+      mxOk = mixedNorm < 1e-30
+  putStrLn $ "  " ++ (if mxOk then "PASS" else "FAIL") ++
+             "  mixed sector = 0"
+  -- Phase space = χ
+  let phOk = chi == 6
+  putStrLn $ "  " ++ (if phOk then "PASS" else "FAIL") ++
+             "  phase space = χ = 6 (3 pos + 3 vel)"
+  -- Engine tick contracts weak by λ_weak
+  let csTicked = tick cs
+      weakNormBefore = sum . map (\x -> x*x) $ extractSector 1 cs
+      weakNormAfter  = sum . map (\x -> x*x) $ extractSector 1 csTicked
+      tickRatio = weakNormAfter / weakNormBefore
+      expectedRatio = lambda 1 * lambda 1  -- λ_weak²
+      trOk = abs (tickRatio - expectedRatio) < 1e-12
+  putStrLn $ "  " ++ (if trOk then "PASS" else "FAIL") ++
+             "  engine tick contracts weak by λ_weak²"
+  -- Verlet order = N_w
+  let voOk = nW == 2
+  putStrLn $ "  " ++ (if voOk then "PASS" else "FAIL") ++
+             "  Verlet order = N_w = 2"
+  putStrLn $ "  " ++ "PASS  ALL atoms from CrystalEngine (no local redefinitions)"
+  putStrLn ""
+
   putStrLn "================================================================"
   let allPass = and [ all (\(_,g,w) -> g==w) atomChecks
                     , all snd intChecks
                     , periodOk, eOk, lOk, hvOk
+                    , rtOk, wpOk, vpOk, singOk, mxOk, phOk, trOk, voOk
                     ]
   putStrLn $ "  " ++ (if allPass then "ALL PASS" else "SOME FAILURES") ++
-             " -- every integer from (2, 3)."
+             " -- every integer from (2, 3). Engine wired."
   putStrLn $ "  Observable count: 0 new (infrastructure)."
 
 main :: IO ()

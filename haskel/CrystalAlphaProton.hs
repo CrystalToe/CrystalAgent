@@ -13,6 +13,7 @@
 -- This module computes dimensionless ratios — no VEV dependence.
 
 module CrystalAlphaProton where
+import qualified CrystalEngine as CE  -- engine atoms
 
 -- ══════════════════════════════════════════════════════════
 -- ALGEBRA ATOMS

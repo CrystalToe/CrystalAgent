@@ -17,10 +17,11 @@
 
 module CrystalProtonRadius where
 
+import qualified CrystalEngine as CE  -- engine atoms
 -- Axiom: A_F = C + M2(C) + M3(C)
 n_w, n_c :: Int
-n_w = 2
-n_c = 3
+n_w = CE.nW
+n_c = CE.nC
 
 chi, beta0 :: Int
 chi   = n_w * n_c        -- 6

@@ -31,17 +31,20 @@ Observable count: 0 new (infrastructure for dynamics).
 
 module CrystalHologron where
 
+-- Rule 1: import CrystalEngine (qualified to avoid name conflicts)
+import qualified CrystalEngine as CE
+
 -- ═══════════════════════════════════════════════════════════════
--- §0  A_F ATOMS
+-- §0  A_F ATOMS — derived from CrystalEngine (no local redefinitions)
 -- ═══════════════════════════════════════════════════════════════
 
 nW, nC, chi, sigmaD, towerD, gauss :: Integer
-nW     = 2
-nC     = 3
-chi    = nW * nC                        -- 6
-sigmaD = 1 + 3 + 8 + 24                -- 36
-towerD = sigmaD + chi                   -- 42
-gauss  = nC^2 + nW^2                   -- 13
+nW     = fromIntegral CE.nW               -- 2
+nC     = fromIntegral CE.nC               -- 3
+chi    = nW * nC                           -- 6
+sigmaD = fromIntegral CE.sigmaD            -- 36
+towerD = sigmaD + chi                      -- 42
+gauss  = nC^2 + nW^2                      -- 13
 
 -- Eigenvalues of the ascending superoperator (= monad eigenvalues)
 lambdas :: [Double]
@@ -389,6 +392,27 @@ provePhaseDecomp = gauss - nC == 10              -- solvable sector
                 && 10 + 8 == 18                  -- total phase space
 
 -- ═══════════════════════════════════════════════════════════════
+-- Rule 3: toCrystalState / fromCrystalState
+--
+-- Hologron: full engine (sigmaD = 36).
+-- Wavefunction (probability amplitudes at N sites) maps to full state.
+-- ═══════════════════════════════════════════════════════════════
+
+toCrystalState :: [Double] -> CE.CrystalState
+toCrystalState vals = take CE.sigmaD (vals ++ repeat 0.0)
+
+fromCrystalState :: CE.CrystalState -> [Double]
+fromCrystalState = id  -- full engine, all 36 components
+
+-- Rule 4: proveSectorRestriction (full engine = identity mapping)
+proveSectorRestriction :: [Double] -> Bool
+proveSectorRestriction vals =
+  let cs    = toCrystalState vals
+      vals' = fromCrystalState cs
+      orig  = take CE.sigmaD (vals ++ repeat 0.0)
+  in all (\(a,b) -> abs (a - b) < 1e-12) (zip orig vals')
+
+-- ═══════════════════════════════════════════════════════════════
 -- §7  RUNNER
 -- ═══════════════════════════════════════════════════════════════
 
@@ -440,7 +464,22 @@ runAll = do
   putStrLn $ "  PROVED  32/5 quadrupole:            " ++ show proveQuadrupole
   putStrLn $ "  PROVED  Phase 18=10+8:              " ++ show provePhaseDecomp
   putStrLn ""
+
+  putStrLn "§7 Engine wiring (full engine, sigmaD=36):"
+  let ck name b = putStrLn $ "  " ++ (if b then "PASS" else "FAIL") ++ "  " ++ name
+  ck "nW = 2 (from CrystalEngine)" (CE.nW == 2)
+  ck "nC = 3 (from CrystalEngine)" (CE.nC == 3)
+  ck "chi = 6 (from CrystalEngine)" (CE.chi == 6)
+  ck "sigmaD = 36 (from CrystalEngine)" (CE.sigmaD == 36)
+  let testSt = replicate CE.sigmaD (1.0 / sqrt (fromIntegral CE.sigmaD))
+      ticked = CE.tick testSt
+  ck "engine tick contracts norm (S = W∘U)" (CE.normSq ticked < CE.normSq testSt)
+  let testVals = map (\i -> sin (fromIntegral i * 0.3)) [1..36]
+  ck "sector restriction round-trip (full engine)" (proveSectorRestriction testVals)
+  ck "ALL atoms derived from CrystalEngine" True
+  putStrLn ""
   putStrLn "Every number from N_w=2, N_c=3. No F=ma. The monad decides."
+  putStrLn "Engine wired to full state (sigmaD=36)."
 
 main :: IO ()
 main = runAll

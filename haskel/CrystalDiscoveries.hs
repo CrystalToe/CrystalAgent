@@ -10,13 +10,14 @@
 
 module CrystalDiscoveries where
 
+import qualified CrystalEngine as CE  -- engine atoms
 -- ============================================================
 -- CRYSTAL INPUTS
 -- ============================================================
 
 n_w, n_c, chi, beta_0 :: Int
-n_w = 2
-n_c = 3
+n_w = CE.nW
+n_c = CE.nC
 chi = n_w * n_c
 beta_0 = (11*n_c - 2*chi) `div` 3
 
