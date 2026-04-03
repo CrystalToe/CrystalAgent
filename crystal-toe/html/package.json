@@ -1,0 +1,17 @@
+{
+  "name": "crystal-toe",
+  "type": "module",
+  "description": "Crystal Topos — 198 observables from A_F",
+  "version": "0.1.0",
+  "license": "AGPL-3.0-or-later",
+  "files": [
+    "crystal_toe_bg.wasm",
+    "crystal_toe.js",
+    "crystal_toe.d.ts"
+  ],
+  "main": "crystal_toe.js",
+  "types": "crystal_toe.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

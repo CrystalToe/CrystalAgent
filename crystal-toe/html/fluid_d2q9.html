@@ -1,0 +1,302 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Crystal Topos — Lattice Boltzmann Fluid</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#060612;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif}
+  canvas{display:block}
+  #hud{position:absolute;top:0;left:0;right:0;padding:10px 16px;
+       background:linear-gradient(180deg,rgba(6,6,18,0.95) 70%,transparent);z-index:10;pointer-events:none}
+  h1{font-size:1.1em;color:#7ec8e3;letter-spacing:2px;margin-bottom:2px}
+  h1 span{color:#e74c3c}
+  .sub{color:#444;font-size:0.7em}
+  .chips{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+  .chip{background:rgba(126,200,227,0.07);border:1px solid rgba(126,200,227,0.12);
+        border-radius:14px;padding:2px 9px;font-size:0.62em;color:#5a9;font-family:monospace}
+  .chip b{color:#7ec8e3}
+  #ctrl{position:absolute;bottom:10px;left:16px;z-index:10;display:flex;gap:8px;align-items:center}
+  #ctrl button{background:rgba(255,255,255,0.04);border:1px solid #1a1a3a;color:#5a9;
+               padding:4px 12px;border-radius:5px;cursor:pointer;font-size:0.7em}
+  label{color:#555;font-size:0.7em}
+  #stats{position:absolute;bottom:10px;right:16px;font-family:monospace;font-size:0.68em;color:#333;z-index:10}
+  #stats b{color:#5a9}
+  #info{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(6,6,18,0.95);z-index:20;
+        display:none;overflow-y:auto;padding:30px 20px}
+  #info.show{display:block}
+  #info .inner{max-width:750px;margin:auto;font-size:0.85em;line-height:1.8;color:#999}
+  #info h3{color:#7ec8e3;font-size:1em;margin:16px 0 6px;letter-spacing:1px}
+  #info h3:first-child{margin-top:0}
+  #info h3 span{color:#e74c3c}
+  #info b{color:#7ec8e3}
+  #info em{color:#e74c3c;font-style:normal}
+  #info code{color:#7ec8e3;background:#0a0a20;padding:1px 5px;border-radius:3px}
+  #info table{border-collapse:collapse;margin:10px 0;width:100%}
+  #info td,#info th{border:1px solid #1a1a3a;padding:5px 10px;font-size:0.85em;text-align:left}
+  #info th{color:#7ec8e3;background:#0a0a20}
+  #info .close{color:#e74c3c;cursor:pointer;font-size:0.8em;margin-top:16px;display:inline-block}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <h1>LATTICE BOLTZMANN <span>FLUID</span></h1>
+  <div class="sub">D2Q9 — 9 = N_c² velocities · c_s² = 1/N_c · Kolmogorov 5/3 = (χ−1)/N_c · weights 4/9, 1/9, 1/36 from (2,3)</div>
+  <div class="chips">
+    <span class="chip"><b>N_c²</b>=9 velocities</span>
+    <span class="chip"><b>c_s²</b>=1/N_c=1/3</span>
+    <span class="chip"><b>5/3</b>=(χ−1)/N_c</span>
+    <span class="chip"><b>4/9</b>=N_w²/N_c²</span>
+    <span class="chip"><b>1/36</b>=1/Σ_d</span>
+    <span class="chip"><b>24</b>=d_mixed (Stokes)</span>
+  </div>
+</div>
+<div id="ctrl">
+  <button onclick="init()">↺ Reset</button>
+  <label>Click and drag to add flow</label>
+  <button id="binfo" onclick="document.getElementById('info').classList.toggle('show')">? EXPLAIN</button>
+</div>
+
+<div id="info">
+<div class="inner">
+<h3>WHAT YOU'RE <span>SEEING</span></h3>
+<p>A real fluid simulation. The cylinder creates a <b>von Kármán vortex street</b> — alternating
+vortices shed from the obstacle. Red = clockwise spin, blue = counter-clockwise. This is the
+same pattern you see behind bridge pillars in a river, airplane wings, and submarine periscopes.
+Click and drag anywhere to inject flow and watch how the fluid responds.</p>
+
+<h3>HOW IT <span>WORKS</span></h3>
+<p>This uses the <b>Lattice Boltzmann Method</b> (LBM), specifically the <b>D2Q9</b> model.
+Instead of solving the Navier-Stokes equations directly, it simulates millions of fictitious
+particles bouncing on a lattice. The fluid behavior <em>emerges</em> from their collisions.
+Each cell has <b>9 velocity directions</b> — one rest, four cardinal, four diagonal.</p>
+
+<h3>WHY <span>9</span> VELOCITIES?</h3>
+<p>In the Crystal Topos, <code>9 = N_c² = 3²</code>. The colour prime N_c = 3 gives us 3 spatial
+dimensions, and the D2Q9 lattice has <code>N_c²</code> velocity states per cell. This is not a
+coincidence — the lattice must have enough symmetry to recover the Navier-Stokes equations,
+and that symmetry requirement gives exactly <code>N_c²</code> in 2D.</p>
+
+<h3>EVERY WEIGHT FROM <span>(2,3)</span></h3>
+<table>
+<tr><th>Weight</th><th>Value</th><th>Crystal formula</th><th>Directions</th></tr>
+<tr><td>Rest</td><td>4/9</td><td><b>N_w² / N_c²</b></td><td>The stationary particle</td></tr>
+<tr><td>Cardinal</td><td>1/9</td><td><b>1 / N_c²</b></td><td>→ ↑ ← ↓ (4 directions)</td></tr>
+<tr><td>Diagonal</td><td>1/36</td><td><b>1 / Σ_d</b></td><td>↗ ↖ ↙ ↘ (4 directions)</td></tr>
+</table>
+<p>The weights sum to 1. The rest weight is <code>N_w²/N_c² = 4/9</code> because the stationary
+state carries the weak sector's contribution. The diagonal weight is <code>1/Σ_d = 1/36</code> —
+the total number of endomorphism channels appears as the normalization for diagonal transport.</p>
+
+<h3>MORE CRYSTAL <span>CONSTANTS</span> IN THE FLUID</h3>
+<table>
+<tr><th>Quantity</th><th>Value</th><th>Crystal</th></tr>
+<tr><td>Speed of sound²</td><td>1/3</td><td><b>1/N_c</b></td></tr>
+<tr><td>Kolmogorov exponent</td><td>5/3</td><td><b>(χ−1)/N_c</b></td></tr>
+<tr><td>Stokes drag coefficient</td><td>24</td><td><b>d_mixed = N_w³·N_c</b></td></tr>
+<tr><td>Von Kármán constant</td><td>2/5</td><td><b>N_w/(χ−1)</b></td></tr>
+<tr><td>Blasius exponent</td><td>1/4</td><td><b>1/N_w²</b></td></tr>
+</table>
+
+<h3>WHY THIS <span>MATTERS</span></h3>
+<p>Standard fluid dynamics treats these as empirical constants — numbers measured in wind tunnels
+and fitted into equations. In the Crystal Topos, <em>every single one</em> derives from
+<code>N_w = 2</code> and <code>N_c = 3</code>. The Kolmogorov 5/3 law that governs turbulence
+from coffee cups to galaxies is <code>(χ−1)/N_c = 5/3</code> — the ratio of the bond dimension
+minus one to the colour prime.</p>
+
+<p>The fluid you're watching obeys the same algebra as nuclear binding, orbital shells,
+black hole geodesics, and cosmic expansion. Same two primes. Same engine.</p>
+
+<p class="close" onclick="document.getElementById('info').classList.remove('show')">✕ Close and watch the fluid</p>
+</div>
+</div>
+<div id="stats">Step <b id="ss">0</b> · Max speed <b id="sv">—</b></div>
+
+<script>
+// D2Q9 Lattice Boltzmann — 9 = N_c² = 3²
+// Weights: w0=4/9=N_w²/N_c², w1-4=1/9=1/N_c², w5-8=1/36=1/Σ_d
+const NX = 300, NY = 120;
+const CX = [0, 1,0,-1,0, 1,-1,-1,1];
+const CY = [0, 0,1,0,-1, 1,1,-1,-1];
+const OPP = [0, 3,4,1,2, 7,8,5,6]; // bounce-back pairs
+const W = [4/9, 1/9,1/9,1/9,1/9, 1/36,1/36,1/36,1/36];
+
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+let CW, CH;
+function resize() { CW = cv.width = innerWidth; CH = cv.height = innerHeight; }
+addEventListener('resize', resize); resize();
+
+let f = new Float64Array(NX*NY*9);
+let rho = new Float64Array(NX*NY);
+let ux = new Float64Array(NX*NY);
+let uy = new Float64Array(NX*NY);
+let barrier = new Uint8Array(NX*NY);
+let step = 0;
+
+function idx(x,y,k) { return (y*NX+x)*9+k; }
+function fi(x,y) { return y*NX+x; }
+
+function feq(k, rho, ux, uy) {
+  const cu = CX[k]*ux + CY[k]*uy;
+  const usq = ux*ux + uy*uy;
+  return W[k] * rho * (1 + 3*cu + 4.5*cu*cu - 1.5*usq);
+}
+
+function init() {
+  step = 0;
+  barrier.fill(0);
+
+  // Cylinder obstacle
+  const cx2 = Math.floor(NX*0.25), cy2 = Math.floor(NY*0.5), rad = Math.floor(NY*0.12);
+  for (let y=0;y<NY;y++) for (let x=0;x<NX;x++) {
+    const dx=x-cx2, dy=y-cy2;
+    if (dx*dx+dy*dy < rad*rad) barrier[fi(x,y)] = 1;
+  }
+
+  // Top and bottom walls
+  for (let x=0;x<NX;x++) { barrier[fi(x,0)] = 1; barrier[fi(x,NY-1)] = 1; }
+
+  // Initialize with uniform rightward flow
+  const u0 = 0.08;
+  for (let y=0;y<NY;y++) for (let x=0;x<NX;x++) {
+    const i = fi(x,y);
+    rho[i] = 1.0;
+    ux[i] = barrier[i] ? 0 : u0;
+    uy[i] = 0;
+    for (let k=0;k<9;k++) f[idx(x,y,k)] = feq(k, rho[i], ux[i], uy[i]);
+  }
+}
+
+const omega = 1.0/0.53; // relaxation: 1/tau, tau slightly above 0.5 for stability
+
+function lbmStep() {
+  // Stream
+  const fnew = new Float64Array(NX*NY*9);
+  for (let y=0;y<NY;y++) for (let x=0;x<NX;x++) {
+    if (barrier[fi(x,y)]) {
+      // Bounce-back
+      for (let k=0;k<9;k++) fnew[idx(x,y,k)] = f[idx(x,y,OPP[k])];
+    } else {
+      for (let k=0;k<9;k++) {
+        const sx = (x - CX[k] + NX) % NX;
+        const sy = (y - CY[k] + NY) % NY;
+        fnew[idx(x,y,k)] = f[idx(sx,sy,k)];
+      }
+    }
+  }
+
+  // Collide
+  for (let y=0;y<NY;y++) for (let x=0;x<NX;x++) {
+    if (barrier[fi(x,y)]) continue;
+    const i = fi(x,y);
+    let r=0, vx=0, vy=0;
+    for (let k=0;k<9;k++) { const fk=fnew[idx(x,y,k)]; r+=fk; vx+=fk*CX[k]; vy+=fk*CY[k]; }
+    rho[i] = r; ux[i] = vx/r; uy[i] = vy/r;
+    for (let k=0;k<9;k++) {
+      fnew[idx(x,y,k)] += omega * (feq(k, r, vx/r, vy/r) - fnew[idx(x,y,k)]);
+    }
+  }
+
+  // Inlet: fixed velocity on left boundary
+  const u0 = 0.08;
+  for (let y=1;y<NY-1;y++) {
+    rho[fi(0,y)] = 1.0; ux[fi(0,y)] = u0; uy[fi(0,y)] = 0;
+    for (let k=0;k<9;k++) fnew[idx(0,y,k)] = feq(k, 1.0, u0, 0);
+  }
+
+  f = fnew;
+  step++;
+}
+
+// Color: curl (vorticity) for beautiful von Kármán street
+function draw() {
+  const imgData = ctx.createImageData(NX, NY);
+  const data = imgData.data;
+  let maxSpd = 0;
+
+  for (let y=1;y<NY-1;y++) for (let x=1;x<NX-1;x++) {
+    const i = fi(x,y);
+    const pi = i*4;
+
+    if (barrier[i]) {
+      data[pi]=40; data[pi+1]=40; data[pi+2]=60; data[pi+3]=255;
+      continue;
+    }
+
+    // Vorticity = duy/dx - dux/dy
+    const curl = (uy[fi(x+1,y)] - uy[fi(x-1,y)]) - (ux[fi(x,y+1)] - ux[fi(x,y-1)]);
+    const spd = Math.sqrt(ux[i]*ux[i] + uy[i]*uy[i]);
+    if (spd > maxSpd) maxSpd = spd;
+
+    // Color by vorticity (blue/red diverging) + speed brightness
+    const v = Math.min(1, Math.abs(curl) * 25);
+    const bright = 0.3 + 0.7 * Math.min(1, spd * 12);
+
+    let r, g, b;
+    if (curl > 0) {
+      r = Math.floor(30 + 225*v*bright);
+      g = Math.floor(40*(1-v)*bright);
+      b = Math.floor(60*(1-v)*bright);
+    } else {
+      r = Math.floor(30*(1-v)*bright);
+      g = Math.floor(60*(1-v)*bright);
+      b = Math.floor(30 + 225*v*bright);
+    }
+    data[pi]=r; data[pi+1]=g; data[pi+2]=b; data[pi+3]=255;
+  }
+
+  // Edges
+  for (let x=0;x<NX;x++) {
+    data[fi(x,0)*4]=20; data[fi(x,0)*4+1]=20; data[fi(x,0)*4+2]=30; data[fi(x,0)*4+3]=255;
+    data[fi(x,NY-1)*4]=20; data[fi(x,NY-1)*4+1]=20; data[fi(x,NY-1)*4+2]=30; data[fi(x,NY-1)*4+3]=255;
+  }
+
+  ctx.putImageData(imgData, 0, 0);
+  // Scale up to fill screen
+  const tmp = document.createElement('canvas');
+  tmp.width = NX; tmp.height = NY;
+  tmp.getContext('2d').putImageData(imgData, 0, 0);
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(tmp, 0, 0, NX, NY, 0, 0, CW, CH);
+
+  document.getElementById('ss').textContent = step;
+  document.getElementById('sv').textContent = maxSpd.toFixed(4);
+}
+
+// Mouse interaction: add velocity perturbation
+let mouseDown = false, lastMX = -1, lastMY = -1;
+cv.addEventListener('mousedown', e => { mouseDown = true; lastMX = e.clientX; lastMY = e.clientY; });
+cv.addEventListener('mouseup', () => { mouseDown = false; lastMX = -1; lastMY = -1; });
+cv.addEventListener('mousemove', e => {
+  if (!mouseDown) return;
+  const mx = Math.floor(e.clientX / CW * NX);
+  const my = Math.floor(e.clientY / CH * NY);
+  const dvx = (e.clientX - lastMX) * 0.3 / CW;
+  const dvy = (e.clientY - lastMY) * 0.3 / CH;
+  lastMX = e.clientX; lastMY = e.clientY;
+
+  // Apply velocity in radius around mouse
+  for (let dy=-3;dy<=3;dy++) for (let dx=-3;dx<=3;dx++) {
+    const x=mx+dx, y=my+dy;
+    if (x<1||x>=NX-1||y<1||y>=NY-1||barrier[fi(x,y)]) continue;
+    ux[fi(x,y)] += dvx;
+    uy[fi(x,y)] += dvy;
+    for (let k=0;k<9;k++) f[idx(x,y,k)] = feq(k, rho[fi(x,y)], ux[fi(x,y)], uy[fi(x,y)]);
+  }
+});
+
+init();
+
+function loop() {
+  for (let i=0;i<8;i++) lbmStep();
+  draw();
+  requestAnimationFrame(loop);
+}
+loop();
+</script>
+</body>
+</html>

@@ -1,0 +1,577 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Crystal Topos — Unified Dynamics</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#060612;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif}
+  .wrap{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;height:100vh;gap:2px;padding:2px}
+  .cell{background:#0a0a1e;border:1px solid #1a1a3a;border-radius:6px;position:relative;overflow:hidden}
+  .cell h2{position:absolute;top:6px;left:10px;font-size:0.7em;color:#7ec8e3;letter-spacing:1px;z-index:2;
+           text-shadow:0 0 10px #060612,0 0 20px #060612}
+  .cell h2 em{color:#e74c3c;font-style:normal}
+  .cell h2 .m{color:#9b59b6;font-weight:normal;font-size:0.9em}
+  canvas{width:100%;height:100%;display:block}
+  #hud{position:absolute;top:0;left:0;right:0;height:28px;display:flex;align-items:center;justify-content:center;
+       gap:10px;background:rgba(6,6,18,0.85);z-index:10;border-bottom:1px solid #1a1a3a}
+  #hud span{font-size:0.6em;color:#444;font-family:monospace}
+  #hud b{color:#7ec8e3}
+  #hud em{color:#e74c3c;font-style:normal}
+  #ctrl{position:absolute;bottom:6px;right:10px;z-index:10;display:flex;gap:4px}
+  #ctrl button{background:rgba(255,255,255,0.03);border:1px solid #1a1a3a;color:#5a9;
+               padding:3px 10px;border-radius:4px;cursor:pointer;font-size:0.65em}
+  #ctrl button.on{background:rgba(231,76,60,0.15);border-color:#e74c3c;color:#e74c3c}
+  #info{position:absolute;top:32px;left:0;right:0;bottom:0;background:rgba(6,6,18,0.94);z-index:20;
+        display:none;overflow-y:auto;padding:30px}
+  #info.show{display:block}
+  #info .inner{max-width:800px;margin:auto;font-size:0.85em;line-height:1.8;color:#999}
+  #info h3{color:#7ec8e3;font-size:1.1em;margin:18px 0 6px;letter-spacing:1px}
+  #info h3:first-child{margin-top:0}
+  #info h3 span{color:#e74c3c}
+  #info b{color:#7ec8e3}
+  #info em{color:#e74c3c;font-style:normal}
+  #info code{color:#7ec8e3;background:#0a0a20;padding:1px 5px;border-radius:3px;font-size:0.95em}
+  #info .vs{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;margin:12px 0;align-items:start}
+  #info .vs div{background:#0a0a20;border:1px solid #1a1a3a;border-radius:6px;padding:10px;font-size:0.85em}
+  #info .vs .arrow{color:#e74c3c;font-size:1.5em;align-self:center;text-align:center}
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <span><b>N_w</b>=2</span>
+  <span><b>N_c</b>=3</span>
+  <span><b>χ</b>=6</span>
+  <span><b>β₀</b>=7</span>
+  <span>|</span>
+  <span>Step <b id="hs">0</b></span>
+  <span>E <b id="he">—</b></span>
+  <span>ΔE <em id="hde">—</em></span>
+  <span>Tick <b id="ht">0</b></span>
+  <span>Entropy <b id="hent">—</b></span>
+</div>
+
+<div class="wrap">
+  <div class="cell">
+    <h2><em>①</em> BINARY ORBIT <span class="m">WasmNBody</span></h2>
+    <canvas id="c1"></canvas>
+  </div>
+  <div class="cell">
+    <h2><em>②</em> MONAD S=W∘U <span class="m">WasmMonad</span></h2>
+    <canvas id="c2"></canvas>
+  </div>
+  <div class="cell">
+    <h2><em>③</em> EM PULSE <span class="m">WasmEM</span></h2>
+    <canvas id="c3"></canvas>
+  </div>
+  <div class="cell">
+    <h2><em>④</em> V_EFF + BINDING <span class="m">WasmGR + WasmNuclear</span></h2>
+    <canvas id="c4"></canvas>
+  </div>
+</div>
+
+<div id="ctrl">
+  <button class="on" id="bp">▶</button>
+  <button id="bpp">⏸</button>
+  <button onclick="init()">↺</button>
+  <button id="binfo" onclick="document.getElementById('info').classList.toggle('show');this.classList.toggle('on')">? WHY</button>
+</div>
+
+<div id="info">
+<div class="inner">
+
+<h3>WHY IS <span>THIS</span> IMPRESSIVE?</h3>
+
+<p>You are watching <b>five independent physics engines</b> running simultaneously in your browser.
+Each panel computes a completely different domain of physics. Normally, each would require its own
+software, its own equations, its own constants. Here, they all run from <em>the same two numbers</em>.</p>
+
+<h3>WHAT EACH PANEL <span>ACTUALLY</span> COMPUTES</h3>
+
+<p><b>① Binary Orbit</b> — Two masses orbiting each other under gravity.
+The force is <code>1/r²</code> because <code>N_c = 3</code> gives 3 spatial dimensions,
+and Gauss's law in 3D forces inverse-square. The integration is order <code>N_w = 2</code> (Verlet).
+If <code>N_c</code> were 4, this orbit would spiral inward and crash. Stable orbits only exist because <code>N_c = 3</code>.</p>
+
+<p><b>② Monad S = W∘U</b> — The quantum state of the algebra, ticking forward in discrete time.
+Four sectors with eigenvalues <code>{1, 1/2, 1/3, 1/6}</code> — these ARE the four truth values of quantum mechanics.
+The singlet (green, λ=1) never decays — that's dark matter. The mixed sector (purple, λ=1/6) decays fastest —
+those are quarks and leptons. You're watching quantum decoherence happen in real time.</p>
+
+<p><b>③ EM Pulse</b> — A photon propagating through space via the Yee FDTD algorithm.
+Each timestep splits into <em>B-update = W</em> (kick) then <em>E-update = U</em> (drift).
+That split IS the monad <code>S = W∘U</code> from Panel ②, restricted to the electromagnetic sector.
+Maxwell's equations are literally the monad acting on 6 = χ field components (3 E + 3 B).</p>
+
+<p><b>④ V_eff + Binding</b> — Two results from two different modules plotted together.
+The top curve (GR) shows the effective potential around a black hole — the dip at <code>r = 6GM = χ·GM</code>
+is the innermost stable orbit. The bottom curve (Nuclear) shows binding energy per nucleon — iron peaks
+at <code>A = 56 = 8 × 7 = d_colour × β₀</code>. Both use the same <code>χ = 6</code>.</p>
+
+<h3>WHY THIS <span>DOESN'T</span> NORMALLY HAPPEN</h3>
+
+<div class="vs">
+<div>
+<b>Standard physics:</b><br>
+• Gravity uses G, c, ℏ<br>
+• QM uses ℏ, m_e, e<br>
+• Nuclear uses α_s, Λ_QCD<br>
+• EM uses ε₀, μ₀, c<br>
+• Cosmology uses H₀, Ω_Λ<br><br>
+<em>~25 independent constants</em><br>
+No connection between them.<br>
+Each domain is a separate theory.
+</div>
+<div class="arrow">→</div>
+<div>
+<b>Crystal Topos:</b><br>
+• Gravity uses N_c = 3, χ = 6<br>
+• QM uses {1, 1/N_w, 1/N_c, 1/χ}<br>
+• Nuclear uses d_colour·β₀ = 56<br>
+• EM uses χ = 6 components<br>
+• Cosmology uses gauss/(gauss+χ)<br><br>
+<em>2 inputs: N_w = 2, N_c = 3</em><br>
+Everything connected.<br>
+One engine, one algebra.
+</div>
+</div>
+
+<h3>THE <span>PUNCHLINE</span></h3>
+
+<p>Panel ① uses <code>N_c = 3</code> for spatial dimensions.<br>
+Panel ② uses <code>N_c = 3</code> for the colour sector eigenvalue 1/3.<br>
+Panel ③ uses <code>N_c = 3</code> for the 3 electric field components.<br>
+Panel ④ uses <code>N_c = 3</code> for nuclear radius <code>R ∝ A^{1/3}</code> AND for the photon sphere at <code>3GM</code>.</p>
+
+<p>Same number. Four completely different jobs. In standard physics, these are unrelated coincidences.
+In the Crystal, they are the <em>same algebraic fact</em>: <code>M₃(ℂ)</code> acts on <code>ℂ³</code>.</p>
+
+<p>That's what unification means. Not "we wrote one program." <em>The physics demanded one program.</em></p>
+
+<p style="margin-top:20px;color:#444;font-size:0.85em">Click <em>? WHY</em> again to close and watch the simulation.</p>
+
+</div>
+</div>
+
+<script type="module">
+// ══════════════════════════════════════════════════════════════
+// Load 5 WASM modules simultaneously
+// ══════════════════════════════════════════════════════════════
+let NBody,EM,Monad,GR,Nuc,OK=false;
+try {
+  const m = await import('./pkg/crystal_toe.js');
+  await m.default();
+  NBody = m.WasmNBody; EM = m.WasmEM; Monad = m.WasmMonad;
+  GR = m.WasmGR; Nuc = m.WasmNuclear;
+  OK = true;
+  console.log('✓ 5 WASM modules ready');
+} catch(e) { console.warn('Fallback:', e.message); }
+
+// ══════════════════════════════════════════════════════════════
+// State — all simulations running simultaneously
+// ══════════════════════════════════════════════════════════════
+let nb, em, monad, gr, nuc;
+let E0_nb, E0_em;
+let playing = true;
+let monadHist = [[],[],[],[]]; // per-sector history
+let emTrail = []; // waterfall history
+let nbTrails = [[],[]]; // binary trails
+let frame = 0;
+
+function init() {
+  frame = 0;
+  monadHist = [[],[],[],[]];
+  emTrail = [];
+  nbTrails = [[],[]];
+
+  if (OK) {
+    // Binary system
+    nb = new NBody(0.003, 0.01);
+    nb.add_body(-1.5, 0, 0, 0, 0.55, 0, 1.0);
+    nb.add_body(1.5, 0, 0, 0, -0.55, 0, 1.0);
+    E0_nb = nb.total_energy();
+
+    // EM pulse
+    em = new EM(400, 0.2, 0.03, 1.0, 0.5);
+    E0_em = em.energy();
+
+    // Monad
+    monad = new Monad();
+
+    // GR + Nuclear (stateless, call per-frame)
+    gr = new GR();
+    nuc = new Nuc();
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// JS fallbacks
+// ══════════════════════════════════════════════════════════════
+let jNB = {
+  b: [{x:-1.5,y:0,vx:0,vy:0.55,m:1},{x:1.5,y:0,vx:0,vy:-0.55,m:1}],
+  step: 0,
+  tick() {
+    const dt=0.003,b=this.b;
+    const dx=b[1].x-b[0].x,dy=b[1].y-b[0].y;
+    const r=Math.sqrt(dx*dx+dy*dy+0.01),f=1/(r*r*r);
+    b[0].vx+=dt*f*dx*b[1].m; b[0].vy+=dt*f*dy*b[1].m;
+    b[1].vx-=dt*f*dx*b[0].m; b[1].vy-=dt*f*dy*b[0].m;
+    b[0].x+=dt*b[0].vx; b[0].y+=dt*b[0].vy;
+    b[1].x+=dt*b[1].vx; b[1].y+=dt*b[1].vy;
+    this.step++;
+  },
+  energy() {
+    const b=this.b;
+    const ke=0.5*(b[0].m*(b[0].vx*b[0].vx+b[0].vy*b[0].vy)+b[1].m*(b[1].vx*b[1].vx+b[1].vy*b[1].vy));
+    const dx=b[0].x-b[1].x,dy=b[0].y-b[1].y;
+    return ke-b[0].m*b[1].m/Math.sqrt(dx*dx+dy*dy+0.01);
+  }
+};
+
+let jEM = {
+  ey: new Float64Array(400), bz: new Float64Array(399), step:0,
+  init() {
+    for(let i=0;i<400;i++){const t=(i/400-0.2)/0.03; this.ey[i]=Math.exp(-(t*t));}
+    this.bz = new Float64Array(399);
+  },
+  tick() {
+    const c=0.5,n=400;
+    for(let i=0;i<n-1;i++) this.bz[i]-=c*(this.ey[i+1]-this.ey[i]);
+    for(let i=1;i<n-1;i++) this.ey[i]-=c*(this.bz[i]-this.bz[i-1]);
+    this.ey[0]=0;this.ey[n-1]=0;this.step++;
+  }
+};
+
+const LAMBDAS=[1,0.5,1/3,1/6], DIMS=[1,3,8,24];
+let jMonad = { amps:[1,1,1,1], t:0,
+  tick(){ for(let i=0;i<4;i++) this.amps[i]*=LAMBDAS[i]; this.t++; },
+  entropy(){ let tw=0; for(let i=0;i<4;i++) tw+=DIMS[i]*this.amps[i];
+    let s=0; for(let i=0;i<4;i++){const p=DIMS[i]*this.amps[i]/tw; if(p>1e-30) s-=p*Math.log(p)} return s; }
+};
+
+if (!OK) { jEM.init(); E0_nb=jNB.energy(); E0_em=1; }
+
+// ══════════════════════════════════════════════════════════════
+// Canvas setup
+// ══════════════════════════════════════════════════════════════
+const cvs = [1,2,3,4].map(i => document.getElementById('c'+i));
+const ctxs = cvs.map(c => c.getContext('2d'));
+let W, H;
+
+function resize() {
+  cvs.forEach(c => {
+    const r = c.getBoundingClientRect();
+    c.width = r.width * 2; c.height = r.height * 2;
+  });
+  W = cvs[0].width; H = cvs[0].height;
+}
+addEventListener('resize', resize); resize();
+
+// ══════════════════════════════════════════════════════════════
+// Panel 1: Binary orbit (Canvas trails)
+// ══════════════════════════════════════════════════════════════
+function draw1() {
+  const ctx = ctxs[0];
+  ctx.fillStyle = 'rgba(10,10,30,0.06)'; ctx.fillRect(0,0,W,H);
+  
+  let pos;
+  if (OK) { pos = nb.positions_2d(); }
+  else { pos = jNB.b.map(b=>[b.x,b.y]); }
+
+  const cx=W/2, cy=H/2, sc=W*0.14;
+  const colors = ['#7ec8e3','#e74c3c'];
+
+  for (let i=0; i<2; i++) {
+    nbTrails[i].push([pos[i][0], pos[i][1]]);
+    if (nbTrails[i].length > 3000) nbTrails[i].shift();
+
+    // Trail
+    const t = nbTrails[i];
+    ctx.lineWidth = 2;
+    for (let j=1; j<t.length; j++) {
+      ctx.globalAlpha = (j/t.length)*0.6;
+      ctx.strokeStyle = colors[i];
+      ctx.beginPath();
+      ctx.moveTo(cx+t[j-1][0]*sc, cy-t[j-1][1]*sc);
+      ctx.lineTo(cx+t[j][0]*sc, cy-t[j][1]*sc);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+
+    // Body glow
+    const sx=cx+pos[i][0]*sc, sy=cy-pos[i][1]*sc;
+    const g=ctx.createRadialGradient(sx,sy,0,sx,sy,20);
+    g.addColorStop(0,colors[i]+'66'); g.addColorStop(1,'transparent');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(sx,sy,20,0,6.283); ctx.fill();
+    ctx.fillStyle=colors[i]; ctx.beginPath(); ctx.arc(sx,sy,4,0,6.283); ctx.fill();
+    ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(sx,sy,1.5,0,6.283); ctx.fill();
+  }
+
+  // Center of mass
+  ctx.fillStyle='#ffffff11'; ctx.beginPath(); ctx.arc(cx,cy,3,0,6.283); ctx.fill();
+}
+
+// ══════════════════════════════════════════════════════════════
+// Panel 2: Monad sectors (live bars + history lines)
+// ══════════════════════════════════════════════════════════════
+function draw2() {
+  const ctx = ctxs[1];
+  ctx.fillStyle = '#0a0a1e'; ctx.fillRect(0,0,W,H);
+
+  let amps;
+  if (OK) { amps = monad.amplitudes(); }
+  else { amps = [...jMonad.amps]; }
+
+  const names = ['singlet','weak','colour','mixed'];
+  const colors = ['#2ecc71','#3498db','#e74c3c','#9b59b6'];
+  const lambdaLabels = ['λ=1','λ=1/2','λ=1/3','λ=1/6'];
+
+  // Record history
+  for (let i=0;i<4;i++) { monadHist[i].push(amps[i]); if(monadHist[i].length>300) monadHist[i].shift(); }
+
+  const barW = W*0.08, gap = W*0.04;
+  const startX = W*0.08;
+  const barBase = H*0.85;
+  const barMaxH = H*0.5;
+
+  // Bars
+  for (let i=0;i<4;i++) {
+    const x = startX + i*(barW+gap);
+    const h = amps[i] * barMaxH;
+
+    // Glow
+    const g = ctx.createLinearGradient(x,barBase,x,barBase-h);
+    g.addColorStop(0, colors[i]+'33'); g.addColorStop(1, colors[i]+'aa');
+    ctx.fillStyle = g;
+    ctx.fillRect(x, barBase-h, barW, h);
+
+    // Border
+    ctx.strokeStyle = colors[i]; ctx.lineWidth = 1;
+    ctx.strokeRect(x, barBase-h, barW, h);
+
+    // Label
+    ctx.fillStyle = colors[i]; ctx.font = `${W*0.025}px monospace`;
+    ctx.fillText(names[i], x, barBase + W*0.035);
+    ctx.fillStyle = '#444'; ctx.font = `${W*0.018}px monospace`;
+    ctx.fillText(lambdaLabels[i], x, barBase + W*0.055);
+    ctx.fillStyle = colors[i];
+    ctx.fillText(amps[i].toFixed(4), x, barBase - h - W*0.01);
+  }
+
+  // History lines (right side)
+  const histX = W*0.55, histW = W*0.4, histH = H*0.7, histY = H*0.1;
+  ctx.strokeStyle = '#1a1a3a'; ctx.lineWidth = 0.5;
+  ctx.strokeRect(histX, histY, histW, histH);
+
+  for (let i=0;i<4;i++) {
+    const data = monadHist[i];
+    if (data.length < 2) continue;
+    ctx.strokeStyle = colors[i]; ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    for (let j=0;j<data.length;j++) {
+      const x = histX + (j/300)*histW;
+      const y = histY + histH - data[j]*histH;
+      j===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// Panel 3: EM pulse propagation (waterfall)
+// ══════════════════════════════════════════════════════════════
+function draw3() {
+  const ctx = ctxs[2];
+  ctx.fillStyle = 'rgba(10,10,30,0.15)'; ctx.fillRect(0,0,W,H);
+
+  let field;
+  if (OK) { field = em.ey_field(); }
+  else { field = Array.from(jEM.ey); }
+
+  const n = field.length;
+  const mid = H*0.5;
+  const sc = H*0.35;
+
+  // Waterfall: shift old lines down
+  emTrail.push(field.slice());
+  if (emTrail.length > 80) emTrail.shift();
+
+  for (let row = 0; row < emTrail.length; row++) {
+    const alpha = (row / emTrail.length) * 0.4;
+    const yOff = mid + (row - emTrail.length) * 3;
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = '#7ec8e3';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const x = (i/n)*W;
+      const y = yOff - emTrail[row][i] * sc * 0.5;
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
+  // Current field (bright)
+  ctx.strokeStyle = '#7ec8e3'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let i=0; i<n; i++) {
+    const x = (i/n)*W, y = mid - field[i]*sc;
+    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+
+  // Glow
+  ctx.strokeStyle = 'rgba(126,200,227,0.15)'; ctx.lineWidth = 6;
+  ctx.beginPath();
+  for (let i=0; i<n; i++) {
+    const x = (i/n)*W, y = mid - field[i]*sc;
+    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+}
+
+// ══════════════════════════════════════════════════════════════
+// Panel 4: V_eff + binding curve (split)
+// ══════════════════════════════════════════════════════════════
+let veffData, bindData;
+function initPanel4() {
+  if (OK) {
+    veffData = gr.veff_curve(1.0, 4.2, 2.5, 40.0, 200);
+    bindData = nuc.binding_curve(120);
+  } else {
+    veffData = []; bindData = [];
+    for(let i=0;i<200;i++){const r=2.5+i*0.19;veffData.push([r,-1/r+4.2*4.2/(2*r*r)-4.2*4.2/(r*r*r)])}
+    for(let a=2;a<=120;a++){const z=Math.round(a/2.1);bindData.push([a,Math.max(0,(15.8*a-18.3*Math.pow(a,2/3)-0.714*z*(z-1)/Math.pow(a,1/3)-23.2*Math.pow(a-2*z,2)/a)/a)])}
+  }
+}
+
+function draw4() {
+  const ctx = ctxs[3];
+  ctx.fillStyle = '#0a0a1e'; ctx.fillRect(0,0,W,H);
+
+  // Top half: V_eff
+  const topH = H*0.48;
+  const mx=W*0.1, mw=W*0.8;
+
+  // V_eff curve
+  const vx = v => mx + (v-2.5)/(40-2.5)*mw;
+  const vy = v => 30 + (0.05-Math.max(-0.15,Math.min(0.05,v)))/(0.05-(-0.15))*(topH-20-30);
+  
+  ctx.strokeStyle = '#f39c12'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let i=0;i<veffData.length;i++) {
+    const x=vx(veffData[i][0]), y=vy(Math.max(-0.15,Math.min(0.05,veffData[i][1])));
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+
+  // ISCO marker
+  ctx.strokeStyle='#7ec8e333'; ctx.lineWidth=0.5; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(vx(6),20); ctx.lineTo(vx(6),topH-20); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#7ec8e344'; ctx.font=`${W*0.02}px monospace`;
+  ctx.fillText('ISCO=χ',vx(6)+4,40);
+
+  // Orbiting marker (animated)
+  const orbR = 12 + 8*Math.sin(frame*0.02);
+  const orbVeff = veffData.find(d => Math.abs(d[0]-orbR)<0.2);
+  if (orbVeff) {
+    const ox=vx(orbVeff[0]), oy=vy(Math.max(-0.15,Math.min(0.05,orbVeff[1])));
+    ctx.fillStyle='#2ecc71'; ctx.beginPath(); ctx.arc(ox,oy,4,0,6.283); ctx.fill();
+  }
+
+  ctx.fillStyle='#f39c1266'; ctx.font=`${W*0.02}px monospace`;
+  ctx.fillText('V_eff(r)',mx+5,35);
+
+  // Bottom half: Binding curve
+  const botY = H*0.52;
+  const bx = v => mx + (v/125)*mw;
+  const by = v => (H-20) - (v/9.5)*(H-20-botY-10);
+
+  ctx.strokeStyle = '#3498db'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let i=0;i<bindData.length;i++) {
+    const x=bx(bindData[i][0]), y=by(bindData[i][1]);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+
+  // Fe-56 marker
+  const fe = bindData.find(d=>d[0]===56);
+  if(fe) {
+    ctx.fillStyle='#2ecc71'; ctx.beginPath(); ctx.arc(bx(56),by(fe[1]),4,0,6.283); ctx.fill();
+    ctx.fillStyle='#2ecc7188'; ctx.font=`${W*0.018}px monospace`;
+    ctx.fillText('Fe-56=8×7',bx(56)+6,by(fe[1])-6);
+  }
+
+  ctx.fillStyle='#3498db66'; ctx.font=`${W*0.02}px monospace`;
+  ctx.fillText('B/A (MeV)',mx+5,botY+20);
+
+  // Divider
+  ctx.strokeStyle='#1a1a3a'; ctx.lineWidth=0.5;
+  ctx.beginPath(); ctx.moveTo(mx,H*0.5); ctx.lineTo(mx+mw,H*0.5); ctx.stroke();
+}
+
+// ══════════════════════════════════════════════════════════════
+// HUD
+// ══════════════════════════════════════════════════════════════
+function updateHUD() {
+  const step = OK ? nb.current_step() : jNB.step;
+  const E = OK ? nb.total_energy() : jNB.energy();
+  const de = E0_nb ? Math.abs((E-E0_nb)/E0_nb*100) : 0;
+  const tick = OK ? monad.current_tick() : jMonad.t;
+  const ent = OK ? monad.entropy() : jMonad.entropy();
+
+  document.getElementById('hs').textContent = step;
+  document.getElementById('he').textContent = E.toFixed(4);
+  const del = document.getElementById('hde');
+  del.textContent = de.toFixed(4)+'%';
+  del.style.color = de<0.01?'#2ecc71':'#f39c12';
+  document.getElementById('ht').textContent = tick;
+  document.getElementById('hent').textContent = ent.toFixed(4);
+}
+
+// ══════════════════════════════════════════════════════════════
+// Main loop — ALL modules compute EVERY frame
+// ══════════════════════════════════════════════════════════════
+init();
+initPanel4();
+
+function loop() {
+  if (playing) {
+    frame++;
+
+    // Advance ALL simulations
+    if (OK) {
+      nb.advance(4);        // WasmNBody: binary orbit
+      em.advance(8);        // WasmEM: photon propagation
+      if (frame % 3 === 0) monad.tick(); // WasmMonad: sector decay
+    } else {
+      for(let i=0;i<4;i++) jNB.tick();
+      for(let i=0;i<8;i++) jEM.tick();
+      if (frame % 3 === 0) jMonad.tick();
+    }
+
+    // Draw ALL panels
+    draw1(); // NBody binary
+    draw2(); // Monad sectors
+    draw3(); // EM pulse
+    draw4(); // GR V_eff + Nuclear binding
+
+    if (frame % 10 === 0) updateHUD();
+  }
+  requestAnimationFrame(loop);
+}
+
+loop();
+
+// Controls
+document.getElementById('bp').onclick=()=>{playing=true;document.getElementById('bp').classList.add('on');document.getElementById('bpp').classList.remove('on')};
+document.getElementById('bpp').onclick=()=>{playing=false;document.getElementById('bpp').classList.add('on');document.getElementById('bp').classList.remove('on')};
+</script>
+</body>
+</html>

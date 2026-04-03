@@ -1,0 +1,307 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Crystal Topos — Ising Phase Transition</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#060612;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;display:flex}
+  #left{flex:1;position:relative}
+  #right{width:320px;background:#0a0a1e;border-left:1px solid #1a1a3a;padding:14px;overflow-y:auto}
+  canvas{display:block;image-rendering:pixelated}
+  h1{font-size:1em;color:#7ec8e3;letter-spacing:2px;margin-bottom:4px}
+  h1 span{color:#e74c3c}
+  .sub{color:#444;font-size:0.68em;margin-bottom:10px}
+  .row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+  label{color:#555;font-size:0.72em;white-space:nowrap}
+  input[type=range]{flex:1}
+  .val{color:#7ec8e3;font-family:monospace;font-size:0.8em;min-width:50px}
+  button{background:rgba(255,255,255,0.04);border:1px solid #1a1a3a;color:#5a9;
+         padding:4px 12px;border-radius:5px;cursor:pointer;font-size:0.7em}
+  button.on{background:rgba(231,76,60,0.2);border-color:#e74c3c;color:#e74c3c}
+  .stat{font-family:monospace;font-size:0.72em;color:#444;margin:4px 0}
+  .stat b{color:#7ec8e3}
+  .stat em{color:#e74c3c;font-style:normal}
+  .note{font-size:0.68em;color:#333;line-height:1.6;margin-top:12px;border-top:1px solid #1a1a3a;padding-top:10px}
+  .note b{color:#5a9}
+  #info{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(6,6,18,0.95);z-index:20;
+        display:none;overflow-y:auto;padding:30px 20px}
+  #info.show{display:block}
+  #info .inner{max-width:750px;margin:auto;font-size:0.85em;line-height:1.8;color:#999}
+  #info h3{color:#7ec8e3;font-size:1em;margin:16px 0 6px}
+  #info h3:first-child{margin-top:0}
+  #info h3 span{color:#e74c3c}
+  #info b{color:#7ec8e3}
+  #info em{color:#e74c3c;font-style:normal}
+  #info code{color:#7ec8e3;background:#0a0a20;padding:1px 5px;border-radius:3px}
+  #info table{border-collapse:collapse;margin:10px 0;width:100%}
+  #info td,#info th{border:1px solid #1a1a3a;padding:5px 10px;font-size:0.85em;text-align:left}
+  #info th{color:#7ec8e3;background:#0a0a20}
+  #info .close{color:#e74c3c;cursor:pointer;font-size:0.8em;margin-top:16px;display:inline-block}
+  #magplot{width:100%;height:120px;background:#060612;border:1px solid #1a1a3a;border-radius:4px;margin-top:8px}
+</style>
+</head>
+<body>
+
+<div id="left">
+  <canvas id="c"></canvas>
+</div>
+
+<div id="right">
+  <h1>ISING <span>PHASE TRANSITION</span></h1>
+  <div class="sub">N_w = 2 spin states · z = N_w² = 4 neighbours · T_c from Onsager</div>
+
+  <div class="row">
+    <label>Temperature:</label>
+    <input type="range" id="stemp" min="0.5" max="5.0" value="3.5" step="0.05">
+    <span class="val" id="vtemp">3.50</span>
+  </div>
+  <div class="row">
+    <button class="on" id="bp">▶</button>
+    <button id="bpp">⏸</button>
+    <button onclick="init()">↺ Hot</button>
+    <button onclick="initCold()">↺ Cold</button>
+    <button onclick="document.getElementById('info').classList.toggle('show')">? EXPLAIN</button>
+  </div>
+
+  <div class="stat">Sweep <b id="ssw">0</b></div>
+  <div class="stat">Magnetization <b id="smag">0</b></div>
+  <div class="stat">|M| <b id="samag">0</b></div>
+  <div class="stat">Energy/site <b id="sen">0</b></div>
+  <div class="stat">T_c (Onsager) = <em id="stc">—</em></div>
+  <div class="stat"><b id="sphase">—</b></div>
+
+  <canvas id="magplot"></canvas>
+
+  <div class="note">
+    <b>N_w = 2</b> spin states (up/down).<br>
+    Square lattice: <b>z = N_w² = 4</b> neighbours.<br>
+    Cubic lattice would have <b>z = χ = 6</b>.<br>
+    Onsager T_c = <b>2J / ln(1+√N_w)</b> = 2/ln(1+√2).<br>
+    Below T_c: spins align → <b>ferromagnet</b>.<br>
+    Above T_c: random → <b>paramagnet</b>.<br>
+    At T_c: <b>scale invariance</b> — fractal domains.<br><br>
+    BCS superconductor ratio: <b>2Δ/kT_c = N_w·π/e^γ ≈ 3.53</b>.<br>
+    Ground state energy: <b>−N_w</b> per site.
+  </div>
+</div>
+
+<script type="module">
+let WCondensed, OK = false;
+try {
+  const m = await import('./pkg/crystal_toe.js');
+  await m.default();
+  WCondensed = m.WasmCondensed;
+  OK = true;
+  console.log('✓ WasmCondensed loaded');
+} catch(e) { console.warn('JS:', e.message); }
+
+const N = 200; // lattice size
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const mp = document.getElementById('magplot'), mctx = mp.getContext('2d');
+let W2, H2, imgData;
+let spins, sweep, playing = true;
+let magHistory = [];
+
+// Onsager critical temperature
+const TC = 2.0 / Math.log(1 + Math.sqrt(2)); // ≈ 2.269
+
+function resize() {
+  const rect = cv.parentElement.getBoundingClientRect();
+  W2 = cv.width = rect.width; H2 = cv.height = rect.height;
+  imgData = ctx.createImageData(N, N);
+  mp.width = 290; mp.height = 120;
+}
+addEventListener('resize', resize); resize();
+
+document.getElementById('stc').textContent = TC.toFixed(4);
+
+// Lattice
+function init() {
+  sweep = 0; magHistory = [];
+  spins = new Int8Array(N*N);
+  // Hot start: random
+  for (let i=0;i<N*N;i++) spins[i] = Math.random() < 0.5 ? 1 : -1;
+}
+
+function initCold() {
+  sweep = 0; magHistory = [];
+  spins = new Int8Array(N*N);
+  for (let i=0;i<N*N;i++) spins[i] = 1;
+}
+
+// Single Metropolis sweep
+let rng = 12345;
+function lcg() { rng = (rng * 1103515245 + 12345) & 0x7fffffff; return rng / 0x7fffffff; }
+
+function metropolisSweep() {
+  const T = +document.getElementById('stemp').value;
+  const beta = 1.0 / T;
+
+  for (let iter = 0; iter < N*N; iter++) {
+    const i = Math.floor(lcg() * N);
+    const j = Math.floor(lcg() * N);
+    const idx = j*N + i;
+    const s = spins[idx];
+
+    // Sum of 4 neighbours (z = N_w² = 4)
+    const sum = spins[j*N + (i+1)%N] + spins[j*N + (i-1+N)%N] +
+                spins[((j+1)%N)*N + i] + spins[((j-1+N)%N)*N + i];
+    const dE = 2 * s * sum;
+
+    if (dE <= 0 || lcg() < Math.exp(-beta * dE)) {
+      spins[idx] = -s;
+    }
+  }
+  sweep++;
+}
+
+function magnetization() {
+  let m = 0;
+  for (let i=0;i<N*N;i++) m += spins[i];
+  return m / (N*N);
+}
+
+function energy() {
+  let e = 0;
+  for (let j=0;j<N;j++) for (let i=0;i<N;i++) {
+    const s = spins[j*N+i];
+    e -= s * (spins[j*N+(i+1)%N] + spins[((j+1)%N)*N+i]);
+  }
+  return e / (N*N);
+}
+
+// Draw lattice
+function drawLattice() {
+  const data = imgData.data;
+  for (let j=0;j<N;j++) for (let i=0;i<N;i++) {
+    const s = spins[j*N+i];
+    const pi = (j*N+i)*4;
+    if (s > 0) {
+      data[pi]=40; data[pi+1]=120; data[pi+2]=220; data[pi+3]=255; // blue = up
+    } else {
+      data[pi]=220; data[pi+1]=60; data[pi+2]=50; data[pi+3]=255; // red = down
+    }
+  }
+  ctx.putImageData(imgData, 0, 0);
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(cv, 0,0,N,N, 0,0,W2,H2);
+}
+
+// Draw magnetization history
+function drawMag() {
+  const w=mp.width, h=mp.height;
+  mctx.fillStyle='#060612'; mctx.fillRect(0,0,w,h);
+
+  // T_c line
+  mctx.strokeStyle='#e74c3c33'; mctx.lineWidth=0.5; mctx.setLineDash([3,3]);
+  mctx.beginPath(); mctx.moveTo(0,h/2); mctx.lineTo(w,h/2); mctx.stroke();
+  mctx.setLineDash([]);
+
+  if (magHistory.length < 2) return;
+  const n = magHistory.length;
+  mctx.strokeStyle='#7ec8e3'; mctx.lineWidth=1.5;
+  mctx.beginPath();
+  for (let i=0;i<n;i++) {
+    const x = (i/Math.max(n-1,1))*w;
+    const y = h/2 - magHistory[i]*(h/2)*0.9;
+    i===0 ? mctx.moveTo(x,y) : mctx.lineTo(x,y);
+  }
+  mctx.stroke();
+
+  // Labels
+  mctx.fillStyle='#333'; mctx.font='9px monospace';
+  mctx.fillText('+1', 2, 10);
+  mctx.fillText('0', 2, h/2+3);
+  mctx.fillText('-1', 2, h-3);
+  mctx.fillText('M(t)', w-25, 10);
+}
+
+function updateStats() {
+  const T = +document.getElementById('stemp').value;
+  document.getElementById('vtemp').textContent = T.toFixed(2);
+  document.getElementById('ssw').textContent = sweep;
+  const m = magnetization();
+  document.getElementById('smag').textContent = m.toFixed(4);
+  document.getElementById('samag').textContent = Math.abs(m).toFixed(4);
+  document.getElementById('sen').textContent = energy().toFixed(3);
+
+  const phase = document.getElementById('sphase');
+  if (T < TC * 0.9) { phase.textContent = '❄ ORDERED (ferromagnet)'; phase.style.color='#3498db'; }
+  else if (T > TC * 1.1) { phase.textContent = '🔥 DISORDERED (paramagnet)'; phase.style.color='#e74c3c'; }
+  else { phase.textContent = '⚡ CRITICAL (scale-free domains)'; phase.style.color='#f39c12'; }
+
+  magHistory.push(m);
+  if (magHistory.length > 500) magHistory.shift();
+}
+
+init();
+function loop() {
+  if (playing) {
+    metropolisSweep();
+    metropolisSweep();
+    drawLattice();
+    drawMag();
+    if (sweep%2===0) updateStats();
+  }
+  requestAnimationFrame(loop);
+}
+loop();
+
+document.getElementById('bp').onclick=()=>{playing=true;document.getElementById('bp').classList.add('on');document.getElementById('bpp').classList.remove('on')};
+document.getElementById('bpp').onclick=()=>{playing=false;document.getElementById('bpp').classList.add('on');document.getElementById('bp').classList.remove('on')};
+document.getElementById('stemp').oninput=function(){document.getElementById('vtemp').textContent=(+this.value).toFixed(2)};
+</script>
+<div id="info">
+<div class="inner">
+<h3>WHAT YOU'RE <span>SEEING</span></h3>
+<p>A <b>200 × 200 lattice</b> of tiny magnets, each pointing up (blue) or down (red). Every frame,
+the computer picks random magnets and asks: "should I flip?" If flipping lowers the total energy,
+it always flips. If flipping raises the energy, it flips with probability <code>e^(−ΔE/kT)</code>.
+This is the <b>Metropolis algorithm</b> — the foundation of all Monte Carlo physics.</p>
+
+<h3>THE <span>PHASE TRANSITION</span></h3>
+<p>Drag the temperature slider. Three regimes:</p>
+<p><b>T &lt; T_c (cold)</b> — Almost all spins align. One color dominates. This is a <em>ferromagnet</em>.
+Long-range order emerges spontaneously from local interactions. Start from "↺ Hot" and cool slowly —
+watch domains grow and merge until one wins.</p>
+<p><b>T = T_c (critical)</b> — Fractal domains at every scale. No single domain wins, but they're not
+random either. This is <em>scale invariance</em> — the system looks the same zoomed in or out.
+This is the exact point where order melts into disorder.</p>
+<p><b>T &gt; T_c (hot)</b> — Pure noise. No pattern. Every spin is independent. This is a <em>paramagnet</em>.
+The thermal energy overwhelms the interaction energy.</p>
+
+<h3>WHY <span>N_w = 2</span> STATES?</h3>
+<p>Each spin has <code>N_w = 2</code> possible values: up (+1) or down (−1). This is the
+<b>weak prime</b> of the Crystal Topos — the same 2 that gives SU(2), the weak force, two truth
+values in classical logic, and binary digits. The Ising model is the simplest system with
+a phase transition, and it has exactly <code>N_w</code> states because that's the smallest
+number that allows symmetry breaking.</p>
+
+<h3>CRYSTAL CONSTANTS IN THE <span>LATTICE</span></h3>
+<table>
+<tr><th>Quantity</th><th>Value</th><th>Crystal</th></tr>
+<tr><td>Spin states</td><td>2</td><td><b>N_w</b></td></tr>
+<tr><td>Neighbours (square)</td><td>4</td><td><b>N_w² = z</b></td></tr>
+<tr><td>Neighbours (cubic)</td><td>6</td><td><b>χ = N_w × N_c</b></td></tr>
+<tr><td>Ground state E/site</td><td>−2</td><td><b>−N_w</b></td></tr>
+<tr><td>BCS ratio 2Δ/kT_c</td><td>≈ 3.53</td><td><b>N_w·π/e^γ</b></td></tr>
+<tr><td>Onsager T_c</td><td>≈ 2.269</td><td><b>2/ln(1+√N_w)</b></td></tr>
+</table>
+
+<h3>WHY THIS <span>MATTERS</span></h3>
+<p>The Ising model is used across physics: magnets, alloys, neural networks, protein folding,
+social dynamics, lattice gauge theory. The critical temperature where order emerges from chaos
+is determined by the coordination number <code>z = N_w² = 4</code>. In the Crystal, this is the
+same <code>N_w = 2</code> that determines the number of generations, the weak mixing angle,
+and the Schwarzschild factor <code>r_s = 2GM</code>. Phase transitions in iron, superconductors,
+and the early universe all trace back to the same prime.</p>
+
+<p class="close" onclick="document.getElementById('info').classList.remove('show')">✕ Close and watch the simulation</p>
+</div>
+</div>
+
+</body>
+</html>

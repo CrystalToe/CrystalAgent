@@ -1,0 +1,336 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Crystal Topos — Schwarzschild Geodesics</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#060612;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif}
+  canvas{display:block;position:absolute;top:0;left:0}
+  #panel{position:absolute;top:10px;right:10px;bottom:10px;width:240px;
+         background:rgba(10,10,30,0.9);border:1px solid #1a1a3a;border-radius:8px;padding:10px;
+         z-index:10;overflow-y:auto}
+  h1{font-size:0.85em;color:#7ec8e3;letter-spacing:2px;margin-bottom:2px}
+  h1 span{color:#e74c3c}
+  .sub{color:#444;font-size:0.6em;margin-bottom:6px}
+  .row{display:flex;gap:6px;align-items:center;margin-bottom:5px}
+  label{color:#555;font-size:0.65em;white-space:nowrap}
+  input[type=range]{flex:1;height:14px}
+  .val{color:#7ec8e3;font-family:monospace;font-size:0.7em;min-width:35px}
+  button{background:rgba(255,255,255,0.04);border:1px solid #1a1a3a;color:#5a9;
+         padding:3px 8px;border-radius:4px;cursor:pointer;font-size:0.62em}
+  button.on{background:rgba(231,76,60,0.2);border-color:#e74c3c;color:#e74c3c}
+  .stat{font-family:monospace;font-size:0.62em;color:#444;margin:2px 0}
+  .stat b{color:#7ec8e3}
+  .stat em{color:#e74c3c;font-style:normal}
+  .note{font-size:0.58em;color:#333;line-height:1.5;margin-top:6px;border-top:1px solid #1a1a3a;padding-top:6px}
+  .note b{color:#5a9}
+  #info{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(6,6,18,0.95);z-index:20;
+        display:none;overflow-y:auto;padding:30px 20px}
+  #info.show{display:block}
+  #info .inner{max-width:750px;margin:auto;font-size:0.85em;line-height:1.8;color:#999}
+  #info h3{color:#7ec8e3;font-size:1em;margin:16px 0 6px}
+  #info h3:first-child{margin-top:0}
+  #info h3 span{color:#e74c3c}
+  #info b{color:#7ec8e3}
+  #info em{color:#e74c3c;font-style:normal}
+  #info code{color:#7ec8e3;background:#0a0a20;padding:1px 5px;border-radius:3px}
+  #info table{border-collapse:collapse;margin:10px 0;width:100%}
+  #info td,#info th{border:1px solid #1a1a3a;padding:5px 10px;font-size:0.85em;text-align:left}
+  #info th{color:#7ec8e3;background:#0a0a20}
+  #info .close{color:#e74c3c;cursor:pointer;font-size:0.8em;margin-top:16px;display:inline-block}
+  #veffplot{width:100%;height:100px;background:#060612;border:1px solid #1a1a3a;border-radius:4px;margin-top:6px}
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+
+<div id="panel">
+  <h1>SCHWARZSCHILD <span>GEODESICS</span></h1>
+  <div class="sub">ISCO = χ·GM · Photon = N_c·GM · r_s = N_w·GM</div>
+
+  <div class="row">
+    <label>L (ang. mom):</label>
+    <input type="range" id="sl" min="2.5" max="6.0" value="4.2" step="0.05">
+    <span class="val" id="vl">4.20</span>
+  </div>
+  <div class="row">
+    <label>E (energy):</label>
+    <input type="range" id="se" min="0.90" max="1.02" value="0.965" step="0.001">
+    <span class="val" id="ve">0.965</span>
+  </div>
+  <div class="row">
+    <button class="on" id="bp">▶</button>
+    <button id="bpp">⏸</button>
+    <button onclick="launch()">Launch</button>
+    <button onclick="document.getElementById('info').classList.toggle('show')">? EXPLAIN</button>
+  </div>
+
+  <div class="stat">r <b id="sr">—</b> GM</div>
+  <div class="stat">φ <b id="sp">—</b>°</div>
+  <div class="stat">Orbits <b id="so">0</b></div>
+  <div class="stat">ISCO = <em>χ = 6</em> GM</div>
+  <div class="stat">Photon = <em>N_c = 3</em> GM</div>
+  <div class="stat">Horizon = <em>N_w = 2</em> GM</div>
+
+  <canvas id="veffplot"></canvas>
+
+  <div class="note">
+    <b>Drag L below ~3.46</b> → particle plunges past ISCO into the black hole.<br>
+    <b>L ≈ 4.2</b> → stable precessing ellipse (Mercury!).<br>
+    <b>L > 5</b> → wide orbit, small precession.<br><br>
+    Precession factor: <b>δφ = 6πGM/a = χ·π·GM/a</b>.<br>
+    Light bending: <b>δθ = 4GM/b = N_w²·GM/b</b>.<br>
+    Einstein equation: <b>16πG = N_w⁴·π·G</b>.
+  </div>
+</div>
+
+<script type="module">
+let WGR, OK = false;
+try {
+  const m = await import('./pkg/crystal_toe.js');
+  await m.default();
+  WGR = m.WasmGR;
+  OK = true;
+  console.log('✓ WasmGR loaded');
+} catch(e) { console.warn('JS:', e.message); }
+
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const vp = document.getElementById('veffplot'), vctx = vp.getContext('2d');
+let W, H;
+function resize() { W=cv.width=innerWidth; H=cv.height=innerHeight; vp.width=220; vp.height=100; }
+addEventListener('resize', resize); resize();
+
+const RS = 2.0; // Schwarzschild radius = N_w * GM
+let playing = true;
+let trail = [];
+let r, vr, phi, tau, orbits;
+let gr;
+
+function launch() {
+  const L = +document.getElementById('sl').value;
+  const E = +document.getElementById('se').value;
+  trail = [];
+  r = 20; vr = -0.01; phi = 0; tau = 0; orbits = 0;
+  if (OK) gr = new WGR();
+  ctx.fillStyle = '#060612'; ctx.fillRect(0,0,W,H);
+}
+
+// JS geodesic integrator
+function tick() {
+  const L = +document.getElementById('sl').value;
+  const dtau = 0.3;
+
+  // dr/dtau from effective potential: (dr/dtau)² = E² - V_eff
+  // d²r/dtau² = -dV_eff/dr
+  const r2 = r*r, r3 = r2*r;
+  const dvdr = -1/r2 + L*L/r3 - 3*RS*L*L/(2*r3*r);
+  const dphi = L / r2;
+
+  // Verlet
+  vr += -dvdr * dtau;
+  r += vr * dtau;
+  phi += dphi * dtau;
+  tau += dtau;
+
+  // Count orbits
+  if (phi > (orbits+1) * 2 * Math.PI) orbits++;
+
+  // Clamp
+  if (r < RS * 1.01) { r = RS * 1.01; vr = 0; }
+  if (r > 100) { r = 100; vr = -Math.abs(vr); }
+
+  trail.push([r, phi]);
+  if (trail.length > 8000) trail.shift();
+}
+
+function drawOrbit() {
+  ctx.fillStyle = 'rgba(6,6,18,0.04)'; ctx.fillRect(0,0,W,H);
+  const cx = W/2, cy = H/2, sc = W * 0.012;
+
+  // Black hole
+  const bhR = RS * sc;
+  const grad = ctx.createRadialGradient(cx,cy,0,cx,cy,bhR*6);
+  grad.addColorStop(0,'#000'); grad.addColorStop(0.2,'#0a0510');
+  grad.addColorStop(0.5,'rgba(80,30,120,0.08)'); grad.addColorStop(1,'transparent');
+  ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(cx,cy,bhR*6,0,6.283); ctx.fill();
+  ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(cx,cy,bhR,0,6.283); ctx.fill();
+  ctx.strokeStyle='#e74c3c33'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.arc(cx,cy,bhR,0,6.283); ctx.stroke();
+
+  // ISCO ring (6GM = χ·GM)
+  ctx.strokeStyle='#7ec8e315'; ctx.lineWidth=0.5; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.arc(cx,cy,6*sc,0,6.283); ctx.stroke();
+
+  // Photon sphere (3GM = N_c·GM)
+  ctx.strokeStyle='#f39c1210'; ctx.setLineDash([2,6]);
+  ctx.beginPath(); ctx.arc(cx,cy,3*sc,0,6.283); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Trail
+  ctx.lineWidth = 1.5;
+  for (let i=1; i<trail.length; i++) {
+    const alpha = (i/trail.length)*0.7;
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = '#7ec8e3';
+    const [r1,p1] = trail[i-1], [r2,p2] = trail[i];
+    ctx.beginPath();
+    ctx.moveTo(cx+r1*sc*Math.cos(p1), cy-r1*sc*Math.sin(p1));
+    ctx.lineTo(cx+r2*sc*Math.cos(p2), cy-r2*sc*Math.sin(p2));
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
+  // Current position
+  const sx = cx + r*sc*Math.cos(phi), sy = cy - r*sc*Math.sin(phi);
+  const g2 = ctx.createRadialGradient(sx,sy,0,sx,sy,15);
+  g2.addColorStop(0,'#7ec8e366'); g2.addColorStop(1,'transparent');
+  ctx.fillStyle=g2; ctx.beginPath(); ctx.arc(sx,sy,15,0,6.283); ctx.fill();
+  ctx.fillStyle='#7ec8e3'; ctx.beginPath(); ctx.arc(sx,sy,4,0,6.283); ctx.fill();
+  ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(sx,sy,1.5,0,6.283); ctx.fill();
+
+  // Labels
+  ctx.fillStyle='#ffffff08'; ctx.font='10px monospace';
+  ctx.fillText('r_s=N_w·GM', cx+bhR+4, cy-bhR);
+  ctx.fillText('ISCO=χ·GM', cx+6*sc+4, cy);
+}
+
+function drawVeff() {
+  const w=vp.width, h=vp.height;
+  vctx.fillStyle='#060612'; vctx.fillRect(0,0,w,h);
+  const L = +document.getElementById('sl').value;
+  const E = +document.getElementById('se').value;
+  const mx=30, mw=w-mx-10, my=10, mh=h-my-20;
+
+  // V_eff curve
+  const rMin=2.2, rMax=40;
+  const pts = [];
+  let vMin=1e9, vMax=-1e9;
+  for (let i=0;i<200;i++) {
+    const rv = rMin + i*(rMax-rMin)/200;
+    const v = (1-RS/rv)*(1+L*L/(rv*rv));
+    pts.push([rv, v]);
+    if(v<vMin)vMin=v; if(v>vMax)vMax=v;
+  }
+  vMin = Math.max(vMin, 0.5); vMax = Math.min(vMax, 1.2);
+
+  const xsc = rv2 => mx + (rv2-rMin)/(rMax-rMin)*mw;
+  const ysc = v => my + mh - (v-vMin)/(vMax-vMin)*mh;
+
+  // Curve
+  vctx.strokeStyle='#f39c12'; vctx.lineWidth=1.5;
+  vctx.beginPath();
+  for (let i=0;i<pts.length;i++) {
+    const x=xsc(pts[i][0]), y=ysc(Math.max(vMin,Math.min(vMax,pts[i][1])));
+    i===0?vctx.moveTo(x,y):vctx.lineTo(x,y);
+  }
+  vctx.stroke();
+
+  // Energy level
+  const eSq = E*E;
+  vctx.strokeStyle='#2ecc7144'; vctx.lineWidth=0.5; vctx.setLineDash([3,3]);
+  vctx.beginPath(); vctx.moveTo(mx,ysc(eSq)); vctx.lineTo(mx+mw,ysc(eSq)); vctx.stroke();
+  vctx.setLineDash([]);
+  vctx.fillStyle='#2ecc7166'; vctx.font='8px monospace'; vctx.fillText('E²',mx+2,ysc(eSq)-3);
+
+  // ISCO marker
+  vctx.strokeStyle='#7ec8e322'; vctx.lineWidth=0.5; vctx.setLineDash([2,4]);
+  vctx.beginPath(); vctx.moveTo(xsc(6),my); vctx.lineTo(xsc(6),my+mh); vctx.stroke();
+  vctx.setLineDash([]);
+  vctx.fillStyle='#7ec8e333'; vctx.font='7px monospace'; vctx.fillText('ISCO',xsc(6)-8,my+mh+12);
+
+  // Current r marker
+  if (r > rMin && r < rMax) {
+    const rv2 = (1-RS/r)*(1+L*L/(r*r));
+    vctx.fillStyle='#2ecc71'; vctx.beginPath();
+    vctx.arc(xsc(r), ysc(Math.max(vMin,Math.min(vMax,rv2))), 4, 0, 6.283); vctx.fill();
+  }
+
+  vctx.fillStyle='#f39c1244'; vctx.font='8px monospace'; vctx.fillText('V_eff(r)', mx+2, my+10);
+}
+
+function updateStats() {
+  document.getElementById('vl').textContent = (+document.getElementById('sl').value).toFixed(2);
+  document.getElementById('ve').textContent = (+document.getElementById('se').value).toFixed(3);
+  document.getElementById('sr').textContent = r.toFixed(2);
+  document.getElementById('sp').textContent = ((phi*180/Math.PI)%360).toFixed(1);
+  document.getElementById('so').textContent = orbits;
+}
+
+launch();
+function loop() {
+  if (playing) {
+    for (let i=0;i<8;i++) tick();
+    drawOrbit();
+    drawVeff();
+    updateStats();
+  }
+  requestAnimationFrame(loop);
+}
+loop();
+
+document.getElementById('bp').onclick=()=>{playing=true;document.getElementById('bp').classList.add('on');document.getElementById('bpp').classList.remove('on')};
+document.getElementById('bpp').onclick=()=>{playing=false;document.getElementById('bpp').classList.add('on');document.getElementById('bp').classList.remove('on')};
+document.getElementById('sl').oninput=()=>launch();
+document.getElementById('se').oninput=()=>launch();
+</script>
+<div id="info">
+<div class="inner">
+<h3>WHAT YOU'RE <span>SEEING</span></h3>
+<p>A particle orbiting a <b>black hole</b> in Einstein's general relativity. The orbit is not a closed
+ellipse — it <em>precesses</em>, tracing a rosette pattern. This precession is what made Einstein
+famous: he predicted Mercury's orbit precesses by 43 arcseconds per century, exactly matching
+the observed anomaly that Newton couldn't explain.</p>
+
+<h3>THE <span>SLIDERS</span></h3>
+<p><b>L (angular momentum)</b> — controls how close the particle gets.
+High L → wide orbit, slow precession. Low L → tight orbit, fast precession.
+Below L ≈ 3.46, there is no stable orbit — the particle <em>plunges into the black hole</em>.
+Drag it down and watch it happen.</p>
+<p><b>E (energy)</b> — controls whether the orbit is bound (E &lt; 1) or escaping (E &gt; 1).
+At E slightly below the V_eff barrier peak, the particle barely stays bound.</p>
+
+<h3>THE <span>V_EFF</span> PLOT</h3>
+<p>The curve on the right is the <b>effective potential</b> — the total "landscape" the particle
+moves through. The green dot shows where the particle currently is. The dashed line is the
+particle's energy. When the energy is below the peak, the particle is trapped. When it's above,
+the particle escapes or plunges.</p>
+
+<h3>EVERY INTEGER FROM <span>(2,3)</span></h3>
+<table>
+<tr><th>GR quantity</th><th>Value</th><th>Crystal</th><th>What it means</th></tr>
+<tr><td>Schwarzschild radius</td><td>r_s = 2GM</td><td><b>N_w · GM</b></td><td>Event horizon — nothing escapes</td></tr>
+<tr><td>Photon sphere</td><td>r = 3GM</td><td><b>N_c · GM</b></td><td>Light orbits in circles</td></tr>
+<tr><td>ISCO</td><td>r = 6GM</td><td><b>χ · GM</b></td><td>Last stable orbit — below this, plunge</td></tr>
+<tr><td>Precession</td><td>δφ = 6πGM/a</td><td><b>χ · π · GM/a</b></td><td>Mercury's 43"/century</td></tr>
+<tr><td>Light bending</td><td>δθ = 4GM/b</td><td><b>N_w² · GM/b</b></td><td>Gravitational lensing</td></tr>
+<tr><td>Einstein equation</td><td>16πG</td><td><b>N_w⁴ · π · G</b></td><td>Coupling of geometry to matter</td></tr>
+<tr><td>Spacetime dims</td><td>4</td><td><b>N_c + 1</b></td><td>3 space + 1 time</td></tr>
+<tr><td>GW polarizations</td><td>2</td><td><b>N_c − 1</b></td><td>Plus and cross modes</td></tr>
+</table>
+
+<h3>WHY <span>ISCO = 6</span>?</h3>
+<p>The innermost stable circular orbit sits at <code>r = 6GM = χ · GM</code>. The bond dimension
+χ = 6 of the Crystal MERA determines where orbits become unstable. This is not a
+coincidence — the MERA's finite bond dimension creates a causal structure isomorphic to the
+Schwarzschild spacetime (Swingle 2012). The <code>χ = 6</code> that gives you 6 Lorentz
+generators, 6 EM components, and 6 phase-space dimensions per body is the same 6 that
+determines the last stable orbit around a black hole.</p>
+
+<h3>WHY THIS <span>MATTERS</span></h3>
+<p>In standard GR, the numbers 2, 3, 4, 6 in the Schwarzschild solution are "just geometry."
+In the Crystal, they are <code>N_w</code>, <code>N_c</code>, <code>N_c+1</code>, and
+<code>χ = N_w × N_c</code>. The same algebra that gives you quark confinement (N_c = 3 colours),
+weak decays (N_w = 2 generations), and atomic shells (capacities 2, 6, 10, 14) also gives you
+the exact structure of black holes. General relativity is not a separate theory — it's the
+Crystal's geometry, viewed from the outside.</p>
+
+<p class="close" onclick="document.getElementById('info').classList.remove('show')">✕ Close and watch the orbit</p>
+</div>
+</div>
+
+</body>
+</html>

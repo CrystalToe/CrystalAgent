@@ -1,0 +1,151 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Crystal Topos — Electromagnetic Pulse</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#000;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif}
+  #hud{position:absolute;top:0;left:0;right:0;padding:10px 16px;background:linear-gradient(180deg,rgba(0,0,0,0.85) 60%,transparent);z-index:10;pointer-events:none}
+  h1{font-size:1em;color:#7ec8e3;letter-spacing:3px}h1 span{color:#e74c3c}
+  .sub{color:#444;font-size:0.65em}
+  .chips{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap}
+  .chip{background:rgba(126,200,227,0.06);border:1px solid rgba(126,200,227,0.1);border-radius:14px;padding:2px 9px;font-size:0.58em;color:#5a9;font-family:monospace}
+  .chip b{color:#7ec8e3}
+</style>
+</head>
+<body>
+<div id="hud">
+  <h1>ELECTROMAGNETIC <span>PULSE</span></h1>
+  <div class="sub">Yee FDTD: S = W∘U — B-kick (W) then E-drift (U) — χ = 6 field components (3E + 3B) — N_c−1 = 2 polarizations</div>
+  <div class="chips">
+    <span class="chip"><b>χ=6</b> components (3E+3B)</span>
+    <span class="chip"><b>S=W∘U</b> split-step</span>
+    <span class="chip"><b>N_c−1=2</b> polarizations</span>
+    <span class="chip"><b>c²=1/(ε₀μ₀)</b></span>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const N = 120; // grid points
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 300);
+camera.position.set(0, 15, 40);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setClearColor(0x020210);
+document.body.appendChild(renderer.domElement);
+addEventListener('resize', () => { camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
+
+scene.add(new THREE.AmbientLight(0x111133, 0.3));
+
+// Propagation axis
+const axGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-N*0.2,0,0),new THREE.Vector3(N*0.2,0,0)]);
+scene.add(new THREE.Line(axGeo, new THREE.LineBasicMaterial({color:0x1a1a3a})));
+
+// E field (cyan, vertical) and B field (red, depth) as line strips
+const ey = new Float64Array(N);
+const bz = new Float64Array(N - 1);
+
+// Gaussian pulse
+const center = 0.15, width = 0.03;
+for (let i = 0; i < N; i++) {
+  const x = i / N;
+  const d = (x - center) / width;
+  ey[i] = Math.exp(-d * d);
+}
+
+const COURANT = 0.5;
+function emTick() {
+  for (let i = 0; i < N-1; i++) bz[i] -= COURANT * (ey[i+1] - ey[i]);
+  for (let i = 1; i < N-1; i++) ey[i] -= COURANT * (bz[i] - bz[i-1]);
+  ey[0] = 0; ey[N-1] = 0;
+}
+
+// E field visualization (vertical ribbons, cyan)
+const eGeo = new THREE.BufferGeometry();
+const ePos = new Float32Array(N * 2 * 3);
+eGeo.setAttribute('position', new THREE.BufferAttribute(ePos, 3));
+const eIdx = [];
+for (let i = 0; i < N-1; i++) { eIdx.push(i*2, i*2+1, i*2+2, i*2+2, i*2+1, i*2+3); }
+eGeo.setIndex(eIdx);
+const eMat = new THREE.MeshBasicMaterial({ color: 0x7ec8e3, transparent: true, opacity: 0.4, side: THREE.DoubleSide });
+const eMesh = new THREE.Mesh(eGeo, eMat);
+scene.add(eMesh);
+
+// E field line
+const elGeo = new THREE.BufferGeometry();
+const elPos = new Float32Array(N * 3);
+elGeo.setAttribute('position', new THREE.BufferAttribute(elPos, 3));
+scene.add(new THREE.Line(elGeo, new THREE.LineBasicMaterial({color: 0x7ec8e3, linewidth: 2})));
+
+// B field visualization (depth ribbons, red)
+const bGeo = new THREE.BufferGeometry();
+const bPos = new Float32Array((N-1) * 2 * 3);
+bGeo.setAttribute('position', new THREE.BufferAttribute(bPos, 3));
+const bIdx2 = [];
+for (let i = 0; i < N-2; i++) { bIdx2.push(i*2, i*2+1, i*2+2, i*2+2, i*2+1, i*2+3); }
+bGeo.setIndex(bIdx2);
+const bMat = new THREE.MeshBasicMaterial({ color: 0xe74c3c, transparent: true, opacity: 0.3, side: THREE.DoubleSide });
+const bMesh = new THREE.Mesh(bGeo, bMat);
+scene.add(bMesh);
+
+// B field line
+const blGeo = new THREE.BufferGeometry();
+const blPos = new Float32Array((N-1) * 3);
+blGeo.setAttribute('position', new THREE.BufferAttribute(blPos, 3));
+scene.add(new THREE.Line(blGeo, new THREE.LineBasicMaterial({color: 0xe74c3c})));
+
+const SCALE = 8, SPREAD = N * 0.2;
+
+function updateFields() {
+  for (let i = 0; i < N; i++) {
+    const x = (i / N - 0.5) * SPREAD * 2;
+    const h = ey[i] * SCALE;
+    // E ribbon: top and bottom
+    ePos[i*6] = x; ePos[i*6+1] = h; ePos[i*6+2] = 0;
+    ePos[i*6+3] = x; ePos[i*6+4] = 0; ePos[i*6+5] = 0;
+    // E line
+    elPos[i*3] = x; elPos[i*3+1] = h; elPos[i*3+2] = 0;
+  }
+  eGeo.attributes.position.needsUpdate = true;
+  elGeo.attributes.position.needsUpdate = true;
+  eGeo.computeVertexNormals();
+
+  for (let i = 0; i < N-1; i++) {
+    const x = ((i+0.5) / N - 0.5) * SPREAD * 2;
+    const d = bz[i] * SCALE;
+    // B ribbon: front and back (perpendicular to E)
+    bPos[i*6] = x; bPos[i*6+1] = 0; bPos[i*6+2] = d;
+    bPos[i*6+3] = x; bPos[i*6+4] = 0; bPos[i*6+5] = 0;
+    // B line
+    blPos[i*3] = x; blPos[i*3+1] = 0; blPos[i*3+2] = d;
+  }
+  bGeo.attributes.position.needsUpdate = true;
+  blGeo.attributes.position.needsUpdate = true;
+  bGeo.computeVertexNormals();
+}
+
+let frame = 0;
+function animate() {
+  requestAnimationFrame(animate);
+  frame++;
+  for (let i = 0; i < 4; i++) emTick();
+  updateFields();
+
+  const t = frame * 0.001;
+  camera.position.x = 40 * Math.cos(t * 0.3);
+  camera.position.z = 40 * Math.sin(t * 0.3);
+  camera.position.y = 10 + 8 * Math.sin(t * 0.15);
+  camera.lookAt(0, 0, 0);
+
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>

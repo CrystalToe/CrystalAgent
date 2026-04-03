@@ -2459,6 +2459,25 @@ Observable count: 0 new (infrastructure). Every number from (2,3).
 
 ```
 
+## §Haskell: CrystalEngine (     341 lines)
+```haskell
+
+{- | CrystalEngine.hs — The native dynamics engine.
+
+  S = W ∘ U applied directly on the full Σd = 36 dimensional state space.
+  Every textbook integrator (Verlet, Yee, LBM, Metropolis) emerges as a
+  sector restriction. No differential equations. No calculus. Just the monad.
+
+  State: 36-component vector partitioned as [1] ⊕ [3] ⊕ [8] ⊕ [24]
+  W: isometry (vertical, contracts √λ_k per sector)
+  U: disentangler (horizontal, contracts √λ_k per sector)
+  S = W ∘ U: one tick of the universe
+
+  Compile: ghc -O2 -main-is CrystalEngine CrystalEngine.hs && ./CrystalEngine
+-}
+
+```
+
 ## §Haskell: CrystalFriedmann (     350 lines)
 ```haskell
 
@@ -3329,6 +3348,30 @@ main = do
   putStrLn $ "  ✓ All match: " ++ show allMatch
 ```
 
+## §Haskell: CrystalHMC (     391 lines)
+```haskell
+
+{- | CrystalHMC.hs — Hamiltonian Monte Carlo on the MERA.
+
+  HMC without calculus. The "Hamiltonian" is H = -ln(S)/β.
+  The "gradient" is a sector projection. The "leapfrog" is tick().
+  The "accept/reject" is compare. All multiply-add. All (2,3).
+
+  Traditional HMC:
+    1. Draw momentum p ~ N(0,1)         → inject into weak sector
+    2. Leapfrog (Hamilton's equations)   → tick() on weak⊕colour
+    3. Accept/reject (Metropolis)        → compare energies
+
+  Crystal HMC:
+    1. Momentum refresh = inject random into weak sector (d=3)
+    2. Trajectory = N applications of S|_{weak⊕colour}
+    3. Accept/reject = energy comparison using H = -ln(λ_k)
+
+  Compile: ghc -O2 -main-is CrystalHMC CrystalHMC.hs && ./CrystalHMC
+-}
+
+```
+
 ## §Haskell: CrystalHologron (     446 lines)
 ```haskell
 
@@ -3978,6 +4021,47 @@ Schrödinger:       H = −ln(S)/β. DERIVED from monad. Not assumed.
 Uncertainty:       1/2 ⊥ 1/3 in Heyting order. Theorem of gcd(2,3)=1.
 
 Observable count: 0 new (infrastructure for dynamics).
+-}
+
+```
+
+## §Haskell: CrystalMonadProof (     362 lines)
+```haskell
+
+{- | Module: CrystalMonadProof — Unique factorisation S = W∘U from A_F.
+
+THEOREM: Given the finite spectral triple (A_F, H_F, D_F) with
+  A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ), the only *-endomorphism S: A_F → A_F
+  that simultaneously preserves:
+    (P1) unitarity      (S†S = 1)
+    (P2) causality       (MERA causal cone structure)
+    (P3) Heyting lattice (truth values {1, 1/N_w, 1/N_c, 1/χ})
+  factors uniquely as S = W ∘ U where:
+    W : vertical isometry   (bond χ → 1, Higgs mechanism)
+    U : horizontal disentangler (nearest-neighbour, gravity)
+
+No other factorisation works. Not U∘W, not W∘U∘W, not S = V for any
+single operator V. The split into exactly two pieces, in this order,
+is forced by the algebra.
+
+PROOF STRATEGY:
+  Step 1: A_F has exactly 4 irreps with dimensions {1, N_w²−1, N_c²−1, d_mixed}
+          = {1, 3, 8, 24}. These are the ONLY sectors. (Wedderburn.)
+  Step 2: The Heyting lattice on sub-objects has exactly 4 truth values
+          {1, 1/N_w, 1/N_c, 1/χ}. This IS the subobject classifier. (Computed.)
+  Step 3: Any endomorphism preserving the lattice must map each sector to
+          itself (no mixing). So S is block-diagonal on the 4 sectors.
+  Step 4: In each sector, S acts as λ_k^t where λ_k is the sector eigenvalue.
+          These eigenvalues are exactly {1, 1/N_w, 1/N_c, 1/χ}. (Monad spectrum.)
+  Step 5: Factor S = W∘U. W acts vertically (across layers), U horizontally
+          (within a layer). The MERA causal cone forces W to contract by χ
+          (bond dimension) and U to act on χ/N_w = 3 sites per layer.
+  Step 6: UNIQUENESS. If S = W'∘U' is another factorisation preserving P1-P3,
+          then W' = W·Φ and U' = Φ†·U for some inner automorphism Φ of A_F.
+          But the Heyting lattice is rigid (4 truth values, no automorphisms
+          permuting them), so Φ = id. Therefore W' = W and U' = U.
+
+QED.
 -}
 
 ```

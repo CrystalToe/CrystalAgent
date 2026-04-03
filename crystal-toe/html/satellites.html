@@ -1,0 +1,265 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Crystal Topos — Satellite Orbits</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#020208;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif}
+  canvas{display:block}
+  #hud{position:absolute;top:0;left:0;right:0;padding:14px 20px;
+       background:linear-gradient(180deg,rgba(2,2,8,0.95) 60%,rgba(2,2,8,0));
+       pointer-events:none;z-index:10}
+  h1{font-size:1.15em;color:#7ec8e3;letter-spacing:3px;text-transform:uppercase;margin-bottom:2px}
+  h1 span{color:#e74c3c}
+  .sub{color:#444;font-size:0.72em;letter-spacing:1px}
+  .chips{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .chip{background:rgba(126,200,227,0.08);border:1px solid rgba(126,200,227,0.15);
+        border-radius:16px;padding:2px 10px;font-size:0.68em;color:#5a9;font-family:monospace}
+  .chip b{color:#7ec8e3}
+  #legend{position:absolute;top:95px;right:16px;font-size:0.68em;color:#444;
+          font-family:monospace;line-height:2;z-index:10;pointer-events:none}
+  .ldot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:middle}
+  #stats{position:absolute;bottom:14px;left:20px;font-family:monospace;font-size:0.72em;color:#333;z-index:10}
+  #stats b{color:#5a9}
+  #ctrl{position:absolute;bottom:14px;right:20px;display:flex;gap:6px;z-index:10}
+  #ctrl button{background:rgba(255,255,255,0.04);border:1px solid #1a1a3a;color:#5a9;
+               padding:4px 12px;border-radius:5px;cursor:pointer;font-size:0.75em}
+  #ctrl button:hover{background:rgba(126,200,227,0.1)}
+  #ctrl button.on{background:rgba(231,76,60,0.2);border-color:#e74c3c;color:#e74c3c}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="hud">
+  <h1>SATELLITE <span>ORBITS</span></h1>
+  <div class="sub">10 satellites — Kepler v² = GM/r, T² = 4π²a³/GM — force 1/r^(N_c−1), closed orbits from N_c=3</div>
+  <div class="chips" id="chips"></div>
+</div>
+<div id="legend"></div>
+<div id="stats">T <b id="st">0.0</b> hrs · Orbits <b id="orb">0</b></div>
+<div id="ctrl">
+  <button class="on" id="bplay">▶</button>
+  <button id="bpause">⏸</button>
+  <button id="breset">↺</button>
+  <button id="bspeed">1×</button>
+</div>
+
+<script type="module">
+let CD=null;
+try{const w=await import('./pkg/crystal_toe.js');await w.default();if(w.crystal_dump)CD=w.crystal_dump();console.log('✓ WASM')}catch(e){console.warn('JS:',e.message)}
+const C=CD||{n_w:2,n_c:3,chi:6,beta0:7,sigma_d:36,tower_d:42};
+document.getElementById('chips').innerHTML=[
+  ['N_w',C.n_w],['N_c',C.n_c],['χ',C.chi],['Force','1/r^(N_c−1)=1/r²'],
+  ['Kepler','T²∝a³ (N_c=3)'],['ISCO','6R_s=χ·R_s'],['Closed orbits','Bertrand (N_c=3)'],
+].map(([k,v])=>`<span class="chip"><b>${k}</b>=${v}</span>`).join('');
+
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+let W,H;function resize(){W=cv.width=innerWidth;H=cv.height=innerHeight}addEventListener('resize',resize);resize();
+
+// ═══════════════════════════════════════════════════════════════
+// Satellite definitions — Earth radii units, GM=1
+// ═══════════════════════════════════════════════════════════════
+const SATS=[
+  {name:'ISS',       alt:0.065, inc:0.90, phase:0.0,  color:'#7ec8e3', type:'LEO'},
+  {name:'Hubble',    alt:0.095, inc:0.50, phase:1.2,  color:'#3498db', type:'LEO'},
+  {name:'SpySat',    alt:0.050, inc:1.57, phase:2.8,  color:'#e67e22', type:'LEO'},
+  {name:'GPS-1',     alt:3.30,  inc:0.96, phase:0.0,  color:'#e74c3c', type:'MEO'},
+  {name:'GPS-2',     alt:3.30,  inc:0.96, phase:2.09, color:'#c0392b', type:'MEO'},
+  {name:'GPS-3',     alt:3.30,  inc:0.96, phase:4.19, color:'#e74c3c', type:'MEO'},
+  {name:'GEO-E',     alt:5.61,  inc:0.02, phase:0.0,  color:'#2ecc71', type:'GEO'},
+  {name:'GEO-W',     alt:5.61,  inc:0.02, phase:3.14, color:'#27ae60', type:'GEO'},
+  {name:'Molniya',   alt:3.80,  inc:1.10, phase:1.5,  color:'#f1c40f', type:'HEO'},
+  {name:'Polar',     alt:1.20,  inc:1.72, phase:0.5,  color:'#9b59b6', type:'SSO'},
+];
+
+let sats,time,playing=true,speedMul=1,totalOrbits=0;
+
+function init(){
+  time=0;totalOrbits=0;
+  sats=SATS.map(d=>{
+    const r=1+d.alt;
+    const omega=Math.sqrt(1/(r*r*r)); // Kepler: ω = sqrt(GM/r³)
+    const period=2*Math.PI/omega;
+    return{...d,r,omega,period,theta:d.phase,trail:[]};
+  });
+  ctx.fillStyle='#020208';ctx.fillRect(0,0,W,H);
+  buildLegend();
+}
+
+function buildLegend(){
+  document.getElementById('legend').innerHTML=sats.map(s=>{
+    const pMin=(s.period*14.4).toFixed(0); // rough scale to minutes
+    return `<div><span class="ldot" style="background:${s.color}"></span>${s.name} <span style="color:#333">${s.type} alt=${s.r.toFixed(1)}R ⊕ T≈${pMin}m</span></div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Physics tick
+// ═══════════════════════════════════════════════════════════════
+const dt=0.002;
+function tick(){
+  time+=dt;
+  for(const s of sats){
+    const prevTheta=s.theta;
+    s.theta+=s.omega*dt;
+    // Count orbits (ISS)
+    if(s.name==='ISS'&&s.theta-prevTheta>0&&Math.floor(s.theta/(2*Math.PI))>Math.floor(prevTheta/(2*Math.PI)))totalOrbits++;
+    // 3D position
+    s.x=s.r*Math.cos(s.theta);
+    s.y=s.r*Math.sin(s.theta)*Math.cos(s.inc);
+    s.z=s.r*Math.sin(s.theta)*Math.sin(s.inc);
+    s.trail.push([s.x,s.y,s.z]);
+    if(s.trail.length>3000)s.trail.shift();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 3D Camera + Projection
+// ═══════════════════════════════════════════════════════════════
+let camA=0;
+function project(x,y,z){
+  camA+=0.0003; // slow auto-rotate
+  const ca=Math.cos(camA),sa=Math.sin(camA);
+  const rx=x*ca-y*sa, ry=x*sa+y*ca, rz=z;
+  const elev=0.35,ce=Math.cos(elev),se=Math.sin(elev);
+  const fy=ry*ce-rz*se, fz=ry*se+rz*ce;
+  const scale=Math.min(W,H)*0.065;
+  const depth=10+fy;
+  const px=W/2+rx*scale*10/depth;
+  const py=H/2-fz*scale*10/depth;
+  return[px,py,depth,fy]; // fy for depth sorting
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Rendering
+// ═══════════════════════════════════════════════════════════════
+function draw(){
+  ctx.fillStyle='rgba(2,2,8,0.08)';ctx.fillRect(0,0,W,H);
+
+  // Stars background (draw once)
+  if(time<dt*2){
+    for(let i=0;i<300;i++){
+      const sx=Math.random()*W,sy=Math.random()*H,br=Math.random();
+      ctx.fillStyle=`rgba(255,255,255,${br*0.3})`;
+      ctx.fillRect(sx,sy,br>0.9?1.5:0.8,br>0.9?1.5:0.8);
+    }
+  }
+
+  // Earth — blue marble with atmosphere glow
+  const[ex,ey]=project(0,0,0);
+  const earthR=Math.min(W,H)*0.06;
+
+  // Atmosphere glow
+  const atm=ctx.createRadialGradient(ex,ey,earthR*0.8,ex,ey,earthR*2.5);
+  atm.addColorStop(0,'rgba(50,120,220,0.15)');
+  atm.addColorStop(0.5,'rgba(30,80,180,0.05)');
+  atm.addColorStop(1,'transparent');
+  ctx.fillStyle=atm;ctx.beginPath();ctx.arc(ex,ey,earthR*2.5,0,6.283);ctx.fill();
+
+  // Earth body
+  const eg=ctx.createRadialGradient(ex-earthR*0.3,ey-earthR*0.3,0,ex,ey,earthR);
+  eg.addColorStop(0,'#2471a3');eg.addColorStop(0.5,'#1a5276');eg.addColorStop(0.8,'#0e3a5c');eg.addColorStop(1,'#081d2c');
+  ctx.fillStyle=eg;ctx.beginPath();ctx.arc(ex,ey,earthR,0,6.283);ctx.fill();
+
+  // Continents hint (subtle patches)
+  ctx.globalAlpha=0.15;
+  for(let i=0;i<5;i++){
+    const a=time*0.1+i*1.3,r2=earthR*0.6;
+    const cx2=ex+Math.cos(a)*r2*0.5,cy2=ey+Math.sin(a)*r2*0.3;
+    ctx.fillStyle='#2ecc71';
+    ctx.beginPath();ctx.arc(cx2,cy2,earthR*(0.15+i*0.05),0,6.283);ctx.fill();
+  }
+  ctx.globalAlpha=1;
+
+  // Orbital paths (faint rings)
+  for(const s of sats){
+    ctx.strokeStyle=s.color+'15';ctx.lineWidth=0.5;
+    ctx.beginPath();
+    for(let a=0;a<6.283;a+=0.05){
+      const ox=s.r*Math.cos(a);
+      const oy=s.r*Math.sin(a)*Math.cos(s.inc);
+      const oz=s.r*Math.sin(a)*Math.sin(s.inc);
+      const[px,py]=project(ox,oy,oz);
+      a===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+    }
+    ctx.closePath();ctx.stroke();
+  }
+
+  // Sort satellites by depth for proper occlusion
+  const sorted=[...sats].sort((a,b)=>{
+    const[,,da]=project(a.x,a.y,a.z);
+    const[,,db]=project(b.x,b.y,b.z);
+    return da-db; // far first
+  });
+
+  // Trails + satellites
+  for(const s of sorted){
+    // Trail
+    const t=s.trail;
+    if(t.length>2){
+      ctx.lineWidth=1.2;
+      for(let j=1;j<t.length;j+=2){
+        ctx.globalAlpha=(j/t.length)*0.5;
+        ctx.strokeStyle=s.color;
+        const[x1,y1]=project(t[j-1][0],t[j-1][1],t[j-1][2]);
+        const[x2,y2]=project(t[j][0],t[j][1],t[j][2]);
+        ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+      }
+      ctx.globalAlpha=1;
+    }
+
+    // Satellite
+    const[sx,sy,sd]=project(s.x,s.y,s.z);
+    const sz=Math.max(1.5, 4-sd*0.1); // size by distance
+
+    // Glow
+    const g2=ctx.createRadialGradient(sx,sy,0,sx,sy,sz*5);
+    g2.addColorStop(0,s.color+'55');g2.addColorStop(.5,s.color+'11');g2.addColorStop(1,'transparent');
+    ctx.fillStyle=g2;ctx.beginPath();ctx.arc(sx,sy,sz*5,0,6.283);ctx.fill();
+
+    // Dot
+    ctx.fillStyle=s.color;ctx.beginPath();ctx.arc(sx,sy,sz,0,6.283);ctx.fill();
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(sx,sy,sz*0.4,0,6.283);ctx.fill();
+
+    // Label (only for closer satellites)
+    if(sd>8){
+      ctx.fillStyle=s.color+'99';ctx.font=`${Math.max(8,11-sd*0.1)}px monospace`;
+      ctx.fillText(s.name,sx+sz*3+4,sy-sz*2);
+    }
+  }
+
+  // Sun direction indicator
+  const sunA=time*0.01;
+  const sunX=W-40,sunY=40;
+  const sg=ctx.createRadialGradient(sunX,sunY,0,sunX,sunY,20);
+  sg.addColorStop(0,'#f1c40f88');sg.addColorStop(.5,'#f39c1222');sg.addColorStop(1,'transparent');
+  ctx.fillStyle=sg;ctx.beginPath();ctx.arc(sunX,sunY,20,0,6.283);ctx.fill();
+  ctx.fillStyle='#f1c40f';ctx.beginPath();ctx.arc(sunX,sunY,3,0,6.283);ctx.fill();
+}
+
+function updateStats(){
+  document.getElementById('st').textContent=(time*14.4).toFixed(1); // rough hours
+  document.getElementById('orb').textContent=totalOrbits;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Loop
+// ═══════════════════════════════════════════════════════════════
+init();
+function loop(){
+  if(playing){for(let i=0;i<4*speedMul;i++)tick();draw();if(Math.floor(time*100)%10===0)updateStats()}
+  requestAnimationFrame(loop);
+}
+loop();
+
+document.getElementById('bplay').onclick=()=>{playing=true;document.getElementById('bplay').classList.add('on');document.getElementById('bpause').classList.remove('on')};
+document.getElementById('bpause').onclick=()=>{playing=false;document.getElementById('bpause').classList.add('on');document.getElementById('bplay').classList.remove('on')};
+document.getElementById('breset').onclick=()=>{camA=0;init()};
+document.getElementById('bspeed').onclick=function(){speedMul=speedMul>=8?1:speedMul*2;this.textContent=speedMul+'×'};
+</script>
+</body>
+</html>
