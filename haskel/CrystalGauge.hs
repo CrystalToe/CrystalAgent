@@ -4,6 +4,7 @@
 {- | Module: CrystalGauge — α, sin²θ_W, Higgs, VEV, Koide, τ mass, generations -}
 module CrystalGauge where
 import CrystalAxiom
+import qualified CrystalEngine as CE  -- engine atoms
 import Data.Ratio ((%))
 
 proveAlphaInv :: Crystal Two Three -> Derived

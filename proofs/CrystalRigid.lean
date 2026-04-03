@@ -25,3 +25,10 @@ theorem lorentz_from_spacetime : nW * nW * (nW * nW - 1) / 2 = chi := by native_
 theorem quat_is_spacetime : nW * nW = 4 := by native_decide
 theorem inertia_is_lorentz : chi = 6 := by native_decide
 theorem d2q9_from_rot : nC * nC = 9 := by native_decide
+-- Engine wiring
+abbrev sigmaD : Nat := 1 + 3 + 8 + 24
+theorem engine_rot_sector : nC = 3 := by native_decide
+theorem engine_quat : nW * nW = 4 := by native_decide
+theorem engine_rigid_dof : chi = 6 := by native_decide
+theorem engine_full : sigmaD = 36 := by native_decide
+-- Engine wired.

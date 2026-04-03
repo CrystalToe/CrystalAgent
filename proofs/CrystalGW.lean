@@ -52,3 +52,10 @@ theorem chirp_83_den : N_c = 3 := by native_decide
 
 -- Chirp 11/3 exponent
 theorem chirp_113_num : N_c ^ 2 + N_w = 11 := by native_decide
+-- Engine wiring
+abbrev sigmaD : Nat := 1 + 3 + 8 + 24
+theorem engine_quad : chi = 6 := by native_decide
+theorem engine_pol : N_c - 1 = 2 := by native_decide
+theorem engine_double : N_w = 2 := by native_decide
+theorem engine_full : sigmaD = 36 := by native_decide
+-- Engine wired.

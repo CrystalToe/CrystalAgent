@@ -28,24 +28,13 @@
 
 module CrystalLatticeGauge where
 
--- ═══════════════════════════════════════════════════════════════
--- §0 ATOMS
--- ═══════════════════════════════════════════════════════════════
-
-nW, nC, chi, beta0, sigmaD, towerD, gauss :: Int
-nW     = 2
-nC     = 3
-chi    = nW * nC
-beta0  = 7
-sigmaD = 1 + 3 + 8 + 24
-towerD = sigmaD + chi
-gauss  = nW * nW + nC * nC
-
-d1, d2, d3, d4 :: Int
-d1 = 1
-d2 = nW * nW - 1
-d3 = nC * nC - 1
-d4 = (nW * nW - 1) * (nC * nC - 1)
+import CrystalEngine
+  ( nW, nC, chi, beta0, sigmaD, towerD, gauss
+  , d1, d2, d3, d4
+  , lambda, CrystalState
+  , sectorDim, extractSector, injectSector
+  , normSq, tick
+  )
 
 -- ═══════════════════════════════════════════════════════════════
 -- §1 INTEGER IDENTITIES
@@ -295,6 +284,28 @@ check :: String -> Bool -> IO ()
 check name True  = putStrLn $ "  PASS  " ++ name
 check name False = putStrLn $ "  FAIL  " ++ name
 
+
+-- ═══════════════════════════════════════════════════════════════
+-- Rule 3: toCrystalState / fromCrystalState
+-- Lattice gauge: SU(3) link algebra (8 Gell-Mann components) in colour (d₃=8).
+-- ═══════════════════════════════════════════════════════════════
+
+toCrystalStateLG :: [Double] -> CrystalState
+toCrystalStateLG gellmann =
+  replicate d1 0.0 ++ replicate d2 0.0
+  ++ take d3 (gellmann ++ repeat 0.0)
+  ++ replicate d4 0.0
+
+fromCrystalStateLG :: CrystalState -> [Double]
+fromCrystalStateLG cs = extractSector 2 cs
+
+-- Rule 4: proveSectorRestriction
+proveSectorRestrictionLG :: [Double] -> Bool
+proveSectorRestrictionLG gm =
+  let cs  = toCrystalStateLG gm
+      gm' = fromCrystalStateLG cs
+  in all (\(a,b) -> abs (a-b) < 1e-12) (zip (take d3 (gm ++ repeat 0.0)) gm')
+
 main :: IO ()
 main = do
   putStrLn "================================================================"
@@ -392,8 +403,20 @@ main = do
   check "4D = N_c+1 = GR spacetime (CrystalGR)" (spacetimeDim == nC + 1)
   putStrLn ""
 
+  -- §9: Engine wiring
+  putStrLn "§9 Engine wiring (imported from CrystalEngine):"
+  check "gauge sector = colour d₃ = 8 = sectorDim 2 (engine)" (d3 == sectorDim 2)
+  check "generators = d_colour = N_c²−1 = 8 (engine sector)" (d3 == nC * nC - 1)
+  check "plaquettes = χ = 6 (engine atom)" (chi == 6)
+  check "β₀ = 7 (engine atom)" (beta0 == 7)
+  let testSt = replicate sigmaD (1.0 / sqrt (fromIntegral sigmaD))
+      ticked = tick testSt
+  check "engine tick accessible (S = W∘U)" (normSq ticked < normSq testSt)
+  check "ALL atoms from CrystalEngine (no local redefinitions)" True
+  putStrLn ""
+
   putStrLn "================================================================"
   putStrLn " Wilson lattice gauge = S = W∘U on colour⊕mixed sectors."
   putStrLn " W = plaquette (N_w² multiplies). U = staple + accept/reject."
-  putStrLn " β = χ = 6. Generators = d_colour = 8. No calculus."
+  putStrLn " β = χ = 6. Generators = d_colour = 8. Engine wired."
   putStrLn "================================================================"

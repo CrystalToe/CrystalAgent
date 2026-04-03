@@ -5,6 +5,7 @@
      Kepler, SR/GR, Immirzi, BH -}
 module CrystalGravity where
 import CrystalAxiom
+import qualified CrystalEngine as CE  -- engine atoms
 import Data.Ratio ((%))
 
 -- ═══════════════════════════════════════════════════════════════════

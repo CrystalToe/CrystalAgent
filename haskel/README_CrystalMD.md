@@ -1,35 +1,39 @@
 <!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
 
-# CrystalMD — Molecular Dynamics from (2,3)
+# CrystalMD.hs — Molecular Dynamics from (2,3)
 
-## Overview
+## What This Module Does
 
-Velocity Verlet integrator with Lennard-Jones, Coulomb, and H-bond potentials.
-LJ exponents 6,12 traced to χ, 2χ. Force coefficient 24 = d_mixed.
+Velocity Verlet with Lennard-Jones + Coulomb + hydrogen bonds. LJ 6-12
+potential where 6 = χ and 12 = 2χ. Bond angles, helix geometry, Flory
+exponent — all from (2,3).
 
-## Integer Traces
+## Engine Wiring
 
-| Physical quantity | Value | Crystal derivation |
-|---|---|---|
+**This module imports CrystalEngine.** No local atom redefinitions.
+
+### Sector: weak⊕colour (d=11)
+
+| MD Concept | Value | Engine Source |
+|-----------|-------|--------------|
 | LJ attractive exponent | 6 | χ |
 | LJ repulsive exponent | 12 | 2χ |
-| LJ potential coefficient | 4 | N_w² |
 | LJ force coefficient | 24 | d_mixed |
-| Tetrahedral bond angle | arccos(−1/3) | arccos(−1/N_c) |
+| LJ potential coefficient | 4 | N_w² |
+| Bond angle arccos(−1/3) | 109.47° | arccos(−1/N_c) |
 | H-bonds A-T | 2 | N_w |
 | H-bonds G-C | 3 | N_c |
-| Helix residues/turn | 3.6 = 18/5 | (N_c²·N_w)/(χ−1) |
-| Flory exponent ν | 2/5 | N_w/(χ−1) |
+| Helix residues/turn | 18/5 | (N_c²N_w)/(χ−1) |
+| Flory ν | 2/5 | N_w/(χ−1) |
 | Coulomb exponent | 2 | N_c−1 |
 
-## Self-Test
+## Proof Certificate
 
-Energy conserved to 3×10⁻⁹, bond angle exact, Coulomb inverse-square verified.
+- `haskel/CrystalMD.hs` — 22 checks (22 PASS)
+- `proofs/CrystalMD.lean` — Lean 4 theorems (by native_decide)
+- `proofs/CrystalMD.agda` — Agda proofs (by refl)
 
-```bash
-ghc -O2 -main-is CrystalMD CrystalMD.hs 2>/dev/null && ./CrystalMD
-```
+## Dependencies
 
-## Observable Count
-
-10 new. All integers from (2,3).
+- **Imports CrystalEngine** — atoms, sector operations, tick, normSq
+- `Data.Ratio`

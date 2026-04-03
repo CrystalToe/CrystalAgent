@@ -4,34 +4,34 @@
 
 ## What This Module Does
 
-Yee FDTD = monad S = W∘U on the EM sector. Propagates EM waves at c = 1.
-Larmor radiation, Rayleigh scattering, Planck/Stefan-Boltzmann — all from (2,3).
+Yee FDTD (Finite-Difference Time-Domain) for Maxwell's equations.
+E and B staggered in space and time — this IS S = W∘U for EM.
+Propagation, Rayleigh scattering, Thomson cross-section, Larmor radiation.
 
-## The EM Integer Map
+## Engine Wiring
 
-| Quantity | Value | Crystal Source |
-|----------|-------|---------------|
-| EM field components | 6 | χ = N_w × N_c |
-| E components | 3 | N_c |
-| B components | 3 | N_c |
-| 2-form dim C(4,2) | 6 | χ |
-| Maxwell equations | 4 | N_c + 1 |
-| c (speed of light) | 1 | χ/χ |
-| Larmor coefficient | 2/3 | (N_c-1)/N_c |
-| Rayleigh λ exponent | 4 | N_w² |
-| Rayleigh size exponent | 6 | χ |
-| Planck λ exponent | 5 | χ-1 |
-| Stefan T exponent | 4 | N_w² |
-| Stefan denominator | 15 | N_c(χ-1) |
-| U(1) gauge group | 1 | singlet sector |
+**This module imports CrystalEngine.** No local atom redefinitions.
 
-## Key Result
+### Sector: colour (d₃ = 8)
 
-Wave propagates at exactly c = 1 (peak displacement = expected c×t to machine precision).
-The Yee FDTD preserves ∇·B = 0 exactly (staggered grid guarantee).
+| EM Concept | Value | Engine Source |
+|-----------|-------|--------------|
+| Field components (3E + 3B) | 6 | χ |
+| EM sector dimension | 8 | d_colour = N_c²−1 |
+| Courant number | 1/2 | 1/N_w |
+| Maxwell's equations | 4 | N_c + 1 |
+| Speed of light | 1 | χ/χ (Lieb-Robinson) |
+| Rayleigh exponent | 4 | N_w² |
+| Thomson factor | 8/3 | d_colour/N_c |
+| Larmor coefficient | 2/3 | (N_c−1)/N_c |
 
 ## Proof Certificate
 
-- `proofs/crystal_em_proof.py` — 34/34 PASS
-- `proofs/CrystalEM.lean` — 18 theorems
-- `proofs/CrystalEM.agda` — 11 proofs
+- `haskel/CrystalEM.hs` — 27 checks (27 PASS)
+- `proofs/CrystalEM.lean` — Lean 4 theorems (by native_decide)
+- `proofs/CrystalEM.agda` — Agda proofs (by refl)
+
+## Dependencies
+
+- **Imports CrystalEngine** — atoms, sector operations, tick, normSq
+- `Data.Ratio`

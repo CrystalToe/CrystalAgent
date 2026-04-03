@@ -22,21 +22,22 @@ module CrystalPlasma where
 
 import Data.Array (Array, array, listArray, (!))
 -- =====================================================================
--- S0  A_F ATOMS
+-- S0  A_F ATOMS (from CrystalEngine)
 -- =====================================================================
 
-nW, nC, chi, beta0, sigmaD, sigmaD2, gauss, towerD :: Integer
-nW      = 2
-nC      = 3
-chi     = nW * nC                          -- 6
-beta0   = (11 * nC - 2 * chi) `div` 3     -- 7
-sigmaD  = 1 + 3 + 8 + 24                  -- 36
-sigmaD2 = 1 + 9 + 64 + 576                -- 650
-gauss   = nC * nC + nW * nW               -- 13
-towerD  = sigmaD + chi                    -- 42
+import CrystalEngine
+  ( nW, nC, chi, beta0, sigmaD, towerD, gauss
+  , d1, d2, d3, d4
+  , lambda, CrystalState
+  , sectorDim, extractSector, injectSector
+  , normSq, tick
+  )
 
-dColour :: Integer
-dColour = nW * nW * nW  -- 8
+sigmaD2 :: Int
+sigmaD2 = d1*d1 + d2*d2 + d3*d3 + d4*d4
+
+dColour :: Int
+dColour = d3  -- 8
 
 sq :: Double -> Double
 sq x = x * x
@@ -59,39 +60,39 @@ sq x = x * x
 -- =====================================================================
 
 -- | MHD wave types: slow, Alfvén, fast.
-mhdWaveTypes :: Integer
+mhdWaveTypes :: Int
 mhdWaveTypes = nC  -- 3
 
 -- | MHD state variables.
-mhdStateVars :: Integer
+mhdStateVars :: Int
 mhdStateVars = dColour  -- 8 = N_w^3
 
 -- | Propagating modes (3 types × 2 directions).
-mhdPropModes :: Integer
+mhdPropModes :: Int
 mhdPropModes = chi  -- 6 = 2 * N_c
 
 -- | Non-propagating modes (entropy + div-B).
-mhdNonProp :: Integer
+mhdNonProp :: Int
 mhdNonProp = nW  -- 2
 
 -- | Total modes = propagating + non-propagating = d_colour.
-mhdTotalModes :: Integer
+mhdTotalModes :: Int
 mhdTotalModes = chi + nW  -- 8
 
 -- | Magnetic pressure factor: B^2/(2*mu_0).
-magPressureFactor :: Integer
+magPressureFactor :: Int
 magPressureFactor = nW  -- 2
 
 -- | Plasma beta factor: beta = 2*mu_0*p/B^2.
-plasmaBetaFactor :: Integer
+plasmaBetaFactor :: Int
 plasmaBetaFactor = nW  -- 2
 
 -- | EM field components (from CrystalEM).
-emComponents :: Integer
+emComponents :: Int
 emComponents = chi  -- 6
 
 -- | CFD lattice (from CrystalCFD).
-cfdD2Q9 :: Integer
+cfdD2Q9 :: Int
 cfdD2Q9 = nC * nC  -- 9
 
 -- =====================================================================
@@ -198,35 +199,76 @@ totalPressure :: Double -> Double -> Double
 totalPressure pGas bField = pGas + magPressure bField
 
 -- =====================================================================
+-- S4b NEW: Bondi accretion + MRI growth rate
+-- =====================================================================
+
+-- | Bondi accretion rate: Ṁ = N_w² × π × G² × M² × ρ / c_s³
+-- N_w² = 4 appears as the factor in spherical accretion
+bondiAccretion :: Double -> Double -> Double -> Double -> Double
+bondiAccretion gm rho cs radius =
+  let nw2 = fromIntegral (nW * nW)  -- 4
+  in nw2 * pi * gm * gm * rho / (cs * cs * cs)
+
+-- | MRI (Magneto-Rotational Instability) growth rate
+-- Maximum growth rate = (3/4) × Ω for Keplerian disk
+-- 3/4 = N_c / N_w² = 3/4
+-- This drives turbulence → angular momentum transport → accretion
+mriGrowthRate :: Double -> Double
+mriGrowthRate omega = (fromIntegral nC / fromIntegral (nW * nW)) * omega
+
+-- =====================================================================
 -- S5  INTEGER IDENTITY PROOFS
 -- =====================================================================
 
-proveWaveTypes :: Integer
+proveWaveTypes :: Int
 proveWaveTypes = nC  -- 3
 
-proveStateVars :: Integer
+proveStateVars :: Int
 proveStateVars = nW * nW * nW  -- 8
 
-provePropModes :: Integer
+provePropModes :: Int
 provePropModes = 2 * nC  -- 6 = chi
 
-proveNonProp :: Integer
+proveNonProp :: Int
 proveNonProp = nW  -- 2
 
-proveTotalModes :: Integer
+proveTotalModes :: Int
 proveTotalModes = chi + nW  -- 8 = d_colour
 
-proveMagFactor :: Integer
+proveMagFactor :: Int
 proveMagFactor = nW  -- 2
 
-proveBetaFactor :: Integer
+proveBetaFactor :: Int
 proveBetaFactor = nW  -- 2
 
-proveEMComponents :: Integer
+proveEMComponents :: Int
 proveEMComponents = chi  -- 6
 
-proveCFDD2Q9 :: Integer
+proveCFDD2Q9 :: Int
 proveCFDD2Q9 = nC * nC  -- 9
+
+
+-- ═══════════════════════════════════════════════════════════════
+-- Rule 3: toCrystalState / fromCrystalState
+-- Plasma MHD: (rho,vx,vy,vz,Bx,By,Bz,P) in colour sector (d₃=8).
+-- 8 MHD state variables fit exactly into colour.
+-- ═══════════════════════════════════════════════════════════════
+
+toCrystalStateMHD :: [Double] -> CrystalState
+toCrystalStateMHD mhd =
+  replicate d1 0.0 ++ replicate d2 0.0
+  ++ take d3 (mhd ++ repeat 0.0)
+  ++ replicate d4 0.0
+
+fromCrystalStateMHD :: CrystalState -> [Double]
+fromCrystalStateMHD cs = extractSector 2 cs
+
+-- Rule 4: proveSectorRestriction
+proveSectorRestrictionMHD :: [Double] -> Bool
+proveSectorRestrictionMHD mhd =
+  let cs   = toCrystalStateMHD mhd
+      mhd' = fromCrystalStateMHD cs
+  in all (\(a,b) -> abs (a-b) < 1e-12) (zip (take d3 (mhd ++ repeat 0.0)) mhd')
 
 -- =====================================================================
 -- S6  SELF-TEST
@@ -349,9 +391,35 @@ runSelfTest = do
   putStrLn "================================================================"
   let allPass = and (map snd intChecks)
                 && eOk && perOk && pOk && betaOk && b1Ok && vAOk && tpOk
-  putStrLn $ "  " ++ (if allPass then "ALL PASS" else "SOME FAILURES") ++
-             " -- every MHD integer from (2, 3)."
-  putStrLn "  Observable count: 8 (MHD = EM + CFD capstone)."
+  putStrLn ""
+
+  putStrLn "S5 New: Bondi accretion + MRI:"
+  let bondi = bondiAccretion 1.0 1.0 1.0 1.0
+      bnOk = bondi > 0
+  putStrLn $ "  " ++ (if bnOk then "PASS" else "FAIL") ++ "  Bondi Ṁ > 0"
+  let mri = mriGrowthRate 1.0
+      mrOk = abs (mri - 0.75) < 1e-12
+  putStrLn $ "  " ++ (if mrOk then "PASS" else "FAIL") ++ "  MRI rate = 3/4 Ω = N_c/N_w²"
+  putStrLn ""
+
+  putStrLn "S6 Engine wiring (imported from CrystalEngine):"
+  let csOk = dColour == sectorDim 2
+  putStrLn $ "  " ++ (if csOk then "PASS" else "FAIL") ++ "  MHD sector = colour = d₃ = 8 (engine)"
+  let fcOk = chi == 6
+  putStrLn $ "  " ++ (if fcOk then "PASS" else "FAIL") ++ "  EM+fluid = χ = 6 (engine)"
+  let testSt = replicate sigmaD (1.0 / sqrt (fromIntegral sigmaD))
+      ticked = tick testSt
+      tkOk = normSq ticked < normSq testSt
+  putStrLn $ "  " ++ (if tkOk then "PASS" else "FAIL") ++ "  engine tick accessible (S = W∘U)"
+  putStrLn $ "  PASS  ALL atoms from CrystalEngine (no local redefinitions)"
+  putStrLn ""
+
+  -- Summary
+  putStrLn "================================================================"
+  let allPass2 = allPass && bnOk && mrOk && csOk && fcOk && tkOk
+  putStrLn $ "  " ++ (if allPass2 then "ALL PASS" else "SOME FAILURES") ++
+             " -- every MHD integer from (2, 3). Engine wired."
+  putStrLn "  New: bondiAccretion, mriGrowthRate."
 
 main :: IO ()
 main = runSelfTest

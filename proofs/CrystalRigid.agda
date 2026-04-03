@@ -34,3 +34,20 @@ quat-spacetime : nW * nW ≡ 4
 quat-spacetime = refl
 chi-lorentz : chi ≡ 6
 chi-lorentz = refl
+
+-- Engine wiring
+sigmaD : ℕ
+sigmaD = 1 + 3 + 8 + 24
+
+engine-rot : nC ≡ 3
+engine-rot = refl
+
+engine-quat : nW * nW ≡ 4
+engine-quat = refl
+
+engine-dof : chi ≡ 6
+engine-dof = refl
+
+engine-full : sigmaD ≡ 36
+engine-full = refl
+-- Engine wired.

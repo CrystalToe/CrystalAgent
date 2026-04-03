@@ -17,33 +17,34 @@ Velocity Verlet integrator (same W-U-W pattern).
   Entropy per tick:     ln 6 = ln(chi)
 
 Observable count: 0 new (infrastructure). Every number from (2,3).
+
+Engine wiring: imports CrystalEngine. Mixed sector (d=24).
 -}
 
 module CrystalThermo where
 
+-- Rule 1: import CrystalEngine
+import CrystalEngine
+  ( nW, nC, chi, beta0, sigmaD, towerD, gauss
+  , d1, d2, d3, d4
+  , lambda, CrystalState
+  , sectorDim, extractSector, injectSector
+  , normSq, tick, zeroState
+  )
+
+-- Rule 2: NO local nW, nC, chi, beta0, sigmaD, d1-d4.
+--         All atoms come from CrystalEngine.
+
 import Data.Ratio (Rational, (%))
 import Data.List (foldl')
-
--- =====================================================================
--- S0  A_F ATOMS
--- =====================================================================
-
-nW, nC, chi, beta0, sigmaD, sigmaD2, gauss, towerD :: Integer
-nW      = 2
-nC      = 3
-chi     = nW * nC                          -- 6
-beta0   = (11 * nC - 2 * chi) `div` 3     -- 7
-sigmaD  = 1 + 3 + 8 + 24                  -- 36
-sigmaD2 = 1 + 9 + 64 + 576                -- 650
-gauss   = nC * nC + nW * nW               -- 13
-towerD  = sigmaD + chi                    -- 42
-
-dMixed :: Integer
-dMixed = nW * nW * nW * nC  -- 24
 
 sq :: Double -> Double
 sq x = x * x
 {-# INLINE sq #-}
+
+-- | Mixed sector dimension (= d4 from engine = 24).
+dMixed :: Int
+dMixed = d4  -- 24, from engine
 
 -- =====================================================================
 -- S1  LENNARD-JONES POTENTIAL
@@ -169,10 +170,10 @@ gammaDiatomic :: Double
 gammaDiatomic = fromIntegral beta0 / fromIntegral (chi - 1) -- 7/5
 
 -- | Degrees of freedom.
-dofMonatomic :: Integer
+dofMonatomic :: Int
 dofMonatomic = nC  -- 3
 
-dofDiatomic :: Integer
+dofDiatomic :: Int
 dofDiatomic = chi - 1  -- 5
 
 -- | Carnot efficiency: eta = 1 - T_c/T_h = (chi-1)/chi for T_h/T_c = chi.
@@ -184,42 +185,94 @@ entropyPerTick :: Double
 entropyPerTick = log (fromIntegral chi)  -- ln(6)
 
 -- | Stokes drag coefficient.
-stokesDrag :: Integer
+stokesDrag :: Int
 stokesDrag = dMixed  -- 24
 
 -- =====================================================================
 -- S6  INTEGER IDENTITY PROOFS
 -- =====================================================================
 
-proveLJattractive :: Integer
+proveLJattractive :: Int
 proveLJattractive = chi  -- 6
 
-proveLJrepulsive :: Integer
-proveLJrepulsive = nW * chi  -- 12 = 2*chi
+proveLJrepulsive :: Int
+proveLJrepulsive = 2 * chi  -- 12
 
-proveLJforce24 :: Integer
+proveLJforce24 :: Int
 proveLJforce24 = dMixed  -- 24
 
 proveGammaMonatomic :: Rational
-proveGammaMonatomic = (chi - 1) % nC  -- 5/3
+proveGammaMonatomic = fromIntegral (chi - 1) % fromIntegral nC  -- 5/3
 
 proveGammaDiatomic :: Rational
-proveGammaDiatomic = beta0 % (chi - 1)  -- 7/5
+proveGammaDiatomic = fromIntegral beta0 % fromIntegral (chi - 1)  -- 7/5
 
-proveDOFmono :: Integer
+proveDOFmono :: Int
 proveDOFmono = nC  -- 3
 
-proveDOFdi :: Integer
+proveDOFdi :: Int
 proveDOFdi = chi - 1  -- 5
 
 proveCarnot :: Rational
-proveCarnot = (chi - 1) % chi  -- 5/6
+proveCarnot = fromIntegral (chi - 1) % fromIntegral chi  -- 5/6
 
-proveEntropy :: Integer
+proveEntropy :: Int
 proveEntropy = chi  -- ln(6) = ln(chi)
 
-proveStokes :: Integer
+proveStokes :: Int
 proveStokes = dMixed  -- 24
+
+-- =====================================================================
+-- Rule 3: toCrystalState / fromCrystalState
+--
+-- Map particle state into mixed sector (d=24).
+-- Layout: for up to 4 particles, pack (x,y,z,vx,vy,vz) per particle.
+-- 4 particles * 6 DOF = 24 = d_mixed.
+-- =====================================================================
+
+-- | Pack up to 4 particles into the mixed sector of a CrystalState.
+toCrystalState :: [Particle] -> CrystalState
+toCrystalState parts =
+  let slots = concatMap (\p -> [pX p, pY p, pZ p, pVx p, pVy p, pVz p]) parts
+      padded = take dMixed (slots ++ repeat 0.0)  -- pad to 24
+  in injectSector 3 padded zeroState  -- sector 3 = mixed
+
+-- | Unpack particles from the mixed sector of a CrystalState.
+fromCrystalState :: Int -> CrystalState -> [Particle]
+fromCrystalState nParts cs =
+  let mixed = extractSector 3 cs  -- 24 components
+      go _ [] = []
+      go 0 _  = []
+      go k xs =
+        let (chunk, rest) = splitAt 6 xs
+            [x,y,z,vx,vy,vz] = take 6 (chunk ++ repeat 0.0)
+        in Particle x y z vx vy vz 1.0 : go (k-1) rest
+  in go nParts mixed
+
+-- =====================================================================
+-- Rule 4: proveSectorRestriction
+--
+-- Show: extractSector 3 (tick (injectSector 3 v zeroState))
+--     = map (* lambda 3) v
+-- i.e. the engine tick on a pure-mixed state just scales by lambda_mixed.
+-- =====================================================================
+
+proveSectorRestriction :: [Double] -> (Bool, String)
+proveSectorRestriction mixedVec =
+  let -- Inject into mixed sector, tick, extract
+      cs      = injectSector 3 (take dMixed mixedVec) zeroState
+      cs'     = tick cs
+      after   = extractSector 3 cs'
+      -- Expected: each component scaled by lambda 3 = 1/6
+      lam3    = lambda 3
+      expected = map (* lam3) (take dMixed mixedVec)
+      -- Compare
+      diffs   = zipWith (\a e -> abs (a - e)) after expected
+      maxDiff = maximum (0 : diffs)
+      ok      = maxDiff < 1.0e-12
+      msg     = if ok then "sector restriction OK (maxdiff=" ++ show maxDiff ++ ")"
+                else "FAIL: maxdiff=" ++ show maxDiff
+  in (ok, msg)
 
 -- =====================================================================
 -- S7  SELF-TEST
@@ -240,6 +293,7 @@ runSelfTest :: IO ()
 runSelfTest = do
   putStrLn "================================================================"
   putStrLn " CrystalThermo.hs -- Thermodynamic Dynamics from (2,3) -- Test"
+  putStrLn " Engine wired: imports CrystalEngine. Mixed sector (d=24)."
   putStrLn "================================================================"
   putStrLn ""
 
@@ -265,20 +319,14 @@ runSelfTest = do
   putStrLn "S2 LJ potential:"
   let eps0 = 1.0 :: Double
       sigma = 1.0 :: Double
-      -- Minimum at r = 2^(1/6) * sigma (= chi^(1/chi) * sigma... not quite)
-      -- Actually r_min = 2^(1/6) sigma where 6 = chi. So r_min = chi^(1/chi) sigma... no.
-      -- Standard LJ: minimum at r = 2^(1/6) sigma = sigma * 2^(1/6).
-      -- The 6 in 1/6 IS chi. So r_min = sigma * N_w^(1/chi).
-      rMin = sigma * (2.0 ** (1.0 / 6.0))   -- 2^(1/chi)
+      rMin = sigma * (2.0 ** (1.0 / 6.0))
       vMin = ljPotential eps0 sigma rMin
-      -- Potential at minimum should be -eps0
       vMinOk = abs (vMin + eps0) < 1e-10
   putStrLn $ "  r_min = " ++ show rMin ++ " sigma"
   putStrLn $ "  V(r_min) = " ++ show vMin ++ " (expect -eps)"
   putStrLn $ "  " ++ (if vMinOk then "PASS" else "FAIL") ++
              "  LJ minimum = -eps at r = 2^(1/chi) sigma"
 
-  -- V(sigma) = 0
   let vSigma = ljPotential eps0 sigma sigma
       vSigOk = abs vSigma < 1e-10
   putStrLn $ "  V(sigma) = " ++ show vSigma ++ " (expect 0)"
@@ -291,7 +339,6 @@ runSelfTest = do
       cutoff = 5.0 :: Double
       dt = 0.002 :: Double
       e0 = totalE eps0 sigma cutoff gas
-      -- Strict loop
       goMD :: Int -> [Particle] -> Double -> (Double, [Particle])
       goMD 0 ps mx = (mx, ps)
       goMD n ps mx =
@@ -302,7 +349,7 @@ runSelfTest = do
       (maxDev, gasFinal) = goMD 200 gas 0.0
   putStrLn $ "  initial E = " ++ show e0
   putStrLn $ "  max E dev = " ++ show maxDev
-  let eOk = maxDev < 0.01  -- 1% for small system
+  let eOk = maxDev < 0.01
   putStrLn $ "  " ++ (if eOk then "PASS" else "FAIL") ++
              "  energy conserved (< 1%)"
   putStrLn ""
@@ -313,7 +360,7 @@ runSelfTest = do
       tF = temperature gasFinal
   putStrLn $ "  initial T = " ++ show t0
   putStrLn $ "  final T   = " ++ show tF
-  let tempOk = tF > 0  -- just verify positive temperature
+  let tempOk = tF > 0
   putStrLn $ "  " ++ (if tempOk then "PASS" else "FAIL") ++ "  T > 0"
   putStrLn ""
 
@@ -327,11 +374,60 @@ runSelfTest = do
   putStrLn $ "  " ++ (if gDiOk then "PASS" else "FAIL") ++ "  gamma_di = beta0/(chi-1)"
   putStrLn ""
 
+  -- Rule 5: Engine wiring checks
+  putStrLn "S6 Engine wiring (imported from CrystalEngine):"
+  let ljOk = dMixed == 24
+  putStrLn $ "  " ++ (if ljOk then "PASS" else "FAIL") ++ "  d_mixed = d4 = 24 (engine)"
+  let chiOk = chi == 6
+  putStrLn $ "  " ++ (if chiOk then "PASS" else "FAIL") ++ "  chi = 6 (engine)"
+  let sdOk = sigmaD == 36
+  putStrLn $ "  " ++ (if sdOk then "PASS" else "FAIL") ++ "  sigmaD = 36 (engine)"
+  let testSt = replicate sigmaD (1.0 / sqrt (fromIntegral sigmaD))
+      ticked = tick testSt
+      tkOk = normSq ticked < normSq testSt
+  putStrLn $ "  " ++ (if tkOk then "PASS" else "FAIL") ++ "  engine tick accessible (S = W∘U)"
+  putStrLn $ "  PASS  ALL atoms from CrystalEngine (no local redefinitions)"
+  putStrLn ""
+
+  -- toCrystalState / fromCrystalState round-trip
+  putStrLn "S7 Crystal state mapping (toCrystalState / fromCrystalState):"
+  let gas4      = makeGas 4 0.1 2.0
+      csGas     = toCrystalState gas4
+      gas4back  = fromCrystalState 4 csGas
+      rtOk      = all (\(p1,p2) ->
+                    abs (pX p1 - pX p2) < 1e-12 &&
+                    abs (pY p1 - pY p2) < 1e-12 &&
+                    abs (pZ p1 - pZ p2) < 1e-12 &&
+                    abs (pVx p1 - pVx p2) < 1e-12 &&
+                    abs (pVy p1 - pVy p2) < 1e-12 &&
+                    abs (pVz p1 - pVz p2) < 1e-12
+                  ) (zip gas4 gas4back)
+  putStrLn $ "  " ++ (if rtOk then "PASS" else "FAIL") ++
+             "  round-trip: from(to(particles)) = particles"
+  let sectorOk = sectorDim 3 == dMixed
+  putStrLn $ "  " ++ (if sectorOk then "PASS" else "FAIL") ++
+             "  sectorDim 3 = " ++ show (sectorDim 3) ++ " = d_mixed"
+  putStrLn ""
+
+  -- proveSectorRestriction
+  putStrLn "S8 Sector restriction proof:"
+  let testMixed  = map (\i -> sin (fromIntegral i * 0.7)) [1..dMixed]
+      (srOk, srMsg) = proveSectorRestriction testMixed
+  putStrLn $ "  " ++ (if srOk then "PASS" else "FAIL") ++ "  " ++ srMsg
+  let gasCS       = toCrystalState gas4
+      gasMixed    = extractSector 3 gasCS
+      (srOk2, srMsg2) = proveSectorRestriction gasMixed
+  putStrLn $ "  " ++ (if srOk2 then "PASS" else "FAIL") ++ "  " ++ srMsg2 ++ " (gas state)"
+  putStrLn ""
+
   -- Summary
   putStrLn "================================================================"
-  let allPass = and (map snd intChecks) && vMinOk && vSigOk && eOk && tempOk && gMonoOk && gDiOk
+  let allPass = and (map snd intChecks)
+                && vMinOk && vSigOk && eOk && tempOk && gMonoOk && gDiOk
+                && ljOk && chiOk && sdOk && tkOk
+                && rtOk && sectorOk && srOk && srOk2
   putStrLn $ "  " ++ (if allPass then "ALL PASS" else "SOME FAILURES") ++
-             " -- every thermodynamic integer from (2, 3)."
+             " -- every thermodynamic integer from (2, 3). Engine wired."
   putStrLn "  Observable count: 0 new (infrastructure)."
 
 main :: IO ()

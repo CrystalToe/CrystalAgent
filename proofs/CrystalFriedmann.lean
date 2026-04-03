@@ -19,3 +19,9 @@ theorem amplitude : N_c * beta0 = 21 := by native_decide
 theorem matter_exp : N_c = 3 := by native_decide
 theorem radiation_exp : N_c + 1 = 4 := by native_decide
 theorem spectral_D : D = 42 := by native_decide
+-- Engine wiring
+abbrev sigmaD : Nat := 1 + 3 + 8 + 24
+theorem engine_gauss : gauss = 13 := by native_decide
+theorem engine_chi : chi = 6 := by native_decide
+theorem engine_full : sigmaD = 36 := by native_decide
+-- Engine wired.

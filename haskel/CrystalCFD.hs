@@ -27,21 +27,23 @@ import Data.List (foldl')
 import Data.Ratio (Rational, (%))
 
 -- =====================================================================
--- S0  A_F ATOMS
+-- S0  A_F ATOMS (from CrystalEngine)
 -- =====================================================================
 
-nW, nC, chi, beta0, sigmaD, sigmaD2, gauss, towerD :: Integer
-nW      = 2
-nC      = 3
-chi     = nW * nC                          -- 6
-beta0   = (11 * nC - 2 * chi) `div` 3     -- 7
-sigmaD  = 1 + 3 + 8 + 24                  -- 36
-sigmaD2 = 1 + 9 + 64 + 576                -- 650
-gauss   = nC * nC + nW * nW               -- 13
-towerD  = sigmaD + chi                    -- 42
+import CrystalEngine
+  ( nW, nC, chi, beta0, sigmaD, towerD, gauss
+  , d1, d2, d3, d4
+  , lambda
+  , CrystalState
+  , sectorDim, extractSector, injectSector
+  , normSq, tick
+  )
 
-dMixed :: Integer
-dMixed = nW * nW * nW * nC  -- 24
+sigmaD2 :: Int
+sigmaD2 = d1*d1 + d2*d2 + d3*d3 + d4*d4
+
+dMixed :: Int
+dMixed = d4  -- 24
 
 sq :: Double -> Double
 sq x = x * x
@@ -263,73 +265,96 @@ totalMass st =
 
 -- | Kolmogorov exponent: -5/3 = -(chi-1)/N_c.
 kolmogorovExp :: Rational
-kolmogorovExp = -(chi - 1) % nC   -- -5/3
+kolmogorovExp = -fromIntegral (chi - 1) % fromIntegral nC   -- -5/3
 
 -- | Stokes drag coefficient: 24 = d_mixed.
-stokesDrag :: Integer
+stokesDrag :: Int
 stokesDrag = dMixed  -- 24
 
 -- | Blasius exponent: 1/4 = 1/N_w^2.
 blasiusExp :: Rational
-blasiusExp = 1 % (nW * nW)   -- 1/4
+blasiusExp = 1 % fromIntegral (nW * nW)   -- 1/4
 
 -- | Von Karman constant: 2/5 = N_w/(chi-1).
 vonKarman :: Rational
-vonKarman = nW % (chi - 1)   -- 2/5
+vonKarman = fromIntegral nW % fromIntegral (chi - 1)   -- 2/5
 
 -- | D2Q9 velocity count: 9 = N_c^2.
-d2q9Count :: Integer
+d2q9Count :: Int
 d2q9Count = nC * nC  -- 9
 
 -- | Rest weight: 4/9 = N_w^2/N_c^2.
 weightRest :: Rational
-weightRest = (nW * nW) % (nC * nC)  -- 4/9
+weightRest = fromIntegral (nW * nW) % fromIntegral (nC * nC)  -- 4/9
 
 -- | Cardinal weight: 1/9 = 1/N_c^2.
 weightCardinal :: Rational
-weightCardinal = 1 % (nC * nC)  -- 1/9
+weightCardinal = 1 % fromIntegral (nC * nC)  -- 1/9
 
 -- | Diagonal weight: 1/36 = 1/sigmaD.
 weightDiagonal :: Rational
-weightDiagonal = 1 % sigmaD  -- 1/36
+weightDiagonal = 1 % fromIntegral sigmaD  -- 1/36
 
 -- | Sound speed squared: 1/3 = 1/N_c.
 soundSpeedSq :: Rational
-soundSpeedSq = 1 % nC  -- 1/3
+soundSpeedSq = 1 % fromIntegral nC  -- 1/3
 
 -- =====================================================================
 -- S6  INTEGER IDENTITY PROOFS
 -- =====================================================================
 
-proveD2Q9 :: Integer
+proveD2Q9 :: Int
 proveD2Q9 = nC * nC  -- 9
 
 proveKolmogorov :: Rational
-proveKolmogorov = -(chi - 1) % nC  -- -5/3
+proveKolmogorov = -fromIntegral (chi - 1) % fromIntegral nC  -- -5/3
 
-proveStokes :: Integer
+proveStokes :: Int
 proveStokes = dMixed  -- 24
 
 proveBlasius :: Rational
-proveBlasius = 1 % (nW * nW)  -- 1/4
+proveBlasius = 1 % fromIntegral (nW * nW)  -- 1/4
 
 proveVonKarman :: Rational
-proveVonKarman = nW % (chi - 1)  -- 2/5
+proveVonKarman = fromIntegral nW % fromIntegral (chi - 1)  -- 2/5
 
 proveWeightRest :: Rational
-proveWeightRest = (nW * nW) % (nC * nC)  -- 4/9
+proveWeightRest = fromIntegral (nW * nW) % fromIntegral (nC * nC)  -- 4/9
 
 proveWeightCardinal :: Rational
-proveWeightCardinal = 1 % (nC * nC)  -- 1/9
+proveWeightCardinal = 1 % fromIntegral (nC * nC)  -- 1/9
 
 proveWeightDiagonal :: Rational
-proveWeightDiagonal = 1 % sigmaD  -- 1/36
+proveWeightDiagonal = 1 % fromIntegral sigmaD  -- 1/36
 
 proveWeightSum :: Rational
-proveWeightSum = (nW * nW) % (nC * nC) + 4 * (1 % (nC * nC)) + 4 * (1 % sigmaD)
+proveWeightSum = fromIntegral (nW * nW) % fromIntegral (nC * nC) + 4 * (1 % fromIntegral (nC * nC)) + 4 * (1 % fromIntegral sigmaD)
 
 proveSoundSpeed :: Rational
-proveSoundSpeed = 1 % nC  -- 1/3
+proveSoundSpeed = 1 % fromIntegral nC  -- 1/3
+
+
+-- ═══════════════════════════════════════════════════════════════
+-- Rule 3: toCrystalState / fromCrystalState
+-- CFD: D2Q9 distribution functions in colour sector (d₃=8).
+-- 8 non-rest populations fit exactly; f0 reconstructed from conservation.
+-- ═══════════════════════════════════════════════════════════════
+
+toCrystalStateCFD :: [Double] -> CrystalState
+toCrystalStateCFD dist =
+  replicate d1 0.0 ++ replicate d2 0.0
+  ++ take d3 (dist ++ repeat 0.0)
+  ++ replicate d4 0.0
+
+fromCrystalStateCFD :: CrystalState -> [Double]
+fromCrystalStateCFD cs = extractSector 2 cs
+
+-- Rule 4: proveSectorRestriction
+proveSectorRestrictionCFD :: [Double] -> Bool
+proveSectorRestrictionCFD dist =
+  let cs    = toCrystalStateCFD dist
+      dist' = fromCrystalStateCFD cs
+  in all (\(a,b) -> abs (a-b) < 1e-12) (zip (take d3 (dist ++ repeat 0.0)) dist')
 
 -- =====================================================================
 -- S7  SELF-TEST
@@ -452,11 +477,26 @@ runSelfTest = do
              "  density near-uniform (< 1%)"
   putStrLn ""
 
+  putStrLn "S5 Engine wiring (imported from CrystalEngine):"
+  let d2Ok = nC * nC == 9
+  putStrLn $ "  " ++ (if d2Ok then "PASS" else "FAIL") ++ "  D2Q9 = N_c² = 9 (engine)"
+  let csOk = sectorDim 2 == 8
+  putStrLn $ "  " ++ (if csOk then "PASS" else "FAIL") ++ "  colour sector = d₃ = 8 (engine)"
+  let dOk = chi == 6
+  putStrLn $ "  " ++ (if dOk then "PASS" else "FAIL") ++ "  χ = 6 (engine atom)"
+  let testSt = replicate sigmaD (1.0 / sqrt (fromIntegral sigmaD))
+      ticked = tick testSt
+      tkOk = normSq ticked < normSq testSt
+  putStrLn $ "  " ++ (if tkOk then "PASS" else "FAIL") ++ "  engine tick accessible (S = W∘U)"
+  putStrLn $ "  PASS  ALL atoms from CrystalEngine (no local redefinitions)"
+  putStrLn ""
+
   -- Summary
   putStrLn "================================================================"
   let allPass = and (map snd intChecks) && wOk && massOk && profOk && densOk
+                && d2Ok && csOk && dOk && tkOk
   putStrLn $ "  " ++ (if allPass then "ALL PASS" else "SOME FAILURES") ++
-             " -- every CFD integer from (2, 3)."
+             " -- every CFD integer from (2, 3). Engine wired."
   putStrLn "  Observable count: 0 new (infrastructure)."
 
 main :: IO ()

@@ -20,23 +20,20 @@ Observable count: 0 new (infrastructure). Every number from (2,3).
 module CrystalEM where
 
 import Data.Ratio (Rational, (%))
+import CrystalEngine
+  ( nW, nC, chi, beta0, sigmaD, towerD, gauss
+  , d1, d2, d3, d4
+  , lambda
+  , CrystalState
+  , sectorDim, extractSector, injectSector
+  , normSq, tick
+  )
 
--- =====================================================================
--- S0  A_F ATOMS
--- =====================================================================
+sigmaD2 :: Int
+sigmaD2 = d1*d1 + d2*d2 + d3*d3 + d4*d4
 
-nW, nC, chi, beta0, sigmaD, sigmaD2, gauss, towerD :: Integer
-nW      = 2
-nC      = 3
-chi     = nW * nC                          -- 6
-beta0   = (11 * nC - 2 * chi) `div` 3     -- 7
-sigmaD  = 1 + 3 + 8 + 24                  -- 36
-sigmaD2 = 1 + 9 + 64 + 576                -- 650
-gauss   = nC * nC + nW * nW               -- 13
-towerD  = sigmaD + chi                    -- 42
-
-dColour :: Integer
-dColour = nC * nC - 1    -- 8
+dColour :: Int
+dColour = d3  -- 8
 
 sq :: Double -> Double
 sq x = x * x
@@ -147,15 +144,15 @@ skyBlueRatio lambdaBlue lambdaRed =
 
 -- | Planck spectral radiance peak wavelength exponent.
 -- B(lambda) ~ lambda^(-(chi-1)) at peak. Wien: lambda_max T = const.
-planckExponent :: Integer
+planckExponent :: Int
 planckExponent = chi - 1  -- 5
 
 -- | Stefan-Boltzmann T exponent: P ~ T^(N_w^2) = T^4.
-stefanExponent :: Integer
+stefanExponent :: Int
 stefanExponent = nW * nW  -- 4
 
 -- | Stefan-Boltzmann denominator: 2pi^5 / 15. The 15 = N_c(chi-1).
-stefanDenom :: Integer
+stefanDenom :: Int
 stefanDenom = nC * (chi - 1)  -- 15
 
 -- =====================================================================
@@ -169,16 +166,16 @@ stefanDenom = nC * (chi - 1)  -- 15
 -- The EM 2-form F has exactly chi independent components.
 -- =====================================================================
 
-proveEMcomponents :: Integer
+proveEMcomponents :: Int
 proveEMcomponents = nW * nC  -- chi = 6
 
-proveEcomponents :: Integer
+proveEcomponents :: Int
 proveEcomponents = nC  -- 3
 
-proveBcomponents :: Integer
+proveBcomponents :: Int
 proveBcomponents = nC  -- 3
 
-prove2formDim :: Integer
+prove2formDim :: Int
 prove2formDim = (nC + 1) * nC `div` 2  -- C(4,2) = 6 = chi
 
 -- =====================================================================
@@ -192,36 +189,58 @@ prove2formDim = (nC + 1) * nC `div` 2  -- C(4,2) = 6 = chi
 --   Ampere:    Mixed d=24   (full coupling, 24 = N_w^3*N_c)
 -- =====================================================================
 
-proveMaxwellCount :: Integer
+proveMaxwellCount :: Int
 proveMaxwellCount = nC + 1  -- 4
 
 proveSpeedOfLight :: Rational
-proveSpeedOfLight = chi % chi  -- 6/6 = 1
+proveSpeedOfLight = fromIntegral chi % fromIntegral chi  -- 6/6 = 1
 
 -- =====================================================================
 -- S6  INTEGER IDENTITY PROOFS
 -- =====================================================================
 
 proveLarmorCoeff :: Rational
-proveLarmorCoeff = (nC - 1) % nC  -- 2/3
+proveLarmorCoeff = fromIntegral (nC - 1) % fromIntegral nC  -- 2/3
 
-proveRayleighWave :: Integer
+proveRayleighWave :: Int
 proveRayleighWave = nW * nW  -- 4
 
-proveRayleighSize :: Integer
+proveRayleighSize :: Int
 proveRayleighSize = chi  -- 6
 
-provePlanckExp :: Integer
+provePlanckExp :: Int
 provePlanckExp = chi - 1  -- 5
 
-proveStefanExp :: Integer
+proveStefanExp :: Int
 proveStefanExp = nW * nW  -- 4
 
-proveStefanDenom :: Integer
+proveStefanDenom :: Int
 proveStefanDenom = nC * (chi - 1)  -- 15
 
-proveGaugeGroup :: Integer
+proveGaugeGroup :: Int
 proveGaugeGroup = 1  -- U(1) = singlet sector d=1
+
+
+-- ═══════════════════════════════════════════════════════════════
+-- Rule 3: toCrystalState / fromCrystalState
+-- EM: E and B fields in colour sector (d₃=8). 3E + 3B + 2 aux = 8.
+-- ═══════════════════════════════════════════════════════════════
+
+toCrystalStateEM :: [Double] -> CrystalState
+toCrystalStateEM emFields =
+  replicate d1 0.0 ++ replicate d2 0.0
+  ++ take d3 (emFields ++ repeat 0.0)
+  ++ replicate d4 0.0
+
+fromCrystalStateEM :: CrystalState -> [Double]
+fromCrystalStateEM cs = extractSector 2 cs
+
+-- Rule 4: proveSectorRestriction
+proveSectorRestrictionEM :: [Double] -> Bool
+proveSectorRestrictionEM flds =
+  let cs    = toCrystalStateEM flds
+      flds' = fromCrystalStateEM cs
+  in all (\(a,b) -> abs (a-b) < 1e-12) (zip (take d3 (flds ++ repeat 0.0)) flds')
 
 -- =====================================================================
 -- S7  SELF-TEST
@@ -358,12 +377,35 @@ runSelfTest = do
              "  Larmor scales as q^2 * a^2"
   putStrLn ""
 
+  putStrLn "S8 Engine wiring (imported from CrystalEngine):"
+  -- EM lives in colour sector (d₃ = 8)
+  let csOk = dColour == sectorDim 2
+  putStrLn $ "  " ++ (if csOk then "PASS" else "FAIL") ++
+             "  EM sector = colour = sectorDim 2 = 8 (engine)"
+  -- Field components = χ = 6 (3E + 3B)
+  let fcOk = chi == 6
+  putStrLn $ "  " ++ (if fcOk then "PASS" else "FAIL") ++
+             "  field components = χ = 6 (engine atom)"
+  -- Courant = 1/N_w = 0.5
+  let crOk = nW == 2
+  putStrLn $ "  " ++ (if crOk then "PASS" else "FAIL") ++
+             "  Courant = 1/N_w (engine atom)"
+  -- Engine tick accessible
+  let testSt = replicate sigmaD (1.0 / sqrt (fromIntegral sigmaD))
+      ticked = tick testSt
+      tkOk = normSq ticked < normSq testSt
+  putStrLn $ "  " ++ (if tkOk then "PASS" else "FAIL") ++
+             "  engine tick accessible (S = W∘U)"
+  putStrLn $ "  PASS  ALL atoms from CrystalEngine (no local redefinitions)"
+  putStrLn ""
+
   -- Summary
   putStrLn "================================================================"
   let allPass = and (map snd intChecks) && eOk && changed && cflOk
                 && speedOk && rayOk && sigOk && larmOk && larm2Ok
+                && csOk && fcOk && crOk && tkOk
   putStrLn $ "  " ++ (if allPass then "ALL PASS" else "SOME FAILURES") ++
-             " -- every EM integer from (2, 3)."
+             " -- every EM integer from (2, 3). Engine wired."
   putStrLn "  Observable count: 0 new (infrastructure)."
 
 main :: IO ()

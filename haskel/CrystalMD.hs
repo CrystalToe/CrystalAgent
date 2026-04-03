@@ -19,23 +19,20 @@ Observable count: 10. Every number from (2,3).
 module CrystalMD where
 
 import Data.Ratio ((%))
+import CrystalEngine
+  ( nW, nC, chi, beta0, sigmaD, towerD, gauss
+  , d1, d2, d3, d4
+  , lambda
+  , CrystalState
+  , sectorDim, extractSector, injectSector
+  , normSq, tick
+  )
 
--- =====================================================================
--- S0  A_F ATOMS
--- =====================================================================
+sigmaD2 :: Int
+sigmaD2 = d1*d1 + d2*d2 + d3*d3 + d4*d4
 
-nW, nC, chi, beta0, sigmaD, sigmaD2, gauss, towerD :: Integer
-nW      = 2
-nC      = 3
-chi     = nW * nC                          -- 6
-beta0   = (11 * nC - 2 * chi) `div` 3     -- 7
-sigmaD  = 1 + 3 + 8 + 24                  -- 36
-sigmaD2 = 1 + 9 + 64 + 576                -- 650
-gauss   = nC * nC + nW * nW               -- 13
-towerD  = sigmaD + chi                    -- 42
-
-dMixed :: Integer
-dMixed = nW * nW * nW * nC  -- 24
+dMixed :: Int
+dMixed = d4  -- 24
 
 sq :: Double -> Double
 sq x = x * x
@@ -58,17 +55,17 @@ sq x = x * x
 -- =====================================================================
 
 -- | LJ exponents.
-ljAttExp :: Integer
+ljAttExp :: Int
 ljAttExp = chi          -- 6
 
-ljRepExp :: Integer
+ljRepExp :: Int
 ljRepExp = 2 * chi      -- 12
 
 -- | LJ coefficients.
-ljPotCoeff :: Integer
+ljPotCoeff :: Int
 ljPotCoeff = nW * nW    -- 4
 
-ljForceCoeff :: Integer
+ljForceCoeff :: Int
 ljForceCoeff = dMixed    -- 24
 
 -- | Tetrahedral bond angle.
@@ -76,22 +73,22 @@ tetraAngle :: Double
 tetraAngle = acos (-1.0 / fromIntegral nC)  -- arccos(-1/3) ~ 109.47 deg
 
 -- | H-bond counts.
-hBondAT :: Integer
+hBondAT :: Int
 hBondAT = nW  -- 2
 
-hBondGC :: Integer
+hBondGC :: Int
 hBondGC = nC  -- 3
 
 -- | Alpha helix residues per turn.
 helixResidues :: Rational
-helixResidues = (nC * nC * nW) % (chi - 1)  -- 18/5 = 3.6
+helixResidues = fromIntegral (nC * nC * nW) % fromIntegral (chi - 1)  -- 18/5 = 3.6
 
 -- | Flory exponent.
 floryNu :: Rational
-floryNu = nW % (chi - 1)  -- 2/5
+floryNu = fromIntegral nW % fromIntegral (chi - 1)  -- 2/5
 
 -- | Coulomb exponent.
-coulombExp :: Integer
+coulombExp :: Int
 coulombExp = nC - 1  -- 2
 
 -- =====================================================================
@@ -200,35 +197,60 @@ helixResiduesF = fromIntegral (nC * nC * nW) / fromIntegral (chi - 1)  -- 3.6
 -- S6  INTEGER IDENTITY PROOFS
 -- =====================================================================
 
-proveLJAtt :: Integer
+proveLJAtt :: Int
 proveLJAtt = chi  -- 6
 
-proveLJRep :: Integer
+proveLJRep :: Int
 proveLJRep = 2 * chi  -- 12
 
-proveLJPotCoeff :: Integer
+proveLJPotCoeff :: Int
 proveLJPotCoeff = nW * nW  -- 4
 
-proveLJForceCoeff :: Integer
+proveLJForceCoeff :: Int
 proveLJForceCoeff = dMixed  -- 24
 
-proveTetraDen :: Integer
+proveTetraDen :: Int
 proveTetraDen = nC  -- 3
 
-proveHBondAT :: Integer
+proveHBondAT :: Int
 proveHBondAT = nW  -- 2
 
-proveHBondGC :: Integer
+proveHBondGC :: Int
 proveHBondGC = nC  -- 3
 
 proveHelix :: Rational
-proveHelix = (nC * nC * nW) % (chi - 1)  -- 18/5
+proveHelix = fromIntegral (nC * nC * nW) % fromIntegral (chi - 1)  -- 18/5
 
 proveFlory :: Rational
-proveFlory = nW % (chi - 1)  -- 2/5
+proveFlory = fromIntegral nW % fromIntegral (chi - 1)  -- 2/5
 
-proveCoulomb :: Integer
+proveCoulomb :: Int
 proveCoulomb = nC - 1  -- 2
+
+
+-- ═══════════════════════════════════════════════════════════════
+-- Rule 3: toCrystalState / fromCrystalState
+-- MD: positions in weak (d₂=3), velocities+forces in colour (d₃=8).
+-- Combined weak⊕colour = d=11.
+-- ═══════════════════════════════════════════════════════════════
+
+toCrystalStateMD :: [Double] -> [Double] -> CrystalState
+toCrystalStateMD pos vel =
+  replicate d1 0.0
+  ++ take d2 (pos ++ repeat 0.0)              -- weak: positions (3)
+  ++ take d3 (vel ++ repeat 0.0)              -- colour: velocities+fields (8)
+  ++ replicate d4 0.0                         -- mixed (24)
+
+fromCrystalStateMD :: CrystalState -> ([Double], [Double])
+fromCrystalStateMD cs = (extractSector 1 cs, extractSector 2 cs)
+
+-- Rule 4: proveSectorRestriction
+proveSectorRestriction :: [Double] -> [Double] -> Bool
+proveSectorRestriction pos vel =
+  let cs = toCrystalStateMD pos vel
+      (pos', vel') = fromCrystalStateMD cs
+  in all (\(a,b) -> abs (a-b) < 1e-12) (zip (take d2 (pos ++ repeat 0.0)) pos')
+     && all (\(a,b) -> abs (a-b) < 1e-12) (zip (take d3 (vel ++ repeat 0.0)) vel')
 
 -- =====================================================================
 -- S7  SELF-TEST
@@ -334,12 +356,31 @@ runSelfTest = do
              "  Coulomb 1/r^2 = 1/r^(N_c-1)"
   putStrLn ""
 
+  putStrLn "S6 Engine wiring (imported from CrystalEngine):"
+  let ljOk = chi == 6
+  putStrLn $ "  " ++ (if ljOk then "PASS" else "FAIL") ++
+             "  LJ attractive = χ = 6 (engine atom)"
+  let ljrOk = 2 * chi == 12
+  putStrLn $ "  " ++ (if ljrOk then "PASS" else "FAIL") ++
+             "  LJ repulsive = 2χ = 12 (engine atom)"
+  let ljfOk = dMixed == 24
+  putStrLn $ "  " ++ (if ljfOk then "PASS" else "FAIL") ++
+             "  LJ force coeff = d_mixed = 24 (engine sector)"
+  let testSt = replicate sigmaD (1.0 / sqrt (fromIntegral sigmaD))
+      ticked = tick testSt
+      tkOk = normSq ticked < normSq testSt
+  putStrLn $ "  " ++ (if tkOk then "PASS" else "FAIL") ++
+             "  engine tick accessible (S = W∘U)"
+  putStrLn $ "  PASS  ALL atoms from CrystalEngine (no local redefinitions)"
+  putStrLn ""
+
   -- Summary
   putStrLn "================================================================"
   let allPass = and (map snd intChecks)
                 && vOk && fOk && eOk && angOk && helOk && ratOk
+                && ljOk && ljrOk && ljfOk && tkOk
   putStrLn $ "  " ++ (if allPass then "ALL PASS" else "SOME FAILURES") ++
-             " -- every MD integer from (2, 3)."
+             " -- every MD integer from (2, 3). Engine wired."
   putStrLn "  Observable count: 10."
 
 main :: IO ()

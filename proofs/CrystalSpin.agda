@@ -139,5 +139,34 @@ cross-bell = refl
 cross-tower : towerD ≡ 42
 cross-tower = refl
 
--- §11 All 31 proofs by refl. Zero postulates.
--- Bloch = S = W∘U. Precession = W. Relaxation = U.
+-- §11 Engine wiring (CrystalSpin imports CrystalEngine)
+-- All atoms from CrystalEngine. No local redefinitions.
+
+engine-spin-sector : d2 ≡ 3
+engine-spin-sector = refl
+
+engine-singlet-untouched : d1 ≡ 1
+engine-singlet-untouched = refl
+
+engine-colour-untouched : d3 ≡ 8
+engine-colour-untouched = refl
+
+engine-mixed-untouched : d4 ≡ 24
+engine-mixed-untouched = refl
+
+engine-t1-eigenvalue : nW ≡ 2
+engine-t1-eigenvalue = refl
+
+engine-t2-eigenvalue : nC ≡ 3
+engine-t2-eigenvalue = refl
+
+engine-tick-contraction : nW * nW ≡ 4
+engine-tick-contraction = refl
+
+engine-weak-start : d1 ≡ 1
+engine-weak-start = refl
+
+engine-weak-end : d1 + d2 ≡ 4
+engine-weak-end = refl
+
+-- Total: 40 proofs by refl. Zero postulates. Engine wired.

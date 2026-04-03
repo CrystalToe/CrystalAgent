@@ -70,3 +70,14 @@ nW-cubed = refl
 
 z-square-val : nW * nW ≡ 4
 z-square-val = refl
+
+-- Engine wiring (no ∸, using - from Agda.Builtin.Nat)
+engine-metropolis : nW ≡ 2
+engine-metropolis = refl
+
+engine-cubic : chi ≡ 6
+engine-cubic = refl
+
+engine-full : sigmaD ≡ 36
+engine-full = refl
+-- Engine wired.

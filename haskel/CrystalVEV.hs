@@ -63,6 +63,7 @@ module CrystalVEV
     -- * Rescaling between modes
   , rescale
   ) where
+import qualified CrystalEngine as CE  -- engine atoms
 
 -- ═══════════════════════════════════════════════════════════════════
 -- §1  THE TWO PRIMES
@@ -70,11 +71,11 @@ module CrystalVEV
 
 -- | N_w = 2 (weak generations, dim M₂(ℂ) factor)
 nW :: Int
-nW = 2
+nW = CE.nW
 
 -- | N_c = 3 (colours, dim M₃(ℂ) factor)
 nC :: Int
-nC = 3
+nC = CE.nC
 
 -- | d₃ = N_c² − 1 = 8 (colour adjoint dimension)
 d3 :: Int

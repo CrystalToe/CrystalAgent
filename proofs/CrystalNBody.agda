@@ -19,3 +19,34 @@ dim : N_c ≡ 3
 dim = refl
 phase : N_w * N_c ≡ 6
 phase = refl
+
+-- §2 Engine wiring
+d2 : ℕ
+d2 = N_w * N_w ∸ 1
+d3 : ℕ
+d3 = N_c * N_c ∸ 1
+d4 : ℕ
+d4 = (N_w * N_w ∸ 1) * (N_c * N_c ∸ 1)
+
+engine-pos : d2 ≡ 3
+engine-pos = refl
+
+engine-vel : d3 ≡ 8
+engine-vel = refl
+
+engine-phase : χ ≡ 6
+engine-phase = refl
+
+engine-dim : d2 + d3 ≡ 11
+engine-dim = refl
+
+engine-oct : N_w * N_w * N_w ≡ d3
+engine-oct = refl
+
+engine-verlet : N_w ≡ 2
+engine-verlet = refl
+
+engine-tick : N_w * N_w ≡ 4
+engine-tick = refl
+
+-- Total: 12 proofs by refl. Engine wired.

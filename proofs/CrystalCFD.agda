@@ -95,3 +95,18 @@ gauss-val = refl
 
 towerD-val : towerD ≡ 42
 towerD-val = refl
+
+-- Engine wiring
+
+engine-d2q9 : nC * nC ≡ 9
+engine-d2q9 = refl
+
+engine-colour : (nC * nC) - 1 ≡ 8
+engine-colour = refl
+
+engine-chi : chi ≡ 6
+engine-chi = refl
+
+engine-full : sigmaD ≡ 36
+engine-full = refl
+-- Engine wired.

@@ -39,3 +39,12 @@ theorem cfd_d2q9 : nC * nC = 9 := by native_decide
 theorem chi_plus_nW : chi + nW = 8 := by native_decide
 theorem two_nC_is_chi : 2 * nC = chi := by native_decide
 theorem nW_cubed : nW * nW * nW = dColour := by native_decide
+-- Engine wiring + new features
+theorem engine_colour : nC * nC - 1 = 8 := by native_decide
+theorem engine_chi : chi = 6 := by native_decide
+theorem engine_full : sigmaD = 36 := by native_decide
+-- Bondi: N_w² = 4, MRI: N_c/N_w² = 3/4
+theorem engine_bondi : nW * nW = 4 := by native_decide
+theorem engine_mri_num : nC = 3 := by native_decide
+theorem engine_mri_den : nW * nW = 4 := by native_decide
+-- Engine wired.

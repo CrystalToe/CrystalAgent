@@ -158,5 +158,39 @@ cross-beta0 = refl
 cross-tower : towerD ≡ 42
 cross-tower = refl
 
--- §9 All 39 proofs by refl. Zero postulates.
--- Split-operator = S = W∘U. ℏ = 1/N_w. No Schrödinger equation.
+-- ═══════════════════════════════════════════════════════════════
+-- ENGINE WIRING PROOFS
+-- ═══════════════════════════════════════════════════════════════
+
+-- Sector structure
+engine-sigmaD : d1 + d2 + d3 + d4 ≡ sigmaD
+engine-sigmaD = refl
+
+engine-sigmaD-val : sigmaD ≡ 36
+engine-sigmaD-val = refl
+
+-- Colour⊕mixed = d3 + d4 = 32
+engine-colour-mixed : d3 + d4 ≡ 32
+engine-colour-mixed = refl
+
+engine-colour-dim : d3 ≡ 8
+engine-colour-dim = refl
+
+engine-mixed-dim : d4 ≡ 24
+engine-mixed-dim = refl
+
+-- Packing: 32 reals = 16 complex amplitudes
+packing-reals : d3 + d4 ≡ 32
+packing-reals = refl
+
+-- Lambda denominators
+lambda-colour-denom : nC ≡ 3
+lambda-colour-denom = refl
+
+lambda-mixed-denom : nW * nC ≡ 6
+lambda-mixed-denom = refl
+
+-- No weak coupling
+no-weak : d2 ≡ 3
+no-weak = refl
+-- Engine wired.
