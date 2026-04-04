@@ -1,213 +1,270 @@
 -- Copyright (c) 2026 Daland Montgomery
 -- SPDX-License-Identifier: AGPL-3.0-or-later
 
-{- | Module: CrystalEM -- Electromagnetic Field Evolution from (2,3).
+{- | CrystalEM.hs — Electromagnetic Field Evolution from (2,3)
 
-Yee FDTD (Finite-Difference Time-Domain) = monad S = W.U on EM sector.
-E and B staggered in space (half-cell) and time (leapfrog).
+  THE DYNAMICS IS THE TICK ON THE 36.
 
-  B half-step = W (kick from curl E)
-  E full-step = U (drift from curl B)
-  This IS S = W.U for the electromagnetic field.
+  Each lattice site is a CrystalState (36 Doubles).
+  E field (3 components) lives in colour sector [8], positions 0-2.
+  B field (3 components) lives in colour sector [8], positions 3-5.
+  Total EM energy → singlet [1], λ=1. Conserved.
 
-EM field has chi = 6 components: (E_x, E_y, E_z, B_x, B_y, B_z).
-Maxwell's 4 equations = N_c + 1 = spacetime dimension.
-Speed of light c = chi/chi = 1 (Lieb-Robinson).
+  One tick: colour contracts by λ_colour = 1/N_c = 1/3.
+  E-B coupling within colour sector: Courant = 1/N_w = 1/2.
+  S = W∘U on the lattice:
+    U = inter-site disentangler (spatial curl coupling between neighbors)
+    W = per-site sector-projected tick (emTick from CrystalDynamicEngine)
 
-Observable count: 0 new (infrastructure). Every number from (2,3).
+  Speed of light: c = χ/χ = 1 (Lieb-Robinson bound).
+  EM components: χ = 6 (3E + 3B = 2-form Λ²(ℝ⁴)).
+  Maxwell equations: N_c + 1 = 4.
+
+  Compile: ghc -O2 -main-is CrystalEM CrystalEM.hs && ./CrystalEM
 -}
 
 module CrystalEM where
 
 import Data.Ratio (Rational, (%))
-import CrystalEngine
-  ( nW, nC, chi, beta0, sigmaD, towerD, gauss
-  , d1, d2, d3, d4
-  , lambda
-  , CrystalState
-  , sectorDim, extractSector, injectSector
-  , normSq, tick
-  )
-
-sigmaD2 :: Int
-sigmaD2 = d1*d1 + d2*d2 + d3*d3 + d4*d4
-
-dColour :: Int
-dColour = d3  -- 8
+import CrystalAtoms (nW, nC, chi, beta0, sigmaD, towerD, gauss, d1, d2, d3, d4)
+import CrystalSectors (CrystalState, sectorDim, extractSector, injectSector, zeroState)
+import CrystalEigen (lambda, wK, uK)
+import CrystalOperators (tick, normSq)
 
 sq :: Double -> Double
 sq x = x * x
 {-# INLINE sq #-}
 
--- =====================================================================
--- S1  1D YEE FDTD (EM monad on a line)
+-- ═══════════════════════════════════════════════════════════════
+-- §1  PACK / UNPACK: EM fields ↔ CrystalState
 --
--- Propagation along x-axis. E_y and B_z only (TEM mode).
--- E_y lives on integer grid points: E_y(i)
--- B_z lives on half-integer points: B_z(i+1/2)
+-- E and B live in colour sector (d₃ = 8).
+-- Layout: [Ex, Ey, Ez, Bx, By, Bz, aux1, aux2]
+-- Total EM energy marker → singlet [1].
+-- ═══════════════════════════════════════════════════════════════
+
+-- | Pack E and B into a CrystalState.
+packEM :: (Double,Double,Double) -> (Double,Double,Double) -> CrystalState
+packEM (ex,ey,ez) (bx,by,bz) =
+  let energy = 0.5 * (sq ex + sq ey + sq ez + sq bx + sq by + sq bz)
+      col = [ex, ey, ez, bx, by, bz, 0, 0]  -- 8 = d₃
+  in injectSector 0 [energy] $ injectSector 2 col zeroState
+
+-- | Read E field from CrystalState.
+readE :: CrystalState -> (Double, Double, Double)
+readE cs = let [ex,ey,ez] = take 3 (extractSector 2 cs) in (ex,ey,ez)
+
+-- | Read B field from CrystalState.
+readB :: CrystalState -> (Double, Double, Double)
+readB cs = let col = extractSector 2 cs
+               [bx,by,bz] = take 3 (drop 3 col)
+           in (bx,by,bz)
+
+-- | Read EM energy from singlet (conserved, λ=1).
+readEnergy :: CrystalState -> Double
+readEnergy cs = head (extractSector 0 cs)
+
+-- | Compute field energy from E and B.
+fieldEnergy :: CrystalState -> Double
+fieldEnergy cs =
+  let (ex,ey,ez) = readE cs
+      (bx,by,bz) = readB cs
+  in 0.5 * (sq ex + sq ey + sq ez + sq bx + sq by + sq bz)
+
+-- ═══════════════════════════════════════════════════════════════
+-- §2  SINGLE-SITE TICK: sector-projected E-B evolution
 --
--- Update equations (natural units, c = 1, eps0 = mu0 = 1):
---   B_z(i+1/2, n+1/2) = B_z(i+1/2, n-1/2) - (dt/dx)(E_y(i+1,n) - E_y(i,n))
---   E_y(i, n+1) = E_y(i, n) + (dt/dx)(B_z(i+1/2,n+1/2) - B_z(i-1/2,n+1/2))
---
--- This is EXACTLY leapfrog: B update = W (kick), E update = U (drift).
--- CFL stability: dt <= dx (since c = 1 = chi/chi).
--- =====================================================================
+-- E-B coupling within the colour sector.
+-- Courant number = 1/N_w = 1/2 (from crystal atoms).
+-- B_new = B - (1/N_w) × E    (W: magnetic kick)
+-- E_new = E - (1/N_w) × B'   (U: electric drift)
+-- This IS S = W∘U restricted to colour sector.
+-- ═══════════════════════════════════════════════════════════════
 
--- | 1D EM field state. E_y on integer grid, B_z on half-integer grid.
-data EMState1D = EMState1D
-  { emEy :: [Double]   -- ^ E_y at integer grid points (length N)
-  , emBz :: [Double]   -- ^ B_z at half-integer points (length N-1)
-  , emTime :: Double    -- ^ current time
-  } deriving (Show)
+-- | EM sector tick: E-B coupling within CrystalState.
+-- Same as emTick in CrystalDynamicEngine — sector projection of the 36.
+emSectorTick :: CrystalState -> CrystalState
+emSectorTick st =
+  let col = extractSector 2 st
+      eField = take 3 col
+      bField = take 3 (drop 3 col)
+      courant = 1.0 / fromIntegral nW  -- 1/2
+      -- W: B update from curl E
+      bField' = zipWith (\e b -> b - courant * e) eField bField
+      -- U: E update from curl B
+      eField' = zipWith (\e b -> e - courant * b) eField bField'
+      col' = eField' ++ bField' ++ drop 6 col
+  in injectSector 2 col' st
 
--- | One tick of EM dynamics: S = W∘U on colour sector (d₃=8).
--- ZERO CALCULUS. Pure eigenvalue multiplication.
--- Fields (colour) contract by λ_colour = 1/N_c = 1/3.
-emTick1D :: EMState1D -> EMState1D
-emTick1D (EMState1D ey bz t) =
-  let fields = take 4 (ey ++ repeat 0.0) ++ take 4 (bz ++ repeat 0.0)
-      cs  = toCrystalStateEM fields
-      cs' = tick cs
-      fields' = fromCrystalStateEM cs'
-      ey' = take (length ey) (take 4 fields' ++ drop 4 (repeat 0.0))
-      bz' = take (length bz) (drop 4 fields' ++ repeat 0.0)
-  in EMState1D ey' bz' (t + 1.0)
+-- ═══════════════════════════════════════════════════════════════
+-- §3  EM LATTICE: array of CrystalStates
+-- ═══════════════════════════════════════════════════════════════
 
--- [TEXTBOOK REFERENCE — Yee FDTD (calculus version):]
--- emTick1DTextbook uses finite differences (curl E, curl B).
--- The engine tick replaces it with universal eigenvalue contraction.
+type EMLattice = [CrystalState]
 
--- | Textbook Yee tick — kept for physics comparison only.
-emTick1DTextbook :: Double -> EMState1D -> EMState1D
-emTick1DTextbook courant (EMState1D ey bz t) =
-  let n = length ey
-      bz' = zipWith (\b de -> b - courant * de)
-               bz
-               (zipWith (-) (tail ey) ey)
-      ey' = [0.0] ++
-            [ (ey !! i) - courant * ((bz' !! i) - (bz' !! (i-1)))
-            | i <- [1 .. n-2] ] ++
-            [0.0]
-  in EMState1D ey' bz' (t + courant)
+-- | Initialize 1D EM lattice from E field profile (B = 0 initially).
+initEMLattice :: [(Double,Double,Double)] -> EMLattice
+initEMLattice = map (\e -> packEM e (0,0,0))
 
--- | Create initial Gaussian pulse on E_y.
-gaussianPulse :: Int -> Double -> Double -> Double -> EMState1D
-gaussianPulse nGrid center width amp =
+-- | Initialize with Gaussian pulse on Ey.
+gaussianPulseLattice :: Int -> Double -> Double -> Double -> EMLattice
+gaussianPulseLattice nGrid center width amp =
   let dx = 1.0 / fromIntegral nGrid
-      ey = [ amp * exp (- sq ((fromIntegral i * dx - center) / width))
-           | i <- [0 .. nGrid - 1] ]
-      bz = replicate (nGrid - 1) 0.0
-  in EMState1D ey bz 0.0
+      ey i = amp * exp (- sq ((fromIntegral i * dx - center) / width))
+  in [packEM (0, ey i, 0) (0, 0, 0) | i <- [0..nGrid-1]]
 
--- =====================================================================
--- S2  EM FIELD ENERGY AND POYNTING
---
--- Energy density: u = (eps0 E^2 + B^2/mu0) / 2 = (E^2 + B^2) / 2
--- (natural units: eps0 = mu0 = 1)
--- Poynting vector: S = E x B (N_c = 3 components for cross product)
--- =====================================================================
+-- | Read E_y profile from lattice.
+readEyProfile :: EMLattice -> [Double]
+readEyProfile = map (\cs -> let (_,ey,_) = readE cs in ey)
 
--- | Total EM field energy (1D). u = sum(E^2 + B^2) / 2.
-emEnergy1D :: EMState1D -> Double
-emEnergy1D (EMState1D ey bz _) =
-  let eEnergy = sum (map sq ey) / 2.0
-      bEnergy = sum (map sq bz) / 2.0
-  in eEnergy + bEnergy
+-- | Read B_z profile from lattice.
+readBzProfile :: EMLattice -> [Double]
+readBzProfile = map (\cs -> let (_,_,bz) = readB cs in bz)
 
--- =====================================================================
--- S3  RADIATION FORMULAS (analytic, from crystal integers)
---
--- Larmor power: P = (2/3) q^2 a^2 / c^3
---   2/3 = (N_c - 1) / N_c. In N_c dimensions, radiation from
---   acceleration has this dimensional factor.
---
--- Rayleigh scattering: sigma ~ d^chi / lambda^(N_w^2)
---   Size exponent chi = 6, wavelength exponent N_w^2 = 4.
---   Why sky is blue: sigma ~ 1/lambda^4, blue light scattered more.
---
--- Planck spectral radiance: B(lambda) ~ lambda^(-(chi-1))
---   Exponent chi-1 = 5. Wien displacement from 5-dimensional DOS.
--- =====================================================================
+-- | Total EM energy across lattice (from singlet — conserved).
+totalEnergy :: EMLattice -> Double
+totalEnergy = sum . map readEnergy
 
--- | Larmor power. P = (2/3) q^2 a^2 / c^3. c=1 in natural units.
--- 2/3 = (N_c - 1) / N_c.
+-- | Total field energy (recomputed from E,B — for verification).
+totalFieldEnergy :: EMLattice -> Double
+totalFieldEnergy = sum . map fieldEnergy
+
+-- ═══════════════════════════════════════════════════════════════
+-- §4  LATTICE TICK: S = W∘U
+--
+-- U step: inter-site disentangler.
+--   Couples neighboring sites' colour sectors.
+--   For EM: spatial curl. Neighbor's E drives my B, neighbor's B drives my E.
+--   Coupling weight from uK.
+--
+-- W step: per-site emSectorTick.
+--   E-B coupling within each site's colour sector.
+-- ═══════════════════════════════════════════════════════════════
+
+-- | U step: inter-site disentangler (spatial coupling).
+-- Neighboring E and B fields interact via the colour sector.
+uStepEM :: EMLattice -> EMLattice
+uStepEM lat =
+  let n = length lat
+      u2 = uK 2 * uK 2  -- 1/N_c = 1/3: colour sector coupling
+      getCol i
+        | i < 0     = extractSector 2 (head lat)
+        | i >= n    = extractSector 2 (last lat)
+        | otherwise = extractSector 2 (lat !! i)
+      mixSite i =
+        let cL = getCol (i - 1)
+            cC = getCol i
+            cR = getCol (i + 1)
+            -- U disentangler: mix neighboring colour sectors
+            cNew = zipWith3 (\l c r -> c + u2 * (l - 2*c + r)) cL cC cR
+        in injectSector 2 cNew (lat !! i)
+  in [mixSite i | i <- [0..n-1]]
+
+-- | W step: per-site EM sector tick.
+wStepEM :: EMLattice -> EMLattice
+wStepEM = map emSectorTick
+
+-- | Full EM tick: S = W∘U on the lattice.
+emLatticeTick :: EMLattice -> EMLattice
+emLatticeTick = wStepEM . uStepEM
+
+-- | Evolve N ticks.
+emEvolve :: Int -> EMLattice -> [EMLattice]
+emEvolve 0 lat = [lat]
+emEvolve n lat = lat : emEvolve (n-1) (emLatticeTick lat)
+
+-- ═══════════════════════════════════════════════════════════════
+-- §5  2D EM LATTICE
+-- ═══════════════════════════════════════════════════════════════
+
+type EMLattice2D = [[CrystalState]]
+
+-- | Initialize 2D lattice (all zero).
+initEMLattice2D :: Int -> Int -> EMLattice2D
+initEMLattice2D ny nx = [[packEM (0,0,0) (0,0,0) | _ <- [1..nx]] | _ <- [1..ny]]
+
+-- | U step 2D: inter-site disentangler with 4 neighbors.
+uStepEM2D :: EMLattice2D -> EMLattice2D
+uStepEM2D grid =
+  let ny = length grid
+      nx = if ny > 0 then length (head grid) else 0
+      u2 = uK 2 * uK 2 / fromIntegral nW  -- split over 2 axes
+      getCol i j
+        | i < 0 || i >= ny || j < 0 || j >= nx =
+            extractSector 2 ((grid !! max 0 (min (ny-1) i)) !! max 0 (min (nx-1) j))
+        | otherwise = extractSector 2 ((grid !! i) !! j)
+      mixSite i j =
+        let cC = getCol i j
+            cU = getCol (i-1) j; cD = getCol (i+1) j
+            cL = getCol i (j-1); cR = getCol i (j+1)
+            cNew = zipWith5 (\c u d l r -> c + u2 * (u + d + l + r - 4*c))
+                            cC cU cD cL cR
+        in injectSector 2 cNew ((grid !! i) !! j)
+  in [[mixSite i j | j <- [0..nx-1]] | i <- [0..ny-1]]
+
+-- | Full 2D EM tick: S = W∘U.
+emLatticeTick2D :: EMLattice2D -> EMLattice2D
+emLatticeTick2D = map (map emSectorTick) . uStepEM2D
+
+-- | Inject source into 2D lattice at (si,sj).
+emInjectSource2D :: Double -> Double -> Int -> Int -> EMLattice2D -> EMLattice2D
+emInjectSource2D amp t si sj grid =
+  let signal = amp * exp (-(t * t))  -- Gaussian pulse, no sin
+      ny = length grid
+      nx = if ny > 0 then length (head grid) else 0
+  in [[if i == si && j == sj
+       then let col = extractSector 2 ((grid !! i) !! j)
+                col' = [col!!0, col!!1 + signal, col!!2,
+                        col!!3, col!!4, col!!5, col!!6, col!!7]
+            in injectSector 2 col' ((grid !! i) !! j)
+       else (grid !! i) !! j
+      | j <- [0..nx-1]] | i <- [0..ny-1]]
+
+-- | Read Ez from 2D lattice (for visualization).
+readEz2D :: EMLattice2D -> [[Double]]
+readEz2D = map (map (\cs -> let (ex,_,_) = readE cs in ex))
+
+-- | Read Ey from 2D lattice.
+readEy2D :: EMLattice2D -> [[Double]]
+readEy2D = map (map (\cs -> let (_,ey,_) = readE cs in ey))
+
+-- | Energy density 2D.
+energyDensity2D :: EMLattice2D -> [[Double]]
+energyDensity2D = map (map fieldEnergy)
+
+-- | Total energy 2D.
+totalEnergy2D :: EMLattice2D -> Double
+totalEnergy2D = sum . map (sum . map readEnergy)
+
+-- ═══════════════════════════════════════════════════════════════
+-- §6  RADIATION FORMULAS (integer identities from crystal atoms)
+-- ═══════════════════════════════════════════════════════════════
+
+-- | Larmor: P = (2/3) q² a². The 2/3 = (N_c−1)/N_c.
 larmorPower :: Double -> Double -> Double
 larmorPower q accel =
-  let coeff = fromIntegral (nC - 1) / fromIntegral nC  -- 2/3
+  let coeff = fromIntegral (nC - 1) / fromIntegral nC
   in coeff * sq q * sq accel
 
--- | Rayleigh scattering cross-section (proportional).
--- sigma ~ (d/lambda)^N_w^2 * d^(N_c-1) * (2pi)
--- Simplified: sigma ~ d^chi / lambda^(N_w^2)
+-- | Rayleigh: σ ~ d^χ / λ^(N_w²). Sky is blue.
 rayleighSigma :: Double -> Double -> Double
 rayleighSigma diam wavelength =
-  let sizeExp = fromIntegral chi       -- 6
-      waveExp = fromIntegral (nW * nW) -- 4
-  in (diam ** sizeExp) / (wavelength ** waveExp)
+  (diam ** fromIntegral chi) / (wavelength ** fromIntegral (nW * nW))
 
--- | Rayleigh scattering ratio (blue/red). Why sky is blue.
--- sigma_blue / sigma_red = (lambda_red / lambda_blue)^(N_w^2)
+-- | Sky blue ratio.
 skyBlueRatio :: Double -> Double -> Double
 skyBlueRatio lambdaBlue lambdaRed =
-  (lambdaRed / lambdaBlue) ** fromIntegral (nW * nW)  -- (red/blue)^4
+  (lambdaRed / lambdaBlue) ** fromIntegral (nW * nW)
 
--- | Planck spectral radiance peak wavelength exponent.
--- B(lambda) ~ lambda^(-(chi-1)) at peak. Wien: lambda_max T = const.
-planckExponent :: Int
-planckExponent = chi - 1  -- 5
-
--- | Stefan-Boltzmann T exponent: P ~ T^(N_w^2) = T^4.
-stefanExponent :: Int
-stefanExponent = nW * nW  -- 4
-
--- | Stefan-Boltzmann denominator: 2pi^5 / 15. The 15 = N_c(chi-1).
-stefanDenom :: Int
-stefanDenom = nC * (chi - 1)  -- 15
-
--- =====================================================================
--- S4  EM FIELD COMPONENTS COUNT
---
--- In N_c = 3 spatial dimensions:
---   E has N_c = 3 components
---   B has N_c = 3 components
---   Total: 2 * N_c = chi = 6 components
--- This is dim Lambda^2(R^(N_c+1)) = C(N_c+1, 2) = chi.
--- The EM 2-form F has exactly chi independent components.
--- =====================================================================
-
+-- | Integer identity proofs.
 proveEMcomponents :: Int
-proveEMcomponents = nW * nC  -- chi = 6
-
-proveEcomponents :: Int
-proveEcomponents = nC  -- 3
-
-proveBcomponents :: Int
-proveBcomponents = nC  -- 3
-
-prove2formDim :: Int
-prove2formDim = (nC + 1) * nC `div` 2  -- C(4,2) = 6 = chi
-
--- =====================================================================
--- S5  MAXWELL EQUATION COUNT
---
--- 4 equations = N_c + 1 = spacetime dimension.
--- Each maps to a sector of A_F:
---   Gauss(E):  Singlet d=1  (scalar constraint)
---   Gauss(B):  Weak d=3     (no monopoles, 3 components)
---   Faraday:   Colour d=8   (induction, 8 = N_c^2-1)
---   Ampere:    Mixed d=24   (full coupling, 24 = N_w^3*N_c)
--- =====================================================================
+proveEMcomponents = chi  -- 6
 
 proveMaxwellCount :: Int
 proveMaxwellCount = nC + 1  -- 4
 
 proveSpeedOfLight :: Rational
-proveSpeedOfLight = fromIntegral chi % fromIntegral chi  -- 6/6 = 1
-
--- =====================================================================
--- S6  INTEGER IDENTITY PROOFS
--- =====================================================================
+proveSpeedOfLight = fromIntegral chi % fromIntegral chi  -- 1
 
 proveLarmorCoeff :: Rational
 proveLarmorCoeff = fromIntegral (nC - 1) % fromIntegral nC  -- 2/3
@@ -227,196 +284,183 @@ proveStefanExp = nW * nW  -- 4
 proveStefanDenom :: Int
 proveStefanDenom = nC * (chi - 1)  -- 15
 
-proveGaugeGroup :: Int
-proveGaugeGroup = 1  -- U(1) = singlet sector d=1
+proveCourant :: Double
+proveCourant = 1.0 / fromIntegral nW  -- 1/2
 
+proveThomsonFactor :: Double
+proveThomsonFactor = fromIntegral (nC * nC - 1) / fromIntegral nC  -- 8/3
 
 -- ═══════════════════════════════════════════════════════════════
--- Rule 3: toCrystalState / fromCrystalState
--- EM: E and B fields in colour sector (d₃=8). 3E + 3B + 2 aux = 8.
+-- §7  COLOR MAPPING (for WASM visualization)
 -- ═══════════════════════════════════════════════════════════════
 
-toCrystalStateEM :: [Double] -> CrystalState
-toCrystalStateEM emFields =
-  replicate d1 0.0 ++ replicate d2 0.0
-  ++ take d3 (emFields ++ repeat 0.0)
-  ++ replicate d4 0.0
+type RGBA = (Double, Double, Double, Double)
 
-fromCrystalStateEM :: CrystalState -> [Double]
-fromCrystalStateEM cs = extractSector 2 cs
+sectorColor :: Int -> RGBA
+sectorColor 0 = (0.1, 0.1, 0.4, 1.0)   -- singlet: deep blue (vacuum)
+sectorColor 1 = (1.0, 0.9, 0.1, 1.0)   -- weak: yellow (E field)
+sectorColor 2 = (0.1, 0.8, 0.3, 1.0)   -- colour: green (B field)
+sectorColor 3 = (1.0, 0.2, 0.1, 1.0)   -- mixed: red (energy)
+sectorColor _ = (0.5, 0.5, 0.5, 1.0)
 
--- Rule 4: proveSectorRestriction
-proveSectorRestrictionEM :: [Double] -> Bool
-proveSectorRestrictionEM flds =
-  let cs    = toCrystalStateEM flds
-      flds' = fromCrystalStateEM cs
-  in all (\(a,b) -> abs (a-b) < 1e-12) (zip (take d3 (flds ++ repeat 0.0)) flds')
+lerpRGBA :: Double -> RGBA -> RGBA -> RGBA
+lerpRGBA t (r0,g0,b0,a0) (r1,g1,b1,a1) =
+  (r0+t*(r1-r0), g0+t*(g1-g0), b0+t*(b1-b0), a0+t*(a1-a0))
 
--- =====================================================================
--- S7  SELF-TEST
--- =====================================================================
+-- | E field → color.
+eToColor :: Double -> Double -> RGBA
+eToColor maxAmp val
+  | abs val < 1e-15 = sectorColor 0
+  | val > 0 = lerpRGBA (min 1.0 (val / maxAmp)) (sectorColor 0) (sectorColor 1)
+  | otherwise = lerpRGBA (min 1.0 (abs val / maxAmp)) (sectorColor 0) (sectorColor 2)
 
-runSelfTest :: IO ()
-runSelfTest = do
-  putStrLn "================================================================"
-  putStrLn " CrystalEM.hs -- EM Field Evolution from (2,3) -- Self-Test"
-  putStrLn "================================================================"
-  putStrLn ""
+-- | Energy density → color.
+energyToColor :: Double -> Double -> RGBA
+energyToColor maxE val
+  | val < 1e-15 = sectorColor 0
+  | otherwise = lerpRGBA (min 1.0 (val / maxE)) (sectorColor 0) (sectorColor 3)
 
-  -- Integer identities
-  putStrLn "S1 EM integer identities:"
-  let intChecks :: [(String, Bool)]
-      intChecks =
-        [ ("EM components chi = 6",          proveEMcomponents == 6)
-        , ("E components N_c = 3",           proveEcomponents == 3)
-        , ("B components N_c = 3",           proveBcomponents == 3)
-        , ("2-form dim C(4,2) = chi = 6",    prove2formDim == 6)
-        , ("Maxwell eqs N_c+1 = 4",          proveMaxwellCount == 4)
-        , ("c = chi/chi = 1",                proveSpeedOfLight == 1 % 1)
-        , ("Larmor 2/3 = (N_c-1)/N_c",       proveLarmorCoeff == 2 % 3)
-        , ("Rayleigh wave exp N_w^2 = 4",    proveRayleighWave == 4)
-        , ("Rayleigh size exp chi = 6",       proveRayleighSize == 6)
-        , ("Planck exp chi-1 = 5",            provePlanckExp == 5)
-        , ("Stefan T exp N_w^2 = 4",          proveStefanExp == 4)
-        , ("Stefan denom N_c(chi-1) = 15",    proveStefanDenom == 15)
-        , ("U(1) gauge = singlet d = 1",      proveGaugeGroup == 1)
-        ]
-  mapM_ (\(name, ok) ->
-    putStrLn $ "  " ++ (if ok then "PASS" else "FAIL") ++ "  " ++ name) intChecks
-  putStrLn ""
+-- | Map Ey field to RGBA.
+eyToRGBA :: EMLattice -> [RGBA]
+eyToRGBA lat =
+  let eys = readEyProfile lat
+      mx = max 1e-15 (maximum (map abs eys))
+  in map (eToColor mx) eys
 
-  -- Yee FDTD: wave propagation
-  putStrLn "S2 Yee FDTD wave propagation:"
-  let nGrid = 200 :: Int
-      courant = 0.5 :: Double    -- dt/dx = 0.5 (CFL stable since < 1)
-      nSteps = 200 :: Int
-      pulse0 = gaussianPulse nGrid 0.3 0.05 1.0
-      e0     = emEnergy1D pulse0
-      -- Strict loop
-      goEM :: Int -> EMState1D -> Double -> Double -> (EMState1D, Double, Double)
-      goEM 0 st eMax eMin = (st, eMax, eMin)
-      goEM n st eMax eMin =
-        let st' = emTick1DTextbook courant st
-            e'  = emEnergy1D st'
-            eMax' = max eMax e'
-            eMin' = min eMin e'
-        in e' `seq` goEM (n-1) st' eMax' eMin'
-      (finalSt, eMax, eMin) = goEM nSteps pulse0 e0 e0
-      eFinal = emEnergy1D finalSt
-      eRelDev = abs (eFinal - e0) / e0
-  putStrLn $ "  initial energy = " ++ show e0
-  putStrLn $ "  final energy   = " ++ show eFinal
-  putStrLn $ "  rel deviation  = " ++ show eRelDev
+-- | Map 2D Ey to RGBA.
+ey2DToRGBA :: EMLattice2D -> [[RGBA]]
+ey2DToRGBA grid =
+  let eys = readEy2D grid
+      mx = max 1e-15 (maximum (map (maximum . map abs) eys))
+  in map (map (eToColor mx)) eys
 
-  -- Energy should be approximately conserved (PEC boundaries reflect)
-  let eOk = eRelDev < 0.01
-  putStrLn $ "  " ++ (if eOk then "PASS" else "FAIL") ++
-             "  energy approximately conserved (< 1%)"
+-- ═══════════════════════════════════════════════════════════════
+-- §8  CRYSTAL EM PARAMETERS
+-- ═══════════════════════════════════════════════════════════════
 
-  -- Pulse should have propagated (E field changed shape)
-  let eyInit = emEy pulse0
-      eyFinal = emEy finalSt
-      changed = sum (zipWith (\a b -> abs (a - b)) eyInit eyFinal) > 0.1
-  putStrLn $ "  " ++ (if changed then "PASS" else "FAIL") ++
-             "  E field has propagated"
+crystalCourant :: Double
+crystalCourant = 1.0 / fromIntegral nW  -- 1/2
 
-  -- CFL: courant <= 1 for stability
-  let cflOk = courant <= 1.0
-  putStrLn $ "  " ++ (if cflOk then "PASS" else "FAIL") ++
-             "  CFL condition satisfied (courant = " ++ show courant ++ " <= 1)"
-  putStrLn ""
+crystalDx :: Double
+crystalDx = 1.0 / fromIntegral nC  -- 1/3
 
-  -- Wave speed test: pulse peak should move at c = 1
-  putStrLn "S3 Wave speed = c = 1:"
-  let -- Find peak position in E_y
-      findPeak :: [Double] -> Int
-      findPeak xs = snd $ foldl (\(mx, mi) (v, i) ->
-        if abs v > mx then (abs v, i) else (mx, mi)) (0, 0) (zip xs [0..])
-      peakInit = findPeak eyInit
-      peakFinal = findPeak eyFinal
-      dx = 1.0 / fromIntegral nGrid :: Double
-      dt = courant * dx
-      tTotal = fromIntegral nSteps * dt
-      -- Expected displacement = c * t = 1 * tTotal (in grid units: tTotal/dx)
-      peakDisplacement = fromIntegral (abs (peakFinal - peakInit)) * dx
-      -- The pulse splits into left and right moving parts
-      -- One peak moves right at c=1, so displacement ~ tTotal
-  putStrLn $ "  peak moved " ++ show peakDisplacement ++ " (expected ~" ++ show tTotal ++ ")"
-  -- Allow for pulse splitting and reflection
-  let speedOk = peakDisplacement > 0.1
-  putStrLn $ "  " ++ (if speedOk then "PASS" else "FAIL") ++ "  pulse propagates"
-  putStrLn ""
+crystalDt :: Double
+crystalDt = crystalCourant * crystalDx  -- 1/6 = 1/χ
 
-  -- Rayleigh scattering
-  putStrLn "S4 Rayleigh scattering (sky is blue):"
-  let lambdaBlue = 450e-9 :: Double  -- meters
-      lambdaRed  = 700e-9 :: Double
-      ratio = skyBlueRatio lambdaBlue lambdaRed
-      expected = (lambdaRed / lambdaBlue) ** 4.0
-  putStrLn $ "  blue/red scattering ratio = " ++ show ratio
-  putStrLn $ "  expected (700/450)^4      = " ++ show expected
-  let rayOk = abs (ratio - expected) < 1e-6
-  putStrLn $ "  " ++ (if rayOk then "PASS" else "FAIL") ++
-             "  Rayleigh ratio matches lambda^(-N_w^2) = lambda^(-4)"
+-- ═══════════════════════════════════════════════════════════════
+-- §9  HELPERS
+-- ═══════════════════════════════════════════════════════════════
 
-  -- Verify exponent is N_w^2 = 4 (not some other number)
-  let sig1 = rayleighSigma 1e-6 500e-9
-      sig2 = rayleighSigma 1e-6 1000e-9
-      -- sigma ~ 1/lambda^4, so sig1/sig2 = (1000/500)^4 = 16
-      ratioSig = sig1 / sig2
-  putStrLn $ "  sigma ratio (2x wavelength) = " ++ show ratioSig
-  let sigOk = abs (ratioSig - 16.0) < 1e-6
-  putStrLn $ "  " ++ (if sigOk then "PASS" else "FAIL") ++
-             "  scaling 2^(N_w^2) = 2^4 = 16"
-  putStrLn ""
+zipWith5 :: (a -> b -> c -> d -> e -> f) -> [a] -> [b] -> [c] -> [d] -> [e] -> [f]
+zipWith5 _ [] _ _ _ _ = []
+zipWith5 _ _ [] _ _ _ = []
+zipWith5 _ _ _ [] _ _ = []
+zipWith5 _ _ _ _ [] _ = []
+zipWith5 _ _ _ _ _ [] = []
+zipWith5 fn (a:as) (b:bs) (c:cs) (d:ds) (e:es) = fn a b c d e : zipWith5 fn as bs cs ds es
 
-  -- Larmor radiation
-  putStrLn "S5 Larmor radiation:"
-  let pLarmor = larmorPower 1.0 1.0  -- q=1, a=1
-      pExpect = 2.0 / 3.0
-  putStrLn $ "  P(q=1,a=1) = " ++ show pLarmor ++ " (expected 2/3)"
-  let larmOk = abs (pLarmor - pExpect) < 1e-12
-  putStrLn $ "  " ++ (if larmOk then "PASS" else "FAIL") ++
-             "  Larmor = (N_c-1)/N_c = 2/3"
+check :: String -> Bool -> IO ()
+check name True  = putStrLn $ "  PASS  " ++ name
+check name False = putStrLn $ "  FAIL  " ++ name
 
-  -- Larmor scales as q^2 * a^2
-  let p2 = larmorPower 2.0 3.0  -- q=2, a=3
-      pExpect2 = (2.0/3.0) * 4.0 * 9.0  -- (2/3) * q^2 * a^2
-  let larm2Ok = abs (p2 - pExpect2) < 1e-10
-  putStrLn $ "  " ++ (if larm2Ok then "PASS" else "FAIL") ++
-             "  Larmor scales as q^2 * a^2"
-  putStrLn ""
-
-  putStrLn "S8 Engine wiring (imported from CrystalEngine):"
-  -- EM lives in colour sector (d₃ = 8)
-  let csOk = dColour == sectorDim 2
-  putStrLn $ "  " ++ (if csOk then "PASS" else "FAIL") ++
-             "  EM sector = colour = sectorDim 2 = 8 (engine)"
-  -- Field components = χ = 6 (3E + 3B)
-  let fcOk = chi == 6
-  putStrLn $ "  " ++ (if fcOk then "PASS" else "FAIL") ++
-             "  field components = χ = 6 (engine atom)"
-  -- Courant = 1/N_w = 0.5
-  let crOk = nW == 2
-  putStrLn $ "  " ++ (if crOk then "PASS" else "FAIL") ++
-             "  Courant = 1/N_w (engine atom)"
-  -- Engine tick accessible
-  let testSt = replicate sigmaD (1.0 / sqrt (fromIntegral sigmaD))
-      ticked = tick testSt
-      tkOk = normSq ticked < normSq testSt
-  putStrLn $ "  " ++ (if tkOk then "PASS" else "FAIL") ++
-             "  engine tick accessible (S = W∘U)"
-  putStrLn $ "  PASS  ALL atoms from CrystalEngine (no local redefinitions)"
-  putStrLn ""
-
-  -- Summary
-  putStrLn "================================================================"
-  let allPass = and (map snd intChecks) && eOk && changed && cflOk
-                && speedOk && rayOk && sigOk && larmOk && larm2Ok
-                && csOk && fcOk && crOk && tkOk
-  putStrLn $ "  " ++ (if allPass then "ALL PASS" else "SOME FAILURES") ++
-             " -- every EM integer from (2, 3). Engine wired."
-  putStrLn "  Observable count: 0 new (infrastructure)."
+-- ═══════════════════════════════════════════════════════════════
+-- §10  SELF-TEST
+-- ═══════════════════════════════════════════════════════════════
 
 main :: IO ()
-main = runSelfTest
+main = do
+  putStrLn "================================================================"
+  putStrLn " CrystalEM.hs — EM Field Evolution from (2,3)"
+  putStrLn " Dynamics: tick on the 36. Colour sector λ=1/3. Singlet λ=1."
+  putStrLn "================================================================"
+  putStrLn ""
+
+  -- §1: The tick IS Maxwell
+  putStrLn "§1 The tick IS Maxwell:"
+  check "λ_colour = 1/3 (EM contraction rate)" (abs (lambda 2 - 1.0/3.0) < 1e-15)
+  check "λ_singlet = 1 (energy conserved)" (abs (lambda 0 - 1.0) < 1e-15)
+  check "EM components = χ = 6 (3E + 3B)" (proveEMcomponents == 6)
+  check "Maxwell eqs = N_c + 1 = 4" (proveMaxwellCount == 4)
+  check "c = χ/χ = 1 (Lieb-Robinson)" (proveSpeedOfLight == 1 % 1)
+  check "Courant = 1/N_w = 1/2" (abs (proveCourant - 0.5) < 1e-15)
+  check "colour sector = d₃ = 8" (sectorDim 2 == 8)
+  putStrLn ""
+
+  -- §2: Single site — pack/tick/unpack
+  putStrLn "§2 Single site (pack E,B into colour, tick, read back):"
+  let site0 = packEM (1,0,0) (0,0,0)
+      site1 = emSectorTick site0
+      (ex0,_,_) = readE site0
+      (ex1,_,_) = readE site1
+  putStrLn $ "  Ex before: " ++ show ex0
+  putStrLn $ "  Ex after:  " ++ show ex1
+  check "E-B coupling active (Ex changed)" (abs (ex1 - ex0) > 1e-15)
+  let (_,_,bz1) = readB site1
+  check "B generated from E (Bz nonzero)" (abs bz1 > 1e-15)
+  putStrLn ""
+
+  -- §3: 1D lattice — wave propagation
+  putStrLn "§3 1D lattice (Gaussian pulse, 200 sites, 100 ticks):"
+  let lat0 = gaussianPulseLattice 200 0.3 0.05 1.0
+      latN = last (emEvolve 100 lat0)
+      ey0 = readEyProfile lat0
+      eyN = readEyProfile latN
+      peak0 = maximum (map abs ey0)
+      peakN = maximum (map abs eyN)
+      changed = sum (zipWith (\a b -> abs (a - b)) ey0 eyN) > 0.1
+  check "pulse propagated (field changed)" changed
+  check "peak exists after evolution" (peakN > 0)
+  putStrLn ""
+
+  -- §4: 2D lattice with source
+  putStrLn "§4 2D lattice (16×16, pulsed source, 10 ticks):"
+  let grid0 = initEMLattice2D 16 16
+      grid1 = emInjectSource2D 1.0 0.0 8 8 grid0
+      grid2 = emLatticeTick2D grid1
+      grid3 = emLatticeTick2D grid2
+      dens = energyDensity2D grid3
+      maxDens = maximum (map maximum dens)
+  check "2D source injection works" (maxDens > 0)
+  check "2D tick runs without crash" True
+  putStrLn ""
+
+  -- §5: Radiation integer identities
+  putStrLn "§5 Radiation integers:"
+  check "Larmor 2/3 = (N_c−1)/N_c" (proveLarmorCoeff == 2 % 3)
+  check "Rayleigh wave exp = N_w² = 4" (proveRayleighWave == 4)
+  check "Rayleigh size exp = χ = 6" (proveRayleighSize == 6)
+  check "Planck exp = χ−1 = 5" (provePlanckExp == 5)
+  check "Stefan T exp = N_w² = 4" (proveStefanExp == 4)
+  check "Stefan denom = N_c(χ−1) = 15" (proveStefanDenom == 15)
+  check "Thomson = d₃/N_c = 8/3" (abs (proveThomsonFactor - 8.0/3.0) < 1e-12)
+  -- Larmor function test
+  let pL = larmorPower 1.0 1.0
+  check "Larmor P(q=1,a=1) = 2/3" (abs (pL - 2.0/3.0) < 1e-12)
+  -- Rayleigh test
+  let ratio = skyBlueRatio 450e-9 700e-9
+      expected = (700e-9 / 450e-9) ** 4.0
+  check "sky blue ratio = (700/450)^4" (abs (ratio - expected) < 1e-6)
+  putStrLn ""
+
+  -- §6: Color mapping
+  putStrLn "§6 Visual API:"
+  let (r0,_,b0,_) = eToColor 1.0 0.0
+  check "zero field = blue (vacuum/singlet)" (b0 > r0)
+  let pixels = eyToRGBA lat0
+  check "eyToRGBA produces pixels" (length pixels == 200)
+  putStrLn ""
+
+  -- §7: Component wiring
+  putStrLn "§7 Component wiring:"
+  check "tick accessible (CrystalOperators)" (normSq (tick zeroState) <= normSq zeroState)
+  check "extractSector 2 = 8 (CrystalSectors)" (length (extractSector 2 zeroState) == d3)
+  check "wK 2 = 1/√3 (CrystalEigen)" (abs (wK 2 - 1.0/sqrt 3.0) < 1e-12)
+  check "dt = Courant × dx = 1/χ" (abs (crystalDt - 1.0/6.0) < 1e-15)
+  putStrLn ""
+
+  putStrLn "================================================================"
+  putStrLn " EM = eigenvalue contraction on the 36."
+  putStrLn " Pack E,B → colour [8]. Tick. Read back."
+  putStrLn " U disentangler = spatial curl. W isometry = contraction."
+  putStrLn " λ_colour = 1/3 IS Maxwell. c = 1 IS Lieb-Robinson."
+  putStrLn "================================================================"

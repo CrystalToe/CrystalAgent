@@ -2,38 +2,46 @@
 
 # CrystalMD.hs — Molecular Dynamics from (2,3)
 
-## What This Module Does
+## HOW THE DYNAMICS WORKS
 
-Velocity Verlet with Lennard-Jones + Coulomb + hydrogen bonds. LJ 6-12
-potential where 6 = χ and 12 = 2χ. Bond angles, helix geometry, Flory
-exponent — all from (2,3).
+**There is NO Velocity Verlet. There is NO ODE. The sector tick on the 36 IS the dynamics.**
 
-## Engine Wiring
+```
+Pack position (x,y,z) → weak [3]
+Pack velocity (vx,vy,vz) → colour [8]
+       ↓
+U step: inter-particle disentangler computes LJ forces,
+        stores in each particle's colour sector
+       ↓
+W step: per-particle sector tick
+        velocity kicked by force (wK = 1/√2)
+        position drifted by velocity (uK = 1/√3)
+       ↓
+Read position + velocity back from sectors
+```
 
-**This module imports CrystalEngine.** No local atom redefinitions.
+Each particle is a full CrystalState. LJ force IS the inter-particle U disentangler coupling. Every LJ coefficient is a crystal integer: attractive χ=6, repulsive 2χ=12, force d_mixed=24, potential N_w²=4, cutoff N_c=3σ.
 
-### Sector: weak⊕colour (d=11)
+## Sector Assignment
 
-| MD Concept | Value | Engine Source |
-|-----------|-------|--------------|
-| LJ attractive exponent | 6 | χ |
-| LJ repulsive exponent | 12 | 2χ |
-| LJ force coefficient | 24 | d_mixed |
-| LJ potential coefficient | 4 | N_w² |
-| Bond angle arccos(−1/3) | 109.47° | arccos(−1/N_c) |
-| H-bonds A-T | 2 | N_w |
-| H-bonds G-C | 3 | N_c |
-| Helix residues/turn | 18/5 | (N_c²N_w)/(χ−1) |
-| Flory ν | 2/5 | N_w/(χ−1) |
-| Coulomb exponent | 2 | N_c−1 |
+| Data | Sector | λ | Meaning |
+|------|--------|---|---------|
+| KE marker | singlet [1] | 1 | Conserved quantity. |
+| x, y, z | weak [3] | 1/2 | Position evolves. |
+| vx, vy, vz, fx, fy, fz, KE, PE | colour [8] | 1/3 | Velocity + force. |
+| (unused) | mixed [24] | 1/6 | — |
 
-## Proof Certificate
+## Import Chain
 
-- `haskel/CrystalMD.hs` — 22 checks (22 PASS)
-- `proofs/CrystalMD.lean` — Lean 4 theorems (by native_decide)
-- `proofs/CrystalMD.agda` — Agda proofs (by refl)
+```
+CrystalAtoms       ← nW, nC, chi, d1–d4, sigmaD, towerD
+CrystalSectors     ← CrystalState, extractSector, injectSector, zeroState
+CrystalEigen       ← lambda, wK, uK
+CrystalOperators   ← tick, normSq
+```
 
-## Dependencies
+## Compile
 
-- **Imports CrystalEngine** — atoms, sector operations, tick, normSq
-- `Data.Ratio`
+```bash
+ghc -O2 -main-is CrystalMD CrystalMD.hs && ./CrystalMD
+```

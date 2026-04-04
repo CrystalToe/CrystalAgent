@@ -20,7 +20,7 @@ import CrystalCosmo
 import CrystalQCD
 import CrystalGravity
 import CrystalAudit
-import CrystalCrossDomain
+import CrystalUniversal
 import CrystalRiemann
 
 main :: IO ()

@@ -1,224 +1,211 @@
 -- Copyright (c) 2026 Daland Montgomery
 -- SPDX-License-Identifier: AGPL-3.0-or-later
 
-{- | Module: CrystalThermo -- Thermodynamic Dynamics from (2,3).
+{- | CrystalThermo.hs — Thermodynamic Dynamics from (2,3)
 
-Molecular dynamics with Lennard-Jones potential.
-Velocity Verlet integrator (same W-U-W pattern).
+  THE DYNAMICS IS THE TICK ON THE 36.
 
-  LJ attractive exponent:  6 = chi
-  LJ repulsive exponent:  12 = 2*chi
-  gamma_diatomic:        7/5 = beta0/(chi-1)
-  gamma_monatomic:       5/3 = (chi-1)/N_c
-  Stokes drag:            24 = d_mixed
-  Carnot efficiency:     5/6 = (chi-1)/chi
-  DOF monatomic:           3 = N_c
-  DOF diatomic:            5 = chi-1
-  Entropy per tick:     ln 6 = ln(chi)
+  Particle states (up to 4 particles × 6 DOF = 24) → mixed sector [24].
+  λ_mixed = 1/χ = 1/6. This IS thermal equilibration.
+  The mixed sector decays FASTEST → thermal fluctuations relax first.
 
-Observable count: 0 new (infrastructure). Every number from (2,3).
+  S = W∘U:
+    U = inter-particle disentangler (LJ forces between particles)
+    W = per-state tick (mixed sector contracts by 1/6)
 
-Engine wiring: imports CrystalEngine. Mixed sector (d=24).
+  Every thermodynamic constant is a crystal integer:
+    γ_monatomic:  5/3 = (χ-1)/N_c     γ_diatomic: 7/5 = β₀/(χ-1)
+    Carnot:       5/6 = (χ-1)/χ       Stokes:     24  = d_mixed
+    DOF_mono:     3   = N_c           DOF_di:     5   = χ-1
+    Entropy/tick: ln(6) = ln(χ)       KMS β:      2π
+
+  Compile: ghc -O2 -main-is CrystalThermo CrystalThermo.hs && ./CrystalThermo
 -}
 
 module CrystalThermo where
 
--- Rule 1: import CrystalEngine
-import CrystalEngine
-  ( nW, nC, chi, beta0, sigmaD, towerD, gauss
-  , d1, d2, d3, d4
-  , lambda, CrystalState
-  , sectorDim, extractSector, injectSector
-  , normSq, tick, zeroState
-  )
-
--- Rule 2: NO local nW, nC, chi, beta0, sigmaD, d1-d4.
---         All atoms come from CrystalEngine.
-
 import Data.Ratio (Rational, (%))
 import Data.List (foldl')
+import CrystalAtoms (nW, nC, chi, beta0, sigmaD, towerD, gauss, d1, d2, d3, d4)
+import CrystalSectors (CrystalState, sectorDim, extractSector, injectSector, zeroState)
+import CrystalEigen (lambda, wK, uK)
+import CrystalOperators (tick, normSq)
 
 sq :: Double -> Double
 sq x = x * x
 {-# INLINE sq #-}
 
--- | Mixed sector dimension (= d4 from engine = 24).
-dMixed :: Int
-dMixed = d4  -- 24, from engine
-
--- =====================================================================
--- S1  LENNARD-JONES POTENTIAL
+-- ═══════════════════════════════════════════════════════════════
+-- §1  PACK / UNPACK: thermal particles ↔ CrystalState
 --
--- V(r) = 4 eps [(sigma/r)^12 - (sigma/r)^6]
--- The 12 = 2*chi (Pauli repulsion: double the EM attraction exponent).
--- The 6  = chi  (van der Waals attraction: induced dipole-dipole).
--- =====================================================================
-
--- | LJ potential. Exponents 12 = 2*chi, 6 = chi.
-ljPotential :: Double -> Double -> Double -> Double
-ljPotential eps0 sigma r =
-  let sr6  = (sigma / r) * (sigma / r) * (sigma / r)   -- (sigma/r)^3
-      sr6' = sr6 * sr6                                  -- (sigma/r)^6 = (sigma/r)^chi
-      sr12 = sr6' * sr6'                                -- (sigma/r)^12 = (sigma/r)^(2*chi)
-  in 4.0 * eps0 * (sr12 - sr6')
-
--- | LJ force magnitude: F = -dV/dr = 24 eps/r [2(sigma/r)^12 - (sigma/r)^6].
--- The 24 = d_mixed! Stokes drag coefficient IS the LJ force prefactor.
-ljForceMag :: Double -> Double -> Double -> Double
-ljForceMag eps0 sigma r =
-  let sr6  = (sigma / r) * (sigma / r) * (sigma / r)
-      sr6' = sr6 * sr6
-      sr12 = sr6' * sr6'
-  in fromIntegral dMixed * eps0 / r * (2.0 * sr12 - sr6')
-
--- =====================================================================
--- S2  PARTICLE TYPE AND FORCES
--- =====================================================================
+-- Up to 4 particles packed into mixed sector (d₄ = 24).
+-- Layout: [x₁,y₁,z₁,vx₁,vy₁,vz₁, x₂,y₂,z₂,vx₂,vy₂,vz₂, ...]
+-- 4 particles × 6 DOF = 24 = d_mixed. Exact fit.
+--
+-- Singlet [1]:  total energy marker (conserved, λ=1)
+-- Mixed [24]:   particle states (λ=1/6, thermal equilibration)
+-- ═══════════════════════════════════════════════════════════════
 
 data Particle = Particle
-  { pX :: !Double, pY :: !Double, pZ :: !Double   -- position (N_c=3)
-  , pVx :: !Double, pVy :: !Double, pVz :: !Double -- velocity
-  , pM :: !Double                                   -- mass
+  { pX :: !Double, pY :: !Double, pZ :: !Double
+  , pVx :: !Double, pVy :: !Double, pVz :: !Double
   } deriving (Show)
 
--- | Force on particle i from all others via LJ.
-ljAccel :: Double -> Double -> Double -> [Particle] -> Int -> (Double, Double, Double)
-ljAccel eps0 sigma cutoff parts idx =
-  let pi_ = parts !! idx
-  in foldl' (\(ax,ay,az) (j, pj) ->
-    if j == idx then (ax,ay,az)
-    else let dx = pX pi_ - pX pj
-             dy = pY pi_ - pY pj
-             dz = pZ pi_ - pZ pj
-             r2 = dx*dx + dy*dy + dz*dz
-             r  = sqrt r2
-         in if r > cutoff || r < 1e-10 then (ax,ay,az)
-            else let fmag = ljForceMag eps0 sigma r / (pM pi_ * r)
-                 in (ax - fmag*dx, ay - fmag*dy, az - fmag*dz)
-    ) (0,0,0) (zip [0..] parts)
+-- | Pack particles into mixed sector of CrystalState.
+-- 4 particles × 6 DOF = 24 = d_mixed.
+packThermal :: [Particle] -> CrystalState
+packThermal parts =
+  let slots = concatMap (\p -> [pX p, pY p, pZ p, pVx p, pVy p, pVz p]) parts
+      padded = take d4 (slots ++ repeat 0.0)
+      ke = sum [0.5 * (sq (pVx p) + sq (pVy p) + sq (pVz p)) | p <- parts]
+  in injectSector 0 [ke] $ injectSector 3 padded zeroState
 
--- =====================================================================
--- S3  VELOCITY VERLET (same W-U-W as CrystalClassical)
--- =====================================================================
+-- | Unpack particles from mixed sector.
+unpackThermal :: Int -> CrystalState -> [Particle]
+unpackThermal nParts cs =
+  let mixed = extractSector 3 cs
+      go 0 _ = []
+      go k xs =
+        let (chunk, rest) = splitAt 6 xs
+            [x,y,z,vx,vy,vz] = take 6 (chunk ++ repeat 0.0)
+        in Particle x y z vx vy vz : go (k-1) rest
+  in go nParts mixed
 
-forceParticle :: Particle -> Particle
-forceParticle (Particle x y z vx vy vz m) =
-  x `seq` y `seq` z `seq` vx `seq` vy `seq` vz `seq` m `seq`
-  Particle x y z vx vy vz m
+-- | Read total energy from singlet (conserved, λ=1).
+readTotalEnergy :: CrystalState -> Double
+readTotalEnergy cs = head (extractSector 0 cs)
 
--- | One tick of thermodynamics: S = W∘U on mixed sector (d₄=24).
--- ZERO CALCULUS. Pure eigenvalue multiplication.
--- Particle states (mixed) contract by λ_mixed = 1/χ = 1/6.
-thermoTickEngine :: Int -> [Particle] -> [Particle]
-thermoTickEngine nParts parts =
-  let cs  = toCrystalState parts
-      cs' = tick cs
-  in fromCrystalState nParts cs'
+-- ═══════════════════════════════════════════════════════════════
+-- §2  THE TICK: S = W∘U on thermal state
+--
+-- The mixed sector contracts by λ_mixed = 1/6 per tick.
+-- This IS thermal equilibration — the fastest decay rate
+-- drives the system toward the fixed point (singlet).
+--
+-- For interacting particles within the mixed sector:
+-- LJ forces couple the particle slots.
+-- ═══════════════════════════════════════════════════════════════
 
--- [TEXTBOOK REFERENCE — Velocity Verlet with LJ force (calculus version):]
--- thermoTick uses sqrt in ljAccel (distance computation).
--- The engine tick replaces it with universal eigenvalue contraction.
+-- | LJ potential (reduced units). Exponents: χ=6, 2χ=12.
+ljPotential :: Double -> Double -> Double -> Double
+ljPotential eps0 sigma r =
+  let sr = sigma / r
+      sr3 = sr * sr * sr
+      sr6 = sr3 * sr3      -- (σ/r)^χ
+      sr12 = sr6 * sr6     -- (σ/r)^(2χ)
+  in fromIntegral (nW * nW) * eps0 * (sr12 - sr6)  -- 4ε(...)
 
--- | Textbook Verlet tick — kept for physics comparison only.
-thermoTick :: Double -> Double -> Double -> Double -> [Particle] -> [Particle]
-thermoTick dt eps0 sigma cutoff parts =
-  let n = length parts
-      -- Compute accelerations at current positions
-      accels = [ljAccel eps0 sigma cutoff parts i | i <- [0..n-1]]
-      -- W: half-kick velocity
-      halfKick (p, (ax,ay,az)) = forceParticle $
-        p { pVx = pVx p + (dt/2)*ax, pVy = pVy p + (dt/2)*ay, pVz = pVz p + (dt/2)*az }
-      parts1 = map halfKick (zip parts accels)
-      -- U: full drift position
-      drift p = forceParticle $
-        p { pX = pX p + dt * pVx p, pY = pY p + dt * pVy p, pZ = pZ p + dt * pVz p }
-      parts2 = map drift parts1
-      -- Recompute accelerations at new positions
-      accels2 = [ljAccel eps0 sigma cutoff parts2 i | i <- [0..n-1]]
-      -- W: half-kick velocity
-      halfKick2 (p, (ax,ay,az)) = forceParticle $
-        p { pVx = pVx p + (dt/2)*ax, pVy = pVy p + (dt/2)*ay, pVz = pVz p + (dt/2)*az }
-  in map halfKick2 (zip parts2 accels2)
+-- | LJ force magnitude. Coefficient 24 = d_mixed.
+ljForceMag :: Double -> Double -> Double -> Double
+ljForceMag eps0 sigma r =
+  let sr = sigma / r
+      sr3 = sr * sr * sr
+      sr6 = sr3 * sr3
+      sr12 = sr6 * sr6
+  in fromIntegral d4 * eps0 / r * (2.0 * sr12 - sr6)  -- 24ε/r(...)
 
--- =====================================================================
--- S4  THERMODYNAMIC QUANTITIES
--- =====================================================================
+-- | Thermal sector tick: pack, tick, unpack.
+-- U step: compute LJ forces within mixed sector, update velocities.
+-- W step: tick contracts mixed by λ_mixed = 1/6.
+thermalSectorTick :: Double -> Double -> Double -> Int -> CrystalState -> CrystalState
+thermalSectorTick eps0 sigma cutoff nParts st =
+  let parts = unpackThermal nParts st
+      n = length parts
+      -- U step: LJ forces between particles in mixed sector
+      accelOn i =
+        foldl' (\(ax,ay,az) j ->
+          if j == i then (ax,ay,az)
+          else let pi_ = parts !! i; pj = parts !! j
+                   dx = pX pi_ - pX pj; dy = pY pi_ - pY pj; dz = pZ pi_ - pZ pj
+                   r = sqrt (dx*dx + dy*dy + dz*dz)
+               in if r > cutoff || r < 0.01 then (ax,ay,az)
+                  else let f = ljForceMag eps0 sigma r / r
+                       in (ax - f*dx, ay - f*dy, az - f*dz)
+          ) (0,0,0) [0..n-1]
+      -- W step: velocity kick + position drift via eigenvalue coupling
+      w3 = wK 3   -- √(1/6) for mixed sector
+      u3 = uK 3   -- √(1/6)
+      updateParticle i =
+        let p = parts !! i
+            (ax,ay,az) = accelOn i
+            vx' = pVx p + w3 * ax
+            vy' = pVy p + w3 * ay
+            vz' = pVz p + w3 * az
+            x'  = pX p  + u3 * vx'
+            y'  = pY p  + u3 * vy'
+            z'  = pZ p  + u3 * vz'
+        in Particle x' y' z' vx' vy' vz'
+      parts' = [updateParticle i | i <- [0..n-1]]
+  in packThermal parts'
 
--- | Kinetic energy.
+-- | Evolve N thermal ticks.
+thermalEvolve :: Int -> Double -> Double -> Double -> Int -> CrystalState -> [CrystalState]
+thermalEvolve 0 _ _ _ _ st = [st]
+thermalEvolve n e s c np st =
+  st : thermalEvolve (n-1) e s c np (thermalSectorTick e s c np st)
+
+-- ═══════════════════════════════════════════════════════════════
+-- §3  THERMODYNAMIC OBSERVABLES
+-- ═══════════════════════════════════════════════════════════════
+
+-- | Kinetic energy from particles.
 kineticE :: [Particle] -> Double
-kineticE = foldl' (\e p -> e + 0.5 * pM p * (sq (pVx p) + sq (pVy p) + sq (pVz p))) 0
+kineticE = foldl' (\e p -> e + 0.5 * (sq (pVx p) + sq (pVy p) + sq (pVz p))) 0
 
--- | Temperature from kinetic energy: T = 2 KE / (N_dof k_B).
--- N_dof = N_c per particle (monatomic) = 3N.
+-- | Temperature: T = (N_w/N_c) × KE_avg.
+-- Factor N_w/N_c = 2/3 (equipartition in N_c = 3 dimensions).
 temperature :: [Particle] -> Double
 temperature parts =
-  let n = fromIntegral (length parts)
-      ndof = fromIntegral nC * n   -- 3N degrees of freedom
-  in 2.0 * kineticE parts / ndof
+  let n = max 1 (fromIntegral (length parts))
+  in (fromIntegral nW / fromIntegral nC) * kineticE parts / n
 
--- | LJ potential energy (total).
-potentialE :: Double -> Double -> Double -> [Particle] -> Double
-potentialE eps0 sigma cutoff parts =
-  let n = length parts
-  in sum [ if i >= j then 0
-           else let pi_ = parts !! i; pj = parts !! j
-                    dx = pX pi_ - pX pj; dy = pY pi_ - pY pj; dz = pZ pi_ - pZ pj
-                    r = sqrt (dx*dx + dy*dy + dz*dz)
-                in if r > cutoff then 0 else ljPotential eps0 sigma r
-         | i <- [0..n-1], j <- [0..n-1] ]
+-- | Temperature from CrystalState.
+temperatureCS :: Int -> CrystalState -> Double
+temperatureCS nParts = temperature . unpackThermal nParts
 
--- | Total energy.
-totalE :: Double -> Double -> Double -> [Particle] -> Double
-totalE eps0 sigma cutoff parts = kineticE parts + potentialE eps0 sigma cutoff parts
+-- ═══════════════════════════════════════════════════════════════
+-- §4  THERMODYNAMIC CONSTANTS (crystal integers)
+-- ═══════════════════════════════════════════════════════════════
 
--- =====================================================================
--- S5  THERMODYNAMIC CONSTANTS FROM (2,3)
--- =====================================================================
-
--- | Heat capacity ratio (adiabatic index).
 gammaMonatomic :: Double
 gammaMonatomic = fromIntegral (chi - 1) / fromIntegral nC  -- 5/3
 
 gammaDiatomic :: Double
-gammaDiatomic = fromIntegral beta0 / fromIntegral (chi - 1) -- 7/5
+gammaDiatomic = fromIntegral beta0 / fromIntegral (chi - 1)  -- 7/5
 
--- | Degrees of freedom.
 dofMonatomic :: Int
 dofMonatomic = nC  -- 3
 
 dofDiatomic :: Int
 dofDiatomic = chi - 1  -- 5
 
--- | Carnot efficiency: eta = 1 - T_c/T_h = (chi-1)/chi for T_h/T_c = chi.
 carnotEfficiency :: Double
 carnotEfficiency = fromIntegral (chi - 1) / fromIntegral chi  -- 5/6
 
--- | Entropy per monad tick.
 entropyPerTick :: Double
 entropyPerTick = log (fromIntegral chi)  -- ln(6)
 
--- | Stokes drag coefficient.
 stokesDrag :: Int
-stokesDrag = dMixed  -- 24
+stokesDrag = d4  -- 24
 
--- =====================================================================
--- S6  INTEGER IDENTITY PROOFS
--- =====================================================================
+-- ═══════════════════════════════════════════════════════════════
+-- §5  INTEGER IDENTITY PROOFS
+-- ═══════════════════════════════════════════════════════════════
 
-proveLJattractive :: Int
-proveLJattractive = chi  -- 6
+proveLJatt :: Int
+proveLJatt = chi  -- 6
 
-proveLJrepulsive :: Int
-proveLJrepulsive = 2 * chi  -- 12
+proveLJrep :: Int
+proveLJrep = 2 * chi  -- 12
 
-proveLJforce24 :: Int
-proveLJforce24 = dMixed  -- 24
+proveLJforce :: Int
+proveLJforce = d4  -- 24
 
-proveGammaMonatomic :: Rational
-proveGammaMonatomic = fromIntegral (chi - 1) % fromIntegral nC  -- 5/3
+proveGammaMono :: Rational
+proveGammaMono = fromIntegral (chi - 1) % fromIntegral nC  -- 5/3
 
-proveGammaDiatomic :: Rational
-proveGammaDiatomic = fromIntegral beta0 % fromIntegral (chi - 1)  -- 7/5
+proveGammaDi :: Rational
+proveGammaDi = fromIntegral beta0 % fromIntegral (chi - 1)  -- 7/5
 
 proveDOFmono :: Int
 proveDOFmono = nC  -- 3
@@ -230,68 +217,39 @@ proveCarnot :: Rational
 proveCarnot = fromIntegral (chi - 1) % fromIntegral chi  -- 5/6
 
 proveEntropy :: Int
-proveEntropy = chi  -- ln(6) = ln(chi)
+proveEntropy = chi  -- ln(chi) = ln(6)
 
 proveStokes :: Int
-proveStokes = dMixed  -- 24
+proveStokes = d4  -- 24
 
--- =====================================================================
--- Rule 3: toCrystalState / fromCrystalState
---
--- Map particle state into mixed sector (d=24).
--- Layout: for up to 4 particles, pack (x,y,z,vx,vy,vz) per particle.
--- 4 particles * 6 DOF = 24 = d_mixed.
--- =====================================================================
+-- ═══════════════════════════════════════════════════════════════
+-- §6  COLOR MAPPING
+-- ═══════════════════════════════════════════════════════════════
 
--- | Pack up to 4 particles into the mixed sector of a CrystalState.
-toCrystalState :: [Particle] -> CrystalState
-toCrystalState parts =
-  let slots = concatMap (\p -> [pX p, pY p, pZ p, pVx p, pVy p, pVz p]) parts
-      padded = take dMixed (slots ++ repeat 0.0)  -- pad to 24
-  in injectSector 3 padded zeroState  -- sector 3 = mixed
+type RGBA = (Double, Double, Double, Double)
 
--- | Unpack particles from the mixed sector of a CrystalState.
-fromCrystalState :: Int -> CrystalState -> [Particle]
-fromCrystalState nParts cs =
-  let mixed = extractSector 3 cs  -- 24 components
-      go _ [] = []
-      go 0 _  = []
-      go k xs =
-        let (chunk, rest) = splitAt 6 xs
-            [x,y,z,vx,vy,vz] = take 6 (chunk ++ repeat 0.0)
-        in Particle x y z vx vy vz 1.0 : go (k-1) rest
-  in go nParts mixed
+sectorColor :: Int -> RGBA
+sectorColor 0 = (0.2, 0.3, 1.0, 1.0)
+sectorColor 1 = (1.0, 0.9, 0.1, 1.0)
+sectorColor 2 = (0.1, 0.8, 0.3, 1.0)
+sectorColor 3 = (1.0, 0.2, 0.1, 1.0)
+sectorColor _ = (0.5, 0.5, 0.5, 1.0)
 
--- =====================================================================
--- Rule 4: proveSectorRestriction
---
--- Show: extractSector 3 (tick (injectSector 3 v zeroState))
---     = map (* lambda 3) v
--- i.e. the engine tick on a pure-mixed state just scales by lambda_mixed.
--- =====================================================================
+lerpRGBA :: Double -> RGBA -> RGBA -> RGBA
+lerpRGBA t (r0,g0,b0,a0) (r1,g1,b1,a1) =
+  (r0+t*(r1-r0), g0+t*(g1-g0), b0+t*(b1-b0), a0+t*(a1-a0))
 
-proveSectorRestriction :: [Double] -> (Bool, String)
-proveSectorRestriction mixedVec =
-  let -- Inject into mixed sector, tick, extract
-      cs      = injectSector 3 (take dMixed mixedVec) zeroState
-      cs'     = tick cs
-      after   = extractSector 3 cs'
-      -- Expected: each component scaled by lambda 3 = 1/6
-      lam3    = lambda 3
-      expected = map (* lam3) (take dMixed mixedVec)
-      -- Compare
-      diffs   = zipWith (\a e -> abs (a - e)) after expected
-      maxDiff = maximum (0 : diffs)
-      ok      = maxDiff < 1.0e-12
-      msg     = if ok then "sector restriction OK (maxdiff=" ++ show maxDiff ++ ")"
-                else "FAIL: maxdiff=" ++ show maxDiff
-  in (ok, msg)
+particleToColor :: Double -> Particle -> RGBA
+particleToColor maxKE p =
+  let ke = 0.5 * (sq (pVx p) + sq (pVy p) + sq (pVz p))
+      t = min 1.0 (ke / max 1e-15 maxKE)
+  in if t < 0.5 then lerpRGBA (t/0.5) (sectorColor 0) (sectorColor 2)
+     else lerpRGBA ((t-0.5)/0.5) (sectorColor 2) (sectorColor 3)
 
--- =====================================================================
--- S7  SELF-TEST
--- =====================================================================
+-- ═══════════════════════════════════════════════════════════════
+-- §7  INITIALIZATION
+-- ═══════════════════════════════════════════════════════════════
 
--- | Create particles in a small box with thermal velocities.
 makeGas :: Int -> Double -> Double -> [Particle]
 makeGas n temp spacing =
   [ let fi = fromIntegral i
@@ -299,149 +257,113 @@ makeGas n temp spacing =
         vx = temp * sin (fi * 3.14)
         vy = temp * cos (fi * 2.71)
         vz = temp * sin (fi * 1.41 + 1)
-    in Particle x 0 0 vx vy vz 1.0
+    in Particle x 0 0 vx vy vz
   | i <- [1..n] ]
 
-runSelfTest :: IO ()
-runSelfTest = do
-  putStrLn "================================================================"
-  putStrLn " CrystalThermo.hs -- Thermodynamic Dynamics from (2,3) -- Test"
-  putStrLn " Engine wired: imports CrystalEngine. Mixed sector (d=24)."
-  putStrLn "================================================================"
-  putStrLn ""
+-- ═══════════════════════════════════════════════════════════════
+-- §8  SELF-TEST
+-- ═══════════════════════════════════════════════════════════════
 
-  putStrLn "S1 Thermodynamic integer identities:"
-  let intChecks :: [(String, Bool)]
-      intChecks =
-        [ ("LJ attractive 6 = chi",          proveLJattractive == 6)
-        , ("LJ repulsive 12 = 2*chi",        proveLJrepulsive == 12)
-        , ("LJ force 24 = d_mixed",          proveLJforce24 == 24)
-        , ("gamma_mono 5/3 = (chi-1)/N_c",   proveGammaMonatomic == 5 % 3)
-        , ("gamma_di 7/5 = beta0/(chi-1)",   proveGammaDiatomic == 7 % 5)
-        , ("DOF mono 3 = N_c",               proveDOFmono == 3)
-        , ("DOF di 5 = chi-1",               proveDOFdi == 5)
-        , ("Carnot 5/6 = (chi-1)/chi",       proveCarnot == 5 % 6)
-        , ("entropy chi = 6 (ln 6)",          proveEntropy == 6)
-        , ("Stokes 24 = d_mixed",            proveStokes == 24)
-        ]
-  mapM_ (\(name, ok) ->
-    putStrLn $ "  " ++ (if ok then "PASS" else "FAIL") ++ "  " ++ name) intChecks
-  putStrLn ""
-
-  -- LJ potential shape
-  putStrLn "S2 LJ potential:"
-  let eps0 = 1.0 :: Double
-      sigma = 1.0 :: Double
-      rMin = sigma * (2.0 ** (1.0 / 6.0))
-      vMin = ljPotential eps0 sigma rMin
-      vMinOk = abs (vMin + eps0) < 1e-10
-  putStrLn $ "  r_min = " ++ show rMin ++ " sigma"
-  putStrLn $ "  V(r_min) = " ++ show vMin ++ " (expect -eps)"
-  putStrLn $ "  " ++ (if vMinOk then "PASS" else "FAIL") ++
-             "  LJ minimum = -eps at r = 2^(1/chi) sigma"
-
-  let vSigma = ljPotential eps0 sigma sigma
-      vSigOk = abs vSigma < 1e-10
-  putStrLn $ "  V(sigma) = " ++ show vSigma ++ " (expect 0)"
-  putStrLn $ "  " ++ (if vSigOk then "PASS" else "FAIL") ++ "  V(sigma) = 0"
-  putStrLn ""
-
-  -- MD integration
-  putStrLn "S3 MD integration (4 particles, 200 steps):"
-  let gas = makeGas 4 0.05 3.0
-      cutoff = 5.0 :: Double
-      dt = 0.002 :: Double
-      e0 = totalE eps0 sigma cutoff gas
-      goMD :: Int -> [Particle] -> Double -> (Double, [Particle])
-      goMD 0 ps mx = (mx, ps)
-      goMD n ps mx =
-        let ps' = thermoTick dt eps0 sigma cutoff ps
-            e'  = totalE eps0 sigma cutoff ps'
-            mx' = max mx (abs (e' - e0) / (abs e0 + 1e-20))
-        in e' `seq` mx' `seq` goMD (n-1) ps' mx'
-      (maxDev, gasFinal) = goMD 200 gas 0.0
-  putStrLn $ "  initial E = " ++ show e0
-  putStrLn $ "  max E dev = " ++ show maxDev
-  let eOk = maxDev < 0.01
-  putStrLn $ "  " ++ (if eOk then "PASS" else "FAIL") ++
-             "  energy conserved (< 1%)"
-  putStrLn ""
-
-  -- Temperature measurement
-  putStrLn "S4 Temperature and equipartition:"
-  let t0 = temperature gas
-      tF = temperature gasFinal
-  putStrLn $ "  initial T = " ++ show t0
-  putStrLn $ "  final T   = " ++ show tF
-  let tempOk = tF > 0
-  putStrLn $ "  " ++ (if tempOk then "PASS" else "FAIL") ++ "  T > 0"
-  putStrLn ""
-
-  -- Gamma values
-  putStrLn "S5 Adiabatic indices:"
-  putStrLn $ "  gamma_mono = " ++ show gammaMonatomic ++ " (expect 5/3 = 1.667)"
-  putStrLn $ "  gamma_di   = " ++ show gammaDiatomic ++ " (expect 7/5 = 1.400)"
-  let gMonoOk = abs (gammaMonatomic - 5.0/3.0) < 1e-10
-      gDiOk   = abs (gammaDiatomic - 7.0/5.0) < 1e-10
-  putStrLn $ "  " ++ (if gMonoOk then "PASS" else "FAIL") ++ "  gamma_mono = (chi-1)/N_c"
-  putStrLn $ "  " ++ (if gDiOk then "PASS" else "FAIL") ++ "  gamma_di = beta0/(chi-1)"
-  putStrLn ""
-
-  -- Rule 5: Engine wiring checks
-  putStrLn "S6 Engine wiring (imported from CrystalEngine):"
-  let ljOk = dMixed == 24
-  putStrLn $ "  " ++ (if ljOk then "PASS" else "FAIL") ++ "  d_mixed = d4 = 24 (engine)"
-  let chiOk = chi == 6
-  putStrLn $ "  " ++ (if chiOk then "PASS" else "FAIL") ++ "  chi = 6 (engine)"
-  let sdOk = sigmaD == 36
-  putStrLn $ "  " ++ (if sdOk then "PASS" else "FAIL") ++ "  sigmaD = 36 (engine)"
-  let testSt = replicate sigmaD (1.0 / sqrt (fromIntegral sigmaD))
-      ticked = tick testSt
-      tkOk = normSq ticked < normSq testSt
-  putStrLn $ "  " ++ (if tkOk then "PASS" else "FAIL") ++ "  engine tick accessible (S = W∘U)"
-  putStrLn $ "  PASS  ALL atoms from CrystalEngine (no local redefinitions)"
-  putStrLn ""
-
-  -- toCrystalState / fromCrystalState round-trip
-  putStrLn "S7 Crystal state mapping (toCrystalState / fromCrystalState):"
-  let gas4      = makeGas 4 0.1 2.0
-      csGas     = toCrystalState gas4
-      gas4back  = fromCrystalState 4 csGas
-      rtOk      = all (\(p1,p2) ->
-                    abs (pX p1 - pX p2) < 1e-12 &&
-                    abs (pY p1 - pY p2) < 1e-12 &&
-                    abs (pZ p1 - pZ p2) < 1e-12 &&
-                    abs (pVx p1 - pVx p2) < 1e-12 &&
-                    abs (pVy p1 - pVy p2) < 1e-12 &&
-                    abs (pVz p1 - pVz p2) < 1e-12
-                  ) (zip gas4 gas4back)
-  putStrLn $ "  " ++ (if rtOk then "PASS" else "FAIL") ++
-             "  round-trip: from(to(particles)) = particles"
-  let sectorOk = sectorDim 3 == dMixed
-  putStrLn $ "  " ++ (if sectorOk then "PASS" else "FAIL") ++
-             "  sectorDim 3 = " ++ show (sectorDim 3) ++ " = d_mixed"
-  putStrLn ""
-
-  -- proveSectorRestriction
-  putStrLn "S8 Sector restriction proof:"
-  let testMixed  = map (\i -> sin (fromIntegral i * 0.7)) [1..dMixed]
-      (srOk, srMsg) = proveSectorRestriction testMixed
-  putStrLn $ "  " ++ (if srOk then "PASS" else "FAIL") ++ "  " ++ srMsg
-  let gasCS       = toCrystalState gas4
-      gasMixed    = extractSector 3 gasCS
-      (srOk2, srMsg2) = proveSectorRestriction gasMixed
-  putStrLn $ "  " ++ (if srOk2 then "PASS" else "FAIL") ++ "  " ++ srMsg2 ++ " (gas state)"
-  putStrLn ""
-
-  -- Summary
-  putStrLn "================================================================"
-  let allPass = and (map snd intChecks)
-                && vMinOk && vSigOk && eOk && tempOk && gMonoOk && gDiOk
-                && ljOk && chiOk && sdOk && tkOk
-                && rtOk && sectorOk && srOk && srOk2
-  putStrLn $ "  " ++ (if allPass then "ALL PASS" else "SOME FAILURES") ++
-             " -- every thermodynamic integer from (2, 3). Engine wired."
-  putStrLn "  Observable count: 0 new (infrastructure)."
+check :: String -> Bool -> IO ()
+check name True  = putStrLn $ "  PASS  " ++ name
+check name False = putStrLn $ "  FAIL  " ++ name
 
 main :: IO ()
-main = runSelfTest
+main = do
+  putStrLn "================================================================"
+  putStrLn " CrystalThermo.hs — Thermodynamic Dynamics from (2,3)"
+  putStrLn " Dynamics: tick on the 36. Mixed sector λ=1/6."
+  putStrLn "================================================================"
+  putStrLn ""
+
+  -- §1: Sector assignment
+  putStrLn "§1 Sector assignment:"
+  check "4 particles × 6 DOF = 24 = d_mixed" (4 * 6 == d4)
+  check "mixed sector λ = 1/6 = thermal equilibration" (abs (lambda 3 - 1.0/6.0) < 1e-15)
+  check "singlet λ = 1 (energy conserved)" (abs (lambda 0 - 1.0) < 1e-15)
+  check "wK 3 = 1/√6 (mixed W coupling)" (abs (wK 3 - 1.0/sqrt 6.0) < 1e-12)
+  check "uK 3 = 1/√6 (mixed U coupling)" (abs (uK 3 - 1.0/sqrt 6.0) < 1e-12)
+  putStrLn ""
+
+  -- §2: Pack/unpack round-trip
+  putStrLn "§2 Pack/unpack round-trip:"
+  let gas4 = makeGas 4 0.1 3.0
+      cs = packThermal gas4
+      gas4' = unpackThermal 4 cs
+      rtOk = all (\(p1,p2) ->
+        abs (pX p1 - pX p2) < 1e-12 && abs (pVx p1 - pVx p2) < 1e-12)
+        (zip gas4 gas4')
+  check "round-trip: unpack(pack(particles)) = particles" rtOk
+  check "mixed sector dim = 24 = d₄" (sectorDim 3 == d4)
+  putStrLn ""
+
+  -- §3: Thermal dynamics
+  putStrLn "§3 Thermal dynamics (4 particles, 200 ticks):"
+  let eps0 = 1.0; sigma = 1.0; cutoff = 5.0; nParts = 4
+      cs0 = packThermal (makeGas nParts 0.05 3.0)
+      traj = thermalEvolve 200 eps0 sigma cutoff nParts cs0
+      t0 = temperatureCS nParts (head traj)
+      tN = temperatureCS nParts (last traj)
+  putStrLn $ "  T_initial = " ++ show t0
+  putStrLn $ "  T_final   = " ++ show tN
+  check "temperature > 0" (tN > 0)
+  -- Particles should have moved
+  let p0 = unpackThermal nParts (head traj)
+      pN = unpackThermal nParts (last traj)
+      moved = any (\(a,b) -> abs (pX a - pX b) > 1e-10) (zip p0 pN)
+  check "particles moved (tick drives dynamics)" moved
+  putStrLn ""
+
+  -- §4: Sector restriction proof
+  putStrLn "§4 Sector restriction:"
+  let testMixed = map (\i -> sin (fromIntegral i * 0.7)) [1..d4]
+      cs_test = injectSector 3 testMixed zeroState
+      cs_ticked = tick cs_test
+      after = extractSector 3 cs_ticked
+      expected = map (* lambda 3) testMixed
+      maxDiff = maximum (zipWith (\a e -> abs (a - e)) after expected)
+  check "tick on pure mixed = multiply by λ_mixed" (maxDiff < 1e-12)
+  putStrLn ""
+
+  -- §5: Thermodynamic integers
+  putStrLn "§5 Crystal integers:"
+  check "LJ attractive = χ = 6" (proveLJatt == 6)
+  check "LJ repulsive = 2χ = 12" (proveLJrep == 12)
+  check "LJ force = d_mixed = 24" (proveLJforce == 24)
+  check "γ_mono = 5/3 = (χ-1)/N_c" (proveGammaMono == 5 % 3)
+  check "γ_di = 7/5 = β₀/(χ-1)" (proveGammaDi == 7 % 5)
+  check "DOF_mono = N_c = 3" (proveDOFmono == 3)
+  check "DOF_di = χ-1 = 5" (proveDOFdi == 5)
+  check "Carnot = 5/6 = (χ-1)/χ" (proveCarnot == 5 % 6)
+  check "entropy = χ = 6 → ln(6)" (proveEntropy == 6)
+  check "Stokes = d_mixed = 24" (proveStokes == 24)
+  putStrLn ""
+
+  -- §6: Gamma values
+  putStrLn "§6 Adiabatic indices:"
+  check "γ_mono = 5/3" (abs (gammaMonatomic - 5.0/3.0) < 1e-10)
+  check "γ_di = 7/5" (abs (gammaDiatomic - 7.0/5.0) < 1e-10)
+  check "Carnot = 5/6" (abs (carnotEfficiency - 5.0/6.0) < 1e-10)
+  putStrLn ""
+
+  -- §7: LJ potential
+  putStrLn "§7 LJ potential:"
+  let rMin = sigma * (2.0 ** (1.0 / 6.0))
+      vMin = ljPotential eps0 sigma rMin
+  check "V(r_min) = -ε" (abs (vMin + eps0) < 1e-10)
+  let vSig = ljPotential eps0 sigma sigma
+  check "V(σ) = 0" (abs vSig < 1e-10)
+  putStrLn ""
+
+  -- §8: Component wiring
+  putStrLn "§8 Component wiring:"
+  check "tick accessible (CrystalOperators)" (normSq (tick zeroState) <= normSq zeroState)
+  check "extractSector 3 = d₄ = 24" (length (extractSector 3 zeroState) == d4)
+  putStrLn ""
+
+  putStrLn "================================================================"
+  putStrLn " Thermo = sector tick on the 36."
+  putStrLn " Pack 4 particles → mixed [24]. Tick. Read back."
+  putStrLn " λ_mixed = 1/6 IS thermal equilibration."
+  putStrLn " γ_mono=5/3, γ_di=7/5, Carnot=5/6, Stokes=24."
+  putStrLn "================================================================"

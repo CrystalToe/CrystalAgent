@@ -390,7 +390,59 @@ ssContent c = let rs=allResidues c; n=fromIntegral(length rs); ss=map assignSS r
                   s=fromIntegral(length(filter(==Sheet)ss))
               in (h/n,s/n,(n-h-s)/n)
 
--- §10 PDB output
+-- §10a THREE.JS VISUALIZATION API
+-- Backbone ribbon, side chain spheres, SS coloring, contact map.
+
+type RGBA = (Double, Double, Double, Double)
+
+-- | Secondary structure → color.
+ssToColor :: SSType -> RGBA
+ssToColor Helix = (1.0, 0.2, 0.3, 1.0)   -- red helix
+ssToColor Sheet = (1.0, 0.9, 0.1, 1.0)   -- yellow sheet
+ssToColor Coil  = (0.3, 0.8, 0.3, 1.0)   -- green coil
+
+-- | Hydrophobicity → color (hydrophobic=warm, polar=cool).
+hydroToColor :: AminoAcid -> RGBA
+hydroToColor aa =
+  let h = hydrophobicity aa
+      t = (h + 1.0) / 2.0  -- [0, 1]
+  in if t > 0.5 then (1.0, 0.5*(2-2*t), 0.1, 1.0)      -- warm
+     else (0.2, 0.4, 0.3 + 0.7*(1-2*t), 1.0)            -- cool
+
+-- | Per-residue render data: (x,y,z, scX,scY,scZ, ssColor, hydroColor, scRadius).
+type ResidueVertex = (Double,Double,Double, Double,Double,Double, RGBA, RGBA, Double)
+
+residueToVertex :: Residue -> ResidueVertex
+residueToVertex r =
+  (resX r, resY r, resZ r,
+   resScX r, resScY r, resScZ r,
+   ssToColor (assignSS r),
+   hydroToColor (resAA r),
+   scRadius (resAA r))
+
+-- | Full chain render data for Three.js.
+chainToRender :: Chain -> [ResidueVertex]
+chainToRender = map residueToVertex . allResidues
+
+-- | Backbone as line segments: [(x1,y1,z1, x2,y2,z2)].
+backboneSegments :: Chain -> [(Double,Double,Double, Double,Double,Double)]
+backboneSegments c =
+  let rs = allResidues c
+  in zipWith (\r1 r2 -> (resX r1, resY r1, resZ r1, resX r2, resY r2, resZ r2))
+             rs (drop 1 rs)
+
+-- | Contact map: [(i, j, distance)] for i<j where dist < cutoff.
+contactMap :: Chain -> [(Int, Int, Double)]
+contactMap c =
+  let rs = allResidues c; n = length rs
+  in [(i,j,d) | i <- [0..n-1], j <- [i+2..n-1],
+      let d = residueDistance (rs!!i) (rs!!j), d < contactCutoff]
+
+-- | Ramachandran data: [(φ, ψ, ssType)] for scatter plot.
+ramachandranData :: Chain -> [(Double, Double, SSType)]
+ramachandranData c = map (\r -> (resPhi r, resPsi r, assignSS r)) (allResidues c)
+
+-- §11 Test
 chainToPDB :: String -> Chain -> String
 chainToPDB title c = unlines $
   ["HEADER    CRYSTAL FOLD FROM (2,3)","TITLE     "++title,

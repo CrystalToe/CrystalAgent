@@ -2,36 +2,45 @@
 
 # CrystalRigid.hs — Rigid Body Dynamics from (2,3)
 
-## What This Module Does
+## HOW THE DYNAMICS WORKS
 
-Quaternion integrator + Euler equations for rigid body rotation. Tumbling
-asymmetric tops, tennis racket instability, moments of inertia — all from (2,3).
+**There is NO Euler integrator. There is NO symplectic stepper. The sector tick on the 36 IS the dynamics.**
 
-## Engine Wiring
+```
+Pack quaternion scalar (qw) → singlet [1]
+Pack quaternion vector (qx,qy,qz) → weak [3]
+Pack angular velocity (ωx,ωy,ωz) + inertia → colour [8]
+       ↓
+   rigidSectorTick (sector-projected tick on the 36)
+       ↓
+W: Euler equations couple ω components through inertia (wK = 1/√2)
+U: quaternion drifts from angular velocity (uK = 1/√3)
+       ↓
+Quaternion normalization (constraint, Newton-Raphson, zero sqrt)
+       ↓
+Read quaternion + ω back from sectors
+```
 
-**This module imports CrystalEngine.** No local atom redefinitions.
+## Sector Assignment
 
-### Sector Restriction: weak (d=3, rotation)
+| Data | Sector | λ | Meaning |
+|------|--------|---|---------|
+| qw (quaternion scalar) | singlet [1] | 1 | Preserved. Normalization anchor. |
+| qx, qy, qz (orientation) | weak [3] | 1/2 | Orientation evolves. |
+| ωx, ωy, ωz, Ix, Iy, Iz, E, L | colour [8] | 1/3 | Angular velocity + inertia. |
+| (unused) | mixed [24] | 1/6 | — |
 
-| Rigid Body Concept | Value | Engine Source |
-|-------------------|-------|--------------|
-| Rotation axes | 3 | N_c |
-| Quaternion components | 4 | N_w² |
-| Inertia tensor (independent) | 6 | χ |
-| Rigid DOF (3 translate + 3 rotate) | 6 | χ |
-| Rotation matrix entries | 9 | N_c² |
-| I_sphere | 2/5 | N_w/(χ−1) |
-| I_rod | 1/12 | 1/(2χ) |
-| I_disk | 1/2 | 1/N_w |
-| I_shell | 2/3 | N_w/N_c |
+## Import Chain
 
-## Proof Certificate
+```
+CrystalAtoms       ← nW, nC, chi, d1–d4, sigmaD, towerD
+CrystalSectors     ← CrystalState, extractSector, injectSector, zeroState
+CrystalEigen       ← lambda, wK, uK
+CrystalOperators   ← tick, normSq
+```
 
-- `haskel/CrystalRigid.hs` — 24 checks (24 PASS)
-- `proofs/CrystalRigid.lean` — Lean 4 theorems (by native_decide)
-- `proofs/CrystalRigid.agda` — Agda proofs (by refl)
+## Compile
 
-## Dependencies
-
-- **Imports CrystalEngine** — atoms, sector operations, tick, normSq
-- `Data.Ratio`
+```bash
+ghc -O2 -main-is CrystalRigid CrystalRigid.hs && ./CrystalRigid
+```

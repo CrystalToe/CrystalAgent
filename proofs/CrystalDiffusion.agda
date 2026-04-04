@@ -143,27 +143,68 @@ cross-tower = refl
 cross-lcg : d1 * d1 + d2 * d2 + d3 * d3 + d4 * d4 ≡ 650
 cross-lcg = refl
 
--- §9 Engine wiring (CrystalDiffusion imports CrystalEngine)
+-- §9 Component wiring (refactored from CrystalEngine)
 
-engine-diff-coeff : chi ≡ 6
-engine-diff-coeff = refl
+component-diff-coeff : chi ≡ 6
+component-diff-coeff = refl
 
-engine-neighbours-1d : nW ≡ 2
-engine-neighbours-1d = refl
+component-neighbours-1d : nW ≡ 2
+component-neighbours-1d = refl
 
-engine-neighbours-3d : nW * nC ≡ chi
-engine-neighbours-3d = refl
+component-neighbours-3d : nW * nC ≡ chi
+component-neighbours-3d = refl
 
-engine-cfl : nW * nC ≡ chi
-engine-cfl = refl
+component-cfl : nW * nC ≡ chi
+component-cfl = refl
 
-engine-singlet-conserved : d1 ≡ 1
-engine-singlet-conserved = refl
+component-singlet-conserved : d1 ≡ 1
+component-singlet-conserved = refl
 
-engine-spatial : d2 ≡ nC
-engine-spatial = refl
+component-spatial : d2 ≡ nC
+component-spatial = refl
 
-engine-full-state : sigmaD ≡ 36
-engine-full-state = refl
+component-full-state : sigmaD ≡ 36
+component-full-state = refl
 
--- Total: 38 proofs by refl. Zero postulates. Engine wired.
+-- Total: 38 proofs by refl. Zero postulates. Refactored: CrystalAtoms + CrystalSectors + CrystalEigen + CrystalOperators.
+
+-- §10 Gray-Scott crystal parameters
+gs-du-denom : chi ≡ 6
+gs-du-denom = refl
+
+gs-dv-denom : d4 ≡ 24
+gs-dv-denom = refl
+
+gs-feed-denom : towerD ≡ 42
+gs-feed-denom = refl
+
+gs-kill-num : beta0 ≡ 7
+gs-kill-num = refl
+
+gs-kill-denom : towerD * towerD ≡ 1764
+gs-kill-denom = refl
+
+gs-dv-identity : nW * nW * chi ≡ d4
+gs-dv-identity = refl
+
+-- §11 Anisotropic diffusion
+aniso-rate-x-denom : nW ≡ 2
+aniso-rate-x-denom = refl
+
+aniso-rate-y-denom : nC ≡ 3
+aniso-rate-y-denom = refl
+
+aniso-rate-z-denom : chi ≡ 6
+aniso-rate-z-denom = refl
+
+-- §12 Crystal grid parameters
+grid-dx-denom : nC ≡ 3
+grid-dx-denom = refl
+
+grid-dt-denom : towerD ≡ 42
+grid-dt-denom = refl
+
+grid-cfl-denom : nW * nW * beta0 ≡ 28
+grid-cfl-denom = refl
+
+-- Total: 50 proofs by refl. Zero postulates.

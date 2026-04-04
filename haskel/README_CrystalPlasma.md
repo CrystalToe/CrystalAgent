@@ -1,37 +1,44 @@
 <!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
 
-# CrystalPlasma.hs — MHD Plasma Dynamics from (2,3)
+# CrystalPlasma.hs — Magnetohydrodynamics from (2,3)
 
-## What This Module Does
+## HOW THE DYNAMICS WORKS
 
-Magnetohydrodynamics: Alfvén waves, magnetic pressure, plasma beta,
-Bondi accretion, MRI growth rate. MHD = EM + CFD merged in colour sector.
+**There is NO FDTD. There is NO Alfvén integrator. The sector tick on the 36 IS MHD.**
 
-## Engine Wiring
+```
+Pack MHD state (rho, vx, vy, vz, Bx, By, Bz, energy) → colour sector [8]
+  8 state variables = d_colour = N_w³. Exact fit.
+       ↓
+U step: inter-site disentangler (spatial propagation, uK² = 1/3)
+W step: per-site v-B coupling within colour sector (wK 2 = 1/√3)
+       ↓
+λ_colour = 1/3. Fields contract toward equilibrium.
+Singlet λ=1 preserves total energy.
+       ↓
+Read velocity + B field back from colour sector
+```
 
-**This module imports CrystalEngine.** No local atom redefinitions.
+## Sector Assignment
 
-### Sector: colour (d₃ = 8 = EM + fluid merged)
+| Data | Sector | λ | Meaning |
+|------|--------|---|---------|
+| Total MHD energy | singlet [1] | 1 | Conserved. |
+| (unused) | weak [3] | 1/2 | — |
+| rho, vx, vy, vz, Bx, By, Bz, e | colour [8] | 1/3 | MHD state. |
+| (unused) | mixed [24] | 1/6 | — |
 
-| MHD Concept | Value | Engine Source |
-|-----------|-------|--------------|
-| MHD state variables | 8 | d_colour = N_w³ |
-| Wave types | 3 | N_c |
-| Propagating modes | 6 | χ |
-| EM components | 6 | χ |
-| Bondi factor | 4 | N_w² |
-| MRI rate | 3/4 Ω | N_c/N_w² |
+## Import Chain
 
-## New Features (this session)
+```
+CrystalAtoms       ← nW, nC, chi, d1–d4, sigmaD, towerD
+CrystalSectors     ← CrystalState, extractSector, injectSector, zeroState
+CrystalEigen       ← lambda, wK, uK
+CrystalOperators   ← tick, normSq
+```
 
-- `bondiAccretion` — Ṁ = N_w²·π·G²·M²·ρ/c_s³
-- `mriGrowthRate` — max growth = (N_c/N_w²)·Ω = (3/4)Ω
+## Compile
 
-## Proof Certificate
-
-- `haskel/CrystalPlasma.hs` — 25 checks (25 PASS)
-
-## Dependencies
-
-- **Imports CrystalEngine** — atoms, sector operations, tick, normSq
-- `Data.Array`
+```bash
+ghc -O2 -main-is CrystalPlasma CrystalPlasma.hs && ./CrystalPlasma
+```
