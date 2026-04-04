@@ -20,13 +20,11 @@
 module CrystalFold where
 
 import Data.List (foldl')
-import CrystalEngine
-  ( nW, nC, chi, beta0, sigmaD, towerD, gauss
-  , d1, d2, d3, d4
-  , lambda, CrystalState
-  , sectorDim, extractSector, injectSector
-  , normSq, tick, zeroState
-  )
+-- Refactored imports: was CrystalEngine
+import CrystalAtoms hiding (main)
+import CrystalEigen (lambda)
+import CrystalSectors (CrystalState, sectorDim, extractSector, injectSector, zeroState)
+import CrystalOperators (tick, normSq)
 
 -- §0 Constants
 caBondLength :: Double

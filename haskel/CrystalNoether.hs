@@ -12,7 +12,7 @@
 
 module CrystalNoether where
 
-import qualified CrystalEngine as CE  -- engine atoms
+import qualified CrystalAtoms as CE  -- refactored: was CrystalEngine
 -- ============================================================
 -- CRYSTAL INPUTS
 -- ============================================================
@@ -142,3 +142,6 @@ runAll = do
     else do
       putStrLn "FAILURES:"
       mapM_ (\(name, _) -> putStrLn $ "  × " ++ name) failed
+
+main :: IO ()
+main = runAll

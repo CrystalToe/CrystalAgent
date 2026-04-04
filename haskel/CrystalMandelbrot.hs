@@ -31,7 +31,7 @@ module CrystalMandelbrot where
 -- ======================================================================
 
 -- Atoms from CrystalEngine (no local redefinitions)
-import CrystalEngine (nW, nC, chi, beta0, sigmaD, towerD, gauss, d1, d2, d3, d4)
+import CrystalAtoms (nW, nC, chi, beta0, sigmaD, towerD, gauss, d1, d2, d3, d4)
 
 sigmaD2 :: Int
 sigmaD2 = d1^(2::Int) + d2^(2::Int) + d3^(2::Int) + d4^(2::Int)  -- 650
