@@ -1,40 +1,34 @@
 -- Copyright (c) 2026 Daland Montgomery
 -- SPDX-License-Identifier: AGPL-3.0-or-later
 
-/-! # CrystalQMeasure — Measurement operators from (2,3)
-Engine wired: mixed sector (d=24).
+/-! # CrystalQMeasure — Measurement operators + tomography from (2,3)
+Pure MERA. Imports CrystalQBase only. No engine.
 -/
 
 abbrev nW : Nat := 2
 abbrev nC : Nat := 3
 abbrev chi : Nat := nW * nC
-abbrev beta0 : Nat := (11 * nC - 2 * chi) / 3
 abbrev d1 : Nat := 1
-abbrev d2 : Nat := nW * nW - 1
+abbrev d2 : Nat := nC
 abbrev d3 : Nat := nC * nC - 1
-abbrev d4 : Nat := (nW * nW - 1) * (nC * nC - 1)
+abbrev d4 : Nat := nW * nW * nW * nC
 abbrev sigmaD : Nat := d1 + d2 + d3 + d4
-abbrev towerD : Nat := sigmaD + chi
-abbrev gauss : Nat := nW * nW + nC * nC
-abbrev kappa_num : Nat := nC  -- ln(3)/ln(2) numerator base
 
--- Core atoms
-theorem nW_val : nW = 2 := by native_decide
-theorem nC_val : nC = 3 := by native_decide
-theorem chi_val : chi = 6 := by native_decide
-theorem beta0_val : beta0 = 7 := by native_decide
-theorem d1_val : d1 = 1 := by native_decide
-theorem d2_val : d2 = 3 := by native_decide
-theorem d3_val : d3 = 8 := by native_decide
-theorem d4_val : d4 = 24 := by native_decide
-theorem sigmaD_val : sigmaD = 36 := by native_decide
-theorem towerD_val : towerD = 42 := by native_decide
-theorem gauss_val : gauss = 13 := by native_decide
+-- §1 Measurement dimensions
+theorem projective_outcomes : chi = 6 := by native_decide
+theorem sector_count : d1 + 1 + 1 + 1 = 4 := by native_decide
 
--- Sector decomposition
-theorem sector_sum : d1 + d2 + d3 + d4 = 36 := by native_decide
-theorem povm_dim : chi = 6 := by native_decide
-theorem sector_outcomes : d1 + 1 + 1 + 1 = 4 := by native_decide
-theorem projectors : chi = 6 := by native_decide
-theorem sigmaD_val2 : sigmaD = 36 := by native_decide
--- Engine wired.
+-- §2 Parity
+theorem parity_even : d1 + d3 = 9 := by native_decide
+theorem parity_odd : d2 + d4 = 27 := by native_decide
+theorem parity_sum : (d1 + d3) + (d2 + d4) = sigmaD := by native_decide
+
+-- §3 Bell and two-particle
+theorem bell_outcomes : chi = 6 := by native_decide
+theorem two_particle : chi * chi = 36 := by native_decide
+theorem povm_norm : sigmaD = 36 := by native_decide
+
+-- §4 Tomography: χ²-1 = 35 bases
+theorem tomography_bases : chi * chi - 1 = 35 := by native_decide
+theorem tomo_parameters : chi * chi = 36 := by native_decide
+theorem tomo_points_per_basis : chi = 6 := by native_decide

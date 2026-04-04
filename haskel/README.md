@@ -14,8 +14,8 @@ cd ~/coding/entity-project/CrystalAgent/haskel
 # Remove GHC build artifacts
 rm -f *.o *.hi *.dyn_o *.dyn_hi
 
-# Remove compiled executables (files with no extension that are executable)
-find . -maxdepth 1 -type f -executable ! -name "*.hs" ! -name "*.md" -delete
+# Remove compiled executables (Mac)
+find . -maxdepth 1 -type f -perm +111 ! -name "*.*" -delete
 
 
 

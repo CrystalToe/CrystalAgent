@@ -2,40 +2,29 @@
 -- SPDX-License-Identifier: AGPL-3.0-or-later
 
 /-! # CrystalQGates — Quantum gates from End(A_F)
-Engine wired: mixed sector (d=24).
+Pure MERA. Imports CrystalQBase only. No engine, no time evolution.
 -/
 
 abbrev nW : Nat := 2
 abbrev nC : Nat := 3
 abbrev chi : Nat := nW * nC
-abbrev beta0 : Nat := (11 * nC - 2 * chi) / 3
-abbrev d1 : Nat := 1
-abbrev d2 : Nat := nW * nW - 1
-abbrev d3 : Nat := nC * nC - 1
-abbrev d4 : Nat := (nW * nW - 1) * (nC * nC - 1)
-abbrev sigmaD : Nat := d1 + d2 + d3 + d4
-abbrev towerD : Nat := sigmaD + chi
-abbrev gauss : Nat := nW * nW + nC * nC
-abbrev kappa_num : Nat := nC  -- ln(3)/ln(2) numerator base
 
--- Core atoms
-theorem nW_val : nW = 2 := by native_decide
-theorem nC_val : nC = 3 := by native_decide
-theorem chi_val : chi = 6 := by native_decide
-theorem beta0_val : beta0 = 7 := by native_decide
-theorem d1_val : d1 = 1 := by native_decide
-theorem d2_val : d2 = 3 := by native_decide
-theorem d3_val : d3 = 8 := by native_decide
-theorem d4_val : d4 = 24 := by native_decide
-theorem sigmaD_val : sigmaD = 36 := by native_decide
-theorem towerD_val : towerD = 42 := by native_decide
-theorem gauss_val : gauss = 13 := by native_decide
+-- §0 Gate space dimensions
+theorem single_dim : chi = 6 := by native_decide
+theorem two_particle_dim : chi * chi = 36 := by native_decide
+theorem three_particle_dim : chi * chi * chi = 216 := by native_decide
+theorem process_matrix_dim : chi * chi * chi * chi = 1296 := by native_decide
 
--- Sector decomposition
-theorem sector_sum : d1 + d2 + d3 + d4 = 36 := by native_decide
-theorem single_gates : chi * chi = 36 := by native_decide
-theorem multi_gates : chi * (chi - 1) / 2 = 15 := by native_decide
-theorem cnot_dim : chi * chi * chi * chi = 1296 := by native_decide
-theorem pauli_group : chi * chi = 36 := by native_decide
-theorem gate_set : chi = 6 := by native_decide
--- Engine wired.
+-- §1 Pauli structure from (2,3)
+theorem pauli_non_trivial : nC = 3 := by native_decide
+theorem pauli_group_size : nW * nW = 4 := by native_decide
+theorem givens_pairs : chi * (chi - 1) = 30 := by native_decide
+
+-- §2 Tensor product = algebra dimension
+theorem tensor_is_sigmaD : chi * chi = 1 + 3 + 8 + 24 := by native_decide
+
+-- §3 Gate counts (from source)
+-- 12 single-particle: I, X, Y, Z, H, S, T, Rx, Ry, Rz, U3, SX
+-- 14 multi-particle: CNOT, CZ, SWAP, iSWAP, √SWAP, Toffoli, CSWAP,
+--                    XX, YY, ZZ, ECR, Givens, fSWAP, Matchgate
+-- 2 application helpers: applySingle, applyTwo

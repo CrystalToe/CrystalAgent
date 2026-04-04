@@ -32,8 +32,9 @@ module CrystalWavelet where
 -- §0 ATOMS
 -- ═══════════════════════════════════════════════════════════════
 
--- Atoms from CrystalEngine (no local redefinitions)
-import CrystalEngine (nW, nC, chi, beta0, sigmaD, towerD, gauss)
+-- Atoms from CrystalAtoms (refactored: was CrystalEngine)
+import CrystalAtoms (nW, nC, chi, beta0, sigmaD, towerD)  -- refactored: was CrystalEngine
+-- gauss defined locally (line below)
 gauss  = nW * nW + nC * nC
 
 d1, d2, d3, d4 :: Int

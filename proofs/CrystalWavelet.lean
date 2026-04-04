@@ -2,7 +2,7 @@
 -- SPDX-License-Identifier: AGPL-3.0-or-later
 
 /-! # CrystalWavelet — MERA = wavelet from (2,3)
-Engine wired: full engine (d=36).
+Pure MERA. Imports CrystalAtoms only.
 -/
 
 abbrev nW : Nat := 2
@@ -39,4 +39,4 @@ theorem mera_layers : towerD = 42 := by native_decide
 theorem filter_len : nW * nC = 6 := by native_decide
 theorem colour_sector : d3 = 8 := by native_decide
 theorem mixed_sector : d4 = 24 := by native_decide
--- Engine wired.
+

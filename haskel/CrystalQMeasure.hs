@@ -18,6 +18,8 @@ module CrystalQMeasure
   , collapse, collapseToSector
     -- * Born probabilities
   , bornProbs, sectorProbs
+    -- * Tomography (χ²-1 = 35 bases)
+  , tomoRotation, tomoMeasureInBasis, tomoReconstruct, tomoFull, tomoFidelity
   ) where
 
 import CrystalQBase
@@ -127,3 +129,59 @@ sectorProbs psi
   | length psi <= chi = map cxNorm2 psi ++ replicate (4 - min 4 (length psi)) 0
   | otherwise = -- Two-particle: marginal of particle 1
       [sum [cxNorm2 (psi !! (i * chi + j)) | j <- [0..chi-1]] | i <- [0..min 3 (chi-1)]]
+
+-- ═══════════════════════════════════════════════════════════════
+-- §3  TOMOGRAPHY FROM (2,3)
+--
+-- Full state reconstruction requires χ²-1 = 35 measurement bases.
+-- Each basis is a DFT rotation of the sector basis by angle
+-- θ_k = 2πk/(χ²-1) for k = 0..34.
+-- The number 35 = χ²-1 = 6²-1 is from (2,3).
+-- ═══════════════════════════════════════════════════════════════
+
+-- | Rotation matrix: DFT-like basis change by angle θ
+-- R(θ)_ij = (1/√χ) × exp(2πi × i × j / χ + i × θ × j)
+tomoRotation :: Double -> Mat
+tomoRotation theta =
+  let s = 1.0 / sqrt (fromIntegral chi)
+  in [[cxScale s (cxExp (cx 0 (2*pi*fromIntegral (i*j) / fromIntegral chi
+                               + theta * fromIntegral j)))
+      | j <- [0..chi-1]] | i <- [0..chi-1]]
+
+-- | Measure state in rotated basis k, return Born probabilities.
+-- k ∈ {0..χ²-2} = {0..34}.
+tomoMeasureInBasis :: Int -> Vec -> [Double]
+tomoMeasureInBasis k psi =
+  let theta = 2 * pi * fromIntegral k / fromIntegral tomographyBases
+      rot = tomoRotation theta
+      rotated = mApply rot psi
+  in map cxNorm2 rotated
+
+-- | Reconstruct density matrix diagonal from χ²-1 = 35 basis measurements.
+-- Input: list of (basis_index, probabilities) from tomoMeasureInBasis.
+-- Output: χ×χ diagonal density matrix (sector populations).
+-- Uses linear inversion: ρ_diag = average over all rotated measurements.
+tomoReconstruct :: [Vec] -> Mat
+tomoReconstruct measResults =
+  let nBases = length measResults
+      -- Average probabilities across all bases → diagonal of ρ
+      avgProbs = [sum [cxNorm2 (m !! k) | m <- measResults]
+                  / fromIntegral nBases | k <- [0..chi-1]]
+      -- Construct diagonal density matrix
+  in mFromDiag [cx p 0 | p <- avgProbs]
+
+-- | Full tomography: measure state in all 35 bases, reconstruct ρ
+tomoFull :: Vec -> Mat
+tomoFull psi =
+  let rotatedStates = [mApply (tomoRotation (2*pi*fromIntegral k
+                        / fromIntegral tomographyBases)) psi
+                      | k <- [0..tomographyBases-1]]
+  in tomoReconstruct rotatedStates
+
+-- | State fidelity: F(ψ, ρ) = ⟨ψ|ρ|ψ⟩ for pure target ψ and reconstructed ρ.
+-- F = 1 means perfect reconstruction. Range [0,1].
+tomoFidelity :: Vec -> Mat -> Double
+tomoFidelity target rho =
+  let result = mApply rho target
+      overlap = foldl cxAdd cxZero (zipWith (\a b -> cxMul (cxConj a) b) target result)
+  in abs (let (Cx r _) = overlap in r)

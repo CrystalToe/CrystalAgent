@@ -2,12 +2,12 @@
 -- SPDX-License-Identifier: AGPL-3.0-or-later
 
 -- CrystalQGates — Quantum gates from End(A_F)
--- Engine wired: mixed sector (d=24).
+-- Pure MERA. Imports CrystalQBase only. No engine, no time evolution.
 
 module CrystalQGates where
 
 open import Agda.Builtin.Equality
-open import Data.Nat using (ℕ; _+_; _*_; _∸_)
+open import Agda.Builtin.Nat renaming (Nat to ℕ)
 
 nW : ℕ
 nW = 2
@@ -18,64 +18,38 @@ nC = 3
 χ : ℕ
 χ = nW * nC
 
-β₀ : ℕ
-β₀ = 7
+-- §0 Gate space dimensions
+single-dim : χ ≡ 6
+single-dim = refl
 
-d₁ : ℕ
-d₁ = 1
+two-particle-dim : χ * χ ≡ 36
+two-particle-dim = refl
 
-d₂ : ℕ
-d₂ = nW * nW ∸ 1
+three-particle-dim : χ * χ * χ ≡ 216
+three-particle-dim = refl
 
-d₃ : ℕ
-d₃ = nC * nC ∸ 1
+process-matrix-dim : χ * χ * χ * χ ≡ 1296
+process-matrix-dim = refl
 
-d₄ : ℕ
-d₄ = (nW * nW ∸ 1) * (nC * nC ∸ 1)
+-- §1 Single-particle gate count: 12
+-- gateI, gateX, gateY, gateZ, gateH, gateS, gateT,
+-- gateRx, gateRy, gateRz, gateU3, gateSX
 
-σD : ℕ
-σD = d₁ + d₂ + d₃ + d₄
+-- §2 Multi-particle gate count: 14
+-- gateCNOT, gateCZ, gateSWAP, gateiSWAP, gateSqrtSWAP,
+-- gateToffoli, gateCSWAP,
+-- gateXX, gateYY, gateZZ, gateECR, gateGivens, gatefSWAP, gateMatchgate
 
-towerD : ℕ
-towerD = σD + χ
+-- §3 Pauli structure from (2,3)
+pauli-non-trivial : nC ≡ 3
+pauli-non-trivial = refl
 
-gauss : ℕ
-gauss = nW * nW + nC * nC
+pauli-group-size : nW * nW ≡ 4
+pauli-group-size = refl
 
--- Core atoms
-nW-val : nW ≡ 2
-nW-val = refl
+givens-pairs : χ * (χ - 1) ≡ 30
+givens-pairs = refl
 
-nC-val : nC ≡ 3
-nC-val = refl
-
-χ-val : χ ≡ 6
-χ-val = refl
-
-d₁-val : d₁ ≡ 1
-d₁-val = refl
-
-d₂-val : d₂ ≡ 3
-d₂-val = refl
-
-d₃-val : d₃ ≡ 8
-d₃-val = refl
-
-d₄-val : d₄ ≡ 24
-d₄-val = refl
-
-σD-val : σD ≡ 36
-σD-val = refl
-
-sector-sum : d₁ + d₂ + d₃ + d₄ ≡ 36
-sector-sum = refl
-
-single-gates : χ * χ ≡ 36
-single-gates = refl
-
-cnot-dim : χ * χ * χ * χ ≡ 1296
-cnot-dim = refl
-
-pauli-group : χ * χ ≡ 36
-pauli-group = refl
--- Engine wired.
+-- §4 Tensor product = algebra dimension
+tensor-is-sigmaD : χ * χ ≡ 1 + 3 + 8 + 24
+tensor-is-sigmaD = refl

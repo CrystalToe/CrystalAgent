@@ -17,7 +17,7 @@
 
 module CrystalProtonRadius where
 
-import qualified CrystalEngine as CE  -- engine atoms
+import qualified CrystalAtoms as CE  -- refactored: was CrystalEngine
 -- Axiom: A_F = C + M2(C) + M3(C)
 n_w, n_c :: Int
 n_w = CE.nW

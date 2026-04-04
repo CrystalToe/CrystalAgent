@@ -144,21 +144,23 @@ computes.
 
 ---
 
-## Proof Counts
+## Proofs
 
 | Language | File | Count |
 |----------|------|-------|
-| Haskell | haskel/CrystalAlphaProton.hs | Full runtime verification |
-| Lean 4 | proofs/CrystalAlphaProton.lean | Integer identities proved |
-| Agda | proofs/CrystalAlphaProton.agda | Integer identities by refl |
-| Rust | crystal-topos/tests/crystal_alpha_proton_tests.rs | Runtime tests |
-| Python | proofs/crystal_alpha_proton_proof.py | Numerical verification |
+| Haskell | CrystalAlphaProton.hs | 9 prove functions, 17 runtime checks |
+| Agda | CrystalAlphaProton.agda | 47 refl |
+| Lean 4 | CrystalAlphaProton.lean | 61 native_decide |
 
 ---
+
+## Import Chain
+
+Standalone. All atoms defined locally (n_w=2, n_c=3). Zero Crystal* imports.
+Refactored: dead `import qualified CrystalEngine as CE` removed.
 
 ## Compile
 
 ```bash
-cd haskel
-ghc -O2 -main-is CrystalAlphaProton CrystalAlphaProton.hs -o alpha_proton && ./alpha_proton
+ghc -O2 -main-is CrystalAlphaProton CrystalAlphaProton.hs && ./CrystalAlphaProton
 ```

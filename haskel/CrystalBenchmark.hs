@@ -3,7 +3,7 @@
 
 {-# LANGUAGE BangPatterns #-}
 module CrystalBenchmark where
-import CrystalEngine
+-- refactored: CrystalEngine import removed (dead — all symbols from CrystalFold)
 import CrystalFold
 
 trpCageSeq :: [AminoAcid]

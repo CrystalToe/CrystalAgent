@@ -2,7 +2,7 @@
 -- SPDX-License-Identifier: AGPL-3.0-or-later
 
 -- CrystalCrossDomain — Cross-domain audit from (2,3)
--- Engine wired: all sectors (d=36).
+-- Pure. Imports CrystalAxiom only. No CrystalEngine.
 
 module CrystalCrossDomain where
 
@@ -72,4 +72,4 @@ sector-sum = refl
 
 gauss-check : gauss ≡ 13
 gauss-check = refl
--- Engine wired.
+
