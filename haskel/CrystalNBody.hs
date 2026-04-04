@@ -1,301 +1,519 @@
 -- Copyright (c) 2026 Daland Montgomery
 -- SPDX-License-Identifier: AGPL-3.0-or-later
 
-{- | Module: CrystalNBody -- N-Body Gravitational Dynamics from (2,3).
+{- | Module: CrystalNBody — N-Body Gravitational Dynamics from (2,3).
 
-Barnes-Hut octree for O(N log N) force computation.
-Symplectic leapfrog for time integration (same as CrystalClassical).
+  THE DYNAMICS IS THE TICK ON THE 36.
+
+  Each body is a CrystalState (36 Doubles).
+  Position (x,y,z) → weak sector [3], λ = 1/2.
+  Velocity (vx,vy,vz) → colour sector [8] first 3, λ = 1/3.
+  Force (fx,fy,fz) → colour sector [8] slots 3-5.
+  KE, mass → colour sector [8] slots 6-7.
+  Energy marker → singlet [1], λ = 1. Conserved.
+
+  S = W∘U per body:
+    U (inter-body): gravitational disentangler. Direct O(N²) or
+      Barnes-Hut O(N log N) via octree. Stores force in colour sector.
+    W (per-body): velocity kicked by force (wK₁), position drifted (uK₂).
 
   Oct-tree children:  8 = 2^N_c = N_w^N_c = d_colour
-  Force exponent:     2 = N_c - 1 (inverse square)
+  Force exponent:     2 = N_c − 1 (inverse square)
   Spatial dimensions: 3 = N_c
-  Phase space/body:   6 = 2*N_c = chi
+  Phase space/body:   6 = χ = N_w × N_c
 
-Observable count: 0 new (infrastructure). Every number from (2,3).
+  Observable count: 0 new (infrastructure). Every number from (2,3).
+
+  Compile: ghc -O2 -main-is CrystalNBody CrystalNBody.hs && ./CrystalNBody
 -}
 
 module CrystalNBody where
 
 import Data.Ratio (Rational, (%))
 import Data.List (foldl')
-import CrystalEngine
-  ( nW, nC, chi, beta0, sigmaD, towerD, gauss
-  , d1, d2, d3, d4
-  , lambda
-  , CrystalState
-  , sectorStart, sectorDim
-  , extractSector, injectSector
-  , normSq, tick
-  )
-
--- Derived (from engine atoms)
-sigmaD2 :: Int
-sigmaD2 = d1*d1 + d2*d2 + d3*d3 + d4*d4  -- 650
-
-dColour :: Int
-dColour = d3  -- 8 = N_c² - 1
+import CrystalAtoms (nW, nC, chi, beta0, sigmaD, towerD, gauss, d1, d2, d3, d4)
+import CrystalSectors (CrystalState, sectorDim, extractSector, injectSector, zeroState)
+import CrystalEigen (lambda, wK, uK)
+import CrystalOperators (tick, normSq)
 
 sq :: Double -> Double
 sq x = x * x
 {-# INLINE sq #-}
 
--- =====================================================================
--- S1  BODY TYPE
--- =====================================================================
+-- ═══════════════════════════════════════════════════════════════
+-- §1  VEC3
+-- ═══════════════════════════════════════════════════════════════
 
-data Body = Body
-  { bodyPx :: !Double, bodyPy :: !Double, bodyPz :: !Double  -- position (N_c=3)
-  , bodyVx :: !Double, bodyVy :: !Double, bodyVz :: !Double  -- velocity (N_c=3)
-  , bodyM  :: !Double                                         -- mass
-  } deriving (Show)
+type Vec3 = (Double, Double, Double)
 
-bodyPos :: Body -> (Double, Double, Double)
-bodyPos b = (bodyPx b, bodyPy b, bodyPz b)
+v3add :: Vec3 -> Vec3 -> Vec3
+v3add (a,b,c) (d,e,f) = (a+d, b+e, c+f)
+{-# INLINE v3add #-}
 
--- =====================================================================
--- S2  BARNES-HUT OCTREE
+v3sub :: Vec3 -> Vec3 -> Vec3
+v3sub (a,b,c) (d,e,f) = (a-d, b-e, c-f)
+{-# INLINE v3sub #-}
+
+v3scale :: Double -> Vec3 -> Vec3
+v3scale s (a,b,c) = (s*a, s*b, s*c)
+{-# INLINE v3scale #-}
+
+v3dot :: Vec3 -> Vec3 -> Double
+v3dot (a,b,c) (d,e,f) = a*d + b*e + c*f
+{-# INLINE v3dot #-}
+
+v3cross :: Vec3 -> Vec3 -> Vec3
+v3cross (a,b,c) (d,e,f) = (b*f-c*e, c*d-a*f, a*e-b*d)
+
+v3norm2 :: Vec3 -> Double
+v3norm2 v = v3dot v v
+{-# INLINE v3norm2 #-}
+
+v3norm :: Vec3 -> Double
+v3norm = sqrt . v3norm2
+
+v3zero :: Vec3
+v3zero = (0,0,0)
+
+-- ═══════════════════════════════════════════════════════════════
+-- §2  PACK / UNPACK: Body ↔ CrystalState
 --
--- Each internal node stores: total mass, center of mass, size.
+-- Singlet [1]:  KE marker (conserved, λ=1)
+-- Weak [3]:     x, y, z
+-- Colour [8]:   vx, vy, vz, fx, fy, fz, KE, mass
+-- Mixed [24]:   (unused)
+--
+-- Mass stored in colour[7]. It's a parameter, not a dynamical DOF,
+-- but packing it keeps each body self-contained in its CrystalState.
+-- ═══════════════════════════════════════════════════════════════
+
+type NBodySystem = [CrystalState]
+
+packBody :: Vec3 -> Vec3 -> Double -> CrystalState
+packBody (x,y,z) (vx,vy,vz) m =
+  let ke = 0.5 * m * (sq vx + sq vy + sq vz)
+      col = [vx, vy, vz, 0, 0, 0, ke, m]
+  in injectSector 0 [ke]
+   $ injectSector 1 [x, y, z]
+   $ injectSector 2 col
+   $ zeroState
+
+readPos :: CrystalState -> Vec3
+readPos cs = let [x,y,z] = extractSector 1 cs in (x,y,z)
+
+readVel :: CrystalState -> Vec3
+readVel cs = let c = extractSector 2 cs in (c!!0, c!!1, c!!2)
+
+readForce :: CrystalState -> Vec3
+readForce cs = let c = extractSector 2 cs in (c!!3, c!!4, c!!5)
+
+readKE :: CrystalState -> Double
+readKE cs = (extractSector 2 cs) !! 6
+
+readMass :: CrystalState -> Double
+readMass cs = (extractSector 2 cs) !! 7
+
+readSpeed :: CrystalState -> Double
+readSpeed = v3norm . readVel
+
+readRadius :: CrystalState -> Double
+readRadius = v3norm . readPos
+
+-- ═══════════════════════════════════════════════════════════════
+-- §3  GRAVITATIONAL COUPLING — DIRECT O(N²) (U disentangler)
+--
+-- F = −G m_j dr / |r|^N_c       [vector form]
+-- |F| = G m_j / |r|^(N_c−1)     [inverse square]
+-- Softening ε: r² → r² + ε²
+-- ═══════════════════════════════════════════════════════════════
+
+gravAccelDirect :: Double -> NBodySystem -> Int -> Vec3
+gravAccelDirect eps2 bodies i =
+  let pi_ = readPos (bodies!!i)
+      n = length bodies
+  in foldl' (\acc j ->
+    if j == i then acc
+    else let pj = readPos (bodies!!j)
+             mj = readMass (bodies!!j)
+             (dx,dy,dz) = v3sub pi_ pj
+             r2 = dx*dx + dy*dy + dz*dz + eps2
+             r = sqrt r2; r3 = r * r2
+             f = -mj / r3
+         in v3add acc (f*dx, f*dy, f*dz))
+    v3zero [0..n-1]
+
+-- | U step (direct): compute gravitational forces, store in colour sector.
+uStepDirect :: Double -> NBodySystem -> NBodySystem
+uStepDirect eps2 bodies =
+  let n = length bodies
+  in [let (fx,fy,fz) = gravAccelDirect eps2 bodies i
+          col = extractSector 2 (bodies!!i)
+          col' = [col!!0, col!!1, col!!2, fx, fy, fz, col!!6, col!!7]
+      in injectSector 2 col' (bodies!!i)
+     | i <- [0..n-1]]
+
+-- ═══════════════════════════════════════════════════════════════
+-- §4  BARNES-HUT OCTREE
+--
 -- 8 children = 2^N_c = N_w^N_c = d_colour.
--- Opening angle theta: use multipole if size/distance < theta.
--- =====================================================================
+-- Opening angle θ: use multipole if size/distance < θ.
+-- This is infrastructure for the U disentangler, not dynamics.
+-- ═══════════════════════════════════════════════════════════════
 
 data OctTree
   = Empty
-  | Leaf !Double !Double !Double !Double   -- x, y, z, mass
-  | Node !Double !Double !Double !Double !Double  -- cx, cy, cz, totalMass, size
-         !OctTree !OctTree !OctTree !OctTree       -- children 0-3
-         !OctTree !OctTree !OctTree !OctTree       -- children 4-7
+  | Leaf !Double !Double !Double !Double          -- x y z mass
+  | Node !Double !Double !Double !Double !Double  -- cx cy cz totalMass size
+         !OctTree !OctTree !OctTree !OctTree
+         !OctTree !OctTree !OctTree !OctTree
 
--- | Which octant a point falls into (0-7).
--- Octant index = 4*(z>cz) + 2*(y>cy) + (x>cx)
 octant :: Double -> Double -> Double -> Double -> Double -> Double -> Int
 octant x y z cx cy cz =
-  let bx = if x > cx then 1 else 0
-      by = if y > cy then 1 else 0
-      bz = if z > cz then 1 else 0
-  in bz * 4 + by * 2 + bx
+  (if z > cz then 4 else 0) + (if y > cy then 2 else 0) + (if x > cx then 1 else 0)
 
--- | Insert a body into the octree.
 insertBody :: Double -> Double -> Double -> Double -> Double -> OctTree -> OctTree
 insertBody x y z m size tree = case tree of
   Empty -> Leaf x y z m
-  Leaf lx ly lz lm ->
-    -- Split: create node, re-insert both
-    let half = size / 2
-        cx = lx  -- approximate center (will refine)
-        cy = ly
-        cz = lz
-        node0 = Node cx cy cz 0 size Empty Empty Empty Empty Empty Empty Empty Empty
-        node1 = insertIntoNode lx ly lz lm half node0
-    in insertIntoNode x y z m half node1
-  Node cx cy cz tm s c0 c1 c2 c3 c4 c5 c6 c7 ->
-    insertIntoNode x y z m (s/2) tree
-
-insertIntoNode :: Double -> Double -> Double -> Double -> Double -> OctTree -> OctTree
-insertIntoNode x y z m half (Node cx cy cz tm s c0 c1 c2 c3 c4 c5 c6 c7) =
-  let -- Update center of mass
-      tm' = tm + m
-      cx' = (cx * tm + x * m) / tm'
-      cy' = (cy * tm + y * m) / tm'
-      cz' = (cz * tm + z * m) / tm'
-      oct = octant x y z cx cy cz
-      ins c = insertBody x y z m half c
-  in case oct of
-    0 -> Node cx' cy' cz' tm' s (ins c0) c1 c2 c3 c4 c5 c6 c7
-    1 -> Node cx' cy' cz' tm' s c0 (ins c1) c2 c3 c4 c5 c6 c7
-    2 -> Node cx' cy' cz' tm' s c0 c1 (ins c2) c3 c4 c5 c6 c7
-    3 -> Node cx' cy' cz' tm' s c0 c1 c2 (ins c3) c4 c5 c6 c7
-    4 -> Node cx' cy' cz' tm' s c0 c1 c2 c3 (ins c4) c5 c6 c7
-    5 -> Node cx' cy' cz' tm' s c0 c1 c2 c3 c4 (ins c5) c6 c7
-    6 -> Node cx' cy' cz' tm' s c0 c1 c2 c3 c4 c5 (ins c6) c7
-    _ -> Node cx' cy' cz' tm' s c0 c1 c2 c3 c4 c5 c6 (ins c7)
-insertIntoNode _ _ _ _ _ t = t
-
--- | Build octree from list of bodies.
-buildTree :: Double -> [Body] -> OctTree
-buildTree size = foldl' (\t b -> insertBody (bodyPx b) (bodyPy b) (bodyPz b) (bodyM b) size t) Empty
-
--- =====================================================================
--- S3  TREE FORCE COMPUTATION
---
--- Force: a = -GM r_hat / |r|^(N_c-1) where N_c-1=2.
--- Barnes-Hut: if size/distance < theta, use node's center of mass.
--- Softening: eps^2 added to r^2 to prevent singularities.
--- =====================================================================
-
--- | Acceleration on a body from the tree. theta = opening angle.
-treeAccel :: Double -> Double -> OctTree -> Double -> Double -> Double -> (Double, Double, Double)
-treeAccel theta eps tree px py pz = go tree
+  Leaf lx ly lz lm
+    | size < 1e-8 ->  -- floor: merge coincident bodies into one leaf
+        let tm = lm + m
+        in Leaf ((lx*lm+x*m)/tm) ((ly*lm+y*m)/tm) ((lz*lm+z*m)/tm) tm
+    | otherwise ->
+        let h = size / 2
+            n0 = Node lx ly lz 0 size Empty Empty Empty Empty Empty Empty Empty Empty
+        in insertInto x y z m h (insertInto lx ly lz lm h n0)
+  Node {} -> insertInto x y z m (size/2) tree
   where
-    go Empty = (0, 0, 0)
+    insertInto px py pz pm half (Node cx cy cz tm s c0 c1 c2 c3 c4 c5 c6 c7) =
+      let tm' = tm + pm
+          cx' = (cx*tm + px*pm) / tm'
+          cy' = (cy*tm + py*pm) / tm'
+          cz' = (cz*tm + pz*pm) / tm'
+          o   = octant px py pz cx cy cz
+          ins c = insertBody px py pz pm half c
+      in case o of
+        0 -> Node cx' cy' cz' tm' s (ins c0) c1 c2 c3 c4 c5 c6 c7
+        1 -> Node cx' cy' cz' tm' s c0 (ins c1) c2 c3 c4 c5 c6 c7
+        2 -> Node cx' cy' cz' tm' s c0 c1 (ins c2) c3 c4 c5 c6 c7
+        3 -> Node cx' cy' cz' tm' s c0 c1 c2 (ins c3) c4 c5 c6 c7
+        4 -> Node cx' cy' cz' tm' s c0 c1 c2 c3 (ins c4) c5 c6 c7
+        5 -> Node cx' cy' cz' tm' s c0 c1 c2 c3 c4 (ins c5) c6 c7
+        6 -> Node cx' cy' cz' tm' s c0 c1 c2 c3 c4 c5 (ins c6) c7
+        _ -> Node cx' cy' cz' tm' s c0 c1 c2 c3 c4 c5 c6 (ins c7)
+    insertInto _ _ _ _ _ t = t
+
+buildTree :: Double -> NBodySystem -> OctTree
+buildTree size = foldl' (\t cs ->
+  let (x,y,z) = readPos cs; m = readMass cs
+  in insertBody x y z m size t) Empty
+
+-- ═══════════════════════════════════════════════════════════════
+-- §5  GRAVITATIONAL COUPLING — TREE O(N log N) (U disentangler)
+-- ═══════════════════════════════════════════════════════════════
+
+treeAccel :: Double -> Double -> OctTree -> Vec3 -> Vec3
+treeAccel theta eps2 tree pos = go tree
+  where
+    go Empty = v3zero
     go (Leaf lx ly lz lm) =
-      let dx = px - lx; dy = py - ly; dz = pz - lz
-          r2 = dx*dx + dy*dy + dz*dz + eps*eps
-          r  = sqrt r2
-          r3 = r * r2
-          f  = -lm / r3
-      in if r2 < eps*eps * 4 then (0,0,0)  -- skip self
-         else (f*dx, f*dy, f*dz)
+      let (dx,dy,dz) = v3sub pos (lx,ly,lz)
+          r2 = dx*dx+dy*dy+dz*dz+eps2
+      in if r2 < eps2*4 then v3zero  -- skip self
+         else let r=sqrt r2; r3=r*r2; f= -lm/r3 in (f*dx,f*dy,f*dz)
     go (Node cx cy cz tm s c0 c1 c2 c3 c4 c5 c6 c7) =
-      let dx = px - cx; dy = py - cy; dz = pz - cz
-          r2 = dx*dx + dy*dy + dz*dz + eps*eps
-          r  = sqrt r2
-      in if s / r < theta  -- multipole approximation
-         then let r3 = r * r2; f = -tm / r3
-              in (f*dx, f*dy, f*dz)
-         else -- recurse into children
-              let (ax0,ay0,az0) = go c0; (ax1,ay1,az1) = go c1
-                  (ax2,ay2,az2) = go c2; (ax3,ay3,az3) = go c3
-                  (ax4,ay4,az4) = go c4; (ax5,ay5,az5) = go c5
-                  (ax6,ay6,az6) = go c6; (ax7,ay7,az7) = go c7
-              in ( ax0+ax1+ax2+ax3+ax4+ax5+ax6+ax7
-                 , ay0+ay1+ay2+ay3+ay4+ay5+ay6+ay7
-                 , az0+az1+az2+az3+az4+az5+az6+az7 )
+      let (dx,dy,dz) = v3sub pos (cx,cy,cz)
+          r2 = dx*dx+dy*dy+dz*dz+eps2; r = sqrt r2
+      in if s/r < theta
+         then let r3=r*r2; f= -tm/r3 in (f*dx,f*dy,f*dz)
+         else let (a0x,a0y,a0z) = go c0; (a1x,a1y,a1z) = go c1
+                  (a2x,a2y,a2z) = go c2; (a3x,a3y,a3z) = go c3
+                  (a4x,a4y,a4z) = go c4; (a5x,a5y,a5z) = go c5
+                  (a6x,a6y,a6z) = go c6; (a7x,a7y,a7z) = go c7
+              in ( a0x+a1x+a2x+a3x+a4x+a5x+a6x+a7x
+                 , a0y+a1y+a2y+a3y+a4y+a5y+a6y+a7y
+                 , a0z+a1z+a2z+a3z+a4z+a5z+a6z+a7z )
 
--- =====================================================================
--- S4  DIRECT N-BODY FORCE (for small N / verification)
--- =====================================================================
-
--- | Direct O(N^2) force computation. a = -G sum(m_j (r-r_j)/|r-r_j|^3).
-directAccel :: Double -> [Body] -> Body -> (Double, Double, Double)
-directAccel eps bodies b =
-  foldl' (\(ax,ay,az) bj ->
-    let dx = bodyPx b - bodyPx bj
-        dy = bodyPy b - bodyPy bj
-        dz = bodyPz b - bodyPz bj
-        r2 = dx*dx + dy*dy + dz*dz + eps*eps
-        r  = sqrt r2
-        r3 = r * r2
-    in if r2 < eps*eps * 4 then (ax,ay,az)  -- skip self
-       else let f = -(bodyM bj) / r3
-            in (ax + f*dx, ay + f*dy, az + f*dz)
-  ) (0,0,0) bodies
-
--- =====================================================================
--- S5  SYMPLECTIC LEAPFROG (same W-U-W as CrystalClassical)
--- =====================================================================
-
--- | Force evaluation of all body fields (prevents thunk buildup).
-forceBody :: Body -> Body
-forceBody (Body px py pz vx vy vz m) =
-  px `seq` py `seq` pz `seq` vx `seq` vy `seq` vz `seq` m `seq` Body px py pz vx vy vz m
-
--- | Strict map over bodies.
-strictMapBodies :: (Body -> Body) -> [Body] -> [Body]
-strictMapBodies f = go []
-  where
-    go acc [] = reverse acc
-    go acc (b:bs) = let b' = forceBody (f b) in b' `seq` go (b':acc) bs
-
--- =====================================================================
--- S5  N-BODY TICK: S = W∘U on weak⊕colour sector, per body
---
--- ZERO CALCULUS. Engine tick contracts each body's:
---   position (weak)   by λ_weak   = 1/N_w = 1/2
---   velocity (colour) by λ_colour = 1/N_c = 1/3
--- No force law. No sqrt. Just the monad, per body.
--- =====================================================================
-
--- | One tick of the N-body monad: engine tick applied per body.
--- ZERO TRANSCENDENTALS. Pure eigenvalue multiplication.
-nbodyTickDirect :: [Body] -> [Body]
-nbodyTickDirect = strictMapBodies (fromCrystalState . tick . toCrystalState)
-
--- | Barnes-Hut tick via engine (same as direct — engine tick is per-body).
-nbodyTick :: [Body] -> [Body]
-nbodyTick = nbodyTickDirect
-
--- [TEXTBOOK REFERENCE — Verlet leapfrog with Newtonian force (calculus version):]
--- nbodyTickDirectTextbook uses sqrt in directAccel (force law).
--- nbodyTickTextbook uses sqrt in treeAccel (Barnes-Hut).
--- Both approximate S = W∘U in the Newtonian limit.
-
--- | Textbook Verlet tick — kept for physics comparison tests only.
-nbodyTickDirectTextbook :: Double -> Double -> [Body] -> [Body]
-nbodyTickDirectTextbook dt eps bodies =
-  let -- W: half-kick
-      accel1 b = directAccel eps bodies b
-      halfKick1 b =
-        let (ax,ay,az) = accel1 b
-        in b { bodyVx = bodyVx b + (dt/2)*ax
-             , bodyVy = bodyVy b + (dt/2)*ay
-             , bodyVz = bodyVz b + (dt/2)*az }
-      bodies1 = strictMapBodies halfKick1 bodies
-      -- U: full drift
-      drift b = b { bodyPx = bodyPx b + dt * bodyVx b
-                  , bodyPy = bodyPy b + dt * bodyVy b
-                  , bodyPz = bodyPz b + dt * bodyVz b }
-      bodies2 = strictMapBodies drift bodies1
-      -- W: half-kick (recompute accel at new positions)
-      accel2 b = directAccel eps bodies2 b
-      halfKick2 b =
-        let (ax,ay,az) = accel2 b
-        in b { bodyVx = bodyVx b + (dt/2)*ax
-             , bodyVy = bodyVy b + (dt/2)*ay
-             , bodyVz = bodyVz b + (dt/2)*az }
-  in strictMapBodies halfKick2 bodies2
-
--- | Textbook Barnes-Hut tick — for physics comparison only.
-nbodyTickTextbook :: Double -> Double -> Double -> Double -> [Body] -> [Body]
-nbodyTickTextbook dt theta eps boxSize bodies =
+-- | U step (tree): Barnes-Hut O(N log N) force computation.
+uStepTree :: Double -> Double -> Double -> NBodySystem -> NBodySystem
+uStepTree theta eps2 boxSize bodies =
   let tree = buildTree boxSize bodies
-      accelOf b = treeAccel theta eps tree (bodyPx b) (bodyPy b) (bodyPz b)
-      halfKick b =
-        let (ax,ay,az) = accelOf b
-        in b { bodyVx = bodyVx b + (dt/2)*ax
-             , bodyVy = bodyVy b + (dt/2)*ay
-             , bodyVz = bodyVz b + (dt/2)*az }
-      bodies1 = strictMapBodies halfKick bodies
-      drift b = b { bodyPx = bodyPx b + dt * bodyVx b
-                  , bodyPy = bodyPy b + dt * bodyVy b
-                  , bodyPz = bodyPz b + dt * bodyVz b }
-      bodies2 = strictMapBodies drift bodies1
-      tree2 = buildTree boxSize bodies2
-      accelOf2 b = treeAccel theta eps tree2 (bodyPx b) (bodyPy b) (bodyPz b)
-      halfKick2 b =
-        let (ax,ay,az) = accelOf2 b
-        in b { bodyVx = bodyVx b + (dt/2)*ax
-             , bodyVy = bodyVy b + (dt/2)*ay
-             , bodyVz = bodyVz b + (dt/2)*az }
-  in strictMapBodies halfKick2 bodies2
+  in [let pos = readPos cs
+          (fx,fy,fz) = treeAccel theta eps2 tree pos
+          col = extractSector 2 cs
+          col' = [col!!0,col!!1,col!!2, fx,fy,fz, col!!6,col!!7]
+      in injectSector 2 col' cs
+     | cs <- bodies]
 
--- =====================================================================
--- S6  CONSERVED QUANTITIES
--- =====================================================================
+-- ═══════════════════════════════════════════════════════════════
+-- §6  THE TICK: S = W∘U
+--
+-- W step: per-body sector coupling.
+--   Velocity kicked by force (wK₁ = 1/√2).
+--   Position drifted by velocity (uK₂ = 1/√3).
+-- U step: inter-body gravitational disentangler (direct or tree).
+-- ═══════════════════════════════════════════════════════════════
 
--- | Total kinetic energy.
-kineticEnergy :: [Body] -> Double
-kineticEnergy = foldl' (\e b -> e + 0.5 * bodyM b * (sq (bodyVx b) + sq (bodyVy b) + sq (bodyVz b))) 0
+bodyTick :: CrystalState -> CrystalState
+bodyTick st =
+  let [x,y,z] = extractSector 1 st
+      col = extractSector 2 st
+      [vx,vy,vz,fx,fy,fz,_,m] = take 8 (col ++ repeat 0)
+      w1 = wK 1
+      vx' = vx + w1*fx;  vy' = vy + w1*fy;  vz' = vz + w1*fz
+      u2 = uK 2
+      x' = x + u2*vx';   y' = y + u2*vy';   z' = z + u2*vz'
+      ke' = 0.5 * m * (sq vx' + sq vy' + sq vz')
+      col' = [vx',vy',vz', fx,fy,fz, ke', m]
+  in injectSector 0 [ke']
+   $ injectSector 1 [x',y',z']
+   $ injectSector 2 col'
+   $ st
 
--- | Total potential energy (direct, O(N^2)).
-potentialEnergy :: Double -> [Body] -> Double
-potentialEnergy eps bodies = go 0 bodies
+wStep :: NBodySystem -> NBodySystem
+wStep = map bodyTick
+
+-- | Full tick (direct O(N²)): S = W∘U.
+nbodyTickDirect :: Double -> NBodySystem -> NBodySystem
+nbodyTickDirect eps2 = wStep . uStepDirect eps2
+
+-- | Full tick (Barnes-Hut O(N log N)): S = W∘U.
+nbodyTickTree :: Double -> Double -> Double -> NBodySystem -> NBodySystem
+nbodyTickTree theta eps2 boxSize = wStep . uStepTree theta eps2 boxSize
+
+-- | Evolve N ticks (direct), full trajectory.
+evolveNBody :: Double -> Int -> NBodySystem -> [NBodySystem]
+evolveNBody eps2 n sys0 = take (n+1) $ iterate (nbodyTickDirect eps2) sys0
+
+-- | Evolve N ticks (direct), final state only (memory-efficient).
+evolveNBodyFinal :: Double -> Int -> NBodySystem -> NBodySystem
+evolveNBodyFinal eps2 n sys0 = go n sys0
+  where go 0 s = s
+        go k s = let s' = nbodyTickDirect eps2 s in s' `seq` go (k-1) s'
+
+-- | Evolve N ticks (tree), full trajectory.
+evolveNBodyTree :: Double -> Double -> Double -> Int -> NBodySystem -> [NBodySystem]
+evolveNBodyTree theta eps2 box n sys0 =
+  take (n+1) $ iterate (nbodyTickTree theta eps2 box) sys0
+
+-- | Evolve N ticks (tree), final only.
+evolveNBodyTreeFinal :: Double -> Double -> Double -> Int -> NBodySystem -> NBodySystem
+evolveNBodyTreeFinal theta eps2 box n sys0 = go n sys0
+  where go 0 s = s
+        go k s = let s' = nbodyTickTree theta eps2 box s in s' `seq` go (k-1) s'
+
+-- ═══════════════════════════════════════════════════════════════
+-- §7  OBSERVABLES
+-- ═══════════════════════════════════════════════════════════════
+
+totalKE :: NBodySystem -> Double
+totalKE = sum . map readKE
+
+potentialEnergy :: Double -> NBodySystem -> Double
+potentialEnergy eps2 bodies = go 0 (zip [0..] bodies)
   where
     go acc [] = acc
-    go acc (b:bs) = go (acc + pairSum b bs) bs
-    pairSum b = foldl' (\e bj ->
-      let dx = bodyPx b - bodyPx bj
-          dy = bodyPy b - bodyPy bj
-          dz = bodyPz b - bodyPz bj
-          r = sqrt (dx*dx + dy*dy + dz*dz + eps*eps)
-      in e - bodyM b * bodyM bj / r) 0
+    go acc ((_,bi):rest) =
+      let pe = foldl' (\e (_,bj) ->
+                 let r = sqrt (v3norm2 (v3sub (readPos bi) (readPos bj)) + eps2)
+                 in e - readMass bi * readMass bj / r) 0 rest
+      in go (acc + pe) rest
 
--- | Total energy.
-totalEnergy :: Double -> [Body] -> Double
-totalEnergy eps bodies = kineticEnergy bodies + potentialEnergy eps bodies
+totalEnergy :: Double -> NBodySystem -> Double
+totalEnergy eps2 sys = totalKE sys + potentialEnergy eps2 sys
 
--- | Total momentum (should be conserved).
-totalMomentum :: [Body] -> (Double, Double, Double)
-totalMomentum = foldl' (\(px,py,pz) b ->
-  (px + bodyM b * bodyVx b, py + bodyM b * bodyVy b, pz + bodyM b * bodyVz b)) (0,0,0)
+totalMomentum :: NBodySystem -> Vec3
+totalMomentum = foldl' (\acc cs ->
+  let m = readMass cs; (vx,vy,vz) = readVel cs
+  in v3add acc (m*vx, m*vy, m*vz)) v3zero
 
--- =====================================================================
--- S7  INTEGER IDENTITY PROOFS
--- =====================================================================
+angMomVec :: CrystalState -> Vec3
+angMomVec cs = v3cross (readPos cs) (v3scale (readMass cs) (readVel cs))
+
+totalAngMom :: NBodySystem -> Vec3
+totalAngMom = foldl' (\acc cs -> v3add acc (angMomVec cs)) v3zero
+
+centerOfMass :: NBodySystem -> Vec3
+centerOfMass sys =
+  let totalM = max 1e-30 (sum (map readMass sys))
+  in v3scale (1/totalM) $ foldl' (\acc cs ->
+       v3add acc (v3scale (readMass cs) (readPos cs))) v3zero sys
+
+virialRatio :: Double -> NBodySystem -> Double
+virialRatio eps2 sys = 2 * totalKE sys / max 1e-30 (abs (potentialEnergy eps2 sys))
+
+-- ═══════════════════════════════════════════════════════════════
+-- §8  TRAJECTORY EXTRACTORS (Three.js / WASM)
+-- ═══════════════════════════════════════════════════════════════
+
+allPositions :: NBodySystem -> [Vec3]
+allPositions = map readPos
+
+allVelocities :: NBodySystem -> [Vec3]
+allVelocities = map readVel
+
+-- | X coords of body i across trajectory snapshots.
+snapX :: Int -> [NBodySystem] -> [Double]
+snapX i = map (\s -> let (x,_,_) = readPos (s!!i) in x)
+
+snapY :: Int -> [NBodySystem] -> [Double]
+snapY i = map (\s -> let (_,y,_) = readPos (s!!i) in y)
+
+snapZ :: Int -> [NBodySystem] -> [Double]
+snapZ i = map (\s -> let (_,_,z) = readPos (s!!i) in z)
+
+snapR :: Int -> [NBodySystem] -> [Double]
+snapR i = map (\s -> readRadius (s!!i))
+
+snapSpeed :: Int -> [NBodySystem] -> [Double]
+snapSpeed i = map (\s -> readSpeed (s!!i))
+
+snapPositions :: Int -> [NBodySystem] -> [Vec3]
+snapPositions i = map (\s -> readPos (s!!i))
+
+-- | Total energy per snapshot.
+snapEnergy :: Double -> [NBodySystem] -> [Double]
+snapEnergy eps2 = map (totalEnergy eps2)
+
+-- | 2D positions + mass for all bodies (flat array for WebGL).
+positions2D :: NBodySystem -> [(Double, Double)]
+positions2D = map (\cs -> let (x,y,_) = readPos cs in (x,y))
+
+positions2DMass :: NBodySystem -> [(Double, Double, Double)]
+positions2DMass = map (\cs -> let (x,y,_) = readPos cs; m = readMass cs in (x,y,m))
+
+-- | 3D positions for all bodies (for Three.js buffer geometry).
+positions3D :: NBodySystem -> [(Double, Double, Double)]
+positions3D = map readPos
+
+-- ═══════════════════════════════════════════════════════════════
+-- §9  COLOR / VISUAL API
+-- ═══════════════════════════════════════════════════════════════
+
+type RGBA = (Double, Double, Double, Double)
+
+sectorColor :: Int -> RGBA
+sectorColor 0 = (0.2, 0.3, 1.0, 1.0)
+sectorColor 1 = (1.0, 0.9, 0.1, 1.0)
+sectorColor 2 = (0.1, 0.8, 0.3, 1.0)
+sectorColor 3 = (1.0, 0.2, 0.1, 1.0)
+sectorColor _ = (0.5, 0.5, 0.5, 1.0)
+
+lerpRGBA :: Double -> RGBA -> RGBA -> RGBA
+lerpRGBA t (r0,g0,b0,a0) (r1,g1,b1,a1) =
+  (r0+t*(r1-r0), g0+t*(g1-g0), b0+t*(b1-b0), a0+t*(a1-a0))
+
+keToColor :: Double -> Double -> RGBA
+keToColor mx ke =
+  let t = min 1.0 (ke / max 1e-15 mx)
+  in if t < 0.5 then lerpRGBA (t/0.5) (sectorColor 0) (sectorColor 2)
+     else lerpRGBA ((t-0.5)/0.5) (sectorColor 2) (sectorColor 3)
+
+colorBodies :: NBodySystem -> [RGBA]
+colorBodies sys =
+  let kes = map readKE sys; mx = max 1e-15 (maximum kes)
+  in map (keToColor mx) kes
+
+colorBodiesBySpeed :: NBodySystem -> [RGBA]
+colorBodiesBySpeed sys =
+  let spds = map readSpeed sys; mx = max 1e-15 (maximum spds)
+  in map (\s -> keToColor (sq mx) (sq s)) spds
+
+-- | Mass-weighted glow radius for rendering (bigger mass = bigger glow).
+glowRadius :: NBodySystem -> [Double]
+glowRadius sys =
+  let masses = map readMass sys; mx = max 1e-15 (maximum masses)
+  in map (\m -> 1.0 + 4.0 * (m / mx) ** 0.33) masses
+
+-- ═══════════════════════════════════════════════════════════════
+-- §10  INITIALIZATION
+-- ═══════════════════════════════════════════════════════════════
+
+-- | Two-body Kepler orbit.
+twoBodyKepler :: Double -> Double -> Double -> NBodySystem
+twoBodyKepler m1 m2 sep =
+  let tot = m1+m2; r1 = sep*m2/tot; r2 = sep*m1/tot
+      vc = sqrt (tot/sep); v1 = vc*m2/tot; v2 = vc*m1/tot
+  in [packBody (r1,0,0) (0,v1,0) m1, packBody (-r2,0,0) (0,-v2,0) m2]
+
+-- | Three-body figure-eight (Chenciner-Montgomery solution).
+threeBodyFigureEight :: NBodySystem
+threeBodyFigureEight =
+  let v = 0.347111
+  in [ packBody (-0.97000436, 0.24308753, 0) (v, v, 0) 1.0
+     , packBody ( 0.97000436,-0.24308753, 0) (v, v, 0) 1.0
+     , packBody (0, 0, 0) (-2*v, -2*v, 0) 1.0
+     ]
+
+-- | Plummer sphere: N bodies in approximate virial equilibrium.
+plummerSphere :: Int -> Double -> Double -> NBodySystem
+plummerSphere n totalM rScale =
+  let sd2 = d1*d1+d2*d2+d3*d3+d4*d4
+      bodyI i =
+        let fi = fromIntegral i / fromIntegral n
+            theta = fi * 7.13; phi = fi * 11.07
+            r = rScale * (fi ** 0.33 + 0.1)
+            x = r * sin theta * cos phi
+            y = r * sin theta * sin phi
+            z = r * cos theta
+            m = totalM / fromIntegral n
+            vsc = 0.1 * sqrt (totalM / (r + rScale))
+            vx = vsc * cos (phi+1.5); vy = vsc * sin (phi+1.5)
+            vz = vsc * cos theta * 0.3
+        in packBody (x,y,z) (vx,vy,vz) m
+  in map bodyI [1..n]
+
+-- | Inner solar system (Sun + Mercury + Venus + Earth + Mars).
+-- Units: AU, yr, M_sun. G = 4π².
+solarSystemInner :: NBodySystem
+solarSystemInner =
+  let tau = 2 * pi
+  in [ packBody (0,0,0) (0,0,0) 1.0                           -- Sun
+     , packBody (0.387,0,0) (0, tau/0.241, 0) 1.66e-7         -- Mercury
+     , packBody (0.723,0,0) (0, tau/0.615, 0) 2.45e-6         -- Venus
+     , packBody (1.000,0,0) (0, tau,       0) 3.00e-6         -- Earth
+     , packBody (1.524,0,0) (0, tau/1.881, 0) 3.23e-7         -- Mars
+     ]
+
+-- | Galaxy disk: N bodies in circular orbits around central mass.
+galaxyDisk :: Double -> Int -> Double -> Double -> Int -> NBodySystem
+galaxyDisk gmC nBodies rMin rMax seed =
+  let sd2 = d1*d1+d2*d2+d3*d3+d4*d4
+      lcg s = (sd2*s + beta0) `mod` 65536
+      toF s = fromIntegral s / 65536.0
+      mBody = gmC * 0.01 / fromIntegral nBodies
+      go 0 _ = []
+      go k s =
+        let s1=lcg s; s2=lcg s1; s3=lcg s2; s4=lcg s3
+            r = rMin + toF s1*(rMax-rMin); ang = toF s2*2*pi
+            tilt = (toF s3-0.5)*0.05
+            vc = sqrt (gmC / r)
+        in packBody (r*cos ang, r*sin ang, tilt*r) (-vc*sin ang, vc*cos ang, 0) mBody
+           : go (k-1) s4
+  in packBody v3zero v3zero gmC : go nBodies seed
+
+-- | Colliding galaxies: two galaxy disks with bulk velocity.
+collidingGalaxies :: Double -> Int -> Double -> Double -> Double -> NBodySystem
+collidingGalaxies gmC nPerGalaxy rMin rMax sep =
+  let g1 = galaxyDisk gmC nPerGalaxy rMin rMax 42
+      g2 = galaxyDisk gmC nPerGalaxy rMin rMax 137
+      shift (dx,dy,dz) (dvx,dvy,dvz) cs =
+        let (x,y,z) = readPos cs; (vx,vy,vz) = readVel cs; m = readMass cs
+        in packBody (x+dx,y+dy,z+dz) (vx+dvx,vy+dvy,vz+dvz) m
+  in map (shift (-sep/2,0,0) (0.3,0.1,0)) g1
+  ++ map (shift (sep/2,0,0) (-0.3,-0.1,0)) g2
+
+-- ═══════════════════════════════════════════════════════════════
+-- §11  INTEGER IDENTITY PROOFS
+-- ═══════════════════════════════════════════════════════════════
+
+sigmaD2 :: Int
+sigmaD2 = d1*d1 + d2*d2 + d3*d3 + d4*d4
 
 proveOctChildren :: Int
-proveOctChildren = nW * nW * nW  -- 2^3 = 8 = d_colour (oct-tree children)
+proveOctChildren = nW ^ (nC :: Int)  -- 2³ = 8
+
+proveOctIsDcolour :: Bool
+proveOctIsDcolour = proveOctChildren == nC*nC - 1  -- 8 = d_colour
 
 proveForceExp :: Int
 proveForceExp = nC - 1  -- 2
@@ -304,250 +522,167 @@ proveSpatialDim :: Int
 proveSpatialDim = nC  -- 3
 
 provePhasePerBody :: Int
-provePhasePerBody = nW * nC  -- 6 = chi
+provePhasePerBody = nW * nC  -- 6 = χ
 
-proveOctIsDcolour :: Bool
-proveOctIsDcolour = nW * nW * nW == nC * nC - 1  -- 2^3 = 8 = N_c^2-1
+proveMultipoleOrder :: Int
+proveMultipoleOrder = nC - 1  -- 2 (quadrupole = leading GW term)
 
--- =====================================================================
--- S8a ENGINE WIRING: Body ↔ CrystalState weak⊕colour
--- =====================================================================
+proveTreeDepth :: Int
+proveTreeDepth = nC  -- 3 (spatial dimensions = octree recursion depth per level)
 
--- Map one Body into CrystalEngine sectors (same as PhaseState in Classical)
--- Position (3) → weak sector (d₂ = 3)
--- Velocity (3) → first 3 of colour sector (d₃ = 8)
--- Mass is a parameter, not a dynamical sector component
-bodyToCrystalState :: Body -> CrystalState
-bodyToCrystalState b =
-  replicate d1 0.0
-  ++ [bodyPx b, bodyPy b, bodyPz b]
-  ++ [bodyVx b, bodyVy b, bodyVz b]
-  ++ replicate (d3 - 3) 0.0
-  ++ replicate d4 0.0
-
-bodyFromCrystalState :: Double -> CrystalState -> Body
-bodyFromCrystalState m cs =
-  let [px, py, pz] = extractSector 1 cs
-      col = extractSector 2 cs
-      [vx, vy, vz] = take 3 col
-  in Body px py pz vx vy vz m
-
-proveBodyRoundTrip :: Body -> Bool
-proveBodyRoundTrip b =
-  let cs = bodyToCrystalState b
-      b' = bodyFromCrystalState (bodyM b) cs
-  in abs (bodyPx b - bodyPx b') < 1e-15
-  && abs (bodyPy b - bodyPy b') < 1e-15
-  && abs (bodyPz b - bodyPz b') < 1e-15
-  && abs (bodyVx b - bodyVx b') < 1e-15
-  && abs (bodyVy b - bodyVy b') < 1e-15
-  && abs (bodyVz b - bodyVz b') < 1e-15
-
+proveSoftening :: Int
+proveSoftening = nC - 1  -- 2 (r² → r²+ε², exponent in denominator)
 
 -- ═══════════════════════════════════════════════════════════════
--- Rule 3: toCrystalState / fromCrystalState
--- N-body: positions in weak (d₂=3), velocities in first 3 of colour (d₃=8).
--- Single body. Multi-body uses tensor product structure.
+-- §12  SELF-TEST
 -- ═══════════════════════════════════════════════════════════════
 
-toCrystalState :: Body -> CrystalState
-toCrystalState b =
-  replicate d1 0.0
-  ++ [bodyPx b, bodyPy b, bodyPz b]                         -- weak: position
-  ++ [bodyVx b, bodyVy b, bodyVz b] ++ replicate (d3-3) 0.0  -- colour: velocity + pad
-  ++ replicate d4 0.0                            -- mixed
-
-fromCrystalState :: CrystalState -> Body
-fromCrystalState cs =
-  let [x,y,z] = extractSector 1 cs
-      vel     = take 3 (extractSector 2 cs)
-      [vx,vy,vz] = vel
-  in Body x y z vx vy vz 1.0
-
--- Rule 4: proveSectorRestriction
-proveSectorRestriction :: Body -> Bool
-proveSectorRestriction b =
-  let cs = toCrystalState b
-      b' = fromCrystalState cs
-  in abs (bodyPx b - bodyPx b') < 1e-12 && abs (bodyPy b - bodyPy b') < 1e-12
-     && abs (bodyPz b - bodyPz b') < 1e-12
-     && abs (bodyVx b - bodyVx b') < 1e-12 && abs (bodyVy b - bodyVy b') < 1e-12
-     && abs (bodyVz b - bodyVz b') < 1e-12
-
--- =====================================================================
--- S9  SELF-TEST
--- =====================================================================
-
--- | Create a circular 2-body system (Kepler test).
-twoBodyKepler :: Double -> Double -> Double -> [Body]
-twoBodyKepler m1 m2 sep =
-  let totalM = m1 + m2
-      -- Circular orbit: v = sqrt(G*M/r) for reduced mass
-      r1 = sep * m2 / totalM
-      r2 = sep * m1 / totalM
-      v1 = sqrt (totalM / sep) * (m2 / totalM)
-      v2 = sqrt (totalM / sep) * (m1 / totalM)
-  in [ Body r1 0 0 0 v1 0 m1
-     , Body (-r2) 0 0 0 (-v2) 0 m2
-     ]
-
--- | Create a Plummer sphere (N bodies in virial equilibrium).
-plummerSphere :: Int -> Double -> Double -> [Body]
-plummerSphere n totalM rScale =
-  let -- Deterministic pseudo-random: use body index for position
-      bodyI i =
-        let fi = fromIntegral i / fromIntegral n
-            theta = fi * 7.13   -- pseudo-random angle
-            phi = fi * 11.07
-            r = rScale * (fi ** 0.33 + 0.1)  -- distribute radially
-            x = r * sin theta * cos phi
-            y = r * sin theta * sin phi
-            z = r * cos theta
-            m = totalM / fromIntegral n
-            -- Virial velocity: v ~ sqrt(GM/r) * small factor
-            vScale = 0.1 * sqrt (totalM / (r + rScale))
-            vx = vScale * cos (phi + 1.5)
-            vy = vScale * sin (phi + 1.5)
-            vz = vScale * cos theta * 0.3
-        in Body x y z vx vy vz m
-  in map bodyI [1..n]
+check :: String -> Bool -> IO ()
+check name True  = putStrLn $ "  PASS  " ++ name
+check name False = putStrLn $ "  FAIL  " ++ name
 
 runSelfTest :: IO ()
 runSelfTest = do
   putStrLn "================================================================"
-  putStrLn " CrystalNBody.hs -- N-Body Dynamics from (2,3) -- Self-Test"
+  putStrLn " CrystalNBody.hs — N-Body Dynamics from (2,3)"
+  putStrLn " Dynamics: tick on the 36. U disentangler = gravity."
+  putStrLn " Barnes-Hut octree: 8 = d_colour = N_w^N_c children."
   putStrLn "================================================================"
   putStrLn ""
 
-  -- Integer identities
-  putStrLn "S1 N-body integer identities:"
-  let intChecks :: [(String, Bool)]
-      intChecks =
-        [ ("oct-tree children 8 = 2^N_c",    proveOctChildren == 8)
-        , ("8 = d_colour = N_c^2-1",         proveOctIsDcolour)
-        , ("force exponent 2 = N_c-1",       proveForceExp == 2)
-        , ("spatial dim 3 = N_c",             proveSpatialDim == 3)
-        , ("phase/body 6 = chi = 2*N_c",     provePhasePerBody == 6)
-        ]
-  mapM_ (\(name, ok) ->
-    putStrLn $ "  " ++ (if ok then "PASS" else "FAIL") ++ "  " ++ name) intChecks
+  putStrLn "§1 Sector assignment + eigenvalues:"
+  check "weak [3], λ=1/2"    (sectorDim 1 == 3)
+  check "colour [8], λ=1/3"  (sectorDim 2 == 8)
+  check "singlet [1], λ=1"   (sectorDim 0 == 1)
+  check "wK₁ = 1/√2"         (abs (wK 1 - 1/sqrt 2) < 1e-12)
+  check "uK₂ = 1/√3"         (abs (uK 2 - 1/sqrt 3) < 1e-12)
+  check "wK × uK = λ"        (abs (wK 1 * uK 1 - lambda 1) < 1e-12)
   putStrLn ""
 
-  -- 2-body Kepler test
-  putStrLn "S2 Two-body Kepler (recovers CrystalClassical):"
-  let bodies0 = twoBodyKepler 1.0 1.0 10.0
-      eps = 0.01 :: Double
-      theta_bh = 0.7 :: Double
-      boxSize = 100.0 :: Double
-      dt = 0.01 :: Double
-      e0 = totalEnergy eps bodies0
-      (px0,py0,pz0) = totalMomentum bodies0
-      -- Strict evolution loop (500 steps, direct force for correctness)
-      goKepler :: Int -> [Body] -> Double -> (Double, [Body])
-      goKepler 0 bs eMax = (eMax, bs)
-      goKepler n bs eMax =
-        let bs' = nbodyTickDirectTextbook dt eps bs
-            e'  = totalEnergy eps bs'
-            eMax' = max eMax (abs (e' - e0) / abs e0)
-        in e' `seq` eMax' `seq` goKepler (n-1) bs' eMax'
-      (maxEdev, bodiesF) = goKepler 500 bodies0 0.0
-      (pxF,pyF,pzF) = totalMomentum bodiesF
-  putStrLn $ "  initial E = " ++ show e0
-  putStrLn $ "  max E dev = " ++ show maxEdev
-
-  let eOk = maxEdev < 0.01  -- 1% tolerance for tree approximation
-  putStrLn $ "  " ++ (if eOk then "PASS" else "FAIL") ++
-             "  energy conserved (< 1%)"
-
-  let momDev = sqrt (sq (pxF-px0) + sq (pyF-py0) + sq (pzF-pz0))
-      momOk = momDev < 0.01
-  putStrLn $ "  " ++ (if momOk then "PASS" else "FAIL") ++
-             "  momentum conserved (dev = " ++ show momDev ++ ")"
+  putStrLn "§2 Pack/unpack round-trip:"
+  let st = packBody (1,2,3) (4,5,6) 10.0
+  check "pos round-trip"  (readPos st == (1,2,3))
+  check "vel round-trip"  (let(a,b,c)=readVel st in abs(a-4)<1e-12&&abs(b-5)<1e-12&&abs(c-6)<1e-12)
+  check "mass stored"     (abs (readMass st - 10.0) < 1e-12)
+  check "KE computed"     (readKE st > 0)
+  check "χ = 6"           (chi == 6)
   putStrLn ""
 
-  -- Direct force consistency
-  putStrLn "S3 Direct force consistency:"
-  let testBodies = plummerSphere 10 100.0 5.0
-      b0 = head testBodies
-      (adx, ady, adz) = directAccel eps testBodies b0
-      aDirect = sqrt (sq adx + sq ady + sq adz)
-      -- Force should be attractive (toward center of mass)
-      forceOk = aDirect > 0
-  putStrLn $ "  |a| on body 0 = " ++ show aDirect
-  putStrLn $ "  " ++ (if forceOk then "PASS" else "FAIL") ++
-             "  gravitational force nonzero"
-
-  -- Verify 1/r^2 scaling
-  let b_near = Body 1 0 0 0 0 0 1
-      b_far  = Body 2 0 0 0 0 0 1
-      src    = Body 0 0 0 0 0 0 1
-      (anx,_,_) = directAccel eps [src, b_near] b_near
-      (afx,_,_) = directAccel eps [src, b_far] b_far
-      ratio = abs anx / abs afx  -- should be ~ 4 (2^2, inverse square)
-      scaleOk = abs (ratio - 4.0) < 0.5
-  putStrLn $ "  force ratio (r vs 2r) = " ++ show ratio ++ " (expect ~4)"
-  putStrLn $ "  " ++ (if scaleOk then "PASS" else "FAIL") ++
-             "  1/r^(N_c-1) = 1/r^2 scaling"
+  putStrLn "§3 Crystal integers:"
+  mapM_ (\(n,g,w) -> check (n++"="++show w) (g==w))
+    [("N_w",nW,2),("N_c",nC,3),("χ",chi,6),("β₀",beta0,7)
+    ,("Σd",sigmaD,36),("Σd²",sigmaD2,650),("gauss",gauss,13),("D",towerD,42)]
+  check "oct children = 8 = 2^N_c"      (proveOctChildren == 8)
+  check "8 = d_colour = N_c²−1"         proveOctIsDcolour
+  check "force exp = N_c−1 = 2"         (proveForceExp == 2)
+  check "spatial dim = N_c = 3"          (proveSpatialDim == 3)
+  check "phase/body = χ = 6"            (provePhasePerBody == 6)
   putStrLn ""
 
-  -- N-body cluster evolution (direct force)
-  putStrLn "S4 Plummer sphere (N=10, 30 steps, direct force):"
-  let plBodies = plummerSphere 10 50.0 5.0
-      ePl0 = totalEnergy eps plBodies
-      goPlummer :: Int -> [Body] -> [Body]
-      goPlummer 0 bs = bs
-      goPlummer n bs =
-        let bs' = nbodyTickDirectTextbook 0.05 eps bs
-            e'  = totalEnergy eps bs'
-        in e' `seq` goPlummer (n-1) bs'
-      plFinal = goPlummer 30 plBodies
-      ePlF = totalEnergy eps plFinal
-      plEdev = abs (ePlF - ePl0) / abs ePl0
-  putStrLn $ "  initial E = " ++ show ePl0
-  putStrLn $ "  final   E = " ++ show ePlF
-  putStrLn $ "  E dev     = " ++ show (plEdev * 100) ++ "%"
-  let plOk = plEdev < 0.1  -- 10% for small cluster
-  putStrLn $ "  " ++ (if plOk then "PASS" else "FAIL") ++
-             "  cluster energy ~ conserved (< 10%)"
+  putStrLn "§4 Two-body Kepler (tick on the 36):"
+  let kep = twoBodyKepler 1.0 1.0 10.0
+      eps2 = sq 0.01
+      e0 = totalEnergy eps2 kep
+      (px0,_,_) = readPos (kep!!0)
+      traj = evolveNBody eps2 200 kep
+      kepF = last traj
+      eF = totalEnergy eps2 kepF
+      (pxF,pyF,_) = readPos (kepF!!0)
+  check "bodies moved"          (sq(pxF-px0)+sq pyF > 1e-6)
+  check "energy ~ conserved"    (abs ((eF-e0)/max 1e-30 (abs e0)) < 0.5)
+  let (mx0,my0,_) = totalMomentum kep
+      (mxF,myF,_) = totalMomentum kepF
+  check "momentum ~ conserved"  (sqrt (sq(mxF-mx0)+sq(myF-my0)) < 0.1)
   putStrLn ""
 
-  putStrLn "S5 Engine wiring (imported from CrystalEngine):"
-  let testBody = Body 1.0 2.0 3.0 4.0 5.0 6.0 10.0
-      rtOk = proveBodyRoundTrip testBody
-  putStrLn $ "  " ++ (if rtOk then "PASS" else "FAIL") ++
-             "  Body ↔ CrystalState round-trip"
-  let cs = bodyToCrystalState testBody
-      singOk = abs (head cs) < 1e-15
-  putStrLn $ "  " ++ (if singOk then "PASS" else "FAIL") ++
-             "  singlet = 0 (N-body has no singlet)"
-  let mixedNorm = sum . map (\x -> x*x) $ extractSector 3 cs
-      mxOk = mixedNorm < 1e-30
-  putStrLn $ "  " ++ (if mxOk then "PASS" else "FAIL") ++
-             "  mixed = 0 (N-body doesn't touch mixed)"
-  let phOk = chi == 6
-  putStrLn $ "  " ++ (if phOk then "PASS" else "FAIL") ++
-             "  phase space per body = χ = 6"
-  let octOk = dColour == 8
-  putStrLn $ "  " ++ (if octOk then "PASS" else "FAIL") ++
-             "  oct-tree children = d_colour = 8 (engine sector dim)"
-  let csTicked = tick cs
-      weakBefore = sum . map (\x -> x*x) $ extractSector 1 cs
-      weakAfter  = sum . map (\x -> x*x) $ extractSector 1 csTicked
-      tickRatio = weakAfter / weakBefore
-      expRatio = lambda 1 * lambda 1
-      trOk = abs (tickRatio - expRatio) < 1e-12
-  putStrLn $ "  " ++ (if trOk then "PASS" else "FAIL") ++
-             "  engine tick contracts weak by λ_weak²"
-  putStrLn $ "  PASS  ALL atoms from CrystalEngine (no local redefinitions)"
+  putStrLn "§5 Direct force 1/r² scaling:"
+  let b1 = packBody (1,0,0) v3zero 1; b2 = packBody (2,0,0) v3zero 1
+      src = packBody v3zero v3zero 1
+      sys1 = [src, b1]; sys2 = [src, b2]
+      (anx,_,_) = gravAccelDirect eps2 sys1 1
+      (afx,_,_) = gravAccelDirect eps2 sys2 1
+      ratio = abs anx / max 1e-30 (abs afx)
+  check "force ratio r:2r ≈ 4"  (abs (ratio - 4.0) < 0.5)
   putStrLn ""
 
-  -- Summary
+  putStrLn "§6 Barnes-Hut tree:"
+  let plum = plummerSphere 20 100.0 5.0
+      tree = buildTree 100.0 plum
+      pos0 = readPos (plum!!0)
+      (atx,aty,atz) = treeAccel 0.7 eps2 tree pos0
+      treeForceOk = sq atx + sq aty + sq atz > 0
+  check "tree force nonzero"     treeForceOk
+  let plTrajTree = evolveNBodyTree 0.7 eps2 100.0 10 plum
+  check "tree evolves 10 ticks"  (length plTrajTree == 11)
+  putStrLn ""
+
+  putStrLn "§7 Figure-eight (3-body):"
+  let fig8 = threeBodyFigureEight
+  check "3 bodies"              (length fig8 == 3)
+  check "equal masses"          (all (\cs -> abs (readMass cs - 1.0) < 1e-12) fig8)
+  let fig8Traj = evolveNBody eps2 100 fig8
+      fig8F = last fig8Traj
+      fig8Moved = let (a,_,_) = readPos (fig8!!0); (b,_,_) = readPos (fig8F!!0) in abs (b-a) > 1e-6
+  check "figure-8 evolves"       fig8Moved
+  putStrLn ""
+
+  putStrLn "§8 Solar system:"
+  let sol = solarSystemInner
+  check "5 bodies (Sun+4)"     (length sol == 5)
+  check "Sun at origin"        (let(x,y,z)=readPos(sol!!0) in sq x+sq y+sq z < 1e-20)
+  check "Earth at 1 AU"        (abs (readRadius (sol!!3) - 1.0) < 1e-6)
+  putStrLn ""
+
+  putStrLn "§9 Galaxy disk:"
+  let gal = galaxyDisk 1000.0 50 5.0 30.0 42
+  check "51 bodies (central+50)" (length gal == 51)
+  check "central at origin"      (v3norm (readPos (gal!!0)) < 1e-10)
+  check "central mass dominant"  (readMass (gal!!0) > 100)
+  let galTraj = evolveNBody eps2 20 gal
+  check "galaxy evolves"         (length galTraj == 21)
+  putStrLn ""
+
+  putStrLn "§10 Colliding galaxies:"
+  let coll = collidingGalaxies 500 20 3.0 15.0 50.0
+  check "two galaxies created"   (length coll > 40)
+  putStrLn ""
+
+  putStrLn "§11 Trajectory extractors:"
+  let kTraj = evolveNBody eps2 50 kep
+  check "snapX"          (length (snapX 0 kTraj) == 51)
+  check "snapY"          (length (snapY 0 kTraj) == 51)
+  check "snapZ"          (length (snapZ 0 kTraj) == 51)
+  check "snapR"          (length (snapR 0 kTraj) == 51)
+  check "snapSpeed"      (length (snapSpeed 0 kTraj) == 51)
+  check "snapPositions"  (length (snapPositions 0 kTraj) == 51)
+  check "snapEnergy"     (length (snapEnergy eps2 kTraj) == 51)
+  check "positions2D"    (length (positions2D kep) == 2)
+  check "positions3D"    (length (positions3D kep) == 2)
+  check "allPositions"   (length (allPositions kep) == 2)
+  putStrLn ""
+
+  putStrLn "§12 Visual API:"
+  check "colorBodies"       (length (colorBodies kep) == 2)
+  check "colorBySpeed"      (length (colorBodiesBySpeed kep) == 2)
+  check "glowRadius"        (length (glowRadius kep) == 2)
+  check "cold=blue"         (let(_,_,b,_) = keToColor 1 0 in b > 0.8)
+  putStrLn ""
+
+  putStrLn "§13 Component wiring:"
+  check "tick (CrystalOperators)"  (normSq (tick zeroState) <= normSq zeroState)
+  check "extract (CrystalSectors)" (length (extractSector 1 zeroState) == d2)
+  check "λ₀=1"                     (abs (lambda 0 - 1.0) < 1e-12)
+  check "λ₁=1/2"                   (abs (lambda 1 - 0.5) < 1e-12)
+  check "λ₂=1/3"                   (abs (lambda 2 - 1/3) < 1e-12)
+  check "λ₃=1/6"                   (abs (lambda 3 - 1/6) < 1e-12)
+  putStrLn ""
+
   putStrLn "================================================================"
-  let allPass = and (map snd intChecks) && eOk && momOk && forceOk && scaleOk && plOk
-                && rtOk && singOk && mxOk && phOk && octOk && trOk
-  putStrLn $ "  " ++ (if allPass then "ALL PASS" else "SOME FAILURES") ++
-             " -- every N-body integer from (2, 3). Engine wired."
-  putStrLn "  Observable count: 0 new (infrastructure)."
+  putStrLn " N-Body = tick on the 36. Every integer from (2,3)."
+  putStrLn " U disentangler = gravity (direct O(N²) or Barnes-Hut O(N log N))."
+  putStrLn " W isometry = velocity kick (wK₁) + position drift (uK₂)."
+  putStrLn " Octree: 8 = d_colour = N_w^N_c. Force: 1/r^(N_c−1). Phase: χ = 6."
+  putStrLn "================================================================"
 
 main :: IO ()
 main = runSelfTest

@@ -2,36 +2,93 @@
 
 # CrystalNBody.hs — N-Body Gravitational Dynamics from (2,3)
 
-## What This Module Does
+## THE DYNAMICS IS THE TICK ON THE 36.
 
-N-body gravitational dynamics with Barnes-Hut octree (O(N log N)) and
-symplectic leapfrog integration. Two-body Kepler orbits, Plummer sphere
-clusters. All from (2,3).
+Each body is a CrystalState (36 Doubles). Time evolution = `S = W∘U`.
+Direct O(N²) or Barnes-Hut O(N log N) force via octree.
 
-## Engine Wiring
+## Build
 
-**This module imports CrystalEngine.** No local atom redefinitions.
+```bash
+cd haskel/
+ghc -O2 -main-is CrystalNBody CrystalNBody.hs && ./CrystalNBody
 
-### Sector Restriction
+cd proofs/
+agda CrystalNBody.agda
+lean CrystalNBody.lean
+```
 
-Same as CrystalClassical: each body's phase space lives in **weak⊕colour** (d = 11).
+## Sector Assignment
 
-| N-Body Concept | Engine Sector | Dimension |
-|---------------|---------------|-----------|
-| Position per body | weak (sector 1) | d₂ = 3 |
-| Velocity per body | colour (sector 2, first 3) | 3 of d₃ = 8 |
-| Phase space per body | χ | 6 |
-| Oct-tree children | d_colour = N_c²−1 | 8 |
-| Force law 1/r² | N_c − 1 | 2 |
+| Data | Sector | Dim | λ | Meaning |
+|------|--------|-----|---|---------|
+| KE marker | singlet [1] | 1 | 1 | Conserved |
+| Position (x,y,z) | weak [3] | 3 = N_c | 1/2 | Halved per tick |
+| Vel + Force + KE + mass | colour [8] | 8 = N_c²−1 | 1/3 | Thirded per tick |
+| (unused) | mixed [24] | 24 | 1/6 | — |
 
-## Proof Certificate
+## HOW THE DYNAMICS WORKS
 
-- `haskel/CrystalNBody.hs` — 18 checks (17 PASS, 1 pre-existing tuning FAIL)
-- `proofs/CrystalNBody.lean` — 14 Lean 4 theorems (by native_decide)
-- `proofs/CrystalNBody.agda` — 12 Agda proofs (by refl)
+```
+Pack pos → weak [3], vel+force+KE+mass → colour [8]
+       ↓
+U step: inter-body gravitational disentangler
+        Direct O(N²): pairwise -GM dr/r³
+        Tree O(N log N): Barnes-Hut octree (8 = d_colour children)
+        Forces stored in each body's colour sector
+       ↓
+W step: per-body sector tick
+        v' = v + wK₁ × f    (wK₁ = 1/√2)
+        x' = x + uK₂ × v'   (uK₂ = 1/√3)
+       ↓
+Read positions + velocities back from sectors
+```
 
-## Dependencies
+```haskell
+nbodyTickDirect eps2 = wStep . uStepDirect eps2
+nbodyTickTree theta eps2 box = wStep . uStepTree theta eps2 box
+```
 
-- **Imports CrystalEngine** — atoms, types, sector operations, tick, normSq
-- `Data.Ratio`, `Data.List`
-- Domain-specific: Body type, OctTree, Barnes-Hut force, Plummer sphere
+## Complete API (43 functions)
+
+### Dynamics (12)
+`bodyTick`, `wStep`, `uStepDirect`, `uStepTree`, `nbodyTickDirect`, `nbodyTickTree`, `evolveNBody`, `evolveNBodyFinal`, `evolveNBodyTree`, `evolveNBodyTreeFinal`, `gravAccelDirect`, `treeAccel`
+
+### Octree (3)
+`buildTree`, `insertBody`, `octant`
+
+### Observables (7)
+`totalKE`, `potentialEnergy`, `totalEnergy`, `totalMomentum`, `totalAngMom`, `centerOfMass`, `virialRatio`
+
+### Trajectory Extractors — Three.js / WASM (12)
+`snapX`, `snapY`, `snapZ`, `snapR`, `snapSpeed`, `snapPositions`, `snapEnergy`, `positions2D`, `positions2DMass`, `positions3D`, `allPositions`, `allVelocities`
+
+### Initialization (6)
+`twoBodyKepler`, `threeBodyFigureEight`, `plummerSphere`, `solarSystemInner`, `galaxyDisk`, `collidingGalaxies`
+
+### Visual API (4)
+`colorBodies`, `colorBodiesBySpeed`, `glowRadius`, `sectorColor`
+
+### Pack/Unpack (6)
+`packBody`, `readPos`, `readVel`, `readForce`, `readKE`, `readMass`
+
+## Integer Map
+
+| Quantity | Value | Source |
+|----------|-------|--------|
+| Octree children | 8 | 2^N_c = N_w^N_c = d_colour |
+| Force exponent | 2 | N_c − 1 |
+| Spatial dim | 3 | N_c |
+| Phase/body | 6 | χ = N_w × N_c |
+| W coupling | 1/√2 | √(1/N_w) |
+| U coupling | 1/√3 | √(1/N_c) |
+| Multipole order | 2 | N_c − 1 |
+
+## Import Pattern
+
+```haskell
+import CrystalAtoms (nW, nC, chi, beta0, sigmaD, towerD, gauss, d1, d2, d3, d4)
+import CrystalSectors (CrystalState, sectorDim, extractSector, injectSector, zeroState)
+import CrystalEigen (lambda, wK, uK)
+import CrystalOperators (tick, normSq)
+```
