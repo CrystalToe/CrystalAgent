@@ -333,6 +333,104 @@ LEAN CrystalDiffusion.lean engine_cfl
 LEAN CrystalDiffusion.lean engine_singlet_conserved
 LEAN CrystalDiffusion.lean engine_spatial
 LEAN CrystalDiffusion.lean engine_full_state
+LEAN CrystalDirac.lean df_dim
+LEAN CrystalDirac.lean df_entries
+LEAN CrystalDirac.lean df_diagonal
+LEAN CrystalDirac.lean df_off_diag
+LEAN CrystalDirac.lean sin2w_cross
+LEAN CrystalDirac.lean hypercharge_cross
+LEAN CrystalDirac.lean alpha_s_den
+LEAN CrystalDirac.lean alpha_s_cross
+LEAN CrystalDirac.lean vcb_num
+LEAN CrystalDirac.lean vcb_den
+LEAN CrystalDirac.lean vcb_192
+LEAN CrystalDirac.lean vcb_vub
+LEAN CrystalDirac.lean vcb_vub_den
+LEAN CrystalDirac.lean vub_den
+LEAN CrystalDirac.lean ko_dim
+LEAN CrystalDirac.lean colour_pairs
+LEAN CrystalDirac.lean mixed_groups
+LEAN CrystalDirac.lean mixed_groups_eq_d2
+LEAN CrystalDirac.lean left_dof
+LEAN CrystalDirac.lean right_dof
+LEAN CrystalDirac.lean lr_sum
+LEAN CrystalDirac.lean lr_eq_sigma
+LEAN CrystalDirac.lean left_weak
+LEAN CrystalDirac.lean right_weak
+LEAN CrystalDirac.lean chiral_asymmetry
+LEAN CrystalDirac.lean mixing_blocks
+LEAN CrystalDirac.lean block_01
+LEAN CrystalDirac.lean block_02
+LEAN CrystalDirac.lean block_03
+LEAN CrystalDirac.lean block_12
+LEAN CrystalDirac.lean block_13
+LEAN CrystalDirac.lean block_23
+LEAN CrystalDirac.lean total_off_diag_blocks
+LEAN CrystalDirac.lean cp_phases
+LEAN CrystalDirac.lean mixed_tensor
+LEAN CrystalDirac.lean colour_mixed_block
+LEAN CrystalDirac.lean strong_block
+LEAN CrystalDirac.lean nu_suppression
+LEAN CrystalDiscover.lean mW_mZ_num
+LEAN CrystalDiscover.lean mW_mZ_den
+LEAN CrystalDiscover.lean mc_ms_num
+LEAN CrystalDiscover.lean mc_ms_den
+LEAN CrystalDiscover.lean ms_md
+LEAN CrystalDiscover.lean mb_mtau_cf_num
+LEAN CrystalDiscover.lean mb_mtau_cf_den
+LEAN CrystalDiscover.lean mu_md_f3
+LEAN CrystalDiscover.lean mu_md_sd2
+LEAN CrystalDiscover.lean mtau_mmu_num
+LEAN CrystalDiscover.lean mt_mW_cross
+LEAN CrystalDiscover.lean mH_mW_num
+LEAN CrystalDiscover.lean mH_mZ_gauss
+LEAN CrystalDiscover.lean mH_mZ_den
+LEAN CrystalDiscover.lean vcb_num
+LEAN CrystalDiscover.lean vcb_den
+LEAN CrystalDiscover.lean vub_num
+LEAN CrystalDiscover.lean vub_denom_gauss_sq
+LEAN CrystalDiscover.lean vcb_vub_ratio_num
+LEAN CrystalDiscover.lean vcb_vub_ratio_den
+LEAN CrystalDiscover.lean vus_vcb_num
+LEAN CrystalDiscover.lean vus_vcb_den_int
+LEAN CrystalDiscover.lean age_hubble_d4
+LEAN CrystalDiscover.lean age_hubble_chi1
+LEAN CrystalDiscover.lean omega_ratio_num
+LEAN CrystalDiscover.lean omega_ratio_den
+LEAN CrystalDiscover.lean sigma8_num
+LEAN CrystalDiscover.lean sigma8_den_int
+LEAN CrystalDiscover.lean ns_cross_num
+LEAN CrystalDiscover.lean ns_cross_den
+LEAN CrystalDiscover.lean omega_lam_m_num
+LEAN CrystalDiscover.lean ising_tc_num
+LEAN CrystalDiscover.lean ising_tc_den
+LEAN CrystalDiscover.lean perc_chi1
+LEAN CrystalDiscover.lean perc_D
+LEAN CrystalDiscover.lean gruneisen
+LEAN CrystalDiscover.lean lindemann_num
+LEAN CrystalDiscover.lean lindemann_den
+LEAN CrystalDiscover.lean re_crit_num
+LEAN CrystalDiscover.lean re_crit_den
+LEAN CrystalDiscover.lean prandtl_water
+LEAN CrystalDiscover.lean prandtl_air_num
+LEAN CrystalDiscover.lean prandtl_air_den
+LEAN CrystalDiscover.lean mu_ratio_nc
+LEAN CrystalDiscover.lean quad_num
+LEAN CrystalDiscover.lean quad_den
+LEAN CrystalDiscover.lean sp2_angle
+LEAN CrystalDiscover.lean diamond_num
+LEAN CrystalDiscover.lean gc_num
+LEAN CrystalDiscover.lean gc_den
+LEAN CrystalDiscover.lean karman_eq_gc
+LEAN CrystalDiscover.lean chi_from_nw_nc
+LEAN CrystalDiscover.lean beta0_from_nc_chi
+LEAN CrystalDiscover.lean sigmaD_sum
+LEAN CrystalDiscover.lean sigmaD2_sum
+LEAN CrystalDiscover.lean gauss_sum
+LEAN CrystalDiscover.lean tower_sum
+LEAN CrystalDiscover.lean fermat_val
+LEAN CrystalDiscover.lean vcb_192
+LEAN CrystalDiscover.lean vcb_192_factored
 LEAN CrystalDiscoveries.lean dark_energy_eq
 LEAN CrystalDiscoveries.lean cdm_eq
 LEAN CrystalDiscoveries.lean baryons_eq
@@ -2094,7 +2192,7 @@ LEAN Main.lean id_sigma_chi_sq
 LEAN Main.lean id_sigma_d2
 LEAN Main.lean id_D_decomp
 LEAN Main.lean id_algebra_N_c
-LEAN_FILES 69
+LEAN_FILES 71
 # AGDA PROOFS
 AGDA CrystalAlphaProton.agda chi-eq
 AGDA CrystalAlphaProton.agda sigma-d-eq
@@ -2365,6 +2463,86 @@ AGDA CrystalDiffusion.agda engine-cfl
 AGDA CrystalDiffusion.agda engine-singlet-conserved
 AGDA CrystalDiffusion.agda engine-spatial
 AGDA CrystalDiffusion.agda engine-full-state
+AGDA CrystalDirac.agda df-dim
+AGDA CrystalDirac.agda df-entries
+AGDA CrystalDirac.agda df-off-diag
+AGDA CrystalDirac.agda sin2w-num
+AGDA CrystalDirac.agda sin2w-den
+AGDA CrystalDirac.agda sin2w-cross
+AGDA CrystalDirac.agda hypercharge-num
+AGDA CrystalDirac.agda hypercharge-cross
+AGDA CrystalDirac.agda alpha-s-den
+AGDA CrystalDirac.agda alpha-s-cross
+AGDA CrystalDirac.agda vcb-num
+AGDA CrystalDirac.agda vcb-den
+AGDA CrystalDirac.agda vcb-factored
+AGDA CrystalDirac.agda vub-den
+AGDA CrystalDirac.agda colour-pairs
+AGDA CrystalDirac.agda mixed-groups
+AGDA CrystalDirac.agda mixed-eq-d2
+AGDA CrystalDirac.agda left-dof
+AGDA CrystalDirac.agda right-dof
+AGDA CrystalDirac.agda lr-sum
+AGDA CrystalDirac.agda lr-eq-sigma
+AGDA CrystalDirac.agda chiral-asymmetry
+AGDA CrystalDirac.agda left-weak
+AGDA CrystalDirac.agda right-weak
+AGDA CrystalDirac.agda block-01
+AGDA CrystalDirac.agda block-02
+AGDA CrystalDirac.agda block-03
+AGDA CrystalDirac.agda block-12
+AGDA CrystalDirac.agda block-13
+AGDA CrystalDirac.agda block-23
+AGDA CrystalDirac.agda total-off-diag
+AGDA CrystalDirac.agda cp-phases
+AGDA CrystalDirac.agda mixed-tensor
+AGDA CrystalDirac.agda colour-mixed
+AGDA CrystalDirac.agda strong-block
+AGDA CrystalDirac.agda nu-suppression
+AGDA CrystalDiscover.agda mc-ms-num
+AGDA CrystalDiscover.agda mc-ms-den
+AGDA CrystalDiscover.agda ms-md
+AGDA CrystalDiscover.agda mW-mZ-num
+AGDA CrystalDiscover.agda mW-mZ-den
+AGDA CrystalDiscover.agda mtau-mmu
+AGDA CrystalDiscover.agda vcb-num
+AGDA CrystalDiscover.agda vcb-den
+AGDA CrystalDiscover.agda vcb-192-factored
+AGDA CrystalDiscover.agda vcb-vub-num
+AGDA CrystalDiscover.agda vcb-vub-den
+AGDA CrystalDiscover.agda vub-gauss-sq
+AGDA CrystalDiscover.agda vus-vcb-num
+AGDA CrystalDiscover.agda omega-ratio-num
+AGDA CrystalDiscover.agda omega-ratio-den
+AGDA CrystalDiscover.agda ns-num
+AGDA CrystalDiscover.agda ns-den
+AGDA CrystalDiscover.agda sigma8-num
+AGDA CrystalDiscover.agda age-hubble-d4
+AGDA CrystalDiscover.agda age-hubble-chi1
+AGDA CrystalDiscover.agda ising-tc-num
+AGDA CrystalDiscover.agda ising-tc-den
+AGDA CrystalDiscover.agda perc-chi1
+AGDA CrystalDiscover.agda perc-D
+AGDA CrystalDiscover.agda gruneisen
+AGDA CrystalDiscover.agda lindemann-den
+AGDA CrystalDiscover.agda re-crit-num
+AGDA CrystalDiscover.agda re-crit-den
+AGDA CrystalDiscover.agda prandtl-water
+AGDA CrystalDiscover.agda prandtl-air-num
+AGDA CrystalDiscover.agda prandtl-air-den
+AGDA CrystalDiscover.agda quad-num
+AGDA CrystalDiscover.agda quad-den
+AGDA CrystalDiscover.agda sp2-angle
+AGDA CrystalDiscover.agda gc-num
+AGDA CrystalDiscover.agda gc-den
+AGDA CrystalDiscover.agda chi-val
+AGDA CrystalDiscover.agda beta0-val
+AGDA CrystalDiscover.agda sigmaD-val
+AGDA CrystalDiscover.agda sigmaD2-val
+AGDA CrystalDiscover.agda gauss-val
+AGDA CrystalDiscover.agda tower-val
+AGDA CrystalDiscover.agda d3-times-d4
+AGDA CrystalDiscover.agda pow-factored
 AGDA CrystalDiscoveries.agda dark-energy-eq
 AGDA CrystalDiscoveries.agda cdm-eq
 AGDA CrystalDiscoveries.agda baryons-eq
@@ -3810,13 +3988,14 @@ AGDA CrystalZResonance.agda gauge-nw5
 AGDA CrystalZResonance.agda cross-tower
 AGDA CrystalZResonance.agda cross-state
 AGDA CrystalZResonance.agda cross-fe56
-AGDA_FILES 68
+AGDA_FILES 70
 # HASKELL MODULES
 HASKELL CrystalAlphaProton.hs
 HASKELL CrystalArcade.hs
 HASKELL CrystalAstro.hs
 HASKELL CrystalAudit.hs
 HASKELL CrystalAxiom.hs
+HASKELL CrystalBenchmark.hs
 HASKELL CrystalBio.hs
 HASKELL CrystalCFD.hs
 HASKELL CrystalChem.hs
@@ -3826,6 +4005,8 @@ HASKELL CrystalCosmo.hs
 HASKELL CrystalCrossDomain.hs
 HASKELL CrystalDecay.hs
 HASKELL CrystalDiffusion.hs
+HASKELL CrystalDirac.hs
+HASKELL CrystalDiscover.hs
 HASKELL CrystalDiscoveries.hs
 HASKELL CrystalEM.hs
 HASKELL CrystalEngine.hs
@@ -4631,8 +4812,8 @@ PYTHON toe/python/examples/thermo/thermo_lattice.py
 PYTHON toe/python/examples/thermo/thermo_lj_potential.py
 PYTHON toe/python/examples/thermo/thermo_md_simulation.py
 # SUMMARY COUNTS
-TOTAL_LEAN_THEOREMS     2095
-TOTAL_AGDA_PROOFS     1714
+TOTAL_LEAN_THEOREMS     2193
+TOTAL_AGDA_PROOFS     1794
 TOTAL_RUST_TESTS      568
-TOTAL_HASKELL_MODULES       68
+TOTAL_HASKELL_MODULES       71
 TOTAL_PYTHON_MODULES      135

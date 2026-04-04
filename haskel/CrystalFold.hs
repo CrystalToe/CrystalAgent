@@ -490,7 +490,7 @@ main = do
   putStrLn ""
 
   let c500=foldN 500 c0
-  writeFile "/mnt/user-data/outputs/crystal_fold.pdb"
+  writeFile "crystal_fold.pdb"
     (chainToPDB "TRP-CAGE-LIKE 20MER FOLDED 500 STEPS" c500)
   putStrLn "§7 PDB written: crystal_fold.pdb"
   putStrLn$"  final R_g = "++show(r2$radiusOfGyration c500)++" Å"

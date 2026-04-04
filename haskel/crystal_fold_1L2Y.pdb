@@ -1,0 +1,43 @@
+HEADER    CRYSTAL FOLD FROM (2,3)
+TITLE     TRP-CAGE 1L2Y CONDITIONED+FOLDED
+REMARK   1 3D backbone from dihedral eigenvalue relaxation
+REMARK   2 Side chains placed by amino acid type
+REMARK   3 36 = Sigma_d DOF per tile. Zero calculus in tick.
+ATOM      1  CA  Asn A   1      -0.399   1.595   0.459  1.00  0.00           C
+ATOM      2  CA  Leu A   2      -0.554  -2.055  -0.588  1.00  0.00           C
+ATOM      3  CA  Tyr A   3        3.02  -3.342  -0.669  1.00  0.00           C
+ATOM      4  CA  Ile A   4       1.549  -6.567  -2.039  1.00  0.00           C
+ATOM      5  CA  Gln A   5       0.373  -3.062  -1.162  1.00  0.00           C
+ATOM      6  CA  Trp A   6       0.956  -6.815  -1.044  1.00  0.00           C
+ATOM      7  CA  Leu A   7       4.619  -5.943  -0.532  1.00  0.00           C
+ATOM      8  CA  Lys A   8       6.549  -9.216  -0.502  1.00  0.00           C
+ATOM      9  CA  Asp A   9       4.464  -6.046  -0.284  1.00  0.00           C
+ATOM     10  CA  Gly A  10       4.193  -9.764  -1.024  1.00  0.00           C
+ATOM     11  CA  Gly A  11       7.878 -10.682  -1.153  1.00  0.00           C
+ATOM     12  CA  Pro A  12       6.151 -14.062  -1.347  1.00  0.00           C
+ATOM     13  CA  Ser A  13       4.616 -10.602  -1.005  1.00  0.00           C
+ATOM     14  CA  Ser A  14       4.516 -14.228  -2.135  1.00  0.00           C
+ATOM     15  CA  Gly A  15       8.134 -14.569  -1.026  1.00  0.00           C
+ATOM     16  CA  Arg A  16       8.768 -18.201  -1.946  1.00  0.00           C
+ATOM     17  CA  Pro A  17       7.165  -14.77  -1.629  1.00  0.00           C
+ATOM     18  CA  Pro A  18       6.314 -18.441  -1.138  1.00  0.00           C
+ATOM     19  CA  Pro A  19      10.066  -18.51  -1.735  1.00  0.00           C
+ATOM     20  CA  Ser A  20       8.597 -21.626  -0.131  1.00  0.00           C
+ATOM   1001  CB  Asn A   1      -2.797   1.697   0.459  1.00  0.00           C
+ATOM   1002  CB  Leu A   2      -1.503  -4.689  -0.588  1.00  0.00           C
+ATOM   1003  CB  Tyr A   3      -0.164  -1.889  -0.669  1.00  0.00           C
+ATOM   1004  CB  Ile A   4       1.549  -9.067  -2.039  1.00  0.00           C
+ATOM   1005  CB  Gln A   5      -2.394  -3.492  -1.162  1.00  0.00           C
+ATOM   1006  CB  Trp A   6       1.836 -10.511  -1.044  1.00  0.00           C
+ATOM   1007  CB  Leu A   7       2.207  -7.364  -0.532  1.00  0.00           C
+ATOM   1008  CB  Lys A   8       6.549 -12.416  -0.502  1.00  0.00           C
+ATOM   1009  CB  Asp A   9       2.071  -5.872  -0.284  1.00  0.00           C
+ATOM   1012  CB  Pro A  12       6.151 -15.962  -1.347  1.00  0.00           C
+ATOM   1013  CB  Ser A  13       2.817 -10.552  -1.005  1.00  0.00           C
+ATOM   1014  CB  Ser A  14       4.347 -16.021  -2.135  1.00  0.00           C
+ATOM   1016  CB  Arg A  16       8.768 -21.701  -1.946  1.00  0.00           C
+ATOM   1017  CB  Pro A  17       5.315 -14.341  -1.629  1.00  0.00           C
+ATOM   1018  CB  Pro A  18       6.279 -20.341  -1.138  1.00  0.00           C
+ATOM   1019  CB  Pro A  19       8.347   -17.7  -1.735  1.00  0.00           C
+ATOM   1020  CB  Ser A  20       8.597 -23.426  -0.131  1.00  0.00           C
+END

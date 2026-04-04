@@ -4712,6 +4712,7 @@ if __name__ == "__main__":
 - **CrystalAstro** —      294 lines, 26 prove functions
 - **CrystalAudit** —      643 lines, 0 prove functions
 - **CrystalAxiom** —      776 lines, 12 prove functions
+- **CrystalBenchmark** —       93 lines, 0 prove functions
 - **CrystalBio** —      315 lines, 24 prove functions
 - **CrystalCFD** —      503 lines, 22 prove functions
 - **CrystalChem** —      357 lines, 28 prove functions
@@ -4721,6 +4722,8 @@ if __name__ == "__main__":
 - **CrystalCrossDomain** —      251 lines, 24 prove functions
 - **CrystalDecay** —      413 lines, 18 prove functions
 - **CrystalDiffusion** —      405 lines, 2 prove functions
+- **CrystalDirac** —      551 lines, 0 prove functions
+- **CrystalDiscover** —      402 lines, 0 prove functions
 - **CrystalDiscoveries** —      151 lines, 0 prove functions
 - **CrystalEM** —      422 lines, 28 prove functions
 - **CrystalEngine** —      347 lines, 0 prove functions
@@ -4791,6 +4794,8 @@ if __name__ == "__main__":
 - **CrystalCrossDomain.lean** — 15 theorems
 - **CrystalDecay.lean** — 25 theorems
 - **CrystalDiffusion.lean** — 38 theorems
+- **CrystalDirac.lean** — 38 theorems
+- **CrystalDiscover.lean** — 60 theorems
 - **CrystalDiscoveries.lean** — 34 theorems
 - **CrystalEM.lean** — 21 theorems
 - **CrystalEngine.lean** — 68 theorems
@@ -4862,6 +4867,8 @@ if __name__ == "__main__":
 - **CrystalCrossDomain.agda** — 10 proofs
 - **CrystalDecay.agda** — 20 proofs
 - **CrystalDiffusion.agda** — 38 proofs
+- **CrystalDirac.agda** — 36 proofs
+- **CrystalDiscover.agda** — 44 proofs
 - **CrystalDiscoveries.agda** — 38 proofs
 - **CrystalEM.agda** — 14 proofs
 - **CrystalEngine.agda** — 65 proofs
