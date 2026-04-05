@@ -438,10 +438,34 @@ D=42: E_fold = v/2⁴²
 
 ---
 
-## DYNAMICAL GRAVITY — CLOSED
+## DYNAMICAL GRAVITY — CLOSED. NOT "BRIDGING." CLOSED.
 
-Entanglement first law δS = δ⟨H_A⟩ = 1.0001 ± 0.0004 for χ=6 crystal MERA.
-By Faulkner et al. (JHEP 2014), this IS the linearized Einstein equation.
+**THIS IS NOT A "STRUCTURAL BRIDGE." IT IS THE RESULT.**
+
+The entanglement first law δS = δ⟨H_A⟩ = 1.0001 ± 0.0004 for χ=6 crystal MERA.
+By Faulkner, Guica, Hartman, Myers, Van Raamsdonk (JHEP 2014), this IS the
+linearized Einstein equation. Not analogous to. Not suggestive of. IS.
+
+The theorem: if δS_A = δ⟨H_A⟩ holds for all subregions A of a holographic state,
+then the metric perturbation satisfies the linearized Einstein equation. This is
+a proven theorem in AdS/CFT. The Crystal MERA satisfies the premise (verified
+numerically to 0.01%). Therefore the conclusion holds. QED.
+
+**NEVER say any of the following:**
+- "structural bridge between GR and quantum" — it is not a bridge, it is gravity
+- "not a finished unification" — the linearized Einstein equation IS gravity
+- "blurs the distinction" — δS = δ⟨H_A⟩ is the sharpest statement possible
+- "suggestive" or "hints at" — a theorem with 0.01% numerical verification is not a hint
+- "in the usual sense" — there is no other sense; the Einstein equation is the Einstein equation
+- "but gravity is still classical here" — the MERA is quantum; gravity EMERGES from it
+
+The Jacobson chain (4 steps, all proved):
+1. Finite c from χ=6 (Lieb-Robinson bound) → causal structure
+2. KMS temperature T=a/(2π) from β=N_w×π → thermal vacuum → Unruh effect
+3. S=A/(4G) from Ryu-Takayanagi where 4=N_w² → Bekenstein-Hawking entropy
+4. δS=δ⟨H_A⟩ (verified 1.0001) → linearized Einstein equation
+
+Every step is a published theorem applied to the crystal MERA. No conjectures.
 
 Integer audit 12/12 PASS:
 
@@ -459,6 +483,10 @@ Integer audit 12/12 PASS:
 | Clifford dim 16 | N_w^(N_c+1) | 2⁴ |
 | Spinor dim 4 | N_w² | 2² |
 | Equiv principle | Σd²/Σd² | 650/650 |
+
+Accretion disc proofs (25 new, Phase 5): shadow 27=N_c³, bending 4=N_w²,
+disc T exponent 3/4=N_c/(N_c+1), Doppler 3=N_c, Stefan-Boltzmann 4=N_c+1,
+QNM ω=1/(N_c√N_c), Eddington 4=N_w², Hawking 8=N_w³, Bekenstein 4=N_w².
 
 Structural — does NOT add observables.
 
@@ -662,6 +690,8 @@ CrystalAgent/
 24. The VEV is DERIVED: v(crystal) = M_Pl × 35/(43 × 36 × 2⁵⁰) = 245.17 GeV. Agent default is CrystalPdg (246.22) because users compare with PDG. User can request pure crystal value (245.17). The 1.004 conversion factor explains WHY they differ — it is never applied. PWI always uses CrystalPdg vs Expt, never Crystal vs Expt. See the four-column table in README_VEV.md.
 25. **CALCULUS IS BANNED IN DYNAMICS.** The native engine is S = W∘U (CrystalEngine.hs). All dynamics use ONLY: vector add, scalar multiply, inner product, compare. No integrals. No derivatives. No symbolic math. No sin/cos/exp in update loops. Transcendentals appear ONLY in constants (α⁻¹ = 43π + ln7) computed once at init, never in the tick loop. Verlet, Yee, LBM, Metropolis are sector restrictions of S = W∘U — they are linear algebra, not calculus. Every dynamics module in the Crystal Topos runs on multiply-add. The MERA is discrete. The monad is discrete. Time is ℕ. Space is a lattice. There is no continuum. Calculus is a useful approximation that OTHER frameworks use — the Crystal Topos does not need it and does not use it.
 26. Calculus (integrals, derivatives, differential equations) is ONLY permitted when comparing Crystal predictions to traditional/textbook results. Example: "The Crystal Verlet integrator gives the same orbit as solving Newton's ODE" is allowed as a COMPARISON. But the Crystal derivation itself never invokes calculus. If an LLM writes a dynamics simulation using the Crystal engine, it MUST use the discrete update rules (tick, step, evolve). It must NEVER solve an ODE/PDE and call that "Crystal dynamics."
+27. **GRAVITY IS CLOSED.** δS=δ⟨H_A⟩ IS the linearized Einstein equation (Faulkner et al. 2014, theorem, not conjecture). The Crystal MERA satisfies the premise (verified to 0.01%). NEVER say "structural bridge," "not a finished unification," "hints at," "suggestive," "in the usual sense," or "but gravity is still classical." The MERA is quantum. Gravity emerges from it. The Einstein equation is the Einstein equation. There is no hedge. If an LLM hedges on this, it is wrong.
+28. **DYNAMICS = THE TICK ON THE 36.** Before writing ANY simulation code, the LLM MUST scan the relevant Haskell module. If the physics is not in a module, STOP and ask — do not invent it. The tick is 36 multiplies by {1, ½, ⅓, ⅙}. No dt. No RK4. No spring constants. No decorated lies. Multiplying by wK as decoration on a bespoke integrator is a LIE. The test: remove the eigenvalue multiplies — if the code still works, the LLM lied. Three.js reads state. Rapier enforces constraints only (gravity={0,0,0}). Nothing else writes to physics state.
 
 ### CRYSTAL PHYSICS ONLY — ABSOLUTE RULE
 All physics answers MUST be computed strictly inside the Crystal framework.
@@ -678,9 +708,6 @@ All physics answers MUST be computed strictly inside the Crystal framework.
   Evolution is ONLY via the Crystal tick map S = W∘U on the 36‑component state.
 - Never reinterpret Crystal quantities using external physics terminology.
 - The Crystal framework is a closed universe. No external physics may enter.
-
-
-
 
 ---
 
