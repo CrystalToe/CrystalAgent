@@ -37,3 +37,15 @@ freq-den = refl
 colour-dim : d₃ ≡ 8
 colour-dim = refl
 -- Total: 12 proofs by refl.
+
+-- §5a Ringdown / QNM
+qnm-freq : nC ≡ 3
+qnm-freq = refl
+qnm-damping-num : nC ≡ 3
+qnm-damping-num = refl
+qnm-damping-den : nC ∸ 1 ≡ 2
+qnm-damping-den = refl
+qnm-shadow : nC * nC * nC ≡ 27
+qnm-shadow = refl
+ringdown-decay : nW * nC ≡ 6
+ringdown-decay = refl

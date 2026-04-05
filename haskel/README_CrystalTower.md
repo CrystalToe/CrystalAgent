@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
 # CrystalTower.hs — Component 6: The 42-Layer Tower
 
 ## What This Module Is

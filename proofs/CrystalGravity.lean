@@ -64,3 +64,13 @@ theorem denom_product : 1 * nW * nC * chi = sigmaD := by native_decide
 theorem sixteen_decompose : nW * nW * nW * nW = (nW * nW) * (nW * nW) := by native_decide
 theorem immirzi_numer : nC = 3 := by native_decide
 theorem immirzi_denom : sigmaD - 1 = 35 := by native_decide
+
+-- §9a Accretion + Eddington + Hawking
+theorem eddington_4 : nW * nW = 4 := by native_decide
+theorem thomson_43 : towerD + 1 = 43 := by native_decide
+theorem hawking_8 : nW * nW * nW = 8 := by native_decide
+theorem bekenstein_4 : nW * nW = 4 := by native_decide
+theorem evap_exp : nC = 3 := by native_decide
+theorem bondi_num : nC - 1 = 2 := by native_decide
+theorem bondi_den : nC = 3 := by native_decide
+theorem isco_lum : chi ^ 5 = 7776 := by native_decide

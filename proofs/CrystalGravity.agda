@@ -127,3 +127,21 @@ sixteen-decompose = refl
 
 immirzi-denom : σD ∸ 1 ≡ 35
 immirzi-denom = refl
+
+-- §9a Accretion + Eddington + Hawking
+eddington-4 : nW * nW ≡ 4
+eddington-4 = refl
+thomson-43 : towerD + 1 ≡ 43
+thomson-43 = refl
+hawking-8 : nW * nW * nW ≡ 8
+hawking-8 = refl
+bekenstein-4 : nW * nW ≡ 4
+bekenstein-4 = refl
+evap-exp : nC ≡ 3
+evap-exp = refl
+bondi-num : nC ∸ 1 ≡ 2
+bondi-num = refl
+bondi-den : nC ≡ 3
+bondi-den = refl
+isco-lum : χ ^ 5 ≡ 7776
+isco-lum = refl

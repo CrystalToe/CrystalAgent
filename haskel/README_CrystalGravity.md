@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
 # README_CrystalGravity.md
 
 ## Module: CrystalGravity — Gravitational Field Dynamics from (2,3)

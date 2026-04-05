@@ -42,3 +42,29 @@ lambda-weak : N_w ≡ 2
 lambda-weak = refl
 lambda-colour : N_c ≡ 3
 lambda-colour = refl
+
+-- §11a Accretion disc
+disc-temp-num : N_c ≡ 3
+disc-temp-num = refl
+disc-temp-den : N_c + 1 ≡ 4
+disc-temp-den = refl
+stefan-boltzmann : N_c + 1 ≡ 4
+stefan-boltzmann = refl
+doppler-beaming : N_c ≡ 3
+doppler-beaming = refl
+disc-aspect : N_w * N_c ≡ 6
+disc-aspect = refl
+rad-eff-num : (N_c * N_c) ∸ 1 ≡ 8
+rad-eff-num = refl
+rad-eff-den : N_c * N_c ≡ 9
+rad-eff-den = refl
+shadow-27 : N_c * N_c * N_c ≡ 27
+shadow-27 = refl
+disc-viscosity : N_c * N_c + N_w * N_w ≡ 13
+disc-viscosity = refl
+disc-phase : (N_w * N_w ∸ 1) * (N_c * N_c ∸ 1) ≡ 24
+disc-phase = refl
+isco-boost : (N_c * N_c) ∸ 1 ≡ 8
+isco-boost = refl
+kerr-eff : N_c ≡ 3
+kerr-eff = refl

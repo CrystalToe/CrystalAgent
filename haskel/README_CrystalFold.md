@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
 # CrystalFold.hs — Protein Folding from (2,3)
 
 ## Compile

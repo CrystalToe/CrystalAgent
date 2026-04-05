@@ -18,3 +18,13 @@ theorem freq_num : nC - 1 = 2 := by native_decide
 theorem freq_den : nC = 3 := by native_decide
 theorem colour_dim : d3 = 8 := by native_decide
 -- Total: 12 theorems by native_decide.
+
+-- §5a Ringdown / QNM integers
+theorem qnm_freq : nC = 3 := by native_decide
+theorem qnm_damping_num : nC = 3 := by native_decide
+theorem qnm_damping_den : nC - 1 = 2 := by native_decide
+theorem qnm_quality_num : nC = 3 := by native_decide
+theorem qnm_quality_den : nC - 1 = 2 := by native_decide
+theorem qnm_shadow : nC * nC * nC = 27 := by native_decide
+theorem ringdown_decay : chi = 6 := by native_decide
+-- Total: 19 theorems by native_decide.
