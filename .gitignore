@@ -25,6 +25,8 @@ haskel/LeanCert/.lake/
 
 # OS
 .DS_Store
+START_HERE.md
+RULES.md
 
 .lake
 
