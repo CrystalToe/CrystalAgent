@@ -139,7 +139,7 @@ C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
 - **CrystalThermo** —      369 lines, 20 prove functions
 - **CrystalThirdGate** —      184 lines, 0 prove functions
 - **CrystalTower** —      323 lines, 0 prove functions
-- **CrystalUnifiedDGP** —      219 lines, 0 prove functions
+- **CrystalUnifiedDGP** —      584 lines, 0 prove functions
 - **CrystalUniversal** —      251 lines, 24 prove functions
 - **CrystalWACAScan** —     2281 lines, 238 prove functions
 - **CrystalWavelet** —      331 lines, 0 prove functions
@@ -155,7 +155,7 @@ C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
 - **ObservableMass** —      353 lines, 0 prove functions
 - **ObservableMath** —      158 lines, 0 prove functions
 - **ObservableMixing** —      157 lines, 0 prove functions
-- **ObservableNuclear** —      216 lines, 0 prove functions
+- **ObservableNuclear** —      283 lines, 0 prove functions
 - **ObservableOptics** —       81 lines, 0 prove functions
 - **ObservableType** —      117 lines, 0 prove functions
 - **WACAScanTest** —      124 lines, 0 prove functions
@@ -243,7 +243,7 @@ C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
 - **CrystalThirdGate.lean** — 10 theorems
 - **CrystalTopos.lean** — 342 theorems
 - **CrystalTower.lean** — 21 theorems
-- **CrystalUnifiedDGP.lean** — 10 theorems
+- **CrystalUnifiedDGP.lean** — 34 theorems
 - **CrystalUniversal.lean** — 35 theorems
 - **CrystalVEV.lean** — 16 theorems
 - **CrystalWACAScan.lean** — 16 theorems
@@ -347,7 +347,7 @@ C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
 - **CrystalThirdGate.agda** — 43 proofs
 - **CrystalTopos.agda** — 272 proofs
 - **CrystalTower.agda** — 25 proofs
-- **CrystalUnifiedDGP.agda** — 34 proofs
+- **CrystalUnifiedDGP.agda** — 81 proofs
 - **CrystalUniversal.agda** — 35 proofs
 - **CrystalVEV.agda** — 11 proofs
 - **CrystalWACAScan.agda** — 10 proofs
