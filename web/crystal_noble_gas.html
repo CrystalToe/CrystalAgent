@@ -1,0 +1,390 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crystal Topos — Same Song, Second Verse</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=JetBrains+Mono:wght@300;400;600&family=Outfit:wght@200;300;400;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:#04080f;color:#e0ddd5;font-family:'Outfit',sans-serif;overflow-x:hidden}
+header{text-align:center;padding:48px 20px 12px}
+h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4.5vw,3.4rem);font-weight:700;color:#f0c040;letter-spacing:-.01em;text-shadow:0 0 60px rgba(240,192,64,.18)}
+.tagline{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:#6a6a7a;letter-spacing:3px;margin-top:8px;text-transform:uppercase}
+.subtitle{max-width:800px;margin:16px auto 0;font-size:.95rem;color:#9a9aa8;line-height:1.7;font-weight:300}
+.subtitle em{color:#f0c040;font-style:normal}
+
+.viz-section{max-width:1200px;margin:40px auto;padding:0 20px}
+.viz-section h2{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:600;color:#e8d78a;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #1a1a2a}
+.viz-section p{color:#9a9aa8;line-height:1.7;font-weight:300;max-width:860px;margin-bottom:14px;font-size:.95rem}
+.viz-section p strong{color:#e6d690;font-weight:600}
+
+svg{display:block;margin:0 auto}
+.chart-container{background:rgba(6,12,25,.6);border:1px solid #1e2636;border-radius:14px;padding:24px;margin:20px 0;overflow-x:auto}
+
+.noble-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px;margin:20px 0}
+.noble-card{background:linear-gradient(135deg,#0d1117,#161b22);border:1px solid #21262d;border-radius:12px;padding:20px 14px;text-align:center;position:relative;overflow:hidden;transition:all .3s}
+.noble-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,var(--glow) 0%,transparent 70%);opacity:.15}
+.noble-card:hover{border-color:var(--glow);transform:translateY(-3px);box-shadow:0 6px 24px var(--shadow)}
+.noble-card .symbol{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:700;position:relative;z-index:1}
+.noble-card .z-val{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:#aab;margin-top:4px;position:relative;z-index:1}
+.noble-card .factors{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:#7a8a9a;margin-top:6px;position:relative;z-index:1}
+.noble-card .status{font-size:.7rem;margin-top:6px;position:relative;z-index:1;font-weight:600}
+.noble-card.blessed .status{color:#50c878}
+.noble-card.forbidden .status{color:#e04050}
+.noble-card.blessed{--glow:rgba(80,200,120,.25);--shadow:rgba(80,200,120,.15)}
+.noble-card.forbidden{--glow:rgba(224,64,80,.25);--shadow:rgba(224,64,80,.15)}
+
+.formula-box{font-family:'JetBrains Mono',monospace;font-size:.92rem;background:rgba(240,192,64,.05);border:1px solid rgba(240,192,64,.15);border-radius:8px;padding:14px 20px;text-align:center;color:#e8d78a;margin:16px 0;line-height:1.8}
+.formula-box .label{color:#6a7082;font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;display:block}
+
+.gap-table{width:100%;border-collapse:collapse;margin:16px 0;font-family:'JetBrains Mono',monospace;font-size:.85rem}
+.gap-table th{color:#f0c040;font-weight:600;text-transform:uppercase;font-size:.7rem;letter-spacing:1.5px;padding:8px 12px;text-align:center;border-bottom:1px solid #2a2a3a}
+.gap-table td{padding:8px 12px;text-align:center;border-bottom:1px solid #12121a}
+.gap-table tr:hover td{background:rgba(240,192,64,.04)}
+.gap-table .nuclear{color:#f0c040}
+.gap-table .electron{color:#50c8ff}
+.gap-table .gap{color:#e08a90}
+.gap-table .cumN{color:#f0c040}
+.gap-table .cumE{color:#50c8ff}
+
+footer{text-align:center;padding:40px 20px 60px;color:#4a4a5a;font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:1px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Same Song, Second Verse</h1>
+  <div class="tagline">the blessed-prime gate governs electron shells</div>
+  <p class="subtitle">
+    Nuclear magic numbers come from <em>n(n+1)</em> — the pronic sequence.
+    Noble gas electron counts come from <em>n²</em> — the square sequence.
+    Both are the bilinear form <em>n · m</em>: nuclear takes m = n+1, electron takes m = n.
+    The gap is exactly <em>n</em> at every shell. And the same blessed primes gate both.
+  </p>
+</header>
+
+<!-- Noble Gas Cards -->
+<div class="viz-section">
+  <h2>The Noble Gases — Prime Gate Test</h2>
+  <p>Every noble gas through Radon factors entirely into blessed primes. Oganesson is the first to fail — and relativistic quantum chemistry independently predicts it should not behave as a noble gas.</p>
+  <div class="noble-grid" id="nobleGrid"></div>
+</div>
+
+<!-- Bilinear chart -->
+<div class="viz-section">
+  <h2>The Bilinear Parent: n·m</h2>
+  <div class="formula-box">
+    <span class="label">nuclear L1 shell size</span>
+    n · (n + 1) = pronic &nbsp;→&nbsp; 2, 6, 12, 20, 30, 42, 56, 72, 90, 110<br>
+    <span class="label" style="margin-top:8px">electron shell capacity</span>
+    n · n = square &nbsp;→&nbsp; 1, 4, 9, 16, 25, 36, 49, 64, 81, 100<br>
+    <span class="label" style="margin-top:8px">gap at each shell</span>
+    n(n+1) − n² = <span style="color:#e08a90">n</span> &nbsp;— exact, always
+  </div>
+  <div class="chart-container">
+    <svg id="bilinearChart" width="1100" height="340"></svg>
+  </div>
+</div>
+
+<!-- Gap Table -->
+<div class="viz-section">
+  <h2>Shell-by-Shell Comparison</h2>
+  <p>The nuclear sequence steps one integer ahead at each level. The electron sequence stays put. The difference is always the shell index itself.</p>
+  <table class="gap-table" id="gapTable">
+    <thead><tr>
+      <th>n</th>
+      <th>nuclear n(n+1)</th>
+      <th>electron n²</th>
+      <th>gap = n</th>
+      <th>× N_w</th>
+      <th>cumulative nuclear</th>
+      <th>cumulative electron</th>
+    </tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<!-- Cumulative Chart -->
+<div class="viz-section">
+  <h2>Cumulative Sequences — Where They Diverge</h2>
+  <p>The nuclear cumulative (gold) and electron cumulative (blue) track together for n = 1, then separate. The <strong>noble gas Z values</strong> (blue dots) are the electron cumulative with each capacity doubled for n ≥ 2. The <strong>nuclear magic numbers</strong> (gold dots) include the spin-orbit correction that kicks in at n = N_c = 3.</p>
+  <div class="chart-container">
+    <svg id="cumulativeChart" width="1100" height="380"></svg>
+  </div>
+</div>
+
+<!-- Radon / 43 callout -->
+<div class="viz-section">
+  <h2>Radon and the Heegner Stamp</h2>
+  <p>
+    Z = 86 = 2 · <strong>43</strong>. The prime 43 sits directly in the Heegner set
+    H = {1, 2, 3, 7, 11, 19, <em>43</em>, 67, 163}. It marks the last stable noble gas.
+    The same number-theoretic structure that gives 163 its singular status
+    — the nine imaginary quadratic fields with class number one —
+    stamps the boundary of noble gas stability.
+  </p>
+  <p>
+    After Radon, the next noble gas position is Z = 118 = 2 · 59.
+    The prime <strong>59 is foreign</strong> (59 ∉ H, 4·59−1 = 235 ∉ H).
+    The framework predicts: <strong>Oganesson is not a true noble gas.</strong>
+    Relativistic DFT agrees — spin-orbit splitting of the 7p shell
+    is expected to make Oganesson reactive, not inert.
+  </p>
+</div>
+
+<footer>
+  Crystal Topos / WACA Programme · April 2026
+</footer>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const H = [1,2,3,7,11,19,43,67,163];
+const isBlessed = p => H.includes(p) || H.includes(4*p - 1);
+
+const nobleGasData = [
+  { sym:'He', z:2,   factors:[2],        note:'2 ∈ H' },
+  { sym:'Ne', z:10,  factors:[2,5],      note:'5 blessed via 4·5−1=19∈H' },
+  { sym:'Ar', z:18,  factors:[2,3,3],    note:'2,3 ∈ H' },
+  { sym:'Kr', z:36,  factors:[2,2,3,3],  note:'2,3 ∈ H' },
+  { sym:'Xe', z:54,  factors:[2,3,3,3],  note:'2,3 ∈ H' },
+  { sym:'Rn', z:86,  factors:[2,43],     note:'43 ∈ H (Heegner!)' },
+  { sym:'Og', z:118, factors:[2,59],     note:'59 foreign → FORBIDDEN' },
+];
+
+// ============================================================
+// NOBLE GAS CARDS
+// ============================================================
+const grid = document.getElementById('nobleGrid');
+nobleGasData.forEach(g => {
+  const allB = g.factors.every(f => isBlessed(f));
+  const card = document.createElement('div');
+  card.className = 'noble-card ' + (allB ? 'blessed' : 'forbidden');
+  card.innerHTML = `
+    <div class="symbol" style="color:${allB ? '#50c878' : '#e04050'}">${g.sym}</div>
+    <div class="z-val">Z = ${g.z}</div>
+    <div class="factors">${g.factors.join(' · ')}</div>
+    <div class="status">${allB ? '✓ ALL BLESSED' : '✗ FORBIDDEN'}</div>
+    <div class="factors" style="margin-top:4px;color:#6a7a8a">${g.note}</div>
+  `;
+  grid.appendChild(card);
+});
+
+// ============================================================
+// BILINEAR CHART (SVG)
+// ============================================================
+(() => {
+  const svg = document.getElementById('bilinearChart');
+  const W = 1100, H = 340;
+  const pad = {l:60, r:40, t:30, b:50};
+  const cw = W - pad.l - pad.r;
+  const ch = H - pad.t - pad.b;
+  const N = 10;
+
+  const pronic = n => n*(n+1);
+  const square = n => n*n;
+  const maxVal = pronic(N); // 110
+
+  const x = n => pad.l + (n / N) * cw;
+  const y = v => pad.t + ch - (v / maxVal) * ch;
+
+  // Grid lines
+  for (let v = 0; v <= maxVal; v += 20) {
+    const line = el('line', {x1:pad.l, x2:W-pad.r, y1:y(v), y2:y(v), stroke:'#1a1a2a', 'stroke-width':0.5});
+    svg.appendChild(line);
+    const label = el('text', {x:pad.l-8, y:y(v)+4, fill:'#4a5268', 'font-size':'11', 'text-anchor':'end', 'font-family':'JetBrains Mono'});
+    label.textContent = v;
+    svg.appendChild(label);
+  }
+
+  // X axis labels
+  for (let n = 1; n <= N; n++) {
+    const label = el('text', {x:x(n), y:H-pad.b+20, fill:'#6a7082', 'font-size':'12', 'text-anchor':'middle', 'font-family':'JetBrains Mono'});
+    label.textContent = 'n=' + n;
+    svg.appendChild(label);
+  }
+
+  // Pronic line (gold)
+  let pronicPath = '';
+  for (let n = 1; n <= N; n++) {
+    pronicPath += (n===1 ? 'M' : 'L') + x(n) + ',' + y(pronic(n));
+  }
+  svg.appendChild(el('path', {d:pronicPath, stroke:'#f0c040', 'stroke-width':2.5, fill:'none', 'stroke-linecap':'round'}));
+
+  // Square line (blue)
+  let squarePath = '';
+  for (let n = 1; n <= N; n++) {
+    squarePath += (n===1 ? 'M' : 'L') + x(n) + ',' + y(square(n));
+  }
+  svg.appendChild(el('path', {d:squarePath, stroke:'#50c8ff', 'stroke-width':2.5, fill:'none', 'stroke-linecap':'round'}));
+
+  // Gap areas + dots
+  for (let n = 1; n <= N; n++) {
+    const px = x(n);
+    const yP = y(pronic(n));
+    const yS = y(square(n));
+
+    // Gap line
+    svg.appendChild(el('line', {x1:px, x2:px, y1:yP, y2:yS, stroke:'#e08a90', 'stroke-width':1.5, 'stroke-dasharray':'4,3', opacity:0.7}));
+
+    // Gap label
+    const gapLabel = el('text', {x:px+8, y:(yP+yS)/2+4, fill:'#e08a90', 'font-size':'10', 'font-family':'JetBrains Mono'});
+    gapLabel.textContent = n;
+    svg.appendChild(gapLabel);
+
+    // Pronic dot
+    svg.appendChild(el('circle', {cx:px, cy:yP, r:5, fill:'#f0c040'}));
+
+    // Square dot
+    svg.appendChild(el('circle', {cx:px, cy:yS, r:5, fill:'#50c8ff'}));
+
+    // Value labels
+    const pLabel = el('text', {x:px, y:yP-10, fill:'#f0c040', 'font-size':'10', 'text-anchor':'middle', 'font-family':'JetBrains Mono'});
+    pLabel.textContent = pronic(n);
+    svg.appendChild(pLabel);
+
+    const sLabel = el('text', {x:px, y:yS+16, fill:'#50c8ff', 'font-size':'10', 'text-anchor':'middle', 'font-family':'JetBrains Mono'});
+    sLabel.textContent = square(n);
+    svg.appendChild(sLabel);
+  }
+
+  // Legend
+  const leg = [{color:'#f0c040', label:'n(n+1) — nuclear L1 (pronic)'}, {color:'#50c8ff', label:'n² — electron (square)'}, {color:'#e08a90', label:'gap = n'}];
+  leg.forEach((l, i) => {
+    const lx = pad.l + 20, ly = pad.t + 14 + i*18;
+    svg.appendChild(el('circle', {cx:lx, cy:ly, r:5, fill:l.color}));
+    const t = el('text', {x:lx+12, y:ly+4, fill:l.color, 'font-size':'11', 'font-family':'JetBrains Mono'});
+    t.textContent = l.label;
+    svg.appendChild(t);
+  });
+
+  function el(tag, attrs) {
+    const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    for (const [k,v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+})();
+
+// ============================================================
+// GAP TABLE
+// ============================================================
+(() => {
+  const tbody = document.querySelector('#gapTable tbody');
+  let cumN = 0, cumE = 0;
+  const nuclearMagic = [2,8,20,28,50,82,126];
+  const nobleZ = [2,10,18,36,54,86,118];
+
+  for (let n = 1; n <= 8; n++) {
+    const p = n*(n+1);
+    const s = n*n;
+    const gap = p - s;
+    cumN += p;
+    cumE += s;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${n}</td>
+      <td class="nuclear">${p}</td>
+      <td class="electron">${s}</td>
+      <td class="gap">${gap}</td>
+      <td style="color:#888">×${2} → ${2*p}, ${2*s}</td>
+      <td class="cumN">${cumN}</td>
+      <td class="cumE">${cumE}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+})();
+
+// ============================================================
+// CUMULATIVE CHART
+// ============================================================
+(() => {
+  const svg = document.getElementById('cumulativeChart');
+  const W = 1100, HH = 380;
+  const pad = {l:70, r:40, t:30, b:50};
+  const cw = W - pad.l - pad.r;
+  const ch = HH - pad.t - pad.b;
+
+  const nuclearMagic = [2,8,20,28,50,82,126];
+  const nobleZ = [2,10,18,36,54,86];
+  const maxVal = 140;
+
+  // Cumulative pronic (no SO correction — pure HO)
+  const cumPronic = [];
+  let cp = 0;
+  for (let n = 1; n <= 8; n++) { cp += n*(n+1); cumPronic.push({n, v:cp}); }
+
+  // Cumulative square
+  const cumSquare = [];
+  let cs = 0;
+  for (let n = 1; n <= 8; n++) { cs += n*n; cumSquare.push({n, v:cs}); }
+
+  const x = n => pad.l + (n / 9) * cw;
+  const y = v => pad.t + ch - (v / maxVal) * ch;
+
+  function el(tag, attrs) {
+    const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    for (const [k,vv] of Object.entries(attrs)) e.setAttribute(k, vv);
+    return e;
+  }
+
+  // Grid
+  for (let v = 0; v <= maxVal; v += 20) {
+    svg.appendChild(el('line', {x1:pad.l, x2:W-pad.r, y1:y(v), y2:y(v), stroke:'#1a1a2a', 'stroke-width':0.5}));
+    const t = el('text', {x:pad.l-8, y:y(v)+4, fill:'#4a5268', 'font-size':'11', 'text-anchor':'end', 'font-family':'JetBrains Mono'});
+    t.textContent = v;
+    svg.appendChild(t);
+  }
+  for (let n = 1; n <= 8; n++) {
+    const t = el('text', {x:x(n), y:HH-pad.b+20, fill:'#6a7082', 'font-size':'12', 'text-anchor':'middle', 'font-family':'JetBrains Mono'});
+    t.textContent = 'n=' + n;
+    svg.appendChild(t);
+  }
+
+  // Cumulative pronic line (gold)
+  let pp = '';
+  cumPronic.forEach((d,i) => { pp += (i===0?'M':'L') + x(d.n) + ',' + y(d.v); });
+  svg.appendChild(el('path', {d:pp, stroke:'#f0c040', 'stroke-width':2, fill:'none', opacity:'0.5'}));
+
+  // Cumulative square line (blue)
+  let sp = '';
+  cumSquare.forEach((d,i) => { sp += (i===0?'M':'L') + x(d.n) + ',' + y(d.v); });
+  svg.appendChild(el('path', {d:sp, stroke:'#50c8ff', 'stroke-width':2, fill:'none', opacity:'0.5'}));
+
+  // Nuclear magic dots (gold, large)
+  nuclearMagic.forEach((v, i) => {
+    const nx = pad.l + ((i+1) / 9) * cw;
+    const ny = y(v);
+    svg.appendChild(el('circle', {cx:nx, cy:ny, r:8, fill:'#f0c040', opacity:'0.9'}));
+    svg.appendChild(el('circle', {cx:nx, cy:ny, r:14, fill:'none', stroke:'#f0c040', 'stroke-width':1, opacity:'0.3'}));
+    const t = el('text', {x:nx, y:ny-14, fill:'#f0c040', 'font-size':'11', 'text-anchor':'middle', 'font-family':'JetBrains Mono', 'font-weight':'600'});
+    t.textContent = v;
+    svg.appendChild(t);
+  });
+
+  // Noble gas dots (blue, large)
+  nobleZ.forEach((v, i) => {
+    const nx = pad.l + ((i+1) / 9) * cw;
+    const ny = y(v);
+    svg.appendChild(el('circle', {cx:nx+12, cy:ny, r:7, fill:'#50c8ff', opacity:'0.9'}));
+    svg.appendChild(el('circle', {cx:nx+12, cy:ny, r:13, fill:'none', stroke:'#50c8ff', 'stroke-width':1, opacity:'0.3'}));
+    const t = el('text', {x:nx+12, y:ny+20, fill:'#50c8ff', 'font-size':'11', 'text-anchor':'middle', 'font-family':'JetBrains Mono', 'font-weight':'600'});
+    t.textContent = v;
+    svg.appendChild(t);
+  });
+
+  // Legend
+  [{c:'#f0c040',l:'nuclear magic {2,8,20,28,50,82,126}'},{c:'#50c8ff',l:'noble gas Z {2,10,18,36,54,86}'}].forEach((leg,i) => {
+    const lx = pad.l+20, ly = pad.t+14+i*18;
+    svg.appendChild(el('circle', {cx:lx, cy:ly, r:5, fill:leg.c}));
+    const t = el('text', {x:lx+12, y:ly+4, fill:leg.c, 'font-size':'11', 'font-family':'JetBrains Mono'});
+    t.textContent = leg.l;
+    svg.appendChild(t);
+  });
+})();
+</script>
+</body>
+</html>
