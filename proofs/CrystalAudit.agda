@@ -1,13 +1,13 @@
 -- Copyright (c) 2026 Daland Montgomery
 -- SPDX-License-Identifier: AGPL-3.0-or-later
 
--- CrystalAudit — Audit infrastructure from (2,3)
--- Engine wired: all sectors (d=36).
+-- CrystalAudit — Naturality constraints and mass ratios from (2,3)
+-- Imports CrystalAxiom only. No CrystalEngine.
 
 module CrystalAudit where
 
 open import Agda.Builtin.Equality
-open import Data.Nat using (ℕ; _+_; _*_; _∸_)
+open import Agda.Builtin.Nat renaming (Nat to ℕ)
 
 nW : ℕ
 nW = 2
@@ -18,58 +18,57 @@ nC = 3
 χ : ℕ
 χ = nW * nC
 
-β₀ : ℕ
-β₀ = 7
-
-d₁ : ℕ
-d₁ = 1
-
-d₂ : ℕ
-d₂ = nW * nW ∸ 1
-
-d₃ : ℕ
-d₃ = nC * nC ∸ 1
-
-d₄ : ℕ
-d₄ = (nW * nW ∸ 1) * (nC * nC ∸ 1)
-
 σD : ℕ
-σD = d₁ + d₂ + d₃ + d₄
+σD = 1 + 3 + 8 + 24
 
 towerD : ℕ
 towerD = σD + χ
 
-gauss : ℕ
-gauss = nW * nW + nC * nC
+d4 : ℕ
+d4 = nW * nW * nW * nC
 
--- Core atoms
-nW-val : nW ≡ 2
-nW-val = refl
+-- §1 Naturality denominators
+vus-denom : σD + nW * nW ≡ 40
+vus-denom = refl
 
-nC-val : nC ≡ 3
-nC-val = refl
+vus-num : nC * nC ≡ 9
+vus-num = refl
 
-χ-val : χ ≡ 6
-χ-val = refl
+s23-denom : 2 * χ - 1 ≡ 11
+s23-denom = refl
 
-d₁-val : d₁ ≡ 1
-d₁-val = refl
+s23-num : χ ≡ 6
+s23-num = refl
 
-d₂-val : d₂ ≡ 3
-d₂-val = refl
+s13-denom : σD + nC * nC ≡ 45
+s13-denom = refl
 
-d₃-val : d₃ ≡ 8
-d₃-val = refl
+-- §2 Endomorphism counts
+mixed-endos : d4 * d4 ≡ 576
+mixed-endos = refl
 
-d₄-val : d₄ ≡ 24
-d₄-val = refl
+total-endos : 1 + 9 + 64 + 576 ≡ 650
+total-endos = refl
 
-σD-val : σD ≡ 36
-σD-val = refl
+-- §3 Mass ratio integers
+ms-mud : nC * nC * nC ≡ 27
+ms-mud = refl
 
-sector-sum : d₁ + d₂ + d₃ + d₄ ≡ 36
-sector-sum = refl
+mb-ms : nC * nC * nC * nW ≡ 54
+mb-ms = refl
 
-total-dim : σD ≡ 36
-total-dim = refl
--- Engine wired.
+mu-md-num : χ - 1 ≡ 5
+mu-md-num = refl
+
+mu-md-denom : 2 * χ - 1 ≡ 11
+mu-md-denom = refl
+
+-- §4 Tower and structure
+tower : towerD ≡ 42
+tower = refl
+
+sigma : σD ≡ 36
+sigma = refl
+
+chi-sq-is-sigma : χ * χ ≡ σD
+chi-sq-is-sigma = refl

@@ -36,9 +36,18 @@ Tests whether the crystal's error distribution (the Prime Wobble Index values ac
 ## Compile
 
 ```bash
-ghc -fno-code CrystalRiemann.hs   # type-check
+ghc -c CrystalRiemann.hs
 ```
 
-## Dependencies
+No main. Type-check only.
 
-Imports `CrystalAxiom`.
+## Import Chain
+
+CrystalAxiom only. Zero CrystalEngine. Already clean.
+
+## Proofs
+
+| Proof file | Theorems | Method |
+|------------|----------|--------|
+| CrystalRiemann.agda | 10 | refl |
+| CrystalRiemann.lean | 15 | native_decide |

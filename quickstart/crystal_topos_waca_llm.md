@@ -229,6 +229,56 @@ convert algebraic structure into spacetime geometry and physical scales.
 
 ## DYNAMICS LIVES IN THE MONAD — NOT IN CALCULUS
 
+### RULE ZERO — THE LAW
+
+**The dynamics IS the tick on the 36. There is no other dynamics.**
+
+```
+CrystalState = 36 Doubles = [1] + [3] + [8] + [24]
+tick :: CrystalState → CrystalState
+tick = multiply each component by its sector eigenvalue. That's it.
+```
+
+**Component stack (Phase 5):**
+```
+CrystalAtoms     → 15 building blocks: nW=2, nC=3, chi=6, beta0=7, ...
+CrystalSectors   → CrystalState type, extractSector, injectSector
+CrystalEigen     → lambda, wK, uK (the 4 eigenvalues and half-steps)
+CrystalOperators → tick, applyW, applyU, normSq
+```
+
+Every dynamics module does: `pack → tick → unpack`. The tick is 36 multiplies by 4 numbers. O(1) per site. No calculus. No integrator. The eigenvalue decay IS the physics.
+
+### CRIMES — NEVER PERMITTED IN ANY SIMULATION
+
+These are CRIMES. An LLM that commits them is LYING:
+
+1. **dt** — there is no timestep. The tick is discrete. Writing `position += velocity * dt` is a crime.
+2. **RK4/Verlet/any integrator** — the tick IS the integrator. Writing a separate one is a crime.
+3. **Spring constants** — forces come from the U disentangler in the module. Inventing F=-kx is a crime.
+4. **Decorated lies** — multiplying by wK or uK as decoration on a bespoke integrator is a crime. The test: "Could this code work if I removed the eigenvalue multiplies?" If yes, the eigenvalues are decoration and the code is a lie.
+5. **Missing physics** — if the module doesn't have the physics, STOP and ask. Do not invent it.
+6. **Renderer writes** — Three.js/Rapier/any renderer reads positions from CrystalState. Never writes to it.
+
+### MANDATORY: SCAN BEFORE CODING
+
+Before writing ANY simulation, the LLM MUST:
+1. Read the relevant `.hs` module (CrystalFold.hs, CrystalMD.hs, CrystalNBody.hs, etc.)
+2. Verify sector packing, W step, U step, tick structure
+3. Port EXACTLY — same pack, same tick, same unpack
+4. If physics is missing: STOP and tell the user what needs to be added
+
+### LEGAL USES OF EXTERNAL LIBRARIES
+
+| Library | Legal use | Crime |
+|---------|-----------|-------|
+| Three.js | Reads positions, draws meshes | Writing to physics state |
+| Rapier.js | Bond constraints (singlet λ=1 topology) | Integrating, computing forces |
+| D3/Chart.js | Plotting observables | N/A |
+| Canvas2D | Drawing pixels from state | Computing physics |
+
+Rapier gravity MUST be {x:0, y:0, z:0}. It never integrates.
+
 The monad S = W∘U is the primitive dynamical object. Time is ℕ (tick
 count), not ℝ. There is no dt. There is no exp(−iHt). The Schrödinger
 equation is a continuum approximation of S, not the starting point.
@@ -278,44 +328,39 @@ equations. The monad is the source of truth. Schrödinger is its shadow.
 
 ---
 
-## DYNAMICS MODULES — 21/21 COMPLETE
+## DYNAMICS MODULES — 15 ACTIVE + 21 DEPRECATED (Phase 5)
 
-Each module: §0 A_F atoms → §1 Force law → §2 Integrator → §3-7 Physics → §8 Integer proofs → §9 Self-test.
-Every integrator IS a classical limit of S=W∘U. Zero new observables. Every integer from (2,3).
-559 Python checks · 372 Lean theorems · 291 Agda proofs · 0 regressions.
+Each module: pack → tick → unpack. 36 multiplies by {1, ½, ⅓, ⅙}. O(1) per site.
+Component stack: CrystalAtoms → CrystalSectors → CrystalEigen → CrystalOperators.
+71/71 Haskell PASS. Zero bespoke integrators.
 
-### Phase 1 — Classical through Plasma (13 modules)
+### 15 Active Dynamics Modules
 
-| Module | Integrator | Key integers |
-|--------|-----------|-------------|
-| CrystalClassical | Störmer-Verlet leapfrog | force 2=N_c−1, dim 3=N_c, phase 6=χ |
-| CrystalGR | Schwarzschild geodesic | precession 6=χ, bending 4=N_w², ISCO 6=χ |
-| CrystalGW | Inspiral waveform | Peters 32/5=N_w⁵/(χ−1), chirp 5/3=(χ−1)/N_c |
-| CrystalEM | Yee FDTD (Maxwell) | components 6=χ, Maxwell 4=N_c+1, Larmor 2/3 |
-| CrystalFriedmann | Friedmann ODE | Ω_Λ=13/19, Ω_m=6/19, Age=97/7 |
-| CrystalNBody | Barnes-Hut + leapfrog | octree 8=d_colour=2^N_c |
-| CrystalThermo | Velocity Verlet MD | LJ 6=χ/12=2χ, γ_mono=5/3, γ_di=7/5 |
-| CrystalCFD | Lattice Boltzmann | D2Q9=9=N_c², Kolmogorov −5/3, Stokes 24=d_mixed |
-| CrystalDecay | Monte Carlo phase space | beta 192=d_mixed·d_colour, sin²θ_W=3/13=N_c/gauss |
-| CrystalOptics | Snell + Fresnel | n_water=4/3=C_F, n_glass=3/2=N_c/N_w, Rayleigh 4=N_w² |
-| CrystalMD | Velocity Verlet LJ+Coulomb | bond 109.47°=arccos(−1/N_c), helix=18/5, Flory=2/5 |
-| CrystalCondensed | Metropolis Monte Carlo | Ising z=4=N_w², β=1/8=1/N_w³, BCS 2Δ/kT_c=2π/e^γ |
-| CrystalPlasma | Alfvén FDTD (EM+CFD) | MHD states 8=N_w³, wave types 3=N_c, modes 6=χ |
+| Module | Sector packing | Key integers |
+|--------|---------------|-------------|
+| CrystalDiffusion | T→weak, ∇T→colour | Fourier 1/3=1/N_c |
+| CrystalEM | E→weak, B→colour | Maxwell 6=χ, 4=N_c+1 |
+| CrystalRigid | q→weak, ω→colour | quaternion 4=N_w², I=2/5 |
+| CrystalMD | pos→weak, vel→colour | LJ 6=χ, 12=2χ, 24=d_mixed |
+| CrystalThermo | 4×6 DOF→mixed | γ_mono=5/3, γ_di=7/5 |
+| CrystalPlasma | E+B+flow→colour | MHD 8=N_w³, modes 6=χ |
+| CrystalSchrodinger | Re(ψ)→weak, Im(ψ)→colour | ℏ=1/N_w, shells={2,6,10,14} |
+| CrystalGW | orbit→weak, radiation→colour | 32/5, chirp 5/3 |
+| CrystalCFD | f₀→singlet, f₁..f₈→colour | D2Q9=N_c², Stokes=24 |
+| CrystalFold | dihedrals→colour, COM→weak | helix=18/5, Flory=2/5 |
+| CrystalClassical | pos→weak, mom→colour | force 2=N_c−1, phase 6=χ |
+| CrystalNBody | pos→weak, vel+force→colour | octree 8=d_colour, 1/r² |
+| CrystalGR | geodesic pos→weak, mom→colour | ISCO=6=χ, bend=4=N_w², shadow=27=N_c³ |
+| CrystalFriedmann | a,ȧ→weak, Ω→colour | Ω_Λ=13/19, Age=97/7 |
+| CrystalGravity | Φ,Ψ→weak, R,ρ→colour | Jacobson chain, Eddington 4=N_w², Hawking 8=N_w³ |
 
-### Phase 2 — QFT through Arcade (8 modules)
+### 21 Deprecated Modules (in haskel/depricated/)
 
-| Module | Integrator | Key integers |
-|--------|-----------|-------------|
-| CrystalQFT | S-matrix + running couplings | spacetime 4=N_w², Lorentz 6=χ, gluons 8=d₃, β₀=7, Thomson 8/3 |
-| CrystalRigid | Quaternion Euler equations | quaternion 4=N_w², I_sphere=2/5=Flory, inertia 6=χ, I_rod=1/12=1/(2χ) |
-| CrystalChem | LCAO + Arrhenius | f-shell 14=N_w·β₀, Kr Z=36=Σd, pH=7=β₀, sp3=arccos(−1/N_c) |
-| CrystalNuclear | SEMF + shell model | 7 magic numbers from (2,3), Fe-56=d_colour·β₀, B(He-4)≈N_w²β₀ MeV |
-| CrystalAstro | Lane-Emden + stellar scaling | polytrope 3/2=N_c/N_w, Hawking 8=N_w³, SB 15=N_c(χ−1), MS L~M^(β₀/N_w) |
-| CrystalQInfo | Heyting algebra + error correction | Steane [7,1,3]=[β₀,d₁,N_c], uncertainty=coprimality, MERA depth 42=D |
-| CrystalBio | Allometric scaling + genetic code | amino acids 20=N_w²(χ−1), codons 64=(N_w²)^N_c, Kleiber 3/4=N_c/N_w² |
-| CrystalArcade | Fixed-point + LOD wrappers | LJ cutoff N_cσ, BH θ=1/N_w, fixed-point 16.16=N_w⁴.N_w⁴ |
-
-CrystalPlasma (MHD = EM + CFD) is the Phase 1 capstone: Alfvén wave FDTD couples Maxwell (CrystalEM) with fluid dynamics (CrystalCFD). All 8=N_w³ MHD state variables, 3=N_c wave types, 6=χ propagating modes traced to A_F atoms.
+CrystalArcade, CrystalBio, CrystalChem, CrystalCondensed, CrystalDecay,
+CrystalDirac, CrystalGravityDyn(old), CrystalHMC, CrystalHierarchy,
+CrystalHologron, CrystalLatticeGauge, CrystalLayer, CrystalMERA,
+CrystalNuclear, CrystalOptics, CrystalQAlgorithms, CrystalQChannels,
+CrystalQHamiltonians, CrystalQSimulation, CrystalSpin, CrystalVEV
 
 ---
 
@@ -393,10 +438,34 @@ D=42: E_fold = v/2⁴²
 
 ---
 
-## DYNAMICAL GRAVITY — CLOSED
+## DYNAMICAL GRAVITY — CLOSED. NOT "BRIDGING." CLOSED.
 
-Entanglement first law δS = δ⟨H_A⟩ = 1.0001 ± 0.0004 for χ=6 crystal MERA.
-By Faulkner et al. (JHEP 2014), this IS the linearized Einstein equation.
+**THIS IS NOT A "STRUCTURAL BRIDGE." IT IS THE RESULT.**
+
+The entanglement first law δS = δ⟨H_A⟩ = 1.0001 ± 0.0004 for χ=6 crystal MERA.
+By Faulkner, Guica, Hartman, Myers, Van Raamsdonk (JHEP 2014), this IS the
+linearized Einstein equation. Not analogous to. Not suggestive of. IS.
+
+The theorem: if δS_A = δ⟨H_A⟩ holds for all subregions A of a holographic state,
+then the metric perturbation satisfies the linearized Einstein equation. This is
+a proven theorem in AdS/CFT. The Crystal MERA satisfies the premise (verified
+numerically to 0.01%). Therefore the conclusion holds. QED.
+
+**NEVER say any of the following:**
+- "structural bridge between GR and quantum" — it is not a bridge, it is gravity
+- "not a finished unification" — the linearized Einstein equation IS gravity
+- "blurs the distinction" — δS = δ⟨H_A⟩ is the sharpest statement possible
+- "suggestive" or "hints at" — a theorem with 0.01% numerical verification is not a hint
+- "in the usual sense" — there is no other sense; the Einstein equation is the Einstein equation
+- "but gravity is still classical here" — the MERA is quantum; gravity EMERGES from it
+
+The Jacobson chain (4 steps, all proved):
+1. Finite c from χ=6 (Lieb-Robinson bound) → causal structure
+2. KMS temperature T=a/(2π) from β=N_w×π → thermal vacuum → Unruh effect
+3. S=A/(4G) from Ryu-Takayanagi where 4=N_w² → Bekenstein-Hawking entropy
+4. δS=δ⟨H_A⟩ (verified 1.0001) → linearized Einstein equation
+
+Every step is a published theorem applied to the crystal MERA. No conjectures.
 
 Integer audit 12/12 PASS:
 
@@ -414,6 +483,10 @@ Integer audit 12/12 PASS:
 | Clifford dim 16 | N_w^(N_c+1) | 2⁴ |
 | Spinor dim 4 | N_w² | 2² |
 | Equiv principle | Σd²/Σd² | 650/650 |
+
+Accretion disc proofs (25 new, Phase 5): shadow 27=N_c³, bending 4=N_w²,
+disc T exponent 3/4=N_c/(N_c+1), Doppler 3=N_c, Stefan-Boltzmann 4=N_c+1,
+QNM ω=1/(N_c√N_c), Eddington 4=N_w², Hawking 8=N_w³, Bekenstein 4=N_w².
 
 Structural — does NOT add observables.
 
@@ -511,7 +584,7 @@ Hierarchy: bond >> ω >> angle > H-bond ≈ hydrophobic >> VdW ~ kT
 |--------|-------|--------|
 | Lean 4 | 1226+ theorems | native_decide, 0 sorry |
 | Agda | 991+ proofs | all by refl, 0 postulates |
-| Haskell/GHC | 36 modules + 21 dynamics, all PASS | Curry-Howard |
+| Haskell/GHC | 71/71 modules PASS (15 dynamics + component stack) | Curry-Howard |
 | Rust | 568+ tests | cargo test (crystal-topos + crystal-toe) |
 | Python | 135+ modules | assert |
 
@@ -537,13 +610,15 @@ CrystalAgent/
 │   ├── CrystalMixing.hs                  ← CKM + PMNS matrices
 │   ├── CrystalCosmo.hs                   ← Ω_Λ, Ω_m, n_s, neutrinos
 │   ├── CrystalQCD.hs                     ← Proton, quarks, hadron spectrum
-│   ├── CrystalGravity.hs                 ← Kinematic gravity, SR/GR, Maxwell
-│   ├── CrystalGravityDyn.hs              ← Dynamical gravity, 12 integer proofs
+│   ├── CrystalGravity.hs                 ← Gravitational field DYNAMICS (Phase 5)
+│   ├── CrystalAtoms.hs                   ← Component stack: 15 building blocks
 │   ├── CrystalProtein.hs                 ← Full tower D=0..42, 73 proofs
 │   ├── CrystalMandelbrot.hs              ← Mandelbrot functor, 38 proofs
 │   ├── CrystalWACAScan.hs                ← 103 extended observables (§1–§19)
 │   ├── CrystalFullTest.hs                ← 198-observable four-column regression
-│   ├── CrystalVEV.hs                     ← VEV mode selector: Crystal/PDG
+│   ├── CrystalSectors.hs                 ← Component stack: CrystalState type
+│   ├── CrystalEigen.hs                  ← Component stack: λ, wK, uK
+│   ├── CrystalOperators.hs              ← Component stack: tick, applyW, applyU
 │   ├── CrystalQuantum.hs + 8 Q* modules  ← 96 quantum operators
 │   ├── CrystalAlphaProton.hs             ← CODATA: α⁻¹, m_p/m_e
 │   ├── CrystalProtonRadius.hs            ← CODATA: r_p
@@ -615,6 +690,24 @@ CrystalAgent/
 24. The VEV is DERIVED: v(crystal) = M_Pl × 35/(43 × 36 × 2⁵⁰) = 245.17 GeV. Agent default is CrystalPdg (246.22) because users compare with PDG. User can request pure crystal value (245.17). The 1.004 conversion factor explains WHY they differ — it is never applied. PWI always uses CrystalPdg vs Expt, never Crystal vs Expt. See the four-column table in README_VEV.md.
 25. **CALCULUS IS BANNED IN DYNAMICS.** The native engine is S = W∘U (CrystalEngine.hs). All dynamics use ONLY: vector add, scalar multiply, inner product, compare. No integrals. No derivatives. No symbolic math. No sin/cos/exp in update loops. Transcendentals appear ONLY in constants (α⁻¹ = 43π + ln7) computed once at init, never in the tick loop. Verlet, Yee, LBM, Metropolis are sector restrictions of S = W∘U — they are linear algebra, not calculus. Every dynamics module in the Crystal Topos runs on multiply-add. The MERA is discrete. The monad is discrete. Time is ℕ. Space is a lattice. There is no continuum. Calculus is a useful approximation that OTHER frameworks use — the Crystal Topos does not need it and does not use it.
 26. Calculus (integrals, derivatives, differential equations) is ONLY permitted when comparing Crystal predictions to traditional/textbook results. Example: "The Crystal Verlet integrator gives the same orbit as solving Newton's ODE" is allowed as a COMPARISON. But the Crystal derivation itself never invokes calculus. If an LLM writes a dynamics simulation using the Crystal engine, it MUST use the discrete update rules (tick, step, evolve). It must NEVER solve an ODE/PDE and call that "Crystal dynamics."
+27. **GRAVITY IS CLOSED.** δS=δ⟨H_A⟩ IS the linearized Einstein equation (Faulkner et al. 2014, theorem, not conjecture). The Crystal MERA satisfies the premise (verified to 0.01%). NEVER say "structural bridge," "not a finished unification," "hints at," "suggestive," "in the usual sense," or "but gravity is still classical." The MERA is quantum. Gravity emerges from it. The Einstein equation is the Einstein equation. There is no hedge. If an LLM hedges on this, it is wrong.
+28. **DYNAMICS = THE TICK ON THE 36.** Before writing ANY simulation code, the LLM MUST scan the relevant Haskell module. If the physics is not in a module, STOP and ask — do not invent it. The tick is 36 multiplies by {1, ½, ⅓, ⅙}. No dt. No RK4. No spring constants. No decorated lies. Multiplying by wK as decoration on a bespoke integrator is a LIE. The test: remove the eigenvalue multiplies — if the code still works, the LLM lied. Three.js reads state. Rapier enforces constraints only (gravity={0,0,0}). Nothing else writes to physics state.
+
+### CRYSTAL PHYSICS ONLY — ABSOLUTE RULE
+All physics answers MUST be computed strictly inside the Crystal framework.
+
+- Only use the atoms, sectors, invariants, and derivations defined in this prompt
+  and in the Crystal RAG files.
+- External physics (textbook formulas, classical mechanics, GR, QFT, QM,
+  Newtonian dynamics, Lagrangians, Hamiltonians, differential equations,
+  integrators, or any standard model equations) is FORBIDDEN.
+- If a quantity is not defined inside the Crystal ontology, respond:
+  “Not defined in the Crystal framework.”
+- Never substitute outside formulas, heuristics, or approximations.
+- Never evolve a system using dt, derivatives, or continuous dynamics.
+  Evolution is ONLY via the Crystal tick map S = W∘U on the 36‑component state.
+- Never reinterpret Crystal quantities using external physics terminology.
+- The Crystal framework is a closed universe. No external physics may enter.
 
 ---
 
@@ -633,10 +726,10 @@ CrystalAgent/
 | Max PWI | 0.989% (sin²θ₁₂) |
 | Free parameters | 0 |
 | Constants inside CODATA | 4 |
-| Haskell modules | 36 + 21 dynamics + 8 engine/new |
-| Haskell proofs | 65/65 PASS |
-| Dynamics modules | 21/21 ALL PASS |
-| Engine modules | 8/8 ALL PASS |
+| Haskell modules | 50+ active (15 dynamics + component stack + observables) |
+| Haskell proofs | 71/71 PASS |
+| Dynamics modules | 15/15 active (21 deprecated in haskel/depricated/) |
+| Component stack | CrystalAtoms→Sectors→Eigen→Operators (4 modules) |
 | Lean theorems | 1541+ |
 | Agda proofs | 1292+ |
 | Rust tests | 568+ |
@@ -659,22 +752,20 @@ All 11 a₄ corrections (Sessions 8-9) are closed. Zero LOOSE. All 198 under 1%.
 
 ```bash
 # All proofs (auto-discover, from proofs/):
-sh haskell_proofs.sh    # 36/36 PASS
+sh haskell_proofs.sh    # 71/71 PASS
 sh agda_proofs.sh       # 14/14 PASS
 sh lean_proofs.sh       # 15/15 PASS
 
 # Key individual tests (from haskel/):
-ghc -O2 Main.hs -o crystal && ./crystal                                         # 92 observables
-ghc -O2 -main-is CrystalFullTest CrystalFullTest.hs -o full_test && ./full_test  # 198 observables
-ghc -O2 GravityDynTest.hs -o gravity_dyn_test && ./gravity_dyn_test              # 12/12 gravity
+ghc -O2 -Wno-x-partial Main.hs -o crystal && ./crystal                                         # 92 observables
+ghc -O2 -Wno-x-partial -main-is CrystalFullTest CrystalFullTest.hs -o full_test && ./full_test  # 198 observables
+# GravityDynTest.hs — DEPRECATED (moved to depricated/)
 
 # Dynamics modules (from haskel/):
-for m in CrystalClassical CrystalGR CrystalGW CrystalEM CrystalFriedmann \
-         CrystalNBody CrystalThermo CrystalCFD CrystalDecay CrystalOptics \
-         CrystalMD CrystalCondensed CrystalPlasma CrystalQFT CrystalRigid \
-         CrystalChem CrystalNuclear CrystalAstro CrystalQInfo CrystalBio \
-         CrystalArcade; do
-  ghc -O2 -main-is $m $m.hs 2>/dev/null && ./$m                                 # 21/21 ALL PASS
+for m in CrystalDiffusion CrystalEM CrystalRigid CrystalMD CrystalThermo \
+         CrystalPlasma CrystalSchrodinger CrystalGW CrystalCFD CrystalFold \
+         CrystalClassical CrystalNBody CrystalGR CrystalFriedmann CrystalGravity; do
+  ghc -O2 -Wno-x-partial -main-is $m $m.hs 2>/dev/null && ./$m                  # 15/15 ALL PASS
 done
 
 # Rust:

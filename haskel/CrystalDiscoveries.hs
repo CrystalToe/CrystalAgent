@@ -10,7 +10,7 @@
 
 module CrystalDiscoveries where
 
-import qualified CrystalEngine as CE  -- engine atoms
+import qualified CrystalAtoms as CE  -- refactored: was CrystalEngine
 -- ============================================================
 -- CRYSTAL INPUTS
 -- ============================================================

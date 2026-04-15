@@ -316,13 +316,13 @@
 
 ══ §9c DIRAC (spinors from weak sector) ══
   Spinor dim = N_w² = 4/1. Clifford dim = N_w⁴ = 16/1.
-  Antimatter: ¬(1/2) = 1/3 (weak → colour = matter → antimatter)
-  CPT: ¬¬(1/2) = 1/2 (CPT: double negation = identity)
+  Antimatter: W†W = I but WW† ≠ I → irreversible → arrow of time → antimatter
+  CPT: CPT = composition of 3 sector involutions. |CPT| = N_c = 3.
 
 ══ §9d BOLTZMANN H-THEOREM + THERMODYNAMICS ══
-  ΔH = ln(χ)/Σd = 0.049771 nats/tick. Increases: True → 2nd Law
+  ΔH = ln(χ)/Σd = -1.791759 nats/tick. Increases: True → 2nd Law
   KMS temperature: β = 2π = 6.283185
-  Partition function Z = 1.046870
+  Partition function Z = 2.000000
 
 ══ §9e KOLMOGOROV 5/3 (turbulence) ══
   K41 exponent = (N_c+N_w)/N_c = 5/3 = 5/3

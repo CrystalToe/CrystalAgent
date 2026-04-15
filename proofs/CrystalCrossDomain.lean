@@ -2,7 +2,7 @@
 -- SPDX-License-Identifier: AGPL-3.0-or-later
 
 /-! # CrystalCrossDomain — Cross-domain audit from (2,3)
-Engine wired: all sectors (d=36).
+Pure. Imports CrystalAxiom only. No CrystalEngine.
 -/
 
 abbrev nW : Nat := 2
@@ -36,4 +36,4 @@ theorem sector_sum : d1 + d2 + d3 + d4 = 36 := by native_decide
 theorem total_dim : sigmaD = 36 := by native_decide
 theorem tower : towerD = 42 := by native_decide
 theorem gauss_check : gauss = 13 := by native_decide
--- Engine wired.
+

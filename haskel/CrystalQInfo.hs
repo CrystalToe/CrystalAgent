@@ -30,8 +30,8 @@ import Data.Ratio ((%))
 -- S0  A_F ATOMS
 -- =====================================================================
 
--- Atoms from CrystalEngine (no local redefinitions)
-import qualified CrystalEngine as CE
+-- Atoms from CrystalAtoms (refactored: was CrystalEngine)
+import qualified CrystalAtoms as CE
 
 nW, nC, chi, beta0, sigmaD, sigmaD2, gauss, towerD :: Integer
 nW      = fromIntegral CE.nW
@@ -101,6 +101,93 @@ steaneCorrects = (nC - 1) `div` 2  -- 1 error
 
 shorN :: Integer
 shorN = nC * nC  -- 9 physical qubits
+
+-- =====================================================================
+-- S2a  ERROR CORRECTION CIRCUITS FROM (2,3)
+--
+-- Steane repetition: β₀ = 7 carriers, each holds a sector index ∈ {0..χ-1}.
+-- Distance = N_c = 3 → corrects (N_c-1)/2 = 1 sector flip.
+-- Shor repetition: N_c² = 9 carriers, grouped in N_c = 3 blocks.
+-- All numbers from (2,3). Pure algebra, no time evolution.
+-- =====================================================================
+
+-- | Encode: replicate sector across β₀ = 7 carriers
+steaneEncode :: Integer -> [Integer]
+steaneEncode sector = replicate (fromIntegral beta0) sector
+
+-- | Inject sector-flip error on carrier at position pos
+-- Flips sector by +1 mod χ (cyclic shift = Pauli X in sector basis)
+steaneInjectError :: Int -> [Integer] -> [Integer]
+steaneInjectError pos carriers =
+  [ if i == pos then (carriers !! i + 1) `mod` chi else carriers !! i
+  | i <- [0 .. length carriers - 1] ]
+
+-- | Syndrome: find which carrier disagrees with majority.
+-- Returns position of error, or -1 if no error detected.
+-- Majority vote uses β₀ = 7 carriers — odd, so majority always exists.
+steaneSyndrome :: [Integer] -> Int
+steaneSyndrome carriers =
+  let maj = majorityVote carriers
+      errs = [i | (i,c) <- zip [0..] carriers, c /= maj]
+  in if null errs then -1
+     else if length errs <= fromIntegral steaneCorrects then head errs
+     else -1  -- too many errors
+
+-- | Correct: replace minority carriers with majority value
+steaneCorrect :: [Integer] -> [Integer]
+steaneCorrect carriers =
+  let maj = majorityVote carriers
+  in map (\c -> if c /= maj then maj else c) carriers
+
+-- | Decode: extract logical sector from (possibly corrected) codeword
+steaneDecode :: [Integer] -> Integer
+steaneDecode = majorityVote
+
+-- | Shor encode: N_c² = 9 carriers in N_c = 3 blocks of N_c = 3
+-- Each block is a repetition of the sector. Block redundancy catches
+-- correlated errors within a block.
+shorEncode :: Integer -> [Integer]
+shorEncode sector = replicate (fromIntegral (nC * nC)) sector
+
+-- | Shor decode: majority vote within each block, then across blocks
+shorDecode :: [Integer] -> Integer
+shorDecode carriers =
+  let blockSize = fromIntegral nC  -- 3
+      blocks = splitEvery blockSize carriers
+      blockVotes = map majorityVote blocks
+  in majorityVote blockVotes
+
+-- | Majority vote: most common element. β₀ = 7 and N_c² = 9 are both
+-- odd, so a strict majority always exists for 0 or 1 errors.
+majorityVote :: [Integer] -> Integer
+majorityVote xs =
+  let count x = length (filter (== x) xs)
+      best = foldl1 (\a b -> if count a >= count b then a else b) xs
+  in best
+
+-- | Split list into chunks of size n
+splitEvery :: Int -> [a] -> [[a]]
+splitEvery _ [] = []
+splitEvery n xs = take n xs : splitEvery n (drop n xs)
+
+-- | Prove encode-correct-decode round trip
+proveSteaneRoundTrip :: Integer -> Bool
+proveSteaneRoundTrip sector =
+  let s = sector `mod` chi
+      encoded = steaneEncode s
+      damaged = steaneInjectError 2 encoded  -- error on carrier 2
+      fixed   = steaneCorrect damaged
+      decoded = steaneDecode fixed
+  in decoded == s
+
+-- | Prove Shor round trip
+proveShorRoundTrip :: Integer -> Bool
+proveShorRoundTrip sector =
+  let s = sector `mod` chi
+      encoded = shorEncode s
+      damaged = steaneInjectError 4 encoded  -- error on carrier 4
+      decoded = shorDecode damaged
+  in decoded == s
 
 -- =====================================================================
 -- S3  MERA STRUCTURE FROM (2,3)
@@ -340,10 +427,39 @@ runSelfTest = do
              "  teleport-superdense duality (both N_w)"
   putStrLn ""
 
+  -- S6: Error correction circuits
+  putStrLn "S6 Error correction circuits:"
+  -- Steane: encode sector 3, inject error at position 2, correct, decode
+  let stRound = proveSteaneRoundTrip 3
+  putStrLn $ "  Steane encode(3): " ++ show (steaneEncode 3)
+  putStrLn $ "  + error at pos 2: " ++ show (steaneInjectError 2 (steaneEncode 3))
+  putStrLn $ "  syndrome:         " ++ show (steaneSyndrome (steaneInjectError 2 (steaneEncode 3)))
+  putStrLn $ "  corrected:        " ++ show (steaneCorrect (steaneInjectError 2 (steaneEncode 3)))
+  putStrLn $ "  " ++ (if stRound then "PASS" else "FAIL") ++
+             "  Steane [beta0,d1,Nc] = [7,1,3] round-trip"
+
+  -- All χ = 6 sectors survive
+  let allSectors = and [proveSteaneRoundTrip s | s <- [0..chi-1]]
+  putStrLn $ "  " ++ (if allSectors then "PASS" else "FAIL") ++
+             "  all chi=" ++ show chi ++ " sectors survive encode-error-correct"
+
+  -- Shor
+  let shRound = proveShorRoundTrip 5
+  putStrLn $ "  Shor encode(5): " ++ show (take 9 (shorEncode 5))
+  putStrLn $ "  " ++ (if shRound then "PASS" else "FAIL") ++
+             "  Shor [Nc^2,d1,Nc] = [9,1,3] round-trip"
+
+  -- Shor all sectors
+  let allShor = and [proveShorRoundTrip s | s <- [0..chi-1]]
+  putStrLn $ "  " ++ (if allShor then "PASS" else "FAIL") ++
+             "  all chi=" ++ show chi ++ " sectors survive Shor round-trip"
+  putStrLn ""
+
   -- Summary
   putStrLn "================================================================"
   let allPass = and (map snd intChecks) && beOk && meOk && sumOk
                 && gcdOk && compOk && hammingOk && shorCFD && dualOk
+                && stRound && allSectors && shRound && allShor
   putStrLn $ "  " ++ (if allPass then "ALL PASS" else "SOME FAILURES") ++
              " -- every QInfo integer from (2, 3)."
   putStrLn "  Observable count: 13."

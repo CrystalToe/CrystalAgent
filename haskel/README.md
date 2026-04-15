@@ -8,6 +8,22 @@
 
 ---
 
+```bash
+cd ~/coding/entity-project/CrystalAgent/haskel
+
+# Remove GHC build artifacts
+rm -f *.o *.hi *.dyn_o *.dyn_hi
+
+# Remove compiled executables (Mac)
+find . -maxdepth 1 -type f -perm +111 ! -name "*.*" -delete
+
+
+
+# Verify
+echo "=== Cleaned ===" && ls *.o *.hi 2>/dev/null | wc -l && echo "build artifacts"
+echo "=== Deprecated ===" && ls deprecated/ | wc -l && echo "files moved"
+```
+
 ## ⚡ Try It Now (No Install — 30 Seconds)
 
 1. **Open** [Gemini](https://gemini.google.com/), [Copilot](https://copilot.microsoft.com/), [Claude](https://claude.ai/), or [ChatGPT](https://chat.openai.com/)

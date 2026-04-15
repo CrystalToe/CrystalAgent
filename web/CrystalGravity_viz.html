@@ -1,0 +1,412 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;500&family=Cormorant+Garamond:wght@600&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#020208; overflow:hidden; font-family:'IBM Plex Mono',monospace; color:#c0d0e8; }
+  #info {
+    position:fixed; top:20px; right:20px; z-index:10;
+    background:rgba(4,8,20,0.88); border:1px solid rgba(40,120,200,0.3);
+    padding:18px 22px; border-radius:12px; backdrop-filter:blur(12px);
+    max-width:300px; pointer-events:none;
+  }
+  #info h1 { font-family:'Cormorant Garamond',serif; font-size:20px; color:#60b0ff; margin-bottom:6px; }
+  #info .sub { font-size:9.5px; color:#506888; margin-bottom:14px; line-height:1.5; }
+  .row { display:flex; justify-content:space-between; font-size:10.5px; margin:3px 0; }
+  .row .label { color:#406080; }
+  .row .val { color:#80c0ff; font-weight:500; }
+  .divider { height:1px; background:rgba(40,100,180,0.2); margin:10px 0; }
+  #jacobson {
+    position:fixed; bottom:20px; right:20px; z-index:10;
+    background:rgba(4,8,20,0.88); border:1px solid rgba(40,120,200,0.2);
+    padding:14px 18px; border-radius:10px; backdrop-filter:blur(12px);
+    font-size:9px; color:#406888; pointer-events:none; line-height:1.7;
+  }
+  #jacobson span { color:#4090d0; }
+  #controls {
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:10;
+    display:flex; gap:12px; align-items:center;
+  }
+  #controls button {
+    background:rgba(30,80,160,0.25); border:1px solid rgba(40,120,200,0.4);
+    color:#60b0ff; padding:8px 16px; border-radius:8px; cursor:pointer;
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.8px;
+    transition:all 0.2s;
+  }
+  #controls button:hover { background:rgba(30,80,160,0.45); }
+  #controls button.active { background:rgba(30,80,160,0.6); border-color:#60b0ff; }
+  #controls select {
+    background:rgba(30,80,160,0.25); border:1px solid rgba(40,120,200,0.4);
+    color:#60b0ff; padding:8px 12px; border-radius:8px;
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px;
+  }
+  #tick-display { font-size:12px; color:#60b0ff; font-weight:500; min-width:70px; text-align:center; }
+  canvas { display:block; }
+</style>
+
+<div id="info">
+  <h1>CrystalGravity</h1>
+  <div class="sub">Gravitational field dynamics from (2,3). Jacobson chain:<br>
+  endomorphisms → thermodynamics → area law → Einstein.</div>
+  <div class="row"><span class="label">Φ_max (potential)</span><span class="val" id="vPhi">0.000</span></div>
+  <div class="row"><span class="label">|R| avg (curvature)</span><span class="val" id="vR">0.000</span></div>
+  <div class="row"><span class="label">ρ_max (matter)</span><span class="val" id="vRho">0.000</span></div>
+  <div class="row"><span class="label">GW amplitude</span><span class="val" id="vGW">0.000</span></div>
+  <div class="divider"></div>
+  <div class="row"><span class="label">E_ADM (conserved)</span><span class="val" id="vE">—</span></div>
+  <div class="row"><span class="label">Entropy</span><span class="val" id="vS">—</span></div>
+  <div class="row"><span class="label">Sector: weak/colour/mixed</span><span class="val" id="vSec">—</span></div>
+</div>
+
+<div id="jacobson">
+  Jacobson Chain:<br>
+  1. <span>c = χ/χ = 6/6 = 1</span> (Lieb-Robinson)<br>
+  2. <span>β = 2π</span> (Bisognano-Wichmann, N_w=2)<br>
+  3. <span>S = A/(4G)</span> (Ryu-Takayanagi, 4=N_w²)<br>
+  4. <span>G_μν = 8πG T_μν</span> (Jacobson, 8=d_colour)
+</div>
+
+<div id="controls">
+  <select id="scenario">
+    <option value="pointmass">Point Mass (1/r²)</option>
+    <option value="gwburst">GW Burst</option>
+    <option value="binary">Binary System</option>
+  </select>
+  <button id="btnReset">RESET</button>
+  <button id="btnPlay" class="active">▶ PLAY</button>
+  <button id="btnStep">TICK</button>
+  <div id="tick-display">tick 0</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════════
+// CRYSTAL ENGINE
+// ══════════════════════════════════════════════════════════════
+const NW=2, NC=3, CHI=NW*NC;
+const D1=1, D2=3, D3=8, D4=24, SIGMA_D=36;
+const LAMBDA = [1.0, 1/NW, 1/NC, 1/CHI];
+const WK = [1.0, 1/Math.sqrt(NW), 1/Math.sqrt(NC), 1/Math.sqrt(CHI)];
+const STARTS = [0, D1, D1+D2, D1+D2+D3];
+const DIMS = [D1, D2, D3, D4];
+
+function sectorOf(i){return i<D1?0:i<D1+D2?1:i<D1+D2+D3?2:3;}
+function zeroState(){return new Float64Array(SIGMA_D);}
+function extractSec(k,s){return Array.from(s.slice(STARTS[k],STARTS[k]+DIMS[k]));}
+function injectSec(k,v,s){for(let i=0;i<DIMS[k];i++)s[STARTS[k]+i]=v[i];}
+
+function wStepGrav(s) {
+  const out = new Float64Array(s);
+  const w=extractSec(1,s), c=extractSec(2,s);
+  const w1=WK[1], w2=WK[2], w3=WK[3];
+  const eAdm=s[0];
+  const phi=w[0], psi=w[1], chi_g=w[2];
+  const R=c[0], rxx=c[1], ryy=c[2], rzz=c[3], rho=c[4], jx=c[5], jy=c[6], jz=c[7];
+  // Kick geometry from curvature
+  out[STARTS[1]+0] = (phi + w1*R) * w1;
+  out[STARTS[1]+1] = (psi + w1*(R+rho)) * w1;
+  out[STARTS[1]+2] = (chi_g + w1*(jx+jy+jz)) * w1;
+  // Kick curvature from geometry
+  out[STARTS[2]+0] = (R + w2*(phi+psi)) * w2;
+  out[STARTS[2]+1] = (rxx + w2*phi) * w2;
+  out[STARTS[2]+2] = (ryy + w2*phi) * w2;
+  out[STARTS[2]+3] = (rzz + w2*phi) * w2;
+  out[STARTS[2]+4] = rho * w2;
+  out[STARTS[2]+5] = jx * w2;
+  out[STARTS[2]+6] = jy * w2;
+  out[STARTS[2]+7] = jz * w2;
+  // GW damps
+  for(let i=0;i<D4;i++) out[STARTS[3]+i] = s[STARTS[3]+i]*w3;
+  return out;
+}
+
+// 1D lattice dynamics
+function uStep1D(lat) {
+  const N=lat.length;
+  const out=lat.map(s=>new Float64Array(s));
+  for(let i=0;i<N;i++) {
+    for(let k=1;k<=3;k++) {
+      const u2=WK[k]*WK[k];
+      const dim=DIMS[k];
+      const iL=Math.max(0,i-1), iR=Math.min(N-1,i+1);
+      for(let d=0;d<dim;d++) {
+        const c=lat[i][STARTS[k]+d];
+        const l=lat[iL][STARTS[k]+d];
+        const r=lat[iR][STARTS[k]+d];
+        out[i][STARTS[k]+d] = c + u2*(l - 2*c + r);
+      }
+    }
+  }
+  return out;
+}
+
+function fullTick1D(lat) {
+  return uStep1D(lat).map(s => wStepGrav(s));
+}
+
+// ══════════════════════════════════════════════════════════════
+// SCENARIOS
+// ══════════════════════════════════════════════════════════════
+const NSITES = 40;
+
+function initPointMass() {
+  const lat=[];
+  const center=NSITES/2;
+  for(let i=0;i<NSITES;i++) {
+    const s=zeroState();
+    const dx=Math.abs(i-center);
+    const r=Math.max(1,dx);
+    const phi=-5/r;
+    const rho=(i===Math.floor(center))?5:0;
+    s[0]=1; // E_ADM
+    s[STARTS[1]+0]=phi; s[STARTS[1]+1]=phi; s[STARTS[1]+2]=0;
+    s[STARTS[2]+0]=6*phi; s[STARTS[2]+1]=2*phi; s[STARTS[2]+2]=2*phi; s[STARTS[2]+3]=2*phi;
+    s[STARTS[2]+4]=rho;
+    lat.push(s);
+  }
+  return lat;
+}
+
+function initGWBurst() {
+  const lat=[];
+  const center=NSITES/2;
+  const sigma=NSITES/8;
+  for(let i=0;i<NSITES;i++) {
+    const s=zeroState();
+    const dx=i-center;
+    const env=0.8*Math.exp(-dx*dx/(2*sigma*sigma));
+    s[0]=1;
+    for(let m=0;m<D4;m++) {
+      s[STARTS[3]+m] = env * Math.sin((m+1)*Math.PI/12);
+    }
+    lat.push(s);
+  }
+  return lat;
+}
+
+function initBinary() {
+  const lat=[];
+  const q1=Math.floor(NSITES/3), q3=Math.floor(2*NSITES/3);
+  for(let i=0;i<NSITES;i++) {
+    const s=zeroState();
+    const r1=Math.max(1,Math.abs(i-q1));
+    const r2=Math.max(1,Math.abs(i-q3));
+    const phi=-3/r1 - 3/r2;
+    const rho=(i===q1||i===q3)?3:0;
+    s[0]=1;
+    s[STARTS[1]+0]=phi; s[STARTS[1]+1]=phi;
+    s[STARTS[2]+0]=6*phi; s[STARTS[2]+1]=2*phi; s[STARTS[2]+2]=2*phi; s[STARTS[2]+3]=2*phi;
+    s[STARTS[2]+4]=rho;
+    // GW between masses
+    const midDist=Math.abs(i-(q1+q3)/2);
+    if(midDist<5) {
+      const gwA=0.05*9*Math.exp(-midDist);
+      for(let m=0;m<D4;m++) s[STARTS[3]+m]=gwA*Math.sin((m+1)*Math.PI/12);
+    }
+    lat.push(s);
+  }
+  return lat;
+}
+
+// ══════════════════════════════════════════════════════════════
+// THREE.JS SCENE
+// ══════════════════════════════════════════════════════════════
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 300);
+camera.position.set(0, 25, 45);
+camera.lookAt(0,-3,0);
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+document.body.appendChild(renderer.domElement);
+
+scene.add(new THREE.AmbientLight(0x102040, 0.5));
+const dLight = new THREE.DirectionalLight(0x6090c0, 0.7);
+dLight.position.set(5,15,10);
+scene.add(dLight);
+
+// Grid floor
+const gridHelper = new THREE.GridHelper(60, 40, 0x102030, 0x0a1520);
+gridHelper.position.y = -8;
+scene.add(gridHelper);
+
+// Create site columns: vertical bars showing potential depth + sphere on top for curvature
+const columns = [];
+const colSpacing = 1.2;
+const colOffset = (NSITES-1)*colSpacing/2;
+
+for(let i=0;i<NSITES;i++) {
+  // Column (bar from floor to potential)
+  const colGeo = new THREE.CylinderGeometry(0.12, 0.12, 1, 8);
+  const colMat = new THREE.MeshStandardMaterial({
+    color: 0x2060c0, transparent:true, opacity:0.6, metalness:0.5, roughness:0.3
+  });
+  const col = new THREE.Mesh(colGeo, colMat);
+  col.position.set(i*colSpacing - colOffset, 0, 0);
+  scene.add(col);
+
+  // Sphere on top (curvature/matter indicator)
+  const sGeo = new THREE.SphereGeometry(0.25, 16, 16);
+  const sMat = new THREE.MeshStandardMaterial({
+    color: 0x2080ff, transparent:true, opacity:0.9, metalness:0.4, roughness:0.3,
+    emissive: 0x001020
+  });
+  const sphere = new THREE.Mesh(sGeo, sMat);
+  sphere.position.set(i*colSpacing - colOffset, 0, 0);
+  scene.add(sphere);
+
+  // GW ring
+  const ringGeo = new THREE.RingGeometry(0.3, 0.5, 24);
+  const ringMat = new THREE.MeshBasicMaterial({
+    color: 0x00ffcc, transparent:true, opacity:0, side:THREE.DoubleSide
+  });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.position.set(i*colSpacing - colOffset, 0, 0);
+  ring.rotation.x = Math.PI/2;
+  scene.add(ring);
+
+  columns.push({ col, sphere, ring, mat:colMat, sMat, ringMat });
+}
+
+// Stars
+const starGeo = new THREE.BufferGeometry();
+const sv=[];
+for(let i=0;i<1500;i++) sv.push((Math.random()-0.5)*200,(Math.random()-0.5)*100+20,(Math.random()-0.5)*200);
+starGeo.setAttribute('position', new THREE.Float32BufferAttribute(sv,3));
+scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({color:0x556688,size:0.12,transparent:true,opacity:0.5})));
+
+// ══════════════════════════════════════════════════════════════
+// SIMULATION
+// ══════════════════════════════════════════════════════════════
+let lattice = initPointMass();
+let tickCount = 0;
+let playing = true;
+let tickTimer = 0;
+const TICK_INTERVAL = 0.4;
+
+function updateVisuals() {
+  let maxPhi=0, avgR=0, maxRho=0, maxGW=0, totE=0;
+  let totW=0, totC=0, totM=0;
+
+  for(let i=0;i<NSITES;i++) {
+    const s = lattice[i];
+    const phi = s[STARTS[1]];
+    const R = s[STARTS[2]];
+    const rho = s[STARTS[2]+4];
+    let gwA = 0;
+    for(let m=0;m<D4;m++) gwA += s[STARTS[3]+m]**2;
+    gwA = Math.sqrt(gwA);
+
+    let wN=0, cN=0, mN=0;
+    for(let j=0;j<D2;j++) wN+=s[STARTS[1]+j]**2;
+    for(let j=0;j<D3;j++) cN+=s[STARTS[2]+j]**2;
+    for(let j=0;j<D4;j++) mN+=s[STARTS[3]+j]**2;
+    totW+=wN; totC+=cN; totM+=mN;
+
+    maxPhi = Math.max(maxPhi, Math.abs(phi));
+    avgR += Math.abs(R);
+    maxRho = Math.max(maxRho, Math.abs(rho));
+    maxGW = Math.max(maxGW, gwA);
+    totE += s[0];
+
+    // Column height = potential depth (inverted: deeper = taller downward)
+    const height = Math.max(0.1, Math.min(12, Math.abs(phi)*2));
+    const c = columns[i];
+    c.col.scale.y = height;
+    c.col.position.y = -height/2;
+
+    // Column color: blue for negative Φ (well), red for positive
+    const wellDepth = Math.min(1, Math.abs(phi)/5);
+    if(phi < 0) {
+      c.mat.color.setRGB(0.1, 0.2+0.3*wellDepth, 0.5+0.5*wellDepth);
+      c.mat.emissive.setRGB(0, 0.05*wellDepth, 0.15*wellDepth);
+    } else {
+      c.mat.color.setRGB(0.5+0.3*wellDepth, 0.15, 0.1);
+      c.mat.emissive.setRGB(0.1*wellDepth, 0, 0);
+    }
+
+    // Sphere: sits on top of column, size from curvature
+    const curvNorm = Math.min(1, Math.sqrt(cN)*0.5);
+    c.sphere.position.y = -height + 0.3;
+    c.sphere.scale.setScalar(0.3 + 1.5*Math.min(1, Math.abs(rho)));
+    const matterHeat = Math.min(1, Math.abs(rho)/5);
+    c.sMat.color.setRGB(0.2+0.8*matterHeat, 0.3-0.2*matterHeat, 0.8-0.6*matterHeat);
+    c.sMat.emissive.setRGB(matterHeat*0.3, 0.05, (1-matterHeat)*0.15);
+
+    // GW ring
+    const gwVis = Math.min(1, gwA*3);
+    c.ring.position.y = -height/2;
+    c.ringMat.opacity = gwVis * 0.8;
+    c.ring.scale.setScalar(1 + gwVis*3);
+    c.ring.rotation.z += gwVis*0.05;
+    const gwHue = 0.45 + 0.1*Math.sin(i*0.5);
+    c.ringMat.color.setHSL(gwHue, 0.9, 0.5+0.3*gwVis);
+  }
+
+  avgR /= NSITES;
+  const totAll = totW+totC+totM || 1;
+
+  document.getElementById('vPhi').textContent = maxPhi.toFixed(4);
+  document.getElementById('vR').textContent = avgR.toFixed(4);
+  document.getElementById('vRho').textContent = maxRho.toFixed(4);
+  document.getElementById('vGW').textContent = maxGW.toFixed(4);
+  document.getElementById('vE').textContent = totE.toFixed(2);
+  document.getElementById('vS').textContent = (Math.log(CHI)*tickCount).toFixed(2)+' nats';
+  document.getElementById('vSec').textContent =
+    (totW/totAll*100).toFixed(0)+'% / '+(totC/totAll*100).toFixed(0)+'% / '+(totM/totAll*100).toFixed(0)+'%';
+  document.getElementById('tick-display').textContent = 'tick '+tickCount;
+}
+
+function doTick() {
+  lattice = fullTick1D(lattice);
+  tickCount++;
+  updateVisuals();
+}
+
+function resetScenario() {
+  const v = document.getElementById('scenario').value;
+  if(v==='pointmass') lattice=initPointMass();
+  else if(v==='gwburst') lattice=initGWBurst();
+  else lattice=initBinary();
+  tickCount=0; tickTimer=0;
+  updateVisuals();
+}
+
+document.getElementById('btnPlay').onclick=function(){
+  playing=!playing;
+  this.textContent=playing?'▶ PLAY':'⏸ PAUSE';
+  this.classList.toggle('active',playing);
+};
+document.getElementById('btnStep').onclick=function(){
+  playing=false;
+  document.getElementById('btnPlay').textContent='⏸ PAUSE';
+  document.getElementById('btnPlay').classList.remove('active');
+  doTick();
+};
+document.getElementById('btnReset').onclick=resetScenario;
+document.getElementById('scenario').onchange=resetScenario;
+
+let angle=0;
+function animate(time) {
+  requestAnimationFrame(animate);
+  if(playing) { tickTimer+=1/60; if(tickTimer>=TICK_INTERVAL){tickTimer=0;doTick();} }
+
+  angle += 0.002;
+  camera.position.x = Math.sin(angle)*40;
+  camera.position.z = Math.cos(angle)*40;
+  camera.position.y = 18 + 5*Math.sin(angle*0.4);
+  camera.lookAt(0,-3,0);
+
+  renderer.render(scene,camera);
+}
+
+updateVisuals();
+animate(0);
+window.addEventListener('resize',()=>{
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
+</script>

@@ -1,8 +1,11 @@
+{-# OPTIONS_GHC -Wno-x-partial #-}
 -- Copyright (c) 2026 Daland Montgomery
 -- SPDX-License-Identifier: AGPL-3.0-or-later
 
--- | CrystalFullTest.hs
--- Four-column regression test for the full observable catalogue.
+-- | CrystalFullTest.hs — TOTAL REWRITE (Phase 5 final task)
+--
+-- Four-column regression test for the full observable catalogue
+-- + dynamics regression for all 15 pack→tick→unpack modules.
 --
 -- THE FOUR-COLUMN TABLE:
 --   Crystal    = Toe()          → formula(standardRuler)  → crystal VEV 245.17
@@ -10,11 +13,13 @@
 --   Expt       = experimental value
 --   PWI        = |Expt − CrystalPdg| / Expt   (scheme noise REMOVED)
 --
--- Two calls.  Same formulas.  Different VEV.
--- The PWI tests formula accuracy, not scheme choice.
+-- POST-REFACTOR:
+--   CrystalGravity.hs is now a DYNAMICS module (pack→tick→unpack).
+--   proveImmirzi and proveBHEntropy are inlined here (gravity proofs
+--   that CrystalFullTest needs but that don't belong in a dynamics module).
 --
--- Compile:  ghc -O2 -main-is CrystalFullTest CrystalFullTest.hs -o full_test
--- Run:      ./full_test
+-- Compile:
+--   ghc -O2 -Wno-x-partial -main-is CrystalFullTest CrystalFullTest.hs && ./CrystalFullTest
 
 module CrystalFullTest where
 
@@ -23,14 +28,17 @@ import Text.Printf (printf)
 import Data.List (sortBy)
 import Data.Ord (comparing, Down(..))
 
--- Original 92: same imports as Main.hs
+-- Observable proof modules (unchanged from Phases 1-4)
 import CrystalAxiom
 import CrystalGauge
 import CrystalMixing
 import CrystalCosmo
 import CrystalQCD
-import CrystalGravity
 import CrystalCrossDomain
+
+-- NOTE: CrystalGravity is NOW a dynamics module (Phase 5).
+-- proveImmirzi and proveBHEntropy are inlined below (§1a).
+-- import CrystalGravity   ← REMOVED (dynamics module, no proof exports)
 
 -- Extended scan: 103 observables (qualified to avoid name collisions)
 import qualified CrystalWACAScan as WS
@@ -41,42 +49,66 @@ import qualified CrystalAlphaProton as AP
 -- S6: proton charge radius
 import qualified CrystalProtonRadius as PR
 
+-- Dynamics component stack (for dynamics regression §9)
+import qualified CrystalAtoms as CA
+import CrystalSectors (CrystalState, extractSector, injectSector, zeroState)
+import CrystalEigen (lambda, wK, uK)
+import CrystalOperators (tick, applyW, applyU, normSq)
+
 -- ══════════════════════════════════════════════════════════════════
 -- §1  THE TWO RULERS — Toe() vs Toe(vev="pdg")
 -- ══════════════════════════════════════════════════════════════════
 
--- | pdgRuler: M_Pl scaled so proveVEV c pdgRuler = 246.22 GeV.
---
---   proveVEV computes: v = M_Pl × 35/(43×36×2⁵⁰)
---   standardRuler:     v = 1.220890e19 × ... = 245.17368 GeV   (Toe())
---   pdgRuler:          v = M_Pl_scaled × ... = 246.22000 GeV   (Toe(vev="pdg"))
---
---   Same formula.  Different input.  Two actual calls.
 pdgRuler :: Ruler
 pdgRuler = MkRuler mpl_scaled (rulerMZ standardRuler)
   where
-    v_crystal  = 245.17368   -- GeV, output of proveVEV c standardRuler
-    v_pdg      = 246.22      -- GeV, PDG experimental extraction
+    v_crystal  = 245.17368
+    v_pdg      = 246.22
     mpl_scaled = rulerMPl standardRuler * (v_pdg / v_crystal)
 
+-- ══════════════════════════════════════════════════════════════════
+-- §1a  INLINED GRAVITY PROOFS
+--
+-- These lived in the old CrystalGravity.hs (proof module).
+-- Phase 5 replaced CrystalGravity.hs with a dynamics module.
+-- The proofs are unchanged — same formulas, same integers.
+-- ══════════════════════════════════════════════════════════════════
+
+-- | Immirzi parameter: (3/13)/(35/36) = 108/455.
+proveImmirzi :: Crystal Two Three -> Derived
+proveImmirzi c =
+  let sw = crFromInts c CrystalAxiom.nC (CrystalAxiom.nW^2 + CrystalAxiom.nC^2)
+      z  = crFromInts c (CrystalAxiom.sigmaD - 1) CrystalAxiom.sigmaD
+      exact = crVal sw / crVal z
+  in Derived "Immirzi γ" "(3/13)/(35/36) = 108/455"
+     (fromRational exact) (Just exact) (lqg 0.23753) Computed
+
+-- | BH entropy coefficient: (β₀²/N_w⁴)/π = 49/(16π).
+proveBHEntropy :: Crystal Two Three -> Derived
+proveBHEntropy c =
+  let b    = crystalBasis c
+      coef = crFromInts c (CrystalAxiom.beta0^2) (CrystalAxiom.nW ^ (4::Integer))
+      val  = crDbl coef / basisPi b
+  in Derived "S_BH (nats)" "(β₀²/N_w⁴)/π = 49/(16π)"
+     val (Just (crVal coef)) (pdg 0.975) Computed
+
+-- Axiom-layer atoms (Integer, not Int — for crFromInts)
 -- ══════════════════════════════════════════════════════════════════
 -- §2  FOUR-COLUMN TEST ENTRY
 -- ══════════════════════════════════════════════════════════════════
 
 data TestEntry = TestEntry
-  { teName       :: String     -- observable name
-  , teCrystal    :: Double     -- Toe(): crystal VEV (245.17)
-  , teCrystalPdg :: Double     -- Toe(vev="pdg"): same formula, PDG VEV (246.22)
-  , teExpt       :: Double     -- experimental / PDG value
-  , tePWI        :: Double     -- PWI = |Expt − CrystalPdg| / Expt (scheme noise removed)
-  , teRawPWI     :: Double     -- raw = |Expt − Crystal| / Expt (includes scheme noise)
-  , teRating     :: String     -- rating symbol (on PWI, not raw)
-  , teFormula    :: String     -- crystal formula
-  , teSource     :: String     -- which module group
+  { teName       :: String
+  , teCrystal    :: Double
+  , teCrystalPdg :: Double
+  , teExpt       :: Double
+  , tePWI        :: Double
+  , teRawPWI     :: Double
+  , teRating     :: String
+  , teFormula    :: String
+  , teSource     :: String
   } deriving (Show)
 
--- | Build TestEntry from two Derived: Toe() and Toe(vev="pdg").
---   Two actual calls to the same prove function.
 fromDerivedPair :: String -> Derived -> Derived -> TestEntry
 fromDerivedPair src crystalD pdgD = TestEntry
   { teName       = dName crystalD
@@ -94,12 +126,11 @@ fromDerivedPair src crystalD pdgD = TestEntry
     pwi    = abs (dCrystal pdgD - expt) / abs expt * 100.0
     rawPwi = abs (dCrystal crystalD - expt) / abs expt * 100.0
 
--- | Build TestEntry from WACAScan Observable (already uses PDG VEV internally).
 fromObservable :: String -> (String, Double, Double, Double, String, String, String) -> TestEntry
 fromObservable src (name, crystal, pdgVal, _pwi, _rating, formula, _domain) = TestEntry
   { teName       = name
-  , teCrystal    = crystal          -- NOTE: WACAScan uses v_mev=246220 (PDG)
-  , teCrystalPdg = crystal          -- same — already PDG VEV
+  , teCrystal    = crystal
+  , teCrystalPdg = crystal
   , teExpt       = pdgVal
   , tePWI        = pwi
   , teRawPWI     = pwi
@@ -109,7 +140,6 @@ fromObservable src (name, crystal, pdgVal, _pwi, _rating, formula, _domain) = Te
   }
   where pwi = abs (crystal - pdgVal) / abs pdgVal * 100.0
 
--- | Build TestEntry from raw values (S4-S6).
 mkTest :: String -> String -> String -> Double -> Double -> TestEntry
 mkTest src name formula crystal expt = TestEntry
   { teName       = name
@@ -128,17 +158,13 @@ mkTest src name formula crystal expt = TestEntry
 -- §3  SOURCE 1: ORIGINAL 92 — CALLED TWICE
 -- ══════════════════════════════════════════════════════════════════
 
--- | The original 92 observables, computed with BOTH rulers.
---   This IS calling Toe() and Toe(vev="pdg").
---   Same formulas.  Two calls.  Different VEV.
 original92 :: [TestEntry]
 original92 =
   let c   = crystalAxiom
-      r   = standardRuler     -- Toe()
-      rp  = pdgRuler          -- Toe(vev="pdg")
+      r   = standardRuler
+      rp  = pdgRuler
       src = "Original"
 
-      -- ── Call 1: Toe() — crystal VEV ──────────────────────────
       crystalDerived =
         [ proveAlphaInv c, proveSinSqThetaW_OS c, proveSinSqThetaW_MS c
         , CrystalGauge.proveVEV c r, proveHiggsMass c r, proveKoide c
@@ -181,8 +207,6 @@ original92 =
         , proveSigmaBaryon c r, proveOmegaSSS c r
         ]
 
-      -- ── Call 2: Toe(vev="pdg") — PDG VEV ────────────────────
-      --   SAME prove functions.  pdgRuler instead of standardRuler.
       pdgDerived =
         [ proveAlphaInv c, proveSinSqThetaW_OS c, proveSinSqThetaW_MS c
         , CrystalGauge.proveVEV c rp, proveHiggsMass c rp, proveKoide c
@@ -231,9 +255,6 @@ original92 =
 -- §4  SOURCE 2: EXTENDED SCAN 103
 -- ══════════════════════════════════════════════════════════════════
 
--- NOTE: WACAScan uses v_mev = 246220 (PDG) internally.
--- Values are ALREADY CrystalPdg.  Crystal = CrystalPdg for these
--- until WACAScan is refactored to accept VEVMode.
 extended86 :: [TestEntry]
 extended86 =
   let swap obs@(name, _, _, _, _, _, _)
@@ -292,7 +313,100 @@ computeMean entries =
   in  sum nonzero / fromIntegral (length nonzero)
 
 -- ══════════════════════════════════════════════════════════════════
--- §8  MAIN
+-- §8  DYNAMICS REGRESSION (Phase 5)
+--
+-- Tests the component stack and the tick on the 36.
+-- Every dynamics module uses the same engine:
+--   pack → tick → unpack. 36 multiplies. O(1) per site.
+--
+-- Tests:
+--   1. Component stack atoms (nW=2, nC=3, chi=6, etc.)
+--   2. Eigenvalues (lambda 0..3 = {1, 1/2, 1/3, 1/6})
+--   3. W.U factorisation (applyW . applyU = tick)
+--   4. Singlet conservation (lambda 0 = 1)
+--   5. Norm contraction (normSq(tick s) < normSq(s))
+--   6. Sector isolation (tick preserves sector boundaries)
+--   7. Pack/unpack round-trip (inject then extract = identity)
+-- ══════════════════════════════════════════════════════════════════
+
+data DynTest = DynTest
+  { dtName :: String
+  , dtPass :: Bool
+  } deriving (Show)
+
+dynamicsTests :: [DynTest]
+dynamicsTests =
+  let -- Test state: uniform across all 36 components
+      st0 = [1.0 / sqrt (fromIntegral CA.sigmaD) | _ <- [1..CA.sigmaD]]
+      st1 = tick st0
+
+      -- Sector-specific test state
+      singletonSt = replicate CA.sigmaD 0.0
+      weakSt = injectSector 1 [1.0, 2.0, 3.0] (replicate CA.sigmaD 0.0)
+      colourSt = injectSector 2 [1,2,3,4,5,6,7,8] (replicate CA.sigmaD 0.0)
+
+      -- Eigenvalue checks
+      eps = 1e-12
+
+  in [ -- §8a Component stack atoms
+       DynTest "nW = 2"       (CA.nW == 2)
+     , DynTest "nC = 3"       (CA.nC == 3)
+     , DynTest "chi = 6"      (CA.chi == 6)
+     , DynTest "beta0 = 7"    (CA.beta0 == 7)
+     , DynTest "d1 = 1"       (CA.d1 == 1)
+     , DynTest "d2 = 3"       (CA.d2 == 3)
+     , DynTest "d3 = 8"       (CA.d3 == 8)
+     , DynTest "d4 = 24"      (CA.d4 == 24)
+     , DynTest "sigmaD = 36"  (CA.sigmaD == 36)
+     , DynTest "towerD = 42"  (CA.towerD == 42)
+     , DynTest "gauss = 13"   (CA.gauss == 13)
+
+       -- §8b Eigenvalues
+     , DynTest "lambda 0 = 1"   (abs (lambda 0 - 1.0) < eps)
+     , DynTest "lambda 1 = 1/2" (abs (lambda 1 - 0.5) < eps)
+     , DynTest "lambda 2 = 1/3" (abs (lambda 2 - 1.0/3.0) < eps)
+     , DynTest "lambda 3 = 1/6" (abs (lambda 3 - 1.0/6.0) < eps)
+     , DynTest "lambda_mixed = lambda_weak * lambda_colour"
+         (abs (lambda 3 - lambda 1 * lambda 2) < eps)
+
+       -- §8c W.U factorisation
+     , DynTest "W.U = tick" (all (\(a,b) -> abs (a-b) < eps)
+                              (zip (applyW (applyU st0)) (tick st0)))
+
+       -- §8d Singlet conservation
+     , DynTest "singlet conserved (lambda=1)"
+         (abs (head st1 - head st0) < eps)
+
+       -- §8e Norm contraction
+     , DynTest "tick contracts norm"
+         (normSq st1 < normSq st0)
+
+       -- §8f Sector isolation
+     , DynTest "tick on weak-only: singlet stays 0"
+         (abs (head (tick weakSt)) < eps)
+     , DynTest "tick on weak-only: colour stays 0"
+         (all (\x -> abs x < eps) (extractSector 2 (tick weakSt)))
+
+       -- §8g Pack/unpack round-trip
+     , DynTest "extractSector . injectSector = id (weak)"
+         (extractSector 1 weakSt == [1.0, 2.0, 3.0])
+     , DynTest "extractSector . injectSector = id (colour)"
+         (extractSector 2 colourSt == [1,2,3,4,5,6,7,8])
+
+       -- §8h Eigenvalue denominator product
+     , DynTest "1 * N_w * N_c * chi = 36 = sigmaD"
+         (1 * CA.nW * CA.nC * CA.chi == CA.sigmaD)
+
+       -- §8i wK/uK half-step values
+     , DynTest "wK 1 = 1/sqrt(2)" (abs (wK 1 - 1/sqrt 2) < eps)
+     , DynTest "wK 2 = 1/sqrt(3)" (abs (wK 2 - 1/sqrt 3) < eps)
+     , DynTest "wK 3 = 1/sqrt(6)" (abs (wK 3 - 1/sqrt 6) < eps)
+     , DynTest "wK * uK = lambda"
+         (all (\k -> abs (wK k * uK k - lambda k) < eps) [0,1,2,3])
+     ]
+
+-- ══════════════════════════════════════════════════════════════════
+-- §9  MAIN
 -- ══════════════════════════════════════════════════════════════════
 
 main :: IO ()
@@ -304,6 +418,7 @@ main = do
   putStrLn "  CRYSTAL TOPOS — FULL REGRESSION TEST (FOUR-COLUMN GAP ANALYSIS)"
   putStrLn "  A_F = C + M2(C) + M3(C).  Zero free parameters."
   putStrLn "  Crystal = Toe()  |  CrystalPdg = Toe(vev=\"pdg\")  |  PWI = |Expt − CrystalPdg|/Expt"
+  putStrLn "  Phase 5 refactor: CrystalGravity → dynamics. Proofs inlined."
   putStrLn "════════════════════════════════════════════════════════════════════════════════════"
   putStrLn ""
 
@@ -358,9 +473,8 @@ main = do
   putStrLn $ "  " ++ replicate 140 '─'
 
   let indexed = zip [1::Int ..] allTests
-  mapM_ (\(i, e) -> do
-    let pass = tePWI e < 4.5
-        tag  = if pass then " " else "!"
+  mapM_ (\(_, e) -> do
+    let tag = if tePWI e < 4.5 then " " else "!"
     printf "%s%-26s %-35s %12.5g %12.5g %12.5g %7.3f%%  %s\n"
       tag (teName e) (teFormula e)
       (teCrystal e) (teCrystalPdg e) (teExpt e)
@@ -371,7 +485,6 @@ main = do
 
   -- ── Statistics ──
   let allPwi    = map tePWI allTests
-      allRawPwi = map teRawPWI allTests
       nExact   = length (filter (<= 1e-6) allPwi)
       nTight   = length [p | p <- allPwi, p > 1e-6 && p < 0.5]
       nGood    = length [p | p <- allPwi, p >= 0.5 && p < 1.0]
@@ -458,14 +571,43 @@ main = do
     (teCrystal rpEntry) (teExpt rpEntry) rpDeltaUnc
   putStrLn ""
 
+  -- ══════════════════════════════════════════════════════════════
+  -- §9  DYNAMICS REGRESSION (Phase 5)
+  -- ══════════════════════════════════════════════════════════════
+  putStrLn "══ §9 DYNAMICS REGRESSION (Phase 5: Component Stack) ══"
+  putStrLn "  The dynamics IS the tick on the 36. O(1) per site."
+  putStrLn "  CrystalState = 36 Doubles = [1] + [3] + [8] + [24]"
+  putStrLn "  λ = {1, 1/2, 1/3, 1/6}.  S = W∘U.  Zero bespoke integrators."
+  putStrLn ""
+
+  let dynResults = dynamicsTests
+      dynPass   = length (filter dtPass dynResults)
+      dynFail   = length (filter (not . dtPass) dynResults)
+      dynTotal  = length dynResults
+
+  mapM_ (\dt ->
+    putStrLn $ "  " ++ (if dtPass dt then "PASS" else "FAIL") ++ "  " ++ dtName dt
+    ) dynResults
+  putStrLn ""
+  printf "  Dynamics: %d/%d PASS\n" dynPass dynTotal
+  if dynFail > 0
+    then printf "  *** %d DYNAMICS FAILURES ***\n" dynFail
+    else putStrLn "  All dynamics tests pass. Component stack verified."
+  putStrLn ""
+
   -- ── Final verdict ──
-  let allPass = nOver == 0
+  let obsPass  = nOver == 0
+      dynOK    = dynFail == 0
+      allOK    = obsPass && countOK && dynOK
   putStrLn "════════════════════════════════════════════════════════════════════════════════════"
-  if allPass && countOK
-    then putStrLn "  RESULT: ALL 198 OBSERVABLES PASS (PWI uses CrystalPdg, scheme noise removed)"
+  if allOK
+    then do
+      printf "  RESULT: ALL %d OBSERVABLES PASS + %d/%d DYNAMICS TESTS PASS\n" nAll dynPass dynTotal
+      putStrLn "  Phase 5 complete. CrystalGravity → dynamics. Component stack verified."
     else do
       if not countOK then putStrLn "  RESULT: COUNT MISMATCH"    else pure ()
-      if not allPass then printf "  RESULT: %d ABOVE PRIME WALL\n" nOver else pure ()
+      if not obsPass then printf "  RESULT: %d ABOVE PRIME WALL\n" nOver else pure ()
+      if not dynOK   then printf "  RESULT: %d DYNAMICS FAILURES\n" dynFail else pure ()
   putStrLn "════════════════════════════════════════════════════════════════════════════════════"
   putStrLn ""
 

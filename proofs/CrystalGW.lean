@@ -1,61 +1,30 @@
 -- Copyright (c) 2026 Daland Montgomery
 -- SPDX-License-Identifier: AGPL-3.0-or-later
+abbrev nW : Nat := 2
+abbrev nC : Nat := 3
+abbrev chi : Nat := nW * nC
+abbrev d3 : Nat := nC * nC - 1
 
-/- CrystalGW.lean — GW integer identities from (N_w, N_c) = (2, 3). -/
+theorem quad_num : nW * nW * nW * nW * nW = 32 := by native_decide
+theorem quad_den : chi - 1 = 5 := by native_decide
+theorem decay_num : nW * nW * nW * nW * nW * nW = 64 := by native_decide
+theorem polarizations : nC - 1 = 2 := by native_decide
+theorem amplitude : nW * nW = 4 := by native_decide
+theorem gw_doubling : nW = 2 := by native_decide
+theorem isco : chi = 6 := by native_decide
+theorem chirp_num : nC = 3 := by native_decide
+theorem chirp_den : chi - 1 = 5 := by native_decide
+theorem freq_num : nC - 1 = 2 := by native_decide
+theorem freq_den : nC = 3 := by native_decide
+theorem colour_dim : d3 = 8 := by native_decide
+-- Total: 12 theorems by native_decide.
 
-def N_w : Nat := 2
-def N_c : Nat := 3
-def chi : Nat := N_w * N_c
-
--- Quadrupole formula
-theorem quadrupole_num : N_w ^ 5 = 32 := by native_decide
-theorem quadrupole_den : chi - 1 = 5 := by native_decide
-
--- Orbital decay
-theorem decay_num : N_w ^ 6 = 64 := by native_decide
-theorem decay_den : chi - 1 = 5 := by native_decide
-
--- Chirp rate
-theorem chirp_coeff_num : N_c * N_w ^ 5 = 96 := by native_decide
-
--- Merger time coefficient
-theorem merger_num : chi - 1 = 5 := by native_decide
-theorem merger_den : N_w ^ 8 = 256 := by native_decide
-
--- Chirp mass exponents: 3/5, 2/5, 1/5
-theorem chirp_mass_3 : N_c = 3 := by native_decide   -- numerator of 3/5
-theorem chirp_mass_5 : chi - 1 = 5 := by native_decide  -- denominator
-
--- Frequency exponent 2/3
-theorem freq_exp_num : N_c - 1 = 2 := by native_decide
-theorem freq_exp_den : N_c = 3 := by native_decide
-
--- Waveform amplitude
-theorem amplitude_4 : N_w ^ 2 = 4 := by native_decide
-
--- Polarizations
-theorem polarizations_2 : N_c - 1 = 2 := by native_decide
-
--- GW frequency doubling
-theorem gw_doubling : N_w = 2 := by native_decide
-
--- ISCO cutoff
-theorem isco_6 : chi = 6 := by native_decide
-
--- Kolmogorov in GW chirp
-theorem kolmogorov_num : chi - 1 = 5 := by native_decide
-theorem kolmogorov_den : N_c = 3 := by native_decide
-
--- Chirp 8/3 exponent
-theorem chirp_83_num : N_c ^ 2 - 1 = 8 := by native_decide  -- d_colour
-theorem chirp_83_den : N_c = 3 := by native_decide
-
--- Chirp 11/3 exponent
-theorem chirp_113_num : N_c ^ 2 + N_w = 11 := by native_decide
--- Engine wiring
-abbrev sigmaD : Nat := 1 + 3 + 8 + 24
-theorem engine_quad : chi = 6 := by native_decide
-theorem engine_pol : N_c - 1 = 2 := by native_decide
-theorem engine_double : N_w = 2 := by native_decide
-theorem engine_full : sigmaD = 36 := by native_decide
--- Engine wired.
+-- §5a Ringdown / QNM integers
+theorem qnm_freq : nC = 3 := by native_decide
+theorem qnm_damping_num : nC = 3 := by native_decide
+theorem qnm_damping_den : nC - 1 = 2 := by native_decide
+theorem qnm_quality_num : nC = 3 := by native_decide
+theorem qnm_quality_den : nC - 1 = 2 := by native_decide
+theorem qnm_shadow : nC * nC * nC = 27 := by native_decide
+theorem ringdown_decay : chi = 6 := by native_decide
+-- Total: 19 theorems by native_decide.

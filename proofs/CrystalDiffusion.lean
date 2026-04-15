@@ -93,20 +93,40 @@ theorem cross_tower : towerD = 42 := by native_decide
 -- LCG (shared with CrystalHMC)
 theorem cross_lcg : d1 * d1 + d2 * d2 + d3 * d3 + d4 * d4 = 650 := by native_decide
 
--- §9 Engine wiring (CrystalDiffusion imports CrystalEngine)
+-- §9 Component wiring (refactored from CrystalEngine)
 -- D = 1/χ = λ_mixed: denominator = χ = 6
-theorem engine_diff_coeff : chi = 6 := by native_decide
+theorem component_diff_coeff : chi = 6 := by native_decide
 -- 1D neighbours = N_w (engine atom)
-theorem engine_neighbours_1d : nW = 2 := by native_decide
+theorem component_neighbours_1d : nW = 2 := by native_decide
 -- 3D neighbours = χ (engine atom)
-theorem engine_neighbours_3d : chi = nW * nC := by native_decide
+theorem component_neighbours_3d : chi = nW * nC := by native_decide
 -- CFL: 2 × N_c = χ
-theorem engine_cfl : nW * nC = chi := by native_decide
+theorem component_cfl : nW * nC = chi := by native_decide
 -- Fourier k=0 conserved ↔ λ_singlet denom = 1
-theorem engine_singlet_conserved : d1 = 1 := by native_decide
+theorem component_singlet_conserved : d1 = 1 := by native_decide
 -- Spatial dim = d_weak = N_c = 3
-theorem engine_spatial : d2 = nC := by native_decide
+theorem component_spatial : d2 = nC := by native_decide
 -- All atoms from CrystalEngine
-theorem engine_full_state : sigmaD = 36 := by native_decide
+theorem component_full_state : sigmaD = 36 := by native_decide
 
--- Total: 38 theorems by native_decide. Zero sorry. Engine wired.
+-- Total: 38 theorems by native_decide. Zero sorry. Refactored: CrystalAtoms + CrystalSectors + CrystalEigen + CrystalOperators.
+
+-- §10 Gray-Scott crystal parameters
+theorem gs_du_denom : chi = 6 := by native_decide
+theorem gs_dv_denom : d4 = 24 := by native_decide
+theorem gs_feed_denom : towerD = 42 := by native_decide
+theorem gs_kill_num : beta0 = 7 := by native_decide
+theorem gs_kill_denom : towerD * towerD = 1764 := by native_decide
+theorem gs_dv_identity : nW * nW * chi = d4 := by native_decide
+
+-- §11 Anisotropic diffusion
+theorem aniso_rate_x_denom : nW = 2 := by native_decide
+theorem aniso_rate_y_denom : nC = 3 := by native_decide
+theorem aniso_rate_z_denom : chi = 6 := by native_decide
+
+-- §12 Crystal grid parameters
+theorem grid_dx_denom : nC = 3 := by native_decide
+theorem grid_dt_denom : towerD = 42 := by native_decide
+theorem grid_cfl_denom : nW * nW * beta0 = 28 := by native_decide
+
+-- Total: 50 theorems by native_decide. Zero sorry.

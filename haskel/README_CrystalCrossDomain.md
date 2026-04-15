@@ -34,9 +34,18 @@ Tests whether the crystal's invariants appear in domains FAR from particle physi
 ## Compile
 
 ```bash
-ghc -fno-code CrystalCrossDomain.hs
+ghc -c CrystalCrossDomain.hs
 ```
 
-## Dependencies
+No main. Type-check only.
 
-Imports `CrystalAxiom`.
+## Import Chain
+
+CrystalAxiom only. Zero CrystalEngine. Already clean.
+
+## Proofs
+
+| Proof file | Theorems | Method |
+|------------|----------|--------|
+| CrystalCrossDomain.agda | 10 | refl |
+| CrystalCrossDomain.lean | 15 | native_decide |

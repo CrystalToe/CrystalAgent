@@ -29,8 +29,8 @@ import Data.Ratio ((%))
 -- S0  A_F ATOMS
 -- =====================================================================
 
--- Atoms from CrystalEngine (no local redefinitions)
-import qualified CrystalEngine as CE
+-- Atoms from CrystalAtoms (refactored: was CrystalEngine)
+import qualified CrystalAtoms as CE
 
 nW, nC, chi, beta0, sigmaD, sigmaD2, gauss, towerD :: Integer
 nW      = fromIntegral CE.nW

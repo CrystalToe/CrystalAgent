@@ -1,13 +1,13 @@
 -- Copyright (c) 2026 Daland Montgomery
 -- SPDX-License-Identifier: AGPL-3.0-or-later
 
--- CrystalQMeasure — Measurement operators from (2,3)
--- Engine wired: mixed sector (d=24).
+-- CrystalQMeasure — Measurement operators + tomography from (2,3)
+-- Pure MERA. Imports CrystalQBase only. No engine.
 
 module CrystalQMeasure where
 
 open import Agda.Builtin.Equality
-open import Data.Nat using (ℕ; _+_; _*_; _∸_)
+open import Agda.Builtin.Nat renaming (Nat to ℕ)
 
 nW : ℕ
 nW = 2
@@ -18,61 +18,56 @@ nC = 3
 χ : ℕ
 χ = nW * nC
 
-β₀ : ℕ
-β₀ = 7
-
 d₁ : ℕ
 d₁ = 1
 
 d₂ : ℕ
-d₂ = nW * nW ∸ 1
+d₂ = nC
 
 d₃ : ℕ
-d₃ = nC * nC ∸ 1
+d₃ = nC * nC - 1
 
 d₄ : ℕ
-d₄ = (nW * nW ∸ 1) * (nC * nC ∸ 1)
+d₄ = nW * nW * nW * nC
 
 σD : ℕ
 σD = d₁ + d₂ + d₃ + d₄
 
-towerD : ℕ
-towerD = σD + χ
+-- §1 Measurement dimensions
+projective-outcomes : χ ≡ 6
+projective-outcomes = refl
 
-gauss : ℕ
-gauss = nW * nW + nC * nC
+sector-count : d₁ + 1 + 1 + 1 ≡ 4
+sector-count = refl
 
--- Core atoms
-nW-val : nW ≡ 2
-nW-val = refl
+-- §2 Parity
+parity-even : d₁ + d₃ ≡ 9
+parity-even = refl
 
-nC-val : nC ≡ 3
-nC-val = refl
+parity-odd : d₂ + d₄ ≡ 27
+parity-odd = refl
 
-χ-val : χ ≡ 6
-χ-val = refl
+parity-sum : (d₁ + d₃) + (d₂ + d₄) ≡ σD
+parity-sum = refl
 
-d₁-val : d₁ ≡ 1
-d₁-val = refl
+-- §3 Bell and two-particle
+bell-outcomes : χ ≡ 6
+bell-outcomes = refl
 
-d₂-val : d₂ ≡ 3
-d₂-val = refl
+two-particle : χ * χ ≡ 36
+two-particle = refl
 
-d₃-val : d₃ ≡ 8
-d₃-val = refl
+povm-norm : σD ≡ 36
+povm-norm = refl
 
-d₄-val : d₄ ≡ 24
-d₄-val = refl
+-- §4 Tomography: χ²-1 = 35 bases
+tomography-bases : χ * χ - 1 ≡ 35
+tomography-bases = refl
 
-σD-val : σD ≡ 36
-σD-val = refl
+-- ρ has χ² = 36 real parameters, trace constraint removes 1 → 35
+tomo-parameters : χ * χ ≡ 36
+tomo-parameters = refl
 
-sector-sum : d₁ + d₂ + d₃ + d₄ ≡ 36
-sector-sum = refl
-
-povm-dim : χ ≡ 6
-povm-dim = refl
-
-sector-outcomes : d₁ + 1 + 1 + 1 ≡ 4
-sector-outcomes = refl
--- Engine wired.
+-- DFT rotation: χ = 6 points per basis
+tomo-points-per-basis : χ ≡ 6
+tomo-points-per-basis = refl

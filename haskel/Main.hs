@@ -18,10 +18,128 @@ import CrystalGauge
 import CrystalMixing
 import CrystalCosmo
 import CrystalQCD
-import CrystalGravity
 import CrystalAudit
-import CrystalCrossDomain
+import CrystalUniversal
 import CrystalRiemann
+
+-- NOTE: CrystalGravity.hs is now a dynamics module (Phase 5).
+-- All proof functions that Main.hs used are inlined below.
+-- import CrystalGravity   ← REMOVED
+
+-- ═══════════════════════════════════════════════════════════════
+-- INLINED FROM OLD CrystalGravity.hs (proof module, now replaced)
+-- Same formulas, same integers. Every number from (2,3).
+-- ═══════════════════════════════════════════════════════════════
+
+proveImmirzi :: Crystal Two Three -> Derived
+proveImmirzi c =
+  let sw = crFromInts c nC (nW^2 + nC^2)
+      z  = crFromInts c (sigmaD - 1) sigmaD
+      exact = crVal sw / crVal z
+  in Derived "Immirzi γ" "(3/13)/(35/36) = 108/455"
+     (fromRational exact) (Just exact) (lqg 0.23753) Computed
+
+proveBHEntropy :: Crystal Two Three -> Derived
+proveBHEntropy c =
+  let b    = crystalBasis c
+      coef = crFromInts c (beta0^2) (nW ^ (4::Integer))
+      val  = crDbl coef / basisPi b
+  in Derived "S_BH (nats)" "(β₀²/N_w⁴)/π = 49/(16π)"
+     val (Just (crVal coef)) (pdg 0.975) Computed
+
+data JacobsonStep = JacobsonStep
+  { jsName :: String, jsFrom :: String, jsNumber :: Rational
+  , jsEndos :: Integer, jsRef :: String }
+
+jacobsonChain :: Crystal Two Three -> [JacobsonStep]
+jacobsonChain _ =
+  [ JacobsonStep "1. Finite c"   "χ = N_w×N_c"     (chi % 1)              650 "Lieb-Robinson 1972"
+  , JacobsonStep "2. KMS T=a/2π" "β = N_w×π"       (nW % 1)               9   "Bisognano-Wichmann 1976"
+  , JacobsonStep "3. S=A/(4G)"   "4 = N_w²"        (nW^2 % 1)             9   "Ryu-Takayanagi 2006"
+  , JacobsonStep "4. 8πG in EFE" "8 = d_colour"    (degeneracy MkColour % 1) 64 "Jacobson 1995"
+  ]
+
+data KeplerLaw = KeplerLaw
+  { klName :: String, klCrystal :: String, klNumber :: Rational, klFrom :: String }
+
+keplerLaws :: Crystal Two Three -> [KeplerLaw]
+keplerLaws _ =
+  [ KeplerLaw "1. Ellipses"   "exponent = N_c-1" ((nC-1) % 1) "1/r^2 → conics (Newton)"
+  , KeplerLaw "2. Equal areas" "L conserved"      ((nC-1) % 1) "central force (∇S radial)"
+  , KeplerLaw "3. T²~a³"      "exponent = N_c"   (nC % 1)     "T²=N_w²π²a^Nc/GM"
+  ]
+
+data RelativityTheorem = RT { rtName :: String, rtFrom :: String, rtNumber :: Rational }
+
+relativityTheorems :: Crystal Two Three -> [RelativityTheorem]
+relativityTheorems _ =
+  [ RT "SR1: frame invariance" "650/650 = 1"         (sigmaD2 % sigmaD2)
+  , RT "SR2: speed of light"   "χ = 6 (LR bound)"    (chi % 1)
+  , RT "SR3: E = mc²"          "χ/χ = 1"             (chi % chi)
+  , RT "SR4: signature (3,1)"  "N_c + 1 = 4"         ((nC+1) % 1)
+  , RT "GR1: G_μν = 8πG T"    "8 = d_colour"        ((nC^2-1) % 1)
+  , RT "GR2: geodesics"        "650/650"             (sigmaD2 % sigmaD2)
+  , RT "GR3: Schwarzschild"    "2 = N_c-1"           ((nC-1) % 1)
+  , RT "GR4: GW speed = c"     "χ/χ = 1"             (chi % chi)
+  , RT "GR5: lensing"          "4 = N_w²"            (nW^2 % 1)
+  , RT "GR6: redshift"         "2 = N_c-1"           ((nC-1) % 1)
+  ]
+
+data MaxwellTheorem = MaxwellTheorem
+  { mxName :: String, mxEquation :: String, mxSector :: String
+  , mxDegeneracy :: Integer, mxCrystal :: String }
+
+proveMaxwell :: Crystal Two Three -> [MaxwellTheorem]
+proveMaxwell _ =
+  [ MaxwellTheorem "Gauss (E)" "∇·E = ρ/ε₀"
+      "Singlet" (degeneracy MkSinglet) "d=1: charge counting"
+  , MaxwellTheorem "Gauss (B)" "∇·B = 0"
+      "Weak"    (degeneracy MkWeak)    "d=3: no magnetic monopole"
+  , MaxwellTheorem "Faraday"   "∇×E = −∂B/∂t"
+      "Colour"  (degeneracy MkColour)  "d=8: induction = adjoint rotation"
+  , MaxwellTheorem "Ampère"    "∇×B = μ₀(J+ε₀∂E/∂t)"
+      "Mixed"   (degeneracy MkMixed)   "d=24: full sector coupling"
+  ]
+
+data SchrodingerTheorem = SchrodingerTheorem
+  { sqName :: String, sqCrystal :: String, sqValue :: String }
+
+proveSchrodinger :: Crystal Two Three -> [SchrodingerTheorem]
+proveSchrodinger _ =
+  [ SchrodingerTheorem "State space"    "ℂ^χ = ℂ⁶"                 "6-dim Hilbert space"
+  , SchrodingerTheorem "Hamiltonian"    "H = −ln(S)/β"             "from KMS at β=2π"
+  , SchrodingerTheorem "Eigenvalues"    "{0, ln2, ln3, ln6}"       "4 sector energies"
+  , SchrodingerTheorem "Complex i"      "ℂ in A_F"                 "algebra is complex"
+  , SchrodingerTheorem "ℏ"              "1/N_w = 1/2 (Heyting)"    "min uncertainty"
+  , SchrodingerTheorem "Time evolution" "ψ(t+dt) = (1−iHdt)ψ(t)"  "infinitesimal S"
+  ]
+
+proveDiracSpinor :: Crystal Two Three -> CrystalRat
+proveDiracSpinor c = crFromInts c (nW^2) 1  -- 4
+
+proveClifford :: Crystal Two Three -> CrystalRat
+proveClifford c = crFromInts c (nW^4) 1  -- 16
+
+proveAntimatter :: Crystal Two Three -> (String, String)
+proveAntimatter _ =
+  ( "W†W = I but WW† ≠ I → irreversible → arrow of time → antimatter"
+  , "CPT = composition of 3 sector involutions. |CPT| = N_c = 3." )
+
+proveHTheorem :: Crystal Two Three -> (Double, Bool)
+proveHTheorem _ =
+  let deltaH = negate (log (fromIntegral chi))  -- -ln(6) per tick
+  in (deltaH, deltaH < 0)
+
+proveKMSTemperature :: Crystal Two Three -> Double
+proveKMSTemperature _ = 2 * pi  -- β = N_w × π
+
+provePartitionFunction :: Crystal Two Three -> Double
+provePartitionFunction _ =
+  let betas = [0, log 2, log 3, log 6]
+  in sum (map (\e -> exp (negate e)) betas)
+
+proveKolmogorov :: Crystal Two Three -> CrystalRat
+proveKolmogorov c = crFromInts c (nC + nW) nC  -- 5/3
 
 main :: IO ()
 main = do

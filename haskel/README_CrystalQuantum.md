@@ -1,71 +1,81 @@
 <!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
 
-# CrystalQuantum — Multi-Particle Quantum Operators from End(A_F)
+# CrystalQuantum — Multi-Particle Quantum Mechanics from End(A_F)
 
 ## What This Module Does
 
-CrystalQuantum derives the complete operator algebra for multi-particle
-quantum simulation from the 650 endomorphisms of A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ).
-Everything from Hilbert space dimension to entanglement measures to gate
-counts traces to (N_w=2, N_c=3).
+CrystalQuantum derives the complete operator algebra for multi-particle quantum
+simulation with entanglement from the 650 endomorphisms of A_F = ℂ ⊕ M₂(ℂ) ⊕ M₃(ℂ).
 
-### Key Results
+Seven key discoveries, all from N_w=2, N_c=3:
 
-- **Hilbert space:** dim(H₁) = χ = 6. dim(H₂) = χ² = 36 = Σd (two particles span the algebra).
-- **Spectrum:** E_k = −ln(λ_k) = {0, ln2, ln3, ln6}. Mass gap = ln(N_w). Symmetric ladder: ΔE₀₁ = ΔE₂₃.
-- **Multi-particle:** Bosons = χ(χ+1)/2 = 21. Fermions = χ(χ−1)/2 = 15 = dim(su(N_w²)) — Pati-Salam emerges.
-- **Entanglement:** S_max = ln(χ) = ΔS_arrow. PPT exact for ℂ^N_w ⊗ ℂ^N_c (Horodecki).
-- **Gates:** Total = χ² = 36 single-particle gates. CNOT = χ⁴ = 1296. End(A_F) = 650.
-- **Time:** Natural period T = 2π/ln(N_w). Discrete step dt = 1/(N_w ln N_w).
-- **Density matrix:** Max mixed purity = 1/χ.
+1. dim(H₂) = χ² = 36 = Σd — two particles span the algebra
+2. S_max = ln(χ) = ln(6) — entanglement = irreversibility
+3. Fermion states = 15 = dim(su(N_w²)) — Pati-Salam emerges
+4. PPT exact for ℂ^N_w ⊗ ℂ^N_c — entanglement decidable
+5. 650 endomorphisms = quantum gate set
+6. Fock space → e^χ — total particle content
+7. Pauli obstruction = Heyting incomparability
 
-### Integer Traces
+Engine wiring (§10a: toCrystalState, quantumTick) was stripped — those are
+time-dependent operations that belong in CrystalDynamicEngine.
 
-| Quantity | Value | Crystal derivation |
-|---|---|---|
-| Hilbert dim | 6 | χ |
-| Two-particle dim | 36 | χ² = Σd |
-| Bosons | 21 | χ(χ+1)/2 |
-| Fermions | 15 | χ(χ−1)/2 = dim(su(N_w²)) |
-| Entangled states | 30 | χ(χ−1) |
-| Entanglement fraction | 5/6 | (χ−1)/χ |
-| Gates | 36 | χ² |
-| CNOT dim | 1296 | χ⁴ |
-| Endomorphisms | 650 | Σd² |
-| Fock limit | e⁶ | e^χ |
+## Contents (433 lines)
 
-## Engine Wiring
+| Section | What |
+|---------|------|
+| §0 | Crystal constants from CrystalAxiom (Integer) |
+| §1 | Hilbert space: dim = χ = 6, eigenvalues, degeneracies |
+| §2 | Hamiltonian: energy spectrum, mass gap ln(2), partition Z |
+| §3 | Creation/annihilation: ladder factors, number eigenvalues |
+| §4 | Multi-particle: tensor dim, symmetric (21), antisymmetric (15), Fock |
+| §5 | Entanglement: max entropy ln(6), product (6) vs entangled (30), PPT |
+| §6 | Gates: sector-preserving + mixing = χ² = 36, CNOT dim χ⁴ = 1296 |
+| §7 | Measurement: sector probabilities, POVM weights |
+| §8 | Time evolution: period 2π/mass_gap, discrete step 1/(N_w ln N_w) |
+| §9 | Density matrices: thermal state, max mixed purity 1/χ |
+| §10 | 10 structural theorems |
 
-**Status: WIRED.** Module #19 on the Engine Wiring Work List.
+## 10 Structural Theorems
 
-### What Changed
+| # | Theorem | Proof |
+|---|---------|-------|
+| 1 | dim(H₂) = χ² = Σd | 36 = 36 |
+| 2 | S_max = ln(χ) = arrow of time | ln(6) = ln(6) |
+| 3 | Fermion states = 15 = dim(su(4)) | χ(χ-1)/2 = N_w⁴-1 |
+| 4 | PPT decidable for N_w ⊗ N_c | 2×3 = 6 ≤ 6 |
+| 5 | Gate count = χ² = 36 | End(ℂ^χ) |
+| 6 | Fock limit e^χ ≈ 403 | truncated |
+| 7 | Ladder symmetric: ΔE₀₁ = ΔE₂₃ = ln(N_w) | ln(2) = ln(2) |
+| 8 | Interaction = 2× fermion count | χ(χ-1) = 2·15 |
+| 9 | Pauli obstruction = Heyting incomparability | gcd(2,3) = 1 |
+| 10 | CNOT = neutrino mixing dim | χ⁴ = 1296 |
 
-1. **`import qualified CrystalEngine as CE`** — engine functions (tick, extractSector,
-   injectSector, CrystalState, lambda, normSq, zeroState) imported from engine.
-2. **Atoms stay from CrystalAxiom** — CrystalQuantum uses Integer throughout;
-   CrystalAxiom provides Integer atoms. CrystalEngine provides Int engine functions.
-   No local atom redefinitions.
-3. **`toCrystalState` / `fromCrystalState`** — packs quantum state data (eigenvalues,
-   energies, entanglement metrics) into colour (d₃=8) + mixed (d₄=24) = 32 slots.
-4. **`proveSectorRestriction`** — round-trip test on 32-component vector.
-5. **Engine wiring checks** added to `quantumAudit`.
-6. **`main`** added to run audit as standalone.
+## Self-Test (10 theorem checks + info printout)
 
-### Sector
+```
+quantumAudit prints: Hilbert space, spectrum, multi-particle, entanglement,
+then runs 10 prove* theorems with PASS/FAIL.
+```
 
-**Colour⊕mixed (d=32).** Quantum operator algebra spans colour (momentum/spin
-structure, d=8) and mixed (entangled/interaction DOF, d=24). No weak-sector
-coupling — quantum operators act on internal Hilbert space, not on spatial geometry.
-
-## Self-Test
+## Compile
 
 ```bash
 ghc -O2 -main-is CrystalQuantum CrystalQuantum.hs && ./CrystalQuantum
 ```
 
-10 structural theorems + engine wiring checks.
+## Import Chain
 
-## Proof Certificate
+CrystalAxiom only (Integer atoms: nW, nC, chi, beta0, towerD, sigmaD, sigmaD2, kappa).
+Refactored: was CrystalAxiom + CrystalEngine. Engine wiring stripped.
 
-- `proofs/CrystalQuantum.lean` — quantum + engine wiring theorems
-- `proofs/CrystalQuantum.agda` — quantum + engine wiring proofs
+## Proofs
+
+| Proof file | Theorems | Method |
+|------------|----------|--------|
+| CrystalQuantum.agda | 9 | refl |
+| CrystalQuantum.lean | 19 | native_decide |
+
+Engine wiring proofs removed. Structural proofs cover: Hilbert dim, two-particle = Σd,
+fermion su(4), entangled count, PPT, gate set, CNOT dim, sector total.
+Lean adds: symmetric/antisymmetric dims, mass gap, Fock, purity, cross-checks.

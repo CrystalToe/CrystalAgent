@@ -2,7 +2,7 @@
 -- SPDX-License-Identifier: AGPL-3.0-or-later
 
 -- CrystalRiemann — Mathematical infrastructure from (2,3)
--- Engine wired: all sectors (d=36).
+-- Pure. Imports CrystalAxiom only. No CrystalEngine.
 
 module CrystalRiemann where
 
@@ -72,4 +72,4 @@ sector-sum = refl
 
 spectral-dim : nW ≡ 2
 spectral-dim = refl
--- Engine wired.
+

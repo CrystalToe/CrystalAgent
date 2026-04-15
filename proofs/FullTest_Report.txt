@@ -3,6 +3,7 @@
   CRYSTAL TOPOS — FULL REGRESSION TEST (FOUR-COLUMN GAP ANALYSIS)
   A_F = C + M2(C) + M3(C).  Zero free parameters.
   Crystal = Toe()  |  CrystalPdg = Toe(vev="pdg")  |  PWI = |Expt − CrystalPdg|/Expt
+  Phase 5 refactor: CrystalGravity → dynamics. Proofs inlined.
 ════════════════════════════════════════════════════════════════════════════════════
 
   Toe()            v = 245.17368 GeV  (crystal derived, ground truth)
@@ -287,7 +288,45 @@
     m_p/m_e:    crystal = 1836.15267343  PDG = 1836.15267343  delta/unc = 0.04
     r_p (fm):   crystal = 0.8408705  exp = 0.84087  delta/unc = 0.0013
 
+══ §9 DYNAMICS REGRESSION (Phase 5: Component Stack) ══
+  The dynamics IS the tick on the 36. O(1) per site.
+  CrystalState = 36 Doubles = [1] + [3] + [8] + [24]
+  λ = {1, 1/2, 1/3, 1/6}.  S = W∘U.  Zero bespoke integrators.
+
+  PASS  nW = 2
+  PASS  nC = 3
+  PASS  chi = 6
+  PASS  beta0 = 7
+  PASS  d1 = 1
+  PASS  d2 = 3
+  PASS  d3 = 8
+  PASS  d4 = 24
+  PASS  sigmaD = 36
+  PASS  towerD = 42
+  PASS  gauss = 13
+  PASS  lambda 0 = 1
+  PASS  lambda 1 = 1/2
+  PASS  lambda 2 = 1/3
+  PASS  lambda 3 = 1/6
+  PASS  lambda_mixed = lambda_weak * lambda_colour
+  PASS  W.U = tick
+  PASS  singlet conserved (lambda=1)
+  PASS  tick contracts norm
+  PASS  tick on weak-only: singlet stays 0
+  PASS  tick on weak-only: colour stays 0
+  PASS  extractSector . injectSector = id (weak)
+  PASS  extractSector . injectSector = id (colour)
+  PASS  1 * N_w * N_c * chi = 36 = sigmaD
+  PASS  wK 1 = 1/sqrt(2)
+  PASS  wK 2 = 1/sqrt(3)
+  PASS  wK 3 = 1/sqrt(6)
+  PASS  wK * uK = lambda
+
+  Dynamics: 28/28 PASS
+  All dynamics tests pass. Component stack verified.
+
 ════════════════════════════════════════════════════════════════════════════════════
-  RESULT: ALL 198 OBSERVABLES PASS (PWI uses CrystalPdg, scheme noise removed)
+  RESULT: ALL 198 OBSERVABLES PASS + 28/28 DYNAMICS TESTS PASS
+  Phase 5 complete. CrystalGravity → dynamics. Component stack verified.
 ════════════════════════════════════════════════════════════════════════════════════
 

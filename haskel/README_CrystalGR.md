@@ -2,43 +2,72 @@
 
 # CrystalGR.hs — General Relativistic Orbits from (2,3)
 
-## What This Module Does
+## THE DYNAMICS IS THE TICK ON THE 36.
 
-Schwarzschild geodesic integration via symplectic leapfrog. Mercury precession,
-light bending, ISCO, Shapiro delay, photon geodesics, accretion disk temperature,
-Einstein ring — all from (2,3).
+Each geodesic = one CrystalState. S = W∘U. U disentangler = Schwarzschild curvature.
 
-## Engine Wiring
+## Build
 
-**This module imports CrystalEngine.** No local atom redefinitions.
+```bash
+cd haskel/
+ghc -O2 -main-is CrystalGR CrystalGR.hs && ./CrystalGR
 
-### Sector: weak⊕colour (d = 3 + 8 = 11, position + curvature)
+cd proofs/
+agda CrystalGR.agda
+lean CrystalGR.lean
+```
 
-| GR Concept | Value | Engine Source |
-|-----------|-------|--------------|
-| Schwarzschild factor | 2 | N_c − 1 |
-| Precession factor | 6 | χ |
-| Light bending factor | 4 | N_w² |
-| ISCO radius | 6GM | χ·GM |
-| ISCO = 3 r_s | 3 | N_c |
-| Spacetime dimensions | 4 | N_c + 1 |
-| 16πG coefficient | 16 | N_w⁴ |
-| Radiative efficiency 8/9 | 8, 9 | d_colour, N_c² |
-| Einstein ring factor | 4 | N_w² |
+## Sector Assignment
 
-## New Features (this session)
+| Data | Sector | Dim | λ |
+|------|--------|-----|---|
+| E² marker | singlet [1] | 1 | 1 |
+| r, φ, τ | weak [3] | 3 | 1/2 |
+| v_r, φ̇, ṫ, F_r, L, E, V_eff, metric | colour [8] | 8 | 1/3 |
 
-- `diskTemperature` — T(r) ∝ r^{−3/4}, inner edge at ISCO = χ·GM
-- `radiativeEfficiency` — η = 1 − √(8/9) where 8 = d_colour, 9 = N_c²
-- `einsteinRadius` — θ_E = √(N_w²·GM·D_LS/(D_L·D_S))
+## HOW THE DYNAMICS WORKS
 
-## Proof Certificate
+```
+U step: curvature disentangler
+  F_r = −GM/r² + L²/r³ − N_c·GM·L²/r⁴
+  φ̇ = L/r²
+  ṫ = E/(1−r_s/r)
+  → stored in colour sector
 
-- `haskel/CrystalGR.hs` — 23 checks (23 PASS)
-- `proofs/CrystalGR.lean` — Lean 4 theorems (by native_decide)
-- `proofs/CrystalGR.agda` — Agda proofs (by refl)
+W step: per-geodesic sector tick
+  v_r' = v_r + wK₁ × F_r
+  r' = r + uK₂ × v_r'
+  φ' = φ + uK₂ × φ̇
+```
 
-## Dependencies
+```haskell
+grTick rs = wStepGR . uStepGR rs
+```
 
-- **Imports CrystalEngine** — atoms, sector operations, tick, normSq
-- `Data.Ratio`
+## Integer Map
+
+| Quantity | Value | Source |
+|----------|-------|--------|
+| r_s = 2GM | 2 | N_c − 1 |
+| Precession 6πGM | 6 | χ |
+| Light bending 4GM/b | 4 | N_w² |
+| ISCO = 6GM | 6 | χ |
+| ISCO = 3r_s | 3 | N_c |
+| Photon sphere = 3GM | 3 | N_c |
+| E²_ISCO = 8/9 | 8,9 | d_colour, N_c² |
+| Spacetime dim | 4 | N_c + 1 |
+| 16πG | 16 | N_w⁴ |
+| GR correction −3GML²/r⁴ | 3 | N_c |
+| Shadow = 3√3 GM | 3,√3 | N_c, √N_c |
+| Shapiro 2r_s ln(4r₁r₂/b²) | 2,4 | N_c−1, N_w² |
+
+## Cool Stuff for Three.js
+
+- `diskRings` — accretion disk ring geometry with temperature color
+- `vEffCurve` — effective potential "rubber sheet" visualization
+- `shadowRadius` — black hole shadow circle for rendering
+- `trajPositions3D` — orbit paths in 3D Cartesian
+- `trajRedshift` — gravitational redshift for color mapping along orbit
+- `plungingOrbit` — particle spiraling into black hole
+- `photonOrbit` — photon deflection / capture
+- `diskColor` — temperature → RGBA for accretion glow

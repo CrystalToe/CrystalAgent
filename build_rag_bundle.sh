@@ -45,7 +45,7 @@ write_header() {
 # D=22 VdW FIXED (Session 13) · Force field from first principles · 0 fitted parameters
 # Rendering/scattering: Planck λ⁻⁵ (χ−1=5), Rayleigh d⁶ (χ=6), Rayleigh λ⁻⁴ (N_w²=4)
 # Hologron dynamics: emergent gravity from monad ticks, V(L)∝L^(-2ln2/ln6), no F=ma
-# 21/21 dynamics modules COMPLETE: Classical→Plasma + QFT→Arcade (Phase 2)
+# 15/15 dynamics modules ACTIVE. 21 deprecated. Phase 5 component stack.
 # Engine purified: tick = multiply by {1, 1/2, 1/3, 1/6}. Zero calculus.
 # CrystalFold v2: 3D backbone + side chains + sequence-dependent. Helix confirmed.
 # 559 Python checks · 372 Lean theorems · 291 Agda proofs · 0 regressions
@@ -67,12 +67,13 @@ The 0.42% gap is a renormalisation scale choice. The 1.004 conversion factor
 (1 + N_c/(16π²)·ln(√N_w·d₈/N_c²), every digit from (2,3)) explains it.
 Never applied — the four-column table removes scheme noise structurally.
 
-## ENGINE — PURIFIED (Session 14+)
+## ENGINE — PHASE 5 COMPONENT STACK
+CrystalAtoms → CrystalSectors → CrystalEigen → CrystalOperators
 tick = multiply each of 36 components by its sector eigenvalue.
-λ = {1, 1/2, 1/3, 1/6}. ZERO TRANSCENDENTALS.
-wK/uK hardcoded as literal Double constants. No sqrt anywhere.
-All 17 dynamics modules route through: domainTick = fromCrystalState . tick . toCrystalState
-Old calculus ticks renamed *Textbook for comparison.
+λ = {1, 1/2, 1/3, 1/6}. ZERO TRANSCENDENTALS. ZERO BESPOKE INTEGRATORS.
+All 15 dynamics modules: pack → tick → unpack. O(1) per site.
+Rule Zero: the dynamics IS the tick on the 36. There is no other.
+21 modules deprecated in haskel/depricated/. No dt. No RK4. No lies.
 
 ## CRYSTALFOLD v2 — PROTEIN FOLDING FROM (2,3)
 Singlet(1,λ=1): bond length — topology (conserved)
@@ -185,9 +186,11 @@ echo "# §HASKELL — Engine + Dynamics (Wave 1)" >> "$OUT2"
 extract_hs "haskel/CrystalEngine.hs" "$OUT2"
 
 # Wave 1 dynamics (Phase 1 modules)
-WAVE1="CrystalClassical CrystalGR CrystalGW CrystalEM CrystalFriedmann
-       CrystalNBody CrystalThermo CrystalCFD CrystalDecay CrystalOptics
-       CrystalMD CrystalCondensed CrystalPlasma"
+# Component stack (always first)
+STACK="CrystalAtoms CrystalSectors CrystalEigen CrystalOperators"
+WAVE1="CrystalDiffusion CrystalEM CrystalRigid CrystalMD CrystalThermo
+       CrystalPlasma CrystalSchrodinger CrystalGW CrystalCFD CrystalClassical
+       CrystalNBody CrystalGR CrystalFriedmann CrystalGravity"
 for mod in $WAVE1; do
     f="haskel/${mod}.hs"
     [ -f "$f" ] || continue
@@ -211,9 +214,8 @@ echo "---" >> "$OUT3"
 echo "# §HASKELL — Quantum + Fold + Static Modules" >> "$OUT3"
 
 # Wave 2 dynamics + fold + static
-WAVE2="CrystalQFT CrystalRigid CrystalChem CrystalNuclear CrystalAstro
-       CrystalQInfo CrystalBio CrystalArcade CrystalHMC CrystalHologron
-       CrystalFold CrystalProtein CrystalBenchmark"
+WAVE2="CrystalFold CrystalProtein CrystalBenchmark CrystalQFT
+       CrystalDynamicEngine CrystalEngine"
 for mod in $WAVE2; do
     f="haskel/${mod}.hs"
     [ -f "$f" ] || continue
@@ -227,9 +229,11 @@ for mod in $WAVE2; do
 done
 
 # Remaining Haskell files not yet included
-DONE_HS="CrystalEngine $WAVE1 $WAVE2"
+DONE_HS="$STACK CrystalEngine $WAVE1 $WAVE2"
 for f in haskel/*.hs; do
     [ -f "$f" ] || continue
+    # Skip deprecated
+    case "$f" in */depricated/*) continue ;; esac
     mod=$(basename "$f" .hs)
     case "$DONE_HS" in *"$mod"*) continue ;; esac
     cursize=$(wc -c < "$OUT3")

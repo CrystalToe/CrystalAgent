@@ -2,36 +2,53 @@
 
 # CrystalEM.hs — Electromagnetic Field Evolution from (2,3)
 
-## What This Module Does
+## HOW THE DYNAMICS WORKS
 
-Yee FDTD (Finite-Difference Time-Domain) for Maxwell's equations.
-E and B staggered in space and time — this IS S = W∘U for EM.
-Propagation, Rayleigh scattering, Thomson cross-section, Larmor radiation.
+**There is NO Yee FDTD. There is NO finite difference scheme. The tick on the 36 IS Maxwell.**
 
-## Engine Wiring
+```
+Pack E(3) and B(3) into colour sector [8] of a CrystalState
+       ↓
+   emSectorTick (sector-projected tick on the 36)
+       ↓
+E-B coupling within colour sector, Courant = 1/N_w = 1/2
+       ↓
+Read E and B back from colour sector
+```
 
-**This module imports CrystalEngine.** No local atom redefinitions.
+For a lattice of N sites, each site is a CrystalState. One EM tick:
 
-### Sector: colour (d₃ = 8)
+1. **U step** (inter-site disentangler): couples neighboring colour sectors. The spatial curl. Coupling weight = uK² = 1/N_c = 1/3.
+2. **W step** (per-site): `emSectorTick` applies E-B coupling within the colour sector of each site. Courant = 1/N_w.
+3. **S = W∘U**: one tick of EM. Done.
 
-| EM Concept | Value | Engine Source |
-|-----------|-------|--------------|
-| Field components (3E + 3B) | 6 | χ |
-| EM sector dimension | 8 | d_colour = N_c²−1 |
-| Courant number | 1/2 | 1/N_w |
-| Maxwell's equations | 4 | N_c + 1 |
-| Speed of light | 1 | χ/χ (Lieb-Robinson) |
-| Rayleigh exponent | 4 | N_w² |
-| Thomson factor | 8/3 | d_colour/N_c |
-| Larmor coefficient | 2/3 | (N_c−1)/N_c |
+Speed of light: c = χ/χ = 1 (Lieb-Robinson bound).
+Energy conservation: total EM energy → singlet, λ_singlet = 1.
 
-## Proof Certificate
+## Sector Assignment
 
-- `haskel/CrystalEM.hs` — 27 checks (27 PASS)
-- `proofs/CrystalEM.lean` — Lean 4 theorems (by native_decide)
-- `proofs/CrystalEM.agda` — Agda proofs (by refl)
+| Data | Sector | λ | Meaning |
+|------|--------|---|---------|
+| Total EM energy | singlet [1] | 1 | Conserved. |
+| (unused) | weak [3] | 1/2 | — |
+| E(3) + B(3) + 2 aux | colour [8] | 1/3 | EM fields contract. |
+| (unused) | mixed [24] | 1/6 | — |
 
-## Dependencies
+## Import Chain
 
-- **Imports CrystalEngine** — atoms, sector operations, tick, normSq
-- `Data.Ratio`
+```
+CrystalAtoms       ← nW, nC, chi, beta0, sigmaD, towerD, gauss, d1–d4
+CrystalSectors     ← CrystalState, sectorDim, extractSector, injectSector, zeroState
+CrystalEigen       ← lambda, wK, uK
+CrystalOperators   ← tick, normSq
+```
+
+## Compile
+
+```bash
+ghc -O2 -main-is CrystalEM CrystalEM.hs && ./CrystalEM
+```
+
+## Proofs
+
+Unchanged from previous — integer identities (chi=6, nC+1=4, etc.) are the same.

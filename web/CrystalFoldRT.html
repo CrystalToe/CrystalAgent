@@ -1,0 +1,454 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;500&family=Playfair+Display:wght@700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#060810;overflow:hidden;font-family:'IBM Plex Mono',monospace;color:#c0d0e0}
+canvas{display:block}
+#hud{position:fixed;top:14px;left:14px;z-index:10;pointer-events:none;
+  background:rgba(6,8,16,0.88);border:1px solid rgba(60,120,180,0.2);
+  padding:14px 18px;border-radius:10px;backdrop-filter:blur(10px);max-width:260px}
+#hud h1{font-family:'Playfair Display',serif;font-size:20px;color:#50c8ff;margin-bottom:3px}
+#hud .sub{font-size:8px;color:#405060;margin-bottom:10px;letter-spacing:1.5px;text-transform:uppercase;line-height:1.5}
+.st{font-size:9.5px;margin:1.5px 0;color:#506878}.st b{color:#60b8e0;font-weight:500}
+.bar{height:3px;background:rgba(40,80,120,0.15);border-radius:2px;margin:3px 0;overflow:hidden}
+.bar-f{height:100%;border-radius:2px;transition:width 0.2s}
+#temp-bar{position:fixed;top:50%;right:16px;transform:translateY(-50%);width:8px;height:200px;
+  background:rgba(40,80,120,0.15);border-radius:4px;z-index:10;pointer-events:none;overflow:hidden}
+#temp-fill{position:absolute;bottom:0;width:100%;border-radius:4px;transition:height 0.3s;
+  background:linear-gradient(to top,#2060ff,#ff4020)}
+#temp-label{position:fixed;top:calc(50% + 110px);right:6px;z-index:10;pointer-events:none;
+  font-size:8px;color:#405060;writing-mode:vertical-rl;letter-spacing:1px}
+#controls{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:10;display:flex;gap:8px}
+#controls button{background:rgba(40,100,160,0.15);border:1px solid rgba(60,120,180,0.25);
+  color:#50a0d0;padding:7px 14px;border-radius:6px;cursor:pointer;font-family:'IBM Plex Mono',monospace;
+  font-size:9px;letter-spacing:0.8px;transition:all 0.2s}
+#controls button:hover{background:rgba(40,100,160,0.35)}
+</style>
+
+<div id="hud">
+<h1>Real-Time Fold</h1>
+<div class="sub">Molecular dynamics through the 36<br>
+W: velocity kick (wK₂) · U: force field (disentangler)<br>
+Simulated annealing · 36 multiplies per residue</div>
+<div class="st">Protein: <b id="vName">Trp-cage 20-mer</b></div>
+<div class="st">R<sub>g</sub>: <b id="vRg">—</b> Å → <b id="vRgTarget">~7.5</b></div>
+<div class="st">E<sub>total</sub>: <b id="vE">—</b></div>
+<div class="st">E<sub>kinetic</sub>: <b id="vKE">—</b></div>
+<div class="st">T: <b id="vT">—</b> (annealing)</div>
+<div class="st">Contacts: <b id="vCon">0</b></div>
+<div class="st">H-bonds: <b id="vHB">0</b></div>
+<div class="st">Step: <b id="vStep">0</b> / <b id="vTotal">5000</b></div>
+<div class="st">SS:</div>
+<div class="bar"><div class="bar-f" id="bH" style="width:0;background:#ff3050"></div></div>
+<div class="bar"><div class="bar-f" id="bE" style="width:0;background:#ffe020"></div></div>
+<div class="bar"><div class="bar-f" id="bC" style="width:0;background:#40d060"></div></div>
+</div>
+<div id="temp-bar"><div id="temp-fill" style="height:100%"></div></div>
+<div id="temp-label">TEMPERATURE</div>
+
+<div id="controls">
+<button onclick="togglePause()">⏸ PAUSE</button>
+<button onclick="resetFold()">UNFOLD</button>
+<button onclick="annealFast()">FAST ANNEAL</button>
+<button onclick="heatUp()">HEAT</button>
+<button onclick="switchProt()">NEXT PROTEIN</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CRYSTAL CONSTANTS
+// ═══════════════════════════════════════════════════════════════
+const NW=2,NC=3,CHI=NW*NC;
+const LAMBDA=[1,1/NW,1/NC,1/CHI];
+const WK=[1,1/Math.sqrt(NW),1/Math.sqrt(NC),1/Math.sqrt(CHI)];
+const CA_BOND=3.8;
+const CONTACT_CUT=8; // d_colour
+
+// 20 amino acids = NW²(CHI-1)
+const AA='ARNDCQEGHILKMFPSTWYV';
+const HYDRO={A:0.47,R:-1,N:-0.73,D:-0.73,C:0.6,Q:-0.73,E:-0.73,G:0.13,
+  H:-0.67,I:1,L:0.87,K:-0.8,M:0.47,F:0.73,P:-0.4,S:-0.07,T:0,W:-0.07,Y:-0.27,V:0.93};
+const SC_RAD={A:0.5,R:2.5,N:1.8,D:1.6,C:1.2,Q:2.1,E:1.9,G:0,H:2.0,I:1.6,
+  L:1.6,K:2.3,M:1.9,F:2.2,P:0.8,S:1.1,T:1.3,W:2.8,Y:2.5,V:1.4};
+// H-bond donors/acceptors
+const DONOR={R:1,N:1,Q:1,H:1,K:1,S:1,T:1,W:1,Y:1};
+const ACCEPTOR={D:1,E:1,N:1,Q:1,S:1,T:1,H:1,Y:1};
+
+// Proteins
+const PROTS=[
+  {name:'Trp-cage 20-mer',seq:'ASWILEGKFAEEVHANAIKR',target:7.5},
+  {name:'Villin HP35',seq:'ARIEEDVFVHVRGALTRSDIKNLKDGGVDLWISF',target:9.0},
+  {name:'WW domain',seq:'GSKLPPGWEKRMSRDGRVYYFNHITNASQFERPSG',target:9.5},
+];
+let protIdx=0;
+
+// ═══════════════════════════════════════════════════════════════
+// PARTICLE SYSTEM: Each residue = position + velocity + force
+// This IS CrystalMD applied to protein residues:
+//   Singlet[1]: total energy (conserved)
+//   Weak[3]: x,y,z position (λ=1/2)
+//   Colour[8]: vx,vy,vz,fx,fy,fz,KE,mass (λ=1/3)
+// ═══════════════════════════════════════════════════════════════
+let R=[]; // residues: {x,y,z,vx,vy,vz,fx,fy,fz,aa,idx}
+let step=0, temperature=1.0, paused=false;
+const MAX_STEPS=8000;
+const DT=0.008;
+
+function initChain(){
+  const seq=PROTS[protIdx].seq;
+  R=[];
+  // Extended chain along x-axis with random perturbation
+  for(let i=0;i<seq.length;i++){
+    R.push({
+      x:i*CA_BOND*0.8+(Math.random()-0.5)*3,
+      y:(Math.random()-0.5)*8,
+      z:(Math.random()-0.5)*8,
+      vx:(Math.random()-0.5)*2,
+      vy:(Math.random()-0.5)*2,
+      vz:(Math.random()-0.5)*2,
+      fx:0,fy:0,fz:0,
+      aa:seq[i], idx:i
+    });
+  }
+  step=0;
+  temperature=1.0;
+  document.getElementById('vName').textContent=PROTS[protIdx].name;
+  document.getElementById('vRgTarget').textContent='~'+PROTS[protIdx].target;
+  document.getElementById('vTotal').textContent=MAX_STEPS;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// U STEP: FORCE FIELD (inter-residue disentangler)
+//
+// 1. Bond springs: keep sequential neighbors at CA_BOND distance
+// 2. Angle restraints: prevent sharp kinks
+// 3. LJ-like: excluded volume (repulsion) + attraction
+// 4. Hydrophobic: nonpolar residues attract each other
+// 5. H-bonds: donor-acceptor pairs at right distance/angle
+// 6. Compaction: gentle global pressure toward center
+// ═══════════════════════════════════════════════════════════════
+function computeForces(){
+  const n=R.length;
+  // Zero forces
+  for(const r of R){r.fx=0;r.fy=0;r.fz=0;}
+
+  for(let i=0;i<n;i++){
+    const ri=R[i];
+
+    // 1. Bond spring to i+1
+    if(i<n-1){
+      const rj=R[i+1];
+      let dx=rj.x-ri.x,dy=rj.y-ri.y,dz=rj.z-ri.z;
+      const d=Math.sqrt(dx*dx+dy*dy+dz*dz)||0.01;
+      const f=50*(d-CA_BOND)/d; // spring constant
+      ri.fx+=f*dx; ri.fy+=f*dy; ri.fz+=f*dz;
+      rj.fx-=f*dx; rj.fy-=f*dy; rj.fz-=f*dz;
+    }
+
+    // 2. Angle restraint (i-1, i, i+1): prevent kinks
+    if(i>0&&i<n-1){
+      const rp=R[i-1],rn=R[i+1];
+      const ax=rp.x-ri.x,ay=rp.y-ri.y,az=rp.z-ri.z;
+      const bx=rn.x-ri.x,by=rn.y-ri.y,bz=rn.z-ri.z;
+      const dot=ax*bx+ay*by+az*bz;
+      const la=Math.sqrt(ax*ax+ay*ay+az*az)||1;
+      const lb=Math.sqrt(bx*bx+by*by+bz*bz)||1;
+      const cosA=dot/(la*lb);
+      // Penalize angles < 90° (cosA > 0 means acute)
+      if(cosA>-0.3){
+        const f=5*(cosA+0.3);
+        const mx=(ax/la+bx/lb), my_=(ay/la+by/lb), mz=(az/la+bz/lb);
+        ri.fx-=f*mx; ri.fy-=f*my_; ri.fz-=f*mz;
+      }
+    }
+
+    // 3-5. Non-bonded interactions (all pairs |i-j|>=3)
+    for(let j=i+3;j<n;j++){
+      const rj=R[j];
+      let dx=rj.x-ri.x,dy=rj.y-ri.y,dz=rj.z-ri.z;
+      const d2=dx*dx+dy*dy+dz*dz;
+      const d=Math.sqrt(d2)||0.01;
+
+      // Excluded volume (repulsion at short range)
+      if(d<3.5){
+        const f=-20*(3.5-d)/(d+0.1);
+        ri.fx+=f*dx/d; ri.fy+=f*dy/d; ri.fz+=f*dz/d;
+        rj.fx-=f*dx/d; rj.fy-=f*dy/d; rj.fz-=f*dz/d;
+      }
+
+      // Hydrophobic attraction
+      const hi=HYDRO[ri.aa]||0, hj=HYDRO[rj.aa]||0;
+      if(hi>0&&hj>0&&d<12&&d>4){
+        const f=0.8*hi*hj*Math.exp(-d/6)/d;
+        ri.fx+=f*dx; ri.fy+=f*dy; ri.fz+=f*dz;
+        rj.fx-=f*dx; rj.fy-=f*dy; rj.fz-=f*dz;
+      }
+
+      // H-bond
+      if(d>4&&d<7&&DONOR[ri.aa]&&ACCEPTOR[rj.aa]){
+        const f=2*Math.exp(-(d-5.5)*(d-5.5)/2)/d;
+        ri.fx+=f*dx; ri.fy+=f*dy; ri.fz+=f*dz;
+        rj.fx-=f*dx; rj.fy-=f*dy; rj.fz-=f*dz;
+      }
+    }
+
+    // 6. Gentle compaction (hydrophobic core formation)
+    const rr=Math.sqrt(ri.x*ri.x+ri.y*ri.y+ri.z*ri.z);
+    if(rr>5){
+      const hi=HYDRO[ri.aa]||0;
+      const f=-0.02*(1+Math.max(0,hi))*rr;
+      ri.fx+=f*ri.x/(rr+0.1);
+      ri.fy+=f*ri.y/(rr+0.1);
+      ri.fz+=f*ri.z/(rr+0.1);
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// W STEP: VELOCITY KICK + POSITION DRIFT
+//
+// Velocity kicked by force × wK₂ = 1/√3
+// Position drifted by velocity × wK₁ = 1/√2
+// Langevin thermostat: random kicks + damping for temperature control
+// ═══════════════════════════════════════════════════════════════
+function integrate(){
+  const gamma=0.5; // friction
+  const noiseAmp=Math.sqrt(2*gamma*temperature);
+
+  for(const r of R){
+    // Langevin: kick + noise + friction
+    r.vx=(r.vx+r.fx*WK[2]*DT-gamma*r.vx*DT+noiseAmp*(Math.random()-0.5)*Math.sqrt(DT));
+    r.vy=(r.vy+r.fy*WK[2]*DT-gamma*r.vy*DT+noiseAmp*(Math.random()-0.5)*Math.sqrt(DT));
+    r.vz=(r.vz+r.fz*WK[2]*DT-gamma*r.vz*DT+noiseAmp*(Math.random()-0.5)*Math.sqrt(DT));
+    // Drift
+    r.x+=r.vx*WK[1]*DT*20;
+    r.y+=r.vy*WK[1]*DT*20;
+    r.z+=r.vz*WK[1]*DT*20;
+  }
+
+  // Center of mass removal
+  let cx=0,cy=0,cz=0;
+  for(const r of R){cx+=r.x;cy+=r.y;cz+=r.z;}
+  cx/=R.length;cy/=R.length;cz/=R.length;
+  for(const r of R){r.x-=cx;r.y-=cy;r.z-=cz;}
+}
+
+// Full tick: S = W∘U
+function foldTick(){
+  computeForces(); // U step
+  integrate();     // W step
+  step++;
+  // Simulated annealing: cool exponentially
+  temperature=Math.max(0.01, 1.0*Math.exp(-step/2000));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// OBSERVABLES
+// ═══════════════════════════════════════════════════════════════
+function rg(){
+  let cx=0,cy=0,cz=0;
+  for(const r of R){cx+=r.x;cy+=r.y;cz+=r.z;}
+  cx/=R.length;cy/=R.length;cz/=R.length;
+  let s=0;
+  for(const r of R)s+=(r.x-cx)**2+(r.y-cy)**2+(r.z-cz)**2;
+  return Math.sqrt(s/R.length);
+}
+function ke(){let s=0;for(const r of R)s+=r.vx*r.vx+r.vy*r.vy+r.vz*r.vz;return s*0.5;}
+function pe(){
+  let e=0;
+  for(let i=0;i<R.length;i++)for(let j=i+3;j<R.length;j++){
+    const d=Math.sqrt((R[i].x-R[j].x)**2+(R[i].y-R[j].y)**2+(R[i].z-R[j].z)**2);
+    if(d<12)e-=(HYDRO[R[i].aa]||0)*(HYDRO[R[j].aa]||0)*Math.exp(-d/6);
+  }
+  return e;
+}
+function contacts(){
+  let c=0;
+  for(let i=0;i<R.length;i++)for(let j=i+3;j<R.length;j++){
+    const d=Math.sqrt((R[i].x-R[j].x)**2+(R[i].y-R[j].y)**2+(R[i].z-R[j].z)**2);
+    if(d<CONTACT_CUT)c++;
+  }
+  return c;
+}
+function hbonds(){
+  let c=0;
+  for(let i=0;i<R.length;i++)for(let j=i+3;j<R.length;j++){
+    const d=Math.sqrt((R[i].x-R[j].x)**2+(R[i].y-R[j].y)**2+(R[i].z-R[j].z)**2);
+    if(d>4&&d<7&&DONOR[R[i].aa]&&ACCEPTOR[R[j].aa])c++;
+  }
+  return c;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// THREE.JS
+// ═══════════════════════════════════════════════════════════════
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,0.1,500);
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.0;
+document.body.appendChild(renderer.domElement);
+
+scene.add(new THREE.AmbientLight(0x203040,0.6));
+const dl=new THREE.DirectionalLight(0x8090b0,0.9);dl.position.set(10,20,15);scene.add(dl);
+scene.add(new THREE.PointLight(0x4080c0,0.4,60));
+
+// Dynamic meshes: backbone spheres + sticks + side chains
+const caGeo=new THREE.SphereGeometry(0.5,10,10);
+const bondGeo=new THREE.CylinderGeometry(0.15,0.15,1,6);
+const caMeshes=[], bondMeshes=[], scMeshes=[], conLines=[];
+
+function createMeshes(){
+  // Clear old
+  caMeshes.forEach(m=>scene.remove(m));
+  bondMeshes.forEach(m=>scene.remove(m));
+  scMeshes.forEach(m=>scene.remove(m));
+  conLines.forEach(m=>scene.remove(m));
+  caMeshes.length=0;bondMeshes.length=0;scMeshes.length=0;conLines.length=0;
+
+  for(let i=0;i<R.length;i++){
+    const r=R[i];
+    const h=HYDRO[r.aa]||0;
+    const t=(h+1)/2;
+    const col=t>0.5?new THREE.Color(1,0.4+0.3*(1-t),0.15):new THREE.Color(0.2,0.5,0.4+0.5*(1-t));
+    // CA sphere
+    const mat=new THREE.MeshStandardMaterial({color:col,metalness:0.35,roughness:0.4});
+    const m=new THREE.Mesh(caGeo,mat);
+    scene.add(m);
+    caMeshes.push(m);
+    // Bond to next
+    if(i<R.length-1){
+      const bMat=new THREE.MeshStandardMaterial({color:0x607080,metalness:0.3,roughness:0.5});
+      const bm=new THREE.Mesh(bondGeo,bMat);
+      scene.add(bm);
+      bondMeshes.push(bm);
+    }
+    // Side chain
+    const sr=SC_RAD[r.aa]||0;
+    if(sr>0.1){
+      const sg=new THREE.SphereGeometry(sr*0.2,6,6);
+      const sm=new THREE.MeshStandardMaterial({color:col,transparent:true,opacity:0.6,metalness:0.2,roughness:0.6});
+      const smesh=new THREE.Mesh(sg,sm);
+      scene.add(smesh);
+      scMeshes.push({mesh:smesh,idx:i,rad:sr});
+    }
+  }
+}
+
+function updateMeshes(){
+  for(let i=0;i<R.length;i++){
+    caMeshes[i].position.set(R[i].x,R[i].y,R[i].z);
+    // Color by speed (hot=moving fast, cool=settled)
+    const spd=Math.sqrt(R[i].vx**2+R[i].vy**2+R[i].vz**2);
+    const heat=Math.min(1,spd*0.3);
+    const h=HYDRO[R[i].aa]||0;
+    const t=(h+1)/2;
+    const baseCol=t>0.5?new THREE.Color(1,0.4+0.3*(1-t),0.15):new THREE.Color(0.2,0.5,0.4+0.5*(1-t));
+    baseCol.lerp(new THREE.Color(1,0.3,0.1),heat*0.5);
+    caMeshes[i].material.color=baseCol;
+    caMeshes[i].material.emissive.setRGB(heat*0.2,heat*0.05,0);
+  }
+  // Bonds
+  for(let i=0;i<bondMeshes.length;i++){
+    const r1=R[i],r2=R[i+1];
+    const mx=(r1.x+r2.x)/2,my_=(r1.y+r2.y)/2,mz=(r1.z+r2.z)/2;
+    const dx=r2.x-r1.x,dy=r2.y-r1.y,dz=r2.z-r1.z;
+    const len=Math.sqrt(dx*dx+dy*dy+dz*dz)||0.01;
+    bondMeshes[i].position.set(mx,my_,mz);
+    bondMeshes[i].scale.set(1,len,1);
+    bondMeshes[i].lookAt(r2.x,r2.y,r2.z);
+    bondMeshes[i].rotateX(Math.PI/2);
+  }
+  // Side chains (offset perpendicular to backbone)
+  for(const sc of scMeshes){
+    const r=R[sc.idx];
+    const ni=Math.min(sc.idx+1,R.length-1);
+    const rn=R[ni];
+    let dx=rn.x-r.x,dy=rn.y-r.y,dz=rn.z-r.z;
+    const dl=Math.sqrt(dx*dx+dy*dy+dz*dz)||1;
+    // Perpendicular
+    let px,py,pz;
+    if(Math.abs(dz/dl)<0.9){px=dy;py=-dx;pz=0}else{px=0;py=dz;pz=-dy}
+    const pl=Math.sqrt(px*px+py*py+pz*pz)||1;
+    const sr=sc.rad*0.6;
+    sc.mesh.position.set(r.x+sr*px/pl, r.y+sr*py/pl, r.z+sr*pz/pl);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CAMERA + CONTROLS
+// ═══════════════════════════════════════════════════════════════
+let camT=0,camP=0.3,camR=35;
+let md_=false,mx_=0,my_=0;
+const cv=renderer.domElement;
+cv.addEventListener('mousedown',e=>{md_=true;mx_=e.clientX;my_=e.clientY});
+cv.addEventListener('mouseup',()=>md_=false);
+cv.addEventListener('mousemove',e=>{
+  if(!md_)return;
+  camT-=(e.clientX-mx_)*0.005;camP=Math.max(-1.5,Math.min(1.5,camP+(e.clientY-my_)*0.005));
+  mx_=e.clientX;my_=e.clientY;
+});
+cv.addEventListener('wheel',e=>{camR=Math.max(8,Math.min(80,camR+e.deltaY*0.04))});
+cv.addEventListener('touchstart',e=>{if(e.touches.length===1){md_=true;mx_=e.touches[0].clientX;my_=e.touches[0].clientY}},{passive:true});
+cv.addEventListener('touchend',()=>md_=false);
+cv.addEventListener('touchmove',e=>{if(!md_||e.touches.length!==1)return;
+  camT-=(e.touches[0].clientX-mx_)*0.005;camP=Math.max(-1.5,Math.min(1.5,camP+(e.touches[0].clientY-my_)*0.005));
+  mx_=e.touches[0].clientX;my_=e.touches[0].clientY;},{passive:true});
+
+function togglePause(){paused=!paused}
+function resetFold(){initChain();createMeshes();}
+function annealFast(){temperature=1.0;step=0;}
+function heatUp(){temperature=Math.min(2,temperature+0.5);}
+function switchProt(){protIdx=(protIdx+1)%PROTS.length;initChain();createMeshes();}
+
+// ═══════════════════════════════════════════════════════════════
+// MAIN LOOP
+// ═══════════════════════════════════════════════════════════════
+initChain();
+createMeshes();
+
+let frame=0;
+function animate(){
+  requestAnimationFrame(animate);
+  frame++;
+
+  // Run multiple ticks per frame for speed
+  if(!paused&&step<MAX_STEPS){
+    for(let i=0;i<5;i++)foldTick();
+  }
+
+  updateMeshes();
+
+  if(!md_)camT+=0.002;
+  camera.position.x=Math.cos(camT)*Math.cos(camP)*camR;
+  camera.position.y=Math.sin(camP)*camR;
+  camera.position.z=Math.sin(camT)*Math.cos(camP)*camR;
+  camera.lookAt(0,0,0);
+
+  // HUD update every 10 frames
+  if(frame%10===0){
+    const _rg=rg(), _ke=ke(), _pe=pe(), _con=contacts(), _hb=hbonds();
+    document.getElementById('vRg').textContent=_rg.toFixed(1);
+    document.getElementById('vE').textContent=(_ke+_pe).toFixed(1);
+    document.getElementById('vKE').textContent=_ke.toFixed(1);
+    document.getElementById('vT').textContent=temperature.toFixed(3);
+    document.getElementById('vCon').textContent=_con;
+    document.getElementById('vHB').textContent=_hb;
+    document.getElementById('vStep').textContent=step;
+    document.getElementById('temp-fill').style.height=(temperature/1.0*100)+'%';
+  }
+
+  renderer.render(scene,camera);
+}
+animate();
+
+window.addEventListener('resize',()=>{
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
+</script>

@@ -1,0 +1,471 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600&family=Cormorant+Garamond:ital,wght@1,600&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#000;overflow:hidden;font-family:'Outfit',sans-serif;color:#d0d8e8}
+  canvas{display:block}
+  #hud{position:fixed;top:24px;left:24px;z-index:10;pointer-events:none}
+  #hud h1{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:28px;color:#ff9944;letter-spacing:1px;text-shadow:0 0 30px rgba(255,140,40,0.4)}
+  #hud .sub{font-size:10px;color:#665544;margin:6px 0 16px;letter-spacing:2px;text-transform:uppercase}
+  #hud .stat{font-size:11px;margin:3px 0;color:#887766}
+  #hud .stat span{color:#ffaa55;font-weight:400}
+  #sectors{position:fixed;bottom:24px;left:24px;z-index:10;pointer-events:none;display:flex;gap:16px}
+  .sec-box{background:rgba(20,12,8,0.7);border:1px solid rgba(255,140,40,0.15);padding:10px 14px;border-radius:8px;backdrop-filter:blur(8px)}
+  .sec-box .name{font-size:9px;color:#665544;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px}
+  .sec-box .val{font-size:16px;color:#ff9944;font-weight:200}
+  .sec-box .lam{font-size:9px;color:#554433}
+  #controls{position:fixed;top:24px;right:24px;z-index:10;display:flex;flex-direction:column;gap:8px}
+  #controls button{background:rgba(255,140,40,0.1);border:1px solid rgba(255,140,40,0.25);color:#cc8844;padding:8px 14px;border-radius:6px;cursor:pointer;font-family:'Outfit',sans-serif;font-size:10px;letter-spacing:1px;transition:all 0.2s}
+  #controls button:hover{background:rgba(255,140,40,0.25)}
+</style>
+
+<div id="hud">
+  <h1>Crystal Black Hole</h1>
+  <div class="sub">Gravitational dynamics from the 36 · λ = {1, ½, ⅓, ⅙}</div>
+  <div class="stat">Stars: <span id="vStars">1000</span></div>
+  <div class="stat">Accreted: <span id="vAccreted">0</span></div>
+  <div class="stat">Tick: <span id="vTick">0</span></div>
+  <div class="stat">M_BH: <span id="vMass">50.0</span></div>
+  <div class="stat">r_s = 2GM: <span id="vRs">—</span></div>
+  <div class="stat">S_BH = A/(4G): <span id="vEntropy">—</span></div>
+</div>
+
+<div id="sectors">
+  <div class="sec-box"><div class="name">Singlet [1]</div><div class="val" id="sS">—</div><div class="lam">λ = 1 conserved</div></div>
+  <div class="sec-box"><div class="name">Weak [3]</div><div class="val" id="sW">—</div><div class="lam">λ = ½ positions</div></div>
+  <div class="sec-box"><div class="name">Colour [8]</div><div class="val" id="sC">—</div><div class="lam">λ = ⅓ momenta</div></div>
+  <div class="sec-box"><div class="name">Mixed [24]</div><div class="val" id="sM">—</div><div class="lam">λ = ⅙ thermal</div></div>
+</div>
+
+<div id="controls">
+  <button onclick="togglePause()">⏸ PAUSE</button>
+  <button onclick="addStars(200)">+ 200 STARS</button>
+  <button onclick="toggleTrails()">TRAILS</button>
+  <button onclick="toggleLensing()">LENSING</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CRYSTAL ENGINE — 36-dimensional state, 4 eigenvalues
+// ═══════════════════════════════════════════════════════════════
+const NW=2,NC=3,CHI=NW*NC,D1=1,D2=3,D3=8,D4=24,SD=36;
+const LAMBDA=[1,1/NW,1/NC,1/CHI];
+const WK=[1,1/Math.sqrt(NW),1/Math.sqrt(NC),1/Math.sqrt(CHI)];
+const S=[0,D1,D1+D2,D1+D2+D3];
+const DIM=[D1,D2,D3,D4];
+
+// Each star = 36 Doubles
+// Singlet[1]: energy (conserved)
+// Weak[3]: x, y, z (position)
+// Colour[8]: vx, vy, vz, fx, fy, fz, KE, mass
+// Mixed[24]: thermal/radiation state
+
+function makeStar(x,y,z,vx,vy,vz,mass){
+  const s=new Float64Array(SD);
+  const ke=0.5*mass*(vx*vx+vy*vy+vz*vz);
+  s[0]=ke; // singlet: energy
+  s[S[1]]=x; s[S[1]+1]=y; s[S[1]+2]=z; // weak: position
+  s[S[2]]=vx; s[S[2]+1]=vy; s[S[2]+2]=vz; // colour: velocity
+  s[S[2]+3]=0; s[S[2]+4]=0; s[S[2]+5]=0; // force (computed by U step)
+  s[S[2]+6]=ke; s[S[2]+7]=mass;
+  return s;
+}
+
+// W step: kick velocities from forces, drift positions from velocities
+function wStep(st){
+  const o=new Float64Array(st);
+  const w1=WK[1],w2=WK[2],w3=WK[3];
+  // Read
+  let x=st[S[1]],y=st[S[1]+1],z=st[S[1]+2];
+  let vx=st[S[2]],vy=st[S[2]+1],vz=st[S[2]+2];
+  let fx=st[S[2]+3],fy=st[S[2]+4],fz=st[S[2]+5];
+  const m=st[S[2]+7];
+  const im=m>0?1/m:0;
+  // Kick velocity from force (wK₂)
+  vx+=w2*fx*im; vy+=w2*fy*im; vz+=w2*fz*im;
+  // Drift position from velocity (wK₁)
+  x+=w1*vx*0.02; y+=w1*vy*0.02; z+=w1*vz*0.02;
+  // Contract by eigenvalues
+  o[S[1]]=x*w1; o[S[1]+1]=y*w1; o[S[1]+2]=z*w1;
+  o[S[2]]=vx*w2; o[S[2]+1]=vy*w2; o[S[2]+2]=vz*w2;
+  // Forces will be recomputed by U step
+  o[S[2]+6]=0.5*m*(vx*vx+vy*vy+vz*vz);
+  // Mixed: thermal radiation near BH
+  for(let i=0;i<D4;i++) o[S[3]+i]*=w3;
+  return o;
+}
+
+// U step: gravitational coupling (BH force)
+function uStepBH(st, bhMass, softening){
+  const o=new Float64Array(st);
+  const x=st[S[1]],y=st[S[1]+1],z=st[S[1]+2];
+  const r2=x*x+y*y+z*z+softening;
+  const r=Math.sqrt(r2);
+  const r3=r2*r;
+  // F = -GM/r² in direction -r̂, exponent N_c-1 = 2
+  const fMag=bhMass/(r2+softening);
+  o[S[2]+3]=-fMag*x/r; // fx
+  o[S[2]+4]=-fMag*y/r; // fy
+  o[S[2]+5]=-fMag*z/r; // fz
+  // Near BH: excite mixed sector (thermal Hawking-like radiation)
+  const rS=2*bhMass*0.01; // Schwarzschild radius proxy
+  if(r<rS*5){
+    const heat=Math.exp(-r/rS)*0.1;
+    for(let i=0;i<D4;i++) o[S[3]+i]+=heat*Math.sin(i*0.5+r);
+  }
+  return o;
+}
+
+// Full tick: S = W∘U
+function fullTick(st,bhMass){
+  return wStep(uStepBH(st,bhMass,0.5));
+}
+
+// Rescale position (undo eigenvalue contraction to keep orbits stable)
+function rescalePos(st){
+  const o=new Float64Array(st);
+  // Undo weak contraction on position to maintain orbit
+  // The eigenvalue decay IS the inspiral — we keep it but slow it
+  o[S[1]]*=1/LAMBDA[1]*0.998; // slight inspiral per tick
+  o[S[1]+1]*=1/LAMBDA[1]*0.998;
+  o[S[1]+2]*=1/LAMBDA[1]*0.998;
+  return o;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// THREE.JS SCENE
+// ═══════════════════════════════════════════════════════════════
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.1,2000);
+camera.position.set(0,35,55);
+camera.lookAt(0,0,0);
+
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=0.9;
+document.body.appendChild(renderer.domElement);
+
+// ── Black hole ────────────────────────────────────────────────
+const bhGeo=new THREE.SphereGeometry(1.5,64,64);
+const bhMat=new THREE.MeshBasicMaterial({color:0x000000});
+const bhMesh=new THREE.Mesh(bhGeo,bhMat);
+scene.add(bhMesh);
+
+// Event horizon glow
+const glowGeo=new THREE.SphereGeometry(2.0,64,64);
+const glowMat=new THREE.MeshBasicMaterial({
+  color:0xff6600,transparent:true,opacity:0.08,side:THREE.BackSide
+});
+scene.add(new THREE.Mesh(glowGeo,glowMat));
+
+const glowGeo2=new THREE.SphereGeometry(3.5,64,64);
+const glowMat2=new THREE.MeshBasicMaterial({
+  color:0xff3300,transparent:true,opacity:0.04,side:THREE.BackSide
+});
+scene.add(new THREE.Mesh(glowGeo2,glowMat2));
+
+// Photon sphere ring
+const photonGeo=new THREE.TorusGeometry(3,0.03,16,100);
+const photonMat=new THREE.MeshBasicMaterial({color:0xffaa44,transparent:true,opacity:0.3});
+const photonRing=new THREE.Mesh(photonGeo,photonMat);
+photonRing.rotation.x=Math.PI/2;
+scene.add(photonRing);
+
+// ── Accretion disc ───────────────────────────────────────────
+const DISC_PARTICLES=3000;
+const discGeo=new THREE.BufferGeometry();
+const discPos=new Float32Array(DISC_PARTICLES*3);
+const discCol=new Float32Array(DISC_PARTICLES*3);
+const discSizes=new Float32Array(DISC_PARTICLES);
+const discVel=[];
+
+for(let i=0;i<DISC_PARTICLES;i++){
+  const r=4+Math.random()*14;
+  const theta=Math.random()*Math.PI*2;
+  const h=(Math.random()-0.5)*0.3*(r/10);
+  discPos[i*3]=Math.cos(theta)*r;
+  discPos[i*3+1]=h;
+  discPos[i*3+2]=Math.sin(theta)*r;
+  // Orbital velocity
+  const v=Math.sqrt(50/(r+0.5))*0.8;
+  discVel.push({
+    vx:-Math.sin(theta)*v+((Math.random()-0.5)*0.1),
+    vz:Math.cos(theta)*v+((Math.random()-0.5)*0.1),
+    vy:(Math.random()-0.5)*0.02
+  });
+  // Color: hot inner (white-yellow), cool outer (red-orange)
+  const temp=Math.max(0,1-r/18);
+  discCol[i*3]=0.8+0.2*temp;
+  discCol[i*3+1]=0.3+0.6*temp;
+  discCol[i*3+2]=0.05+0.8*temp*temp;
+  discSizes[i]=0.4+temp*1.2;
+}
+
+discGeo.setAttribute('position',new THREE.BufferAttribute(discPos,3));
+discGeo.setAttribute('color',new THREE.BufferAttribute(discCol,3));
+discGeo.setAttribute('size',new THREE.BufferAttribute(discSizes,1));
+
+const discMat=new THREE.PointsMaterial({
+  size:0.5,vertexColors:true,transparent:true,opacity:0.7,
+  blending:THREE.AdditiveBlending,depthWrite:false,
+  sizeAttenuation:true
+});
+const disc=new THREE.Points(discGeo,discMat);
+scene.add(disc);
+
+// ── Stars (1000, crystal-driven orbits) ──────────────────────
+let stars=[];
+let starMeshes=[];
+let trailsEnabled=false;
+let lensingEnabled=true;
+let paused=false;
+let accreted=0;
+let tickCount=0;
+const BH_MASS=50;
+
+const starGroup=new THREE.Group();
+scene.add(starGroup);
+
+function createStarMesh(temp){
+  const size=0.08+Math.random()*0.15;
+  const geo=new THREE.SphereGeometry(size,6,6);
+  const r=0.6+0.4*temp, g=0.5+0.5*temp*temp, b=0.3+0.7*temp*temp*temp;
+  const mat=new THREE.MeshBasicMaterial({
+    color:new THREE.Color(r,g,b),
+    transparent:true,opacity:0.9
+  });
+  return new THREE.Mesh(geo,mat);
+}
+
+function spawnStar(){
+  const r=15+Math.random()*60;
+  const theta=Math.random()*Math.PI*2;
+  const phi=(Math.random()-0.5)*Math.PI*0.6;
+  const x=Math.cos(theta)*Math.cos(phi)*r;
+  const y=Math.sin(phi)*r*0.3;
+  const z=Math.sin(theta)*Math.cos(phi)*r;
+  // Orbital velocity
+  const v=Math.sqrt(BH_MASS/(r+1))*0.6;
+  const vx=-Math.sin(theta)*v+(Math.random()-0.5)*0.3;
+  const vz=Math.cos(theta)*v+(Math.random()-0.5)*0.3;
+  const vy=(Math.random()-0.5)*0.15;
+  const mass=0.5+Math.random()*2;
+  const st=makeStar(x,y,z,vx,vy,vz,mass);
+  const temp=Math.random();
+  const mesh=createStarMesh(temp);
+  mesh.position.set(x,y,z);
+  starGroup.add(mesh);
+  stars.push({state:st,mesh,trail:[],temp});
+}
+
+function addStars(n){
+  for(let i=0;i<n;i++) spawnStar();
+  document.getElementById('vStars').textContent=stars.length;
+}
+
+// Initial 1000 stars
+addStars(1000);
+
+// ── Trail system ─────────────────────────────────────────────
+const trailLines=[];
+
+// ── Lensing effect (background distortion) ───────────────────
+const bgStars=new THREE.BufferGeometry();
+const bgPos=new Float32Array(5000*3);
+for(let i=0;i<5000;i++){
+  const r=100+Math.random()*400;
+  const t=Math.random()*Math.PI*2;
+  const p=(Math.random()-0.5)*Math.PI;
+  bgPos[i*3]=Math.cos(t)*Math.cos(p)*r;
+  bgPos[i*3+1]=Math.sin(p)*r;
+  bgPos[i*3+2]=Math.sin(t)*Math.cos(p)*r;
+}
+bgStars.setAttribute('position',new THREE.BufferAttribute(bgPos,3));
+const bgMat=new THREE.PointsMaterial({
+  color:0x6688aa,size:0.3,transparent:true,opacity:0.5,
+  blending:THREE.AdditiveBlending,depthWrite:false
+});
+const bgPoints=new THREE.Points(bgStars,bgMat);
+scene.add(bgPoints);
+
+// Ambient light (very dim)
+scene.add(new THREE.AmbientLight(0x221111,0.3));
+
+// Point light at BH (accretion glow)
+const bhLight=new THREE.PointLight(0xff6622,2,80);
+scene.add(bhLight);
+
+// ═══════════════════════════════════════════════════════════════
+// SIMULATION LOOP
+// ═══════════════════════════════════════════════════════════════
+let angle=0;
+let totSing=0,totWeak=0,totCol=0,totMix=0;
+
+function simulate(){
+  if(paused) return;
+  tickCount++;
+
+  totSing=0;totWeak=0;totCol=0;totMix=0;
+  const toRemove=[];
+
+  for(let i=0;i<stars.length;i++){
+    const star=stars[i];
+    // Full crystal tick: U (gravity) then W (kick+drift)
+    let st=fullTick(star.state,BH_MASS);
+    st=rescalePos(st);
+    star.state=st;
+
+    const x=st[S[1]],y=st[S[1]+1],z=st[S[1]+2];
+    const r=Math.sqrt(x*x+y*y+z*z);
+
+    // Accretion: star falls past event horizon
+    if(r<2.0){
+      toRemove.push(i);
+      accreted++;
+      continue;
+    }
+
+    // Update mesh position
+    star.mesh.position.set(x,y,z);
+
+    // Gravitational lensing: apparent position shift
+    if(lensingEnabled && r<30){
+      const lensStrength=4/(r*r+1);
+      const dx=x/r,dy=y/r,dz=z/r;
+      star.mesh.position.x+=dx*lensStrength;
+      star.mesh.position.y+=dy*lensStrength;
+      star.mesh.position.z+=dz*lensStrength;
+    }
+
+    // Tidal heating: glow near BH
+    const heat=r<10?Math.exp(-r/3):0;
+    star.mesh.material.emissive=new THREE.Color(heat*0.5,heat*0.2,0);
+
+    // Track sector norms
+    totSing+=st[0]*st[0];
+    for(let j=0;j<D2;j++) totWeak+=st[S[1]+j]**2;
+    for(let j=0;j<D3;j++) totCol+=st[S[2]+j]**2;
+    for(let j=0;j<D4;j++) totMix+=st[S[3]+j]**2;
+
+    // Trail
+    if(trailsEnabled) star.trail.push(new THREE.Vector3(x,y,z));
+    if(star.trail.length>30) star.trail.shift();
+  }
+
+  // Remove accreted stars (reverse order)
+  for(let i=toRemove.length-1;i>=0;i--){
+    const idx=toRemove[i];
+    starGroup.remove(stars[idx].mesh);
+    stars[idx].mesh.geometry.dispose();
+    stars[idx].mesh.material.dispose();
+    stars.splice(idx,1);
+  }
+
+  // Accretion disc dynamics
+  const dPos=disc.geometry.attributes.position.array;
+  const dCol=disc.geometry.attributes.color.array;
+  for(let i=0;i<DISC_PARTICLES;i++){
+    let x=dPos[i*3],y=dPos[i*3+1],z=dPos[i*3+2];
+    const dv=discVel[i];
+    const r=Math.sqrt(x*x+z*z)+0.1;
+    // Gravity
+    const f=BH_MASS/(r*r+1);
+    dv.vx-=f*x/(r)*0.001;
+    dv.vz-=f*z/(r)*0.001;
+    dv.vy-=y*0.01; // restoring to plane
+    x+=dv.vx*0.02; y+=dv.vy*0.02; z+=dv.vz*0.02;
+    // Respawn if accreted
+    if(r<2){
+      const nr=6+Math.random()*12;
+      const nt=Math.random()*Math.PI*2;
+      x=Math.cos(nt)*nr; z=Math.sin(nt)*nr; y=(Math.random()-0.5)*0.2;
+      const nv=Math.sqrt(BH_MASS/(nr+0.5))*0.8;
+      dv.vx=-Math.sin(nt)*nv; dv.vz=Math.cos(nt)*nv; dv.vy=0;
+    }
+    dPos[i*3]=x; dPos[i*3+1]=y; dPos[i*3+2]=z;
+    // Color: temperature from radius
+    const temp=Math.max(0,Math.min(1,1-Math.sqrt(x*x+z*z)/18));
+    dCol[i*3]=0.8+0.2*temp;
+    dCol[i*3+1]=0.3+0.6*temp;
+    dCol[i*3+2]=0.05+0.9*temp*temp;
+  }
+  disc.geometry.attributes.position.needsUpdate=true;
+  disc.geometry.attributes.color.needsUpdate=true;
+
+  // BH light pulses
+  bhLight.intensity=1.5+0.5*Math.sin(tickCount*0.05);
+}
+
+function updateHUD(){
+  document.getElementById('vStars').textContent=stars.length;
+  document.getElementById('vAccreted').textContent=accreted;
+  document.getElementById('vTick').textContent=tickCount;
+  document.getElementById('vMass').textContent=(BH_MASS+accreted*0.5).toFixed(1);
+  const rs=(2*(BH_MASS+accreted*0.5)*0.01).toFixed(3);
+  document.getElementById('vRs').textContent=rs+' (N_c−1=2)';
+  const area=4*Math.PI*rs*rs;
+  document.getElementById('vEntropy').textContent=(area/4).toFixed(1)+' (4=N_w²)';
+  const tot=totSing+totWeak+totCol+totMix||1;
+  document.getElementById('sS').textContent=(totSing/tot*100).toFixed(1)+'%';
+  document.getElementById('sW').textContent=(totWeak/tot*100).toFixed(1)+'%';
+  document.getElementById('sC').textContent=(totCol/tot*100).toFixed(1)+'%';
+  document.getElementById('sM').textContent=(totMix/tot*100).toFixed(1)+'%';
+}
+
+// ── Camera ───────────────────────────────────────────────────
+let camTheta=0,camPhi=0.4,camR=60;
+let mouseDown=false,lastMX=0,lastMY=0;
+
+renderer.domElement.addEventListener('mousedown',e=>{mouseDown=true;lastMX=e.clientX;lastMY=e.clientY});
+renderer.domElement.addEventListener('mouseup',()=>mouseDown=false);
+renderer.domElement.addEventListener('mousemove',e=>{
+  if(!mouseDown)return;
+  camTheta-=(e.clientX-lastMX)*0.005;
+  camPhi=Math.max(-1.2,Math.min(1.2,camPhi+(e.clientY-lastMY)*0.005));
+  lastMX=e.clientX;lastMY=e.clientY;
+});
+renderer.domElement.addEventListener('wheel',e=>{
+  camR=Math.max(15,Math.min(200,camR+e.deltaY*0.05));
+});
+
+function animate(){
+  requestAnimationFrame(animate);
+
+  simulate();
+
+  // Auto-rotate (slow) + user control
+  if(!mouseDown) camTheta+=0.001;
+  camera.position.x=Math.cos(camTheta)*Math.cos(camPhi)*camR;
+  camera.position.y=Math.sin(camPhi)*camR;
+  camera.position.z=Math.sin(camTheta)*Math.cos(camPhi)*camR;
+  camera.lookAt(0,0,0);
+
+  // Photon ring wobble
+  photonRing.rotation.z=Math.sin(tickCount*0.01)*0.05;
+
+  // Glow pulse
+  glowMat.opacity=0.06+0.03*Math.sin(tickCount*0.03);
+  glowMat2.opacity=0.03+0.02*Math.sin(tickCount*0.02);
+
+  if(tickCount%3===0) updateHUD();
+
+  renderer.render(scene,camera);
+}
+
+// ── Controls ─────────────────────────────────────────────────
+function togglePause(){paused=!paused}
+function toggleTrails(){trailsEnabled=!trailsEnabled}
+function toggleLensing(){lensingEnabled=!lensingEnabled}
+
+window.addEventListener('resize',()=>{
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
+
+animate();
+</script>

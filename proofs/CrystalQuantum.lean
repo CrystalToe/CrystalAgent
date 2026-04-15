@@ -2,7 +2,8 @@
 -- SPDX-License-Identifier: AGPL-3.0-or-later
 
 /-! # CrystalQuantum — Multi-particle quantum operators from (2,3)
-Engine wired: colour⊕mixed sector (d=32).
+Imports CrystalAxiom only. Engine wiring (§10a) stripped — time-dependent.
+10 structural theorems. Pure MERA.
 -/
 
 abbrev nW : Nat := 2
@@ -23,12 +24,9 @@ theorem two_particle : chi * chi = 36 := by native_decide
 theorem two_particle_is_sigmaD : chi * chi = sigmaD := by native_decide
 
 -- §2 Spectrum
--- E_k = -ln(λ_k), mass gap = ln(N_w) = ln(2)
 theorem mass_gap_denom : nW = 2 := by native_decide
 
 -- §3 Ladder
--- creation: sqrt(d_{k+1}/d_k)
--- ΔE₀₁ = ΔE₂₃ = ln(N_w) — symmetric ladder
 theorem ladder_symmetric_nw : nW = 2 := by native_decide
 
 -- §4 Multi-particle
@@ -54,22 +52,7 @@ theorem sector_total : sigmaD = 36 := by native_decide
 theorem time_denom : nW = 2 := by native_decide
 
 -- §9 Density matrix
--- purity of max mixed = 1/chi, chi = 6
 theorem max_mixed_denom : chi = 6 := by native_decide
 
 -- §10 Cross-checks
 theorem interactions_2x_fermions : chi * (chi - 1) = 2 * (chi * (chi - 1) / 2) := by native_decide
-
--- ═══════════════════════════════════════════════════════════════
--- ENGINE WIRING PROOFS
--- ═══════════════════════════════════════════════════════════════
-
-theorem engine_sigmaD : d1 + d2 + d3 + d4 = sigmaD := by native_decide
-theorem engine_sigmaD_val : sigmaD = 36 := by native_decide
-theorem engine_colour_mixed : d3 + d4 = 32 := by native_decide
-theorem engine_colour_dim : d3 = 8 := by native_decide
-theorem engine_mixed_dim : d4 = 24 := by native_decide
-theorem lambda_colour_denom : nC = 3 := by native_decide
-theorem lambda_mixed_denom : nW * nC = 6 := by native_decide
-theorem no_weak : d2 = 3 := by native_decide
--- Engine wired.

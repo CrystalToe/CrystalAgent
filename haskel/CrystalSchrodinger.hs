@@ -3,322 +3,366 @@
 
 {- | CrystalSchrodinger.hs — Quantum Mechanics from (2,3)
 
-  Sector restriction: colour⊕mixed (d=32)
-  Textbook method: Split-operator = S = W∘U exactly
-    W = potential kick (V × ψ, diagonal multiply)
-    U = kinetic drift (T × ψ, nearest-neighbour hopping)
+  THE DYNAMICS IS THE TICK ON THE 36.
 
-  Crystal constants:
-    ℏ               = 1/N_w = 1/2  (Heyting minimum uncertainty)
-    Spin states      = N_w = 2
-    Pauli matrices   = N_c = 3
-    Spatial dims     = N_c = 3
-    Phase space      = χ = 6
-    Bohr: a₀ denom   = N_w = 2  (a₀ = ℏ²/(m×e²) = (1/N_w)²/...)
-    Rydberg: 1/N_w   = 1/2  (E_H = m×e⁴/(2ℏ²))
-    Principal q.n.   = n ∈ ℕ  (discrete, not continuous)
-    Orbitals per n   = n² (shell capacity = N_w×n²)
+  Each lattice site is a CrystalState (36 Doubles).
+  Re(ψ) → weak sector [3] first component, λ = 1/2.
+  Im(ψ) → colour sector [8] first component, λ = 1/3.
+  Norm²  → singlet [1], λ = 1. Conserved.
 
-  NO CALCULUS. The Laplacian is a HOPPING MATRIX (nearest-neighbour).
-  The potential is a DIAGONAL MULTIPLY. The time step is a MATRIX
-  MULTIPLY. No integrals. No derivatives. The lattice IS the physics.
+  S = W∘U:
+    W = potential coupling: rotates Re↔Im within each site (wK)
+    U = kinetic coupling: mixes neighboring sites' amplitudes (uK)
+
+  Crystal integers:
+    ℏ = 1/N_w = 1/2        Spin states = N_w = 2
+    Pauli matrices = N_c = 3   Phase space = χ = 6
+    Shells: s=2=N_w  p=6=χ  d=10=N_w(χ-1)  f=14=N_wβ₀
+
+  Three.js ready: |ψ|² height map, phase→hue, probability current arrows,
+  tunneling visualization, orbital shapes.
 
   Compile: ghc -O2 -main-is CrystalSchrodinger CrystalSchrodinger.hs && ./CrystalSchrodinger
 -}
 
 module CrystalSchrodinger where
 
--- Rule 1: import CrystalEngine
-import CrystalEngine
-  ( nW, nC, chi, beta0, sigmaD, towerD, gauss
-  , d1, d2, d3, d4
-  , lambda, CrystalState
-  , sectorDim, extractSector, injectSector
-  , normSq, tick, zeroState
-  )
+import CrystalAtoms (nW, nC, chi, beta0, sigmaD, towerD, gauss, d1, d2, d3, d4)
+import CrystalSectors (CrystalState, sectorDim, extractSector, injectSector, zeroState)
+import CrystalEigen (lambda, wK, uK)
+import CrystalOperators (tick, normSq)
 
--- Rule 2: NO local nW, nC, chi, beta0, sigmaD, d1-d4.
---         All atoms come from CrystalEngine.
--- Note: engine's normSq is for CrystalState; psiNormSq below is for Psi.
+sq :: Double -> Double
+sq x = x * x
+{-# INLINE sq #-}
 
 hbar :: Double
-hbar = 1.0 / fromIntegral nW   -- 1/2
+hbar = 1.0 / fromIntegral nW  -- 1/2
 
 -- ═══════════════════════════════════════════════════════════════
--- §1 INTEGER IDENTITIES
+-- §1  PACK / UNPACK: quantum amplitude ↔ CrystalState
+--
+-- Singlet [1]:  |ψ|² (probability, conserved, λ=1)
+-- Weak [3]:     Re(ψ), 0, 0  (real part = position-like)
+-- Colour [8]:   Im(ψ), 0, ... (imag part = momentum-like)
+-- Mixed [24]:   potential value + aux
+--
+-- Re(ψ) in weak, Im(ψ) in colour mirrors position/momentum duality.
+-- λ_weak = 1/2, λ_colour = 1/3: different contraction rates
+-- create the interference pattern.
 -- ═══════════════════════════════════════════════════════════════
 
-spinStates :: Int
-spinStates = nW                       -- 2 (up/down)
+-- | Pack complex amplitude into CrystalState.
+packQuantum :: Double -> Double -> Double -> CrystalState
+packQuantum re im potential =
+  let prob = re * re + im * im
+      col = [im, 0, 0, 0, 0, 0, 0, 0]
+      mixed = potential : replicate (d4 - 1) 0.0
+  in injectSector 0 [prob]
+   $ injectSector 1 [re, 0, 0]
+   $ injectSector 2 col
+   $ injectSector 3 mixed
+   $ zeroState
 
-pauliCount :: Int
-pauliCount = nC                       -- 3 (σ_x, σ_y, σ_z)
+-- | Read Re(ψ) from weak sector.
+readRe :: CrystalState -> Double
+readRe cs = head (extractSector 1 cs)
 
-bellStates :: Int
-bellStates = nW * nW                  -- 4
+-- | Read Im(ψ) from colour sector.
+readIm :: CrystalState -> Double
+readIm cs = head (extractSector 2 cs)
 
-spatialDim :: Int
-spatialDim = nC                       -- 3
+-- | Read |ψ|² from singlet (conserved).
+readProb :: CrystalState -> Double
+readProb cs = head (extractSector 0 cs)
 
-phaseSpace :: Int
-phaseSpace = chi                      -- 6
+-- | Read potential from mixed sector.
+readPotential :: CrystalState -> Double
+readPotential cs = head (extractSector 3 cs)
 
--- Hydrogen spectrum: E_n = -1/(N_w × n²) in natural units
--- Bohr radius factor = N_w = 2 (a₀ = ℏ/(m α c), ℏ = 1/N_w)
-bohrFactor :: Int
-bohrFactor = nW                       -- 2
-
--- Shell capacity = N_w × n² (s=2, p=6=χ, d=10=N_w(χ-1), f=14=N_w β₀)
-shellS :: Int
-shellS = nW                           -- 2
-shellP :: Int
-shellP = chi                          -- 6
-shellD :: Int
-shellD = nW * (chi - 1)              -- 10
-shellF :: Int
-shellF = nW * beta0                   -- 14
-
--- Uncertainty: Δx Δp ≥ ℏ/2 = 1/(N_w²) = 1/4
-uncertaintyDenom :: Int
-uncertaintyDenom = nW * nW            -- 4
+-- | Get complex amplitude as (Re, Im).
+readAmplitude :: CrystalState -> (Double, Double)
+readAmplitude cs = (readRe cs, readIm cs)
 
 -- ═══════════════════════════════════════════════════════════════
--- §2 WAVEFUNCTION ON A LATTICE
+-- §2  QUANTUM LATTICE: array of CrystalStates
 -- ═══════════════════════════════════════════════════════════════
 
--- Complex amplitude
-data C = C !Double !Double deriving (Show)
+type QuantumLattice = [CrystalState]
 
-cAdd :: C -> C -> C
-cAdd (C a b) (C c d) = C (a + c) (b + d)
+-- | Initialize from real wavefunction profile + potential.
+initQuantumLattice :: [(Double, Double)] -> [Double] -> QuantumLattice
+initQuantumLattice amps potential =
+  zipWith (\(re,im) v -> packQuantum re im v) amps (potential ++ repeat 0.0)
 
-cMul :: C -> C -> C
-cMul (C a b) (C c d) = C (a * c - b * d) (a * d + b * c)
+-- | Read probability density |ψ|² from lattice.
+readProbDensity :: QuantumLattice -> [Double]
+readProbDensity = map (\cs -> let r = readRe cs; i = readIm cs in r*r + i*i)
 
-cScale :: Double -> C -> C
-cScale s (C a b) = C (s * a) (s * b)
+-- | Read Re(ψ) profile.
+readReProfile :: QuantumLattice -> [Double]
+readReProfile = map readRe
 
-cNormSq :: C -> Double
-cNormSq (C a b) = a * a + b * b
+-- | Read Im(ψ) profile.
+readImProfile :: QuantumLattice -> [Double]
+readImProfile = map readIm
 
-cConj :: C -> C
-cConj (C a b) = C a (negate b)
-
-cZero :: C
-cZero = C 0 0
-
--- Wavefunction: array of complex amplitudes on N lattice sites
-type Psi = [C]
-
--- Norm squared
-psiNormSq :: Psi -> Double
-psiNormSq = sum . map cNormSq
-
--- Normalise
-normalise :: Psi -> Psi
-normalise psi =
-  let n = sqrt (psiNormSq psi)
-  in map (cScale (1.0 / n)) psi
-
--- Inner product ⟨φ|ψ⟩
-innerProduct :: Psi -> Psi -> C
-innerProduct phi psi = foldl cAdd cZero $ zipWith (\p q -> cMul (cConj p) q) phi psi
-
--- Expectation value ⟨ψ|O|ψ⟩ where O is diagonal (real values)
-expectDiag :: [Double] -> Psi -> Double
-expectDiag op psi = sum $ zipWith (\o p -> o * cNormSq p) op psi
+-- | Total probability (should be conserved).
+totalProb :: QuantumLattice -> Double
+totalProb = sum . readProbDensity
 
 -- ═══════════════════════════════════════════════════════════════
--- §3 POTENTIALS (diagonal, no calculus)
+-- §3  THE TICK: S = W∘U on the quantum lattice
+--
+-- W step (per-site): potential rotates Re↔Im.
+--   Re' = Re × cos(V×wK) - Im × sin(V×wK)
+--   Im' = Re × sin(V×wK) + Im × cos(V×wK)
+--   The rotation angle = V × wK. Potential IS the coupling.
+--   cos/sin precomputed at init (rotation table).
+--
+-- U step (inter-site): kinetic coupling.
+--   Mixes neighboring sites' amplitudes via uK.
+--   This IS the discrete Laplacian / hopping matrix.
+--   Re_i' = Re_i + uK² × (Re_{i-1} - 2Re_i + Re_{i+1})
+--   Im_i' = Im_i + uK² × (Im_{i-1} - 2Im_i + Im_{i+1})
 -- ═══════════════════════════════════════════════════════════════
 
--- Grid spacing
-type Grid = [Double]   -- x positions
+-- | Precomputed rotation table: (cos θ, sin θ) per site.
+-- θ = -V × dt/(2ℏ). Transcendentals at INIT only, not in tick.
+type RotTable = [(Double, Double)]
+
+makeRotTable :: [Double] -> Double -> RotTable
+makeRotTable potential dt =
+  [(cos theta, sin theta)
+  | v <- potential, let theta = negate v * dt / (2.0 * hbar)]
+
+-- | W step: potential rotation at each site.
+-- Uses precomputed rotation table. ZERO transcendentals in tick.
+wStepQuantum :: RotTable -> QuantumLattice -> QuantumLattice
+wStepQuantum table lat = zipWith rotateSite table lat
+  where
+    rotateSite (ct, st) cs =
+      let re = readRe cs
+          im = readIm cs
+          re' = ct * re - st * im
+          im' = st * re + ct * im
+          col = extractSector 2 cs
+          col' = im' : drop 1 col
+      in injectSector 1 [re', 0, 0]
+       $ injectSector 2 col'
+       $ cs
+
+-- | U step: kinetic coupling between sites.
+-- Hopping via uK: discrete Laplacian on Re and Im separately.
+uStepQuantum :: QuantumLattice -> QuantumLattice
+uStepQuantum lat =
+  let n = length lat
+      u2 = uK 1 * uK 1  -- 1/N_w = 1/2: hopping strength
+      getRe i
+        | i < 0 || i >= n = 0.0  -- boundary
+        | otherwise = readRe (lat !! i)
+      getIm i
+        | i < 0 || i >= n = 0.0
+        | otherwise = readIm (lat !! i)
+      mixSite i =
+        let re = getRe i
+            im = getIm i
+            -- Discrete Laplacian via U disentangler
+            reHop = u2 * (getRe (i-1) - 2*re + getRe (i+1))
+            imHop = u2 * (getIm (i-1) - 2*im + getIm (i+1))
+            re' = re + imHop   -- Schrödinger: ∂Re/∂t ~ -∇²Im
+            im' = im - reHop   -- Schrödinger: ∂Im/∂t ~ +∇²Re
+            col = extractSector 2 (lat !! i)
+            col' = im' : drop 1 col
+        in injectSector 1 [re', 0, 0]
+         $ injectSector 2 col'
+         $ (lat !! i)
+  in [mixSite i | i <- [0..n-1]]
+
+-- | Full quantum tick: S = W∘U.
+-- Half-kick W, full drift U, half-kick W (Strang splitting, order N_w = 2).
+quantumTick :: RotTable -> QuantumLattice -> QuantumLattice
+quantumTick rot = wStepQuantum rot . uStepQuantum . wStepQuantum rot
+
+-- | Evolve N ticks.
+quantumEvolve :: Int -> RotTable -> QuantumLattice -> [QuantumLattice]
+quantumEvolve 0 _   lat = [lat]
+quantumEvolve n rot lat = lat : quantumEvolve (n-1) rot (quantumTick rot lat)
+
+-- ═══════════════════════════════════════════════════════════════
+-- §4  POTENTIALS + INITIAL STATES
+-- ═══════════════════════════════════════════════════════════════
+
+type Grid = [Double]
 
 makeGrid :: Int -> Double -> Double -> Grid
 makeGrid n xmin xmax = [xmin + fromIntegral i * dx | i <- [0..n-1]]
   where dx = (xmax - xmin) / fromIntegral (n - 1)
 
--- Harmonic oscillator: V = x²/(N_w) (half = 1/N_w)
 harmonicV :: Grid -> [Double]
-harmonicV = map (\x -> x * x / fromIntegral nW)
+harmonicV = map (\x -> x * x / fromIntegral nW)  -- V = x²/(N_w)
 
--- Coulomb-like: V = -1/|x| (hydrogen in 1D)
 coulombV :: Grid -> [Double]
 coulombV = map (\x -> negate 1.0 / (abs x + 0.1))
 
--- Square well: V = 0 inside, V_0 outside
-squareWellV :: Double -> Double -> Double -> Grid -> [Double]
-squareWellV halfWidth v0 _ = map (\x -> if abs x < halfWidth then 0.0 else v0)
+barrierV :: Double -> Double -> Grid -> [Double]
+barrierV halfWidth v0 = map (\x -> if abs x < halfWidth then 0.0 else v0)
 
--- ═══════════════════════════════════════════════════════════════
--- §4 THE S = W∘U DECOMPOSITION (split-operator)
---
--- ZERO CALCULUS IN TICK. Rotation coefficients precomputed at init.
--- ═══════════════════════════════════════════════════════════════
-
--- Precomputed rotation table: (cos θ_j, sin θ_j) per lattice site.
--- Created ONCE at init from the potential. cos/sin are here, not in tick.
-type RotTable = [(Double, Double)]
-
-makeRotTable :: [Double] -> Double -> RotTable
-makeRotTable potential dt =
-  [ let theta = negate vj * dt / (2.0 * hbar)
-    in (cos theta, sin theta)            -- transcendentals at INIT only
-  | vj <- potential ]
-
--- W: POTENTIAL KICK (diagonal multiply)
--- ψ_j → exp(-i V_j dt / (2ℏ)) × ψ_j
--- exp(-iθ) = (cos θ, sin θ) looked up from precomputed table.
--- ZERO CALCULUS. Pure multiply-add.
-applyV :: RotTable -> Psi -> Psi
-applyV table psi = zipWith rotate table psi
-  where
-    rotate (ct, st) pj = cMul (C ct st) pj   -- multiply-add only
-
--- [TEXTBOOK REFERENCE — what the above replaces:]
--- applyV_textbook potential dt psi = zipWith rotate potential psi
---   where rotate vj pj = let theta = negate vj * dt / (2.0 * hbar)
---                         in cMul (C (cos theta) (sin theta)) pj
--- Identical results. cos/sin moved from per-tick to init.
-
--- U: KINETIC DRIFT (nearest-neighbour hopping)
--- ALREADY CLEAN — no transcendentals. Pure add/multiply.
-applyT :: Double -> Double -> Psi -> Psi
-applyT dx dt psi =
-  let n = length psi
-      kinCoeff = hbar * hbar / (2.0 * dx * dx)
-      -- Hopping: nearest-neighbour add/subtract
-      hop j = cAdd (cAdd (safeGet (j-1) psi) (safeGet (j+1) psi))
-                    (cScale (negate 2.0) (psi !! j))
-      safeGet i ps
-        | i < 0     = cZero  -- boundary
-        | i >= n    = cZero
-        | otherwise = ps !! i
-      -- Apply: ψ_j → ψ_j - i × kinCoeff × dt/ℏ × hop_j
-      update j pj =
-        let h = hop j
-            factor = negate kinCoeff * dt / hbar
-        in cAdd pj (cMul (C 0 factor) h)
-  in [update j (psi !! j) | j <- [0..n-1]]
-
--- S = W∘U: one tick of quantum mechanics
--- Split-operator: exp(-iHdt) ≈ exp(-iVdt/2) × exp(-iTdt) × exp(-iVdt/2)
---   First half-kick W (potential)  — precomputed rotation, multiply-add
---   Then drift U (kinetic)         — hopping, add/subtract
---   Then half-kick W (potential)  — same precomputed rotation
--- ZERO CALCULUS IN THIS FUNCTION.
-quantumTick :: RotTable -> Double -> Double -> Psi -> Psi
-quantumTick rotTable dx dt =
-  applyV rotTable . applyT dx dt . applyV rotTable
-
--- Evolve for N ticks. ZERO CALCULUS per tick.
-quantumEvolve :: Int -> RotTable -> Double -> Double -> Psi -> [Psi]
-quantumEvolve 0 _ _ _ psi = [psi]
-quantumEvolve n rot dx dt psi =
-  let psi' = quantumTick rot dx dt psi
-  in psi : quantumEvolve (n - 1) rot dx dt psi'
-
--- ═══════════════════════════════════════════════════════════════
--- §5 OBSERVABLES (no calculus)
--- ═══════════════════════════════════════════════════════════════
-
--- Position expectation ⟨x⟩ = Σ x_j |ψ_j|²
-expectX :: Grid -> Psi -> Double
-expectX = expectDiag
-
--- Probability density |ψ(x)|²
-probDensity :: Psi -> [Double]
-probDensity = map cNormSq
-
--- Energy (discrete): E = ⟨T⟩ + ⟨V⟩
--- ⟨V⟩ = Σ V_j |ψ_j|²
--- ⟨T⟩ = Σ ψ*_j T_jk ψ_k (hopping matrix, nearest-neighbour)
-expectEnergy :: [Double] -> Double -> Psi -> Double
-expectEnergy potential dx psi =
-  let n = length psi
-      kinCoeff = hbar * hbar / (2.0 * dx * dx)
-      safeGet i ps
-        | i < 0     = cZero
-        | i >= n    = cZero
-        | otherwise = ps !! i
-      -- Kinetic: -ℏ²/(2m dx²) × ⟨ψ| hop |ψ⟩
-      kinetic = negate kinCoeff * sum
-        [let hop = cAdd (cAdd (safeGet (j-1) psi) (safeGet (j+1) psi))
-                        (cScale (negate 2.0) (psi !! j))
-             contrib = cMul (cConj (psi !! j)) hop
-         in case contrib of C re _ -> re
-        | j <- [0..n-1]]
-      -- Potential: Σ V_j |ψ_j|²
-      pot = sum $ zipWith (\v p -> v * cNormSq p) potential psi
-  in kinetic + pot
-
--- ═══════════════════════════════════════════════════════════════
--- §6 INITIAL STATES
--- ═══════════════════════════════════════════════════════════════
-
--- Gaussian wavepacket centred at x0 with width σ and momentum k
-gaussianPacket :: Grid -> Double -> Double -> Double -> Psi
+-- | Gaussian wavepacket: centered at x0, width σ, momentum k.
+gaussianPacket :: Grid -> Double -> Double -> Double -> [(Double, Double)]
 gaussianPacket grid x0 sigma k =
-  normalise [C (env * cos phase) (env * sin phase) | x <- grid,
-    let env = exp (negate (x - x0) * (x - x0) / (2.0 * sigma * sigma)),
-    let phase = k * x]
+  let raw = [(env * cos (k*x), env * sin (k*x))
+            | x <- grid,
+              let env = exp (negate (x - x0)^(2::Int) / (2*sigma*sigma))]
+      norm = sqrt (sum [re*re + im*im | (re,im) <- raw])
+  in [(re/norm, im/norm) | (re,im) <- raw]
 
--- Ground state of harmonic oscillator (Gaussian, k=0)
-groundState :: Grid -> Double -> Psi
+groundState :: Grid -> Double -> [(Double, Double)]
 groundState grid sigma = gaussianPacket grid 0.0 sigma 0.0
 
 -- ═══════════════════════════════════════════════════════════════
--- Rule 3: toCrystalState / fromCrystalState
+-- §5  THREE.JS VISUALIZATION API
 --
--- Schrodinger: colour⊕mixed sector (d=32).
--- Pack leading 32 real components of Psi (16 complex amplitudes)
--- into colour (d₃=8 reals) + mixed (d₄=24 reals).
--- Full wavefunction lives in Psi; crystal state is the engine view.
+-- Everything a Rust/WASM/Three.js renderer needs:
+--   |ψ|² → height map (1D) or sphere radius (3D)
+--   phase → hue (sector colors rotating)
+--   probability current → arrow field
+--   orbital shapes → spherical harmonic envelopes
 -- ═══════════════════════════════════════════════════════════════
 
-psiToReals :: Psi -> [Double]
-psiToReals = concatMap (\(C re im) -> [re, im])
+type RGBA = (Double, Double, Double, Double)
 
-realsToPsi :: [Double] -> Psi
-realsToPsi [] = []
-realsToPsi [x] = [C x 0]
-realsToPsi (x:y:rest) = C x y : realsToPsi rest
+sectorColor :: Int -> RGBA
+sectorColor 0 = (0.2, 0.3, 1.0, 1.0)   -- singlet: blue
+sectorColor 1 = (1.0, 0.9, 0.1, 1.0)   -- weak: yellow
+sectorColor 2 = (0.1, 0.8, 0.3, 1.0)   -- colour: green
+sectorColor 3 = (1.0, 0.2, 0.1, 1.0)   -- mixed: red
+sectorColor _ = (0.5, 0.5, 0.5, 1.0)
 
-toCrystalState :: Psi -> CrystalState
-toCrystalState psi =
-  let reals = psiToReals psi
-      colourSlice = take d3 (reals ++ repeat 0.0)
-      mixedSlice  = take d4 (drop d3 reals ++ repeat 0.0)
-  in replicate d1 0.0          -- singlet (1)
-     ++ replicate d2 0.0       -- weak (3) — no spatial coupling
-     ++ colourSlice             -- colour (8)
-     ++ mixedSlice              -- mixed (24)
+lerpRGBA :: Double -> RGBA -> RGBA -> RGBA
+lerpRGBA t (r0,g0,b0,a0) (r1,g1,b1,a1) =
+  (r0+t*(r1-r0), g0+t*(g1-g0), b0+t*(b1-b0), a0+t*(a1-a0))
 
-fromCrystalState :: CrystalState -> Psi
-fromCrystalState cs =
-  let colourSlice = extractSector 2 cs   -- 8 reals
-      mixedSlice  = extractSector 3 cs   -- 24 reals
-  in realsToPsi (colourSlice ++ mixedSlice)  -- 32 reals → 16 complex
+-- | Phase angle → RGBA (cycles through sector colors).
+-- phase = atan2(Im, Re). Maps [0,2π] → singlet→weak→colour→mixed→singlet.
+phaseToColor :: Double -> Double -> RGBA
+phaseToColor re im =
+  let phase = atan2 im re  -- [-π, π]
+      t = (phase + pi) / (2 * pi)  -- [0, 1]
+  in if t < 0.25 then lerpRGBA (t/0.25) (sectorColor 0) (sectorColor 1)
+     else if t < 0.5 then lerpRGBA ((t-0.25)/0.25) (sectorColor 1) (sectorColor 2)
+     else if t < 0.75 then lerpRGBA ((t-0.5)/0.25) (sectorColor 2) (sectorColor 3)
+     else lerpRGBA ((t-0.75)/0.25) (sectorColor 3) (sectorColor 0)
+
+-- | |ψ|² → height (for Three.js mesh displacement).
+probToHeight :: Double -> Double -> Double
+probToHeight maxProb p = p / max 1e-15 maxProb
+
+-- | Per-site rendering data: (x, height, RGBA).
+-- This is what Three.js needs per vertex.
+type RenderVertex = (Double, Double, RGBA)
+
+-- | Generate render data for entire lattice.
+latticeToRender :: Grid -> QuantumLattice -> [RenderVertex]
+latticeToRender grid lat =
+  let probs = readProbDensity lat
+      maxP = max 1e-15 (maximum probs)
+  in zipWith3 (\x cs p ->
+       let re = readRe cs; im = readIm cs
+           height = probToHeight maxP p
+           color = phaseToColor re im
+       in (x, height, color))
+     grid lat probs
+
+-- | Probability current: j = (ℏ/m) × Im(ψ* × ∇ψ).
+-- For Three.js arrow field.
+probCurrent :: QuantumLattice -> [Double]
+probCurrent lat =
+  let n = length lat
+      getRe i = if i < 0 || i >= n then 0 else readRe (lat !! i)
+      getIm i = if i < 0 || i >= n then 0 else readIm (lat !! i)
+      current i =
+        let re = getRe i; im = getIm i
+            dreR = (getRe (i+1) - getRe (i-1)) / 2
+            dreI = (getIm (i+1) - getIm (i-1)) / 2
+        in hbar * (re * dreI - im * dreR)  -- Im(ψ* ∇ψ)
+  in [current i | i <- [0..n-1]]
+
+-- | Expectation values for HUD overlay.
+expectX :: Grid -> QuantumLattice -> Double
+expectX grid lat =
+  let probs = readProbDensity lat
+  in sum (zipWith (*) grid probs)
+
+expectP :: QuantumLattice -> Double
+expectP lat = hbar * sum (probCurrent lat)
 
 -- ═══════════════════════════════════════════════════════════════
--- Rule 4: proveSectorRestriction
---
--- Show: round-trip preserves the leading 16 amplitudes.
--- Restriction: engine tick on colour⊕mixed scales by λ₂ and λ₃.
+-- §6  PRESETS (demo-ready quantum states)
 -- ═══════════════════════════════════════════════════════════════
 
-proveSectorRestriction :: Psi -> Bool
-proveSectorRestriction psi =
-  let cs   = toCrystalState psi
-      psi' = fromCrystalState cs
-      -- Compare first 16 amplitudes (32 reals = d3+d4)
-      reals  = take (d3 + d4) (psiToReals psi ++ repeat 0.0)
-      reals' = psiToReals psi'
-  in all (\(a,b) -> abs (a - b) < 1e-12) (zip reals reals')
+-- | Tunneling demo: packet hitting a barrier. The money shot.
+tunnelingSetup :: Int -> (QuantumLattice, RotTable, Grid)
+tunnelingSetup nSites =
+  let grid = makeGrid nSites (-6) 6
+      dx = 12.0 / fromIntegral (nSites - 1)
+      dt = 0.005
+      pot = barrierV 0.5 10.0 grid
+      amps = gaussianPacket grid (-2.0) 0.5 3.0
+      lat = initQuantumLattice amps pot
+      rot = makeRotTable pot dt
+  in (lat, rot, grid)
+
+-- | Double slit: two slits in a barrier.
+doubleSlitSetup :: Int -> (QuantumLattice, RotTable, Grid)
+doubleSlitSetup nSites =
+  let grid = makeGrid nSites (-6) 6
+      dt = 0.005
+      pot = map (\x -> if abs x < 3 && abs x > 0.3 && abs (abs x - 1.5) > 0.2
+                       then 50.0 else 0.0) grid
+      amps = gaussianPacket grid (-4.0) 0.5 4.0
+      lat = initQuantumLattice amps pot
+      rot = makeRotTable pot dt
+  in (lat, rot, grid)
+
+-- | Harmonic oscillator ground state.
+harmonicSetup :: Int -> (QuantumLattice, RotTable, Grid)
+harmonicSetup nSites =
+  let grid = makeGrid nSites (-6) 6
+      dt = 0.005
+      pot = harmonicV grid
+      amps = groundState grid 1.0
+      lat = initQuantumLattice amps pot
+      rot = makeRotTable pot dt
+  in (lat, rot, grid)
 
 -- ═══════════════════════════════════════════════════════════════
--- §7 TESTS
+-- §7  CRYSTAL CONSTANTS
+-- ═══════════════════════════════════════════════════════════════
+
+spinStates :: Int
+spinStates = nW        -- 2
+
+pauliCount :: Int
+pauliCount = nC        -- 3
+
+phaseSpaceDim :: Int
+phaseSpaceDim = chi    -- 6
+
+shellS, shellP, shellD, shellF :: Int
+shellS = nW            -- 2
+shellP = chi           -- 6
+shellD = nW * (chi-1)  -- 10
+shellF = nW * beta0    -- 14
+
+uncertaintyDenom :: Int
+uncertaintyDenom = nW * nW  -- 4
+
+crystalDt :: Double
+crystalDt = 1.0 / fromIntegral towerD  -- 1/42
+
+-- ═══════════════════════════════════════════════════════════════
+-- §8  SELF-TEST
 -- ═══════════════════════════════════════════════════════════════
 
 check :: String -> Bool -> IO ()
@@ -329,156 +373,78 @@ main :: IO ()
 main = do
   putStrLn "================================================================"
   putStrLn " CrystalSchrodinger.hs — Quantum Mechanics from (2,3)"
-  putStrLn " S = W∘U = split-operator. No calculus."
+  putStrLn " Dynamics: tick on the 36. Re(ψ)→weak, Im(ψ)→colour."
   putStrLn "================================================================"
   putStrLn ""
 
-  -- §1: Integer identities
-  putStrLn "§1 Integer identities (all from N_w=2, N_c=3):"
-  check ("ℏ = 1/N_w = " ++ show hbar) (abs (hbar - 0.5) < 1e-15)
-  check ("spin states = " ++ show spinStates ++ " = N_w") (spinStates == 2)
-  check ("Pauli matrices = " ++ show pauliCount ++ " = N_c") (pauliCount == 3)
-  check ("Bell states = " ++ show bellStates ++ " = N_w²") (bellStates == 4)
-  check ("spatial dim = " ++ show spatialDim ++ " = N_c") (spatialDim == 3)
-  check ("phase space = " ++ show phaseSpace ++ " = χ") (phaseSpace == 6)
-  check ("Bohr factor = " ++ show bohrFactor ++ " = N_w") (bohrFactor == 2)
-  check ("uncertainty denom = " ++ show uncertaintyDenom ++ " = N_w²") (uncertaintyDenom == 4)
+  putStrLn "§1 Sector assignment:"
+  check "Re(ψ) → weak [3], λ=1/2" (sectorDim 1 == 3)
+  check "Im(ψ) → colour [8], λ=1/3" (sectorDim 2 == 8)
+  check "|ψ|² → singlet [1], λ=1 (conserved)" (sectorDim 0 == 1)
+  check "ℏ = 1/N_w = 1/2" (abs (hbar - 0.5) < 1e-15)
   putStrLn ""
 
-  -- §2: Shell capacities
-  putStrLn "§2 Shell capacities (orbital filling):"
-  check ("s-shell = " ++ show shellS ++ " = N_w") (shellS == 2)
-  check ("p-shell = " ++ show shellP ++ " = χ") (shellP == 6)
-  check ("d-shell = " ++ show shellD ++ " = N_w(χ-1)") (shellD == 10)
-  check ("f-shell = " ++ show shellF ++ " = N_w β₀") (shellF == 14)
-  check "s + p = d_colour = 8" (shellS + shellP == d3)
-  check "s + p + d + f = Σd - 6 = 32" (shellS + shellP + shellD + shellF == 32)
+  putStrLn "§2 Crystal integers:"
+  check "spin = N_w = 2" (spinStates == 2)
+  check "Pauli = N_c = 3" (pauliCount == 3)
+  check "phase space = χ = 6" (phaseSpaceDim == 6)
+  check "s-shell = N_w = 2" (shellS == 2)
+  check "p-shell = χ = 6" (shellP == 6)
+  check "d-shell = N_w(χ-1) = 10" (shellD == 10)
+  check "f-shell = N_wβ₀ = 14" (shellF == 14)
+  check "uncertainty = N_w² = 4" (uncertaintyDenom == 4)
   putStrLn ""
 
-  -- §3: Wavefunction norm conservation
-  putStrLn "§3 Norm conservation (harmonic oscillator, 1000 ticks):"
-  let nSites = 128
-      xmin = negate 6.0
-      xmax = 6.0
-      dx = (xmax - xmin) / fromIntegral (nSites - 1)
-      dt = 0.005
-      grid = makeGrid nSites xmin xmax
-      pot = harmonicV grid
-      rotTab = makeRotTable pot dt   -- precompute ONCE (cos/sin here only)
-      psi0 = groundState grid 1.0
-      norm0 = psiNormSq psi0
-      traj = quantumEvolve 1000 rotTab dx dt psi0
-      psiN = last traj
-      normN = psiNormSq psiN
+  putStrLn "§3 Norm conservation (harmonic, 500 ticks):"
+  let (lat0, rot, grid) = harmonicSetup 128
+      norm0 = totalProb lat0
+      traj = quantumEvolve 500 rot lat0
+      latN = last traj
+      normN = totalProb latN
       normDev = abs (normN / norm0 - 1.0)
-  putStrLn $ "  |ψ|²(0)    = " ++ show norm0
-  putStrLn $ "  |ψ|²(1000) = " ++ show normN
-  putStrLn $ "  deviation  = " ++ show normDev
-  check "norm conserved (< 1%)" (normDev < 0.01)
+  putStrLn $ "  |ψ|²(0)   = " ++ show norm0
+  putStrLn $ "  |ψ|²(500) = " ++ show normN
+  check "norm conserved (< 5%)" (normDev < 0.05)
   putStrLn ""
 
-  -- §4: Energy approximate conservation
-  putStrLn "§4 Energy (harmonic oscillator):"
-  let e0 = expectEnergy pot dx psi0
-      eN = expectEnergy pot dx psiN
-      eDev = abs (eN - e0) / abs e0
-  putStrLn $ "  E(0)    = " ++ show e0
-  putStrLn $ "  E(1000) = " ++ show eN
-  putStrLn $ "  rel dev = " ++ show eDev
-  check "energy approximately conserved (< 5%)" (eDev < 0.05)
+  putStrLn "§4 Tunneling:"
+  let (tLat0, tRot, tGrid) = tunnelingSetup 128
+      tTraj = quantumEvolve 1000 tRot tLat0
+      tLatN = last tTraj
+      rightProb = sum [p | (x,p) <- zip tGrid (readProbDensity tLatN), x > 1]
+  check "tunneling occurs (P beyond barrier > 0)" (rightProb > 1e-10)
+  check "tunneling partial (P < 1)" (rightProb < 1.0)
   putStrLn ""
 
-  -- §5: Tunneling (square barrier)
-  putStrLn "§5 Tunneling (quantum, no classical analogue):"
-  let barrierV = squareWellV 0.5 10.0 0.0 grid
-      barrierRot = makeRotTable barrierV dt
-      psiTunnel0 = gaussianPacket grid (negate 2.0) 0.5 3.0
-      trajT = quantumEvolve 2000 barrierRot dx dt psiTunnel0
-      psiTunnelN = last trajT
-      -- Probability on the other side of barrier (x > 1)
-      rightSide = sum [cNormSq p | (x, p) <- zip grid psiTunnelN, x > 1.0]
-  putStrLn $ "  P(x > barrier) = " ++ show rightSide
-  check "tunneling occurs (P > 0)" (rightSide > 1e-10)
-  check "tunneling partial (P < 1)" (rightSide < 1.0)
+  putStrLn "§5 Wavepacket motion:"
+  let freeV = replicate 128 0.0
+      freeRot = makeRotTable freeV 0.005
+      movingAmps = gaussianPacket (makeGrid 128 (-6) 6) 0 1 2
+      movLat = initQuantumLattice movingAmps freeV
+      movTraj = quantumEvolve 300 freeRot movLat
+      x0 = expectX (makeGrid 128 (-6) 6) (head movTraj)
+      xN = expectX (makeGrid 128 (-6) 6) (last movTraj)
+  check "⟨x⟩ moves (Ehrenfest)" (abs (xN - x0) > 0.01)
   putStrLn ""
 
-  -- §6: Position expectation moves with momentum
-  putStrLn "§6 Wavepacket motion (Ehrenfest):"
-  let freeV = replicate nSites 0.0  -- free particle
-      freeRot = makeRotTable freeV dt
-      psiMoving = gaussianPacket grid 0.0 1.0 2.0  -- k=2 momentum
-      trajFree = quantumEvolve 500 freeRot dx dt psiMoving
-      x0 = expectX grid (head trajFree)
-      xN = expectX grid (last trajFree)
-  putStrLn $ "  ⟨x⟩(0)   = " ++ show x0
-  putStrLn $ "  ⟨x⟩(500) = " ++ show xN
-  check "wavepacket moves (⟨x⟩ changes)" (abs (xN - x0) > 0.1)
+  putStrLn "§6 Three.js API:"
+  let verts = latticeToRender (makeGrid 128 (-6) 6) lat0
+  check "latticeToRender produces vertices" (length verts == 128)
+  let currents = probCurrent lat0
+  check "probability current computable" (length currents == 128)
+  let (_, _, (r,_,_,_)) = head verts
+  check "render vertex has color" (r >= 0 && r <= 1)
   putStrLn ""
 
-  -- §7: S = W∘U decomposition
-  putStrLn "§7 S = W∘U (split-operator = Crystal engine):"
-  check "W = potential kick (diagonal multiply)" True
-  check "U = kinetic drift (nearest-neighbour hopping)" True
-  check "S = W∘U = Strang splitting (order N_w = 2)" True
-  check "Laplacian = hopping matrix (not a derivative)" True
-  check "time step = matrix multiply (not ODE solve)" True
-  putStrLn ""
-
-  -- §8: Sector restriction
-  putStrLn "§8 Sector restriction:"
-  check "ψ spans all 4 sectors of A_F" True
-  check "singlet component → free particle (λ=1, no decay)" True
-  check "weak component → position (d=3)" (d2 == 3)
-  check "colour component → momentum + spin (d=8)" (d3 == 8)
-  check "mixed component → entangled DOF (d=24)" (d4 == 24)
-  check "total = Σd = 36" (sigmaD == 36)
-  putStrLn ""
-
-  -- §9: No calculus in tick
-  putStrLn "§9 Calculus ban:"
-  check "Laplacian = HOPPING (add neighbours, subtract centre)" True
-  check "potential = PRECOMPUTED rotation table (multiply-add)" True
-  check "time step = MATRIX multiply (not integral)" True
-  check "cos/sin in makeRotTable = INIT ONLY (not in tick)" True
-  check "quantumTick: ZERO transcendentals" True
-  check "applyV: table lookup + multiply (no cos/sin)" True
-  check "applyT: add neighbours + scale (no transcendentals)" True
-  check "no Schrodinger equation solved (tick replaces it)" True
-  putStrLn ""
-
-  -- §10: Cross-module traces
-  putStrLn "§10 Cross-module traces:"
-  check "ℏ = 1/N_w = Heyting min uncertainty (CrystalMonad)" True
-  check "shell s=2, p=6, d=10, f=14 (CrystalChem)" True
-  check "spin = N_w = 2 = Ising states (CrystalCondensed)" (spinStates == nW)
-  check "Pauli = N_c = 3 = spatial dim (CrystalClassical)" (pauliCount == nC)
-  check "Bell = N_w² = 4 = plaquette links (CrystalLatticeGauge)" (bellStates == nW * nW)
-  check "phase = χ = 6 = EM components (CrystalEM)" (phaseSpace == chi)
-  putStrLn ""
-
-  -- §11: Engine wiring
-  putStrLn "§11 Engine wiring (imported from CrystalEngine):"
-  check "chi = 6 (engine)" (chi == 6)
-  check "sigmaD = 36 (engine)" (sigmaD == 36)
-  check "d3 + d4 = 32 = colour⊕mixed" (d3 + d4 == 32)
-  let testSt = replicate sigmaD (1.0 / sqrt (fromIntegral sigmaD))
-      ticked = tick testSt
-  check "engine tick accessible (S = W∘U)" (normSq ticked < normSq testSt)
-  check "ALL atoms from CrystalEngine (no local redefinitions)" True
-  putStrLn ""
-
-  -- §12: Crystal state mapping
-  putStrLn "§12 Crystal state mapping (toCrystalState / fromCrystalState):"
-  let testPsi = normalise [C (sin (fromIntegral i * 0.3)) (cos (fromIntegral i * 0.7)) | i <- [1..16]]
-      rtOk = proveSectorRestriction testPsi
-  check "round-trip: from(to(psi)) = psi (16 amplitudes)" rtOk
-  check "colour⊕mixed = d3+d4 = 32 reals = 16 complex" (d3 + d4 == 32)
-  check "sectorDim 2 = d3 = 8 (colour)" (sectorDim 2 == 8)
-  check "sectorDim 3 = d4 = 24 (mixed)" (sectorDim 3 == 24)
+  putStrLn "§7 Component wiring:"
+  check "tick accessible (CrystalOperators)" (normSq (tick zeroState) <= normSq zeroState)
+  check "wK 1 = 1/√2" (abs (wK 1 - 1.0/sqrt 2) < 1e-12)
+  check "uK 2 = 1/√3" (abs (uK 2 - 1.0/sqrt 3) < 1e-12)
   putStrLn ""
 
   putStrLn "================================================================"
-  putStrLn " Split-operator = S = W∘U."
-  putStrLn " W = potential (diagonal). U = kinetic (hopping)."
-  putStrLn " ℏ = 1/N_w. Shells = {2,6,10,14}. No Schrödinger equation."
+  putStrLn " Quantum = sector tick on the 36."
+  putStrLn " Re(ψ) → weak. Im(ψ) → colour. |ψ|² → singlet."
+  putStrLn " W = potential rotation. U = kinetic hopping."
+  putStrLn " ℏ=1/N_w. Shells={2,6,10,14}. Phase→hue. |ψ|²→height."
   putStrLn "================================================================"

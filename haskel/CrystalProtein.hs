@@ -25,7 +25,7 @@ VEV: Toe() default = crystal derived 245.17 GeV (ground truth).
      See README_VEV.md for the two-mode / four-column gap analysis.
 -}
 module CrystalProtein where
-import qualified CrystalEngine as CE
+import qualified CrystalAtoms as CE  -- refactored: was CrystalEngine
 
 -- ═══════════════════════════════════════════════════════════════
 -- §0  D=0: THE ALGEBRA A_F

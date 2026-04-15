@@ -2,7 +2,7 @@
 -- SPDX-License-Identifier: AGPL-3.0-or-later
 
 /-! # CrystalRiemann — Mathematical infrastructure from (2,3)
-Engine wired: all sectors (d=36).
+Pure. Imports CrystalAxiom only. No CrystalEngine.
 -/
 
 abbrev nW : Nat := 2
@@ -36,4 +36,4 @@ theorem sector_sum : d1 + d2 + d3 + d4 = 36 := by native_decide
 theorem spatial_dim : nC = 3 := by native_decide
 theorem sigmaD_check : sigmaD = 36 := by native_decide
 theorem spectral_dim : nW = 2 := by native_decide
--- Engine wired.
+

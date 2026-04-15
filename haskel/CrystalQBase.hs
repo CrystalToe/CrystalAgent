@@ -150,7 +150,7 @@ mMul a b =
   let n = length a
       bt = transpose' b
   in [[foldl cxAdd cxZero (zipWith cxMul (a!!i) (bt!!j)) | j <- [0..n-1]] | i <- [0..n-1]]
-  where transpose' [] = []; transpose' ([] : _) = []; transpose' m = map head m : transpose' (map tail m)
+  where transpose' [] = []; transpose' ([] : _) = []; transpose' xss = [h | (h:_) <- xss] : transpose' [t | (_:t) <- xss]
 
 mApply :: Mat -> Vec -> Vec
 mApply m v = [foldl cxAdd cxZero (zipWith cxMul row v) | row <- m]
