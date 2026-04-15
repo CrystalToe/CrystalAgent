@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
 # Crystal Lattice — Formal Verification
 
 Two formalizations of the Crystal Lattice theorems: one in **Lean 4** and one in **Agda**.

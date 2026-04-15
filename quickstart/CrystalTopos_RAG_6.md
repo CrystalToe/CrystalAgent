@@ -88,12 +88,14 @@ C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
 - **CrystalBenchmark** —       96 lines, 0 prove functions
 - **CrystalCFD** —      398 lines, 20 prove functions
 - **CrystalClassical** —      642 lines, 36 prove functions
+- **CrystalConfluence** —      379 lines, 0 prove functions
 - **CrystalCorrections** —      368 lines, 0 prove functions
 - **CrystalCosmo** —      483 lines, 46 prove functions
 - **CrystalCrossDomain** —      251 lines, 24 prove functions
 - **CrystalDiffusion** —      383 lines, 0 prove functions
 - **CrystalDiscover** —      402 lines, 0 prove functions
 - **CrystalDiscoveries** —      151 lines, 0 prove functions
+- **CrystalDiscreteTriple** —     1187 lines, 62 prove functions
 - **CrystalDynamicEngine** —      495 lines, 0 prove functions
 - **CrystalEigen** —      117 lines, 0 prove functions
 - **CrystalEM** —      466 lines, 22 prove functions
@@ -106,12 +108,15 @@ C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
 - **CrystalGravity** —      800 lines, 50 prove functions
 - **CrystalGW** —      400 lines, 32 prove functions
 - **CrystalImplosion** —      694 lines, 0 prove functions
+- **CrystalLattice** —      349 lines, 0 prove functions
+- **CrystalMagicNumbers** —      302 lines, 0 prove functions
 - **CrystalMandelbrot** —      383 lines, 0 prove functions
 - **CrystalMD** —      415 lines, 22 prove functions
 - **CrystalMixing** —      216 lines, 28 prove functions
 - **CrystalMonad** —      478 lines, 24 prove functions
 - **CrystalMonadProof** —      362 lines, 24 prove functions
 - **CrystalNBody** —      688 lines, 16 prove functions
+- **CrystalNobleGas** —      215 lines, 0 prove functions
 - **CrystalNoether** —      147 lines, 0 prove functions
 - **CrystalOperators** —      426 lines, 0 prove functions
 - **CrystalPlasma** —      326 lines, 24 prove functions
@@ -129,11 +134,12 @@ C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
 - **CrystalRigid** —      393 lines, 16 prove functions
 - **CrystalSchrodinger** —      450 lines, 0 prove functions
 - **CrystalSectors** —      144 lines, 0 prove functions
+- **CrystalStratum** —      359 lines, 0 prove functions
 - **CrystalStructural** —      238 lines, 58 prove functions
 - **CrystalThermo** —      369 lines, 20 prove functions
 - **CrystalTower** —      323 lines, 0 prove functions
 - **CrystalUniversal** —      251 lines, 24 prove functions
-- **CrystalWACAScan** —     2083 lines, 208 prove functions
+- **CrystalWACAScan** —     2281 lines, 238 prove functions
 - **CrystalWavelet** —      331 lines, 0 prove functions
 - **CrystalZResonance** —      262 lines, 0 prove functions
 - **Main** —      748 lines, 22 prove functions
@@ -165,6 +171,7 @@ C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
 - **CrystalChem.lean** — 18 theorems
 - **CrystalClassical.lean** — 38 theorems
 - **CrystalCondensed.lean** — 18 theorems
+- **CrystalConfluence.lean** — 88 theorems
 - **CrystalCorrections.lean** — 13 theorems
 - **CrystalCosmo.lean** — 18 theorems
 - **CrystalCrossDomain.lean** — 15 theorems
@@ -173,6 +180,7 @@ C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
 - **CrystalDirac.lean** — 38 theorems
 - **CrystalDiscover.lean** — 60 theorems
 - **CrystalDiscoveries.lean** — 34 theorems
+- **CrystalDiscreteTriple.lean** — 50 theorems
 - **CrystalDynamicEngine.lean** — 48 theorems
 - **CrystalEigen.lean** — 14 theorems
 - **CrystalEM.lean** — 27 theorems
@@ -190,8 +198,10 @@ C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
 - **CrystalHMC.lean** — 41 theorems
 - **CrystalHologron.lean** — 38 theorems
 - **CrystalImplosion.lean** — 30 theorems
+- **CrystalLattice.lean** — 107 theorems
 - **CrystalLatticeGauge.lean** — 47 theorems
 - **CrystalLayer.lean** — 19 theorems
+- **CrystalMagicNumbers.lean** — 100 theorems
 - **CrystalMandelbrot.lean** — 30 theorems
 - **CrystalMD.lean** — 20 theorems
 - **CrystalMERA.lean** — 18 theorems
@@ -199,6 +209,7 @@ C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
 - **CrystalMonad.lean** — 18 theorems
 - **CrystalMonadProof.lean** — 42 theorems
 - **CrystalNBody.lean** — 16 theorems
+- **CrystalNobleGas.lean** — 43 theorems
 - **CrystalNoether.lean** — 14 theorems
 - **CrystalNuclear.lean** — 16 theorems
 - **CrystalOperators.lean** — 69 theorems
@@ -224,6 +235,7 @@ C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
 - **CrystalSchrodinger.lean** — 13 theorems
 - **CrystalSectors.lean** — 24 theorems
 - **CrystalSpin.lean** — 38 theorems
+- **CrystalStratum.lean** — 73 theorems
 - **CrystalStructural.lean** — 45 theorems
 - **CrystalThermo.lean** — 30 theorems
 - **CrystalTopos.lean** — 342 theorems
@@ -246,6 +258,7 @@ C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
 - **ObservableNuclear.lean** — 20 theorems
 - **ObservableOptics.lean** — 5 theorems
 - **ObservableType.lean** — 5 theorems
+- **Universality.lean** — 37 theorems
 
 ## Agda Proofs
 - **CrystalAlphaProton.agda** — 45 proofs
@@ -260,6 +273,7 @@ C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
 - **CrystalChem.agda** — 13 proofs
 - **CrystalClassical.agda** — 38 proofs
 - **CrystalCondensed.agda** — 16 proofs
+- **CrystalConfluence.agda** — 71 proofs
 - **CrystalCorrections.agda** — 16 proofs
 - **CrystalCosmo.agda** — 13 proofs
 - **CrystalCrossDomain.agda** — 10 proofs
@@ -268,6 +282,7 @@ C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
 - **CrystalDirac.agda** — 36 proofs
 - **CrystalDiscover.agda** — 44 proofs
 - **CrystalDiscoveries.agda** — 38 proofs
+- **CrystalDiscreteTriple.agda** — 51 proofs
 - **CrystalDynamicEngine.agda** — 43 proofs
 - **CrystalEigen.agda** — 14 proofs
 - **CrystalEM.agda** — 27 proofs
@@ -285,8 +300,10 @@ C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
 - **CrystalHMC.agda** — 41 proofs
 - **CrystalHologron.agda** — 34 proofs
 - **CrystalImplosion.agda** — 32 proofs
+- **CrystalLattice.agda** — 86 proofs
 - **CrystalLatticeGauge.agda** — 45 proofs
 - **CrystalLayer.agda** — 17 proofs
+- **CrystalMagicNumbers.agda** — 59 proofs
 - **CrystalMandelbrot.agda** — 28 proofs
 - **CrystalMD.agda** — 20 proofs
 - **CrystalMERA.agda** — 16 proofs
@@ -294,6 +311,7 @@ C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
 - **CrystalMonad.agda** — 14 proofs
 - **CrystalMonadProof.agda** — 36 proofs
 - **CrystalNBody.agda** — 16 proofs
+- **CrystalNobleGas.agda** — 37 proofs
 - **CrystalNoether.agda** — 14 proofs
 - **CrystalNuclear.agda** — 12 proofs
 - **CrystalOperators.agda** — 44 proofs
@@ -319,6 +337,7 @@ C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
 - **CrystalSchrodinger.agda** — 13 proofs
 - **CrystalSectors.agda** — 23 proofs
 - **CrystalSpin.agda** — 38 proofs
+- **CrystalStratum.agda** — 66 proofs
 - **CrystalStructural.agda** — 49 proofs
 - **CrystalThermo.agda** — 30 proofs
 - **CrystalTopos.agda** — 272 proofs
@@ -340,6 +359,7 @@ C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
 - **ObservableNuclear.agda** — 21 proofs
 - **ObservableOptics.agda** — 6 proofs
 - **ObservableType.agda** — 5 proofs
+- **Universality.agda** — 28 proofs
 
 ## Rust Tests
 - **toe/src/discoveries.rs** — 2 tests

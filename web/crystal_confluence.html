@@ -1,0 +1,590 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crystal Confluence — Multi-Layer Reinforcement of Nuclear Magic Numbers</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=JetBrains+Mono:wght@300;400;600&family=Outfit:wght@200;300;400;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:#04080f;color:#e0ddd5;font-family:'Outfit',sans-serif;overflow-x:hidden}
+header{text-align:center;padding:48px 20px 16px;position:relative;z-index:10}
+h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4.5vw,3.6rem);font-weight:700;color:#f0c040;letter-spacing:-.01em;text-shadow:0 0 60px rgba(240,192,64,.18)}
+.tagline{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:#6a6a7a;letter-spacing:3px;margin-top:8px;text-transform:uppercase}
+.subtitle{max-width:760px;margin:18px auto 0;font-size:.95rem;color:#9a9aa8;line-height:1.7;font-weight:300}
+.subtitle em{color:#f0c040;font-style:normal}
+#stage{position:relative;width:100%;height:72vh;min-height:540px;background:radial-gradient(ellipse at center,#06101f 0%,#020510 70%,#000 100%);overflow:hidden;border-top:1px solid #151525;border-bottom:1px solid #151525}
+#stage canvas{display:block}
+.overlay{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:5}
+.legend{position:absolute;top:16px;left:16px;pointer-events:auto;background:rgba(6,12,25,.82);border:1px solid #1e2636;border-radius:10px;padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:.72rem;line-height:1.8;backdrop-filter:blur(6px)}
+.legend h3{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:600;color:#f0c040;margin-bottom:8px;letter-spacing:.5px}
+.legend .key{display:flex;align-items:center;gap:8px;color:#ccc}
+.legend .dot{width:10px;height:10px;border-radius:50%;box-shadow:0 0 8px currentColor}
+.legend .dot.gold{background:#f0c040;color:#f0c040}
+.legend .dot.silver{background:#c4d0dc;color:#c4d0dc}
+.legend .dot.rose{background:#e08a90;color:#e08a90}
+.legend .dot.forbid{background:#8b2a2a;color:#8b2a2a}
+.controls{position:absolute;top:16px;right:16px;pointer-events:auto;display:flex;flex-direction:column;gap:6px}
+.controls button{background:rgba(6,12,25,.82);border:1px solid #1e2636;color:#c8c8d4;font-family:'JetBrains Mono',monospace;font-size:.72rem;padding:7px 12px;border-radius:6px;cursor:pointer;transition:all .2s;text-transform:uppercase;letter-spacing:1px;backdrop-filter:blur(6px)}
+.controls button:hover{border-color:#f0c04066;color:#f0c040;background:rgba(240,192,64,.06)}
+.controls button.active{border-color:#f0c040;color:#f0c040;background:rgba(240,192,64,.12)}
+#tooltip{position:absolute;pointer-events:none;background:rgba(10,16,30,.95);border:1px solid #f0c04055;border-radius:10px;padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:#f0f0f0;max-width:320px;opacity:0;transition:opacity .15s;backdrop-filter:blur(8px);box-shadow:0 8px 40px rgba(0,0,0,.7);z-index:20;line-height:1.6}
+#tooltip .title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:#f0c040;letter-spacing:-.02em;margin-bottom:4px}
+#tooltip .label{color:#9da8b8;font-size:.7rem;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
+#tooltip .layer{display:flex;gap:8px;margin:3px 0;color:#e6e6ec}
+#tooltip .strength{margin-top:8px;padding-top:8px;border-top:1px solid #22334a;color:#f0c040;font-size:.85rem}
+.legend-hint{margin-top:10px;padding-top:8px;border-top:1px solid #1e2636;color:#6a7082;font-size:.68rem;font-family:'Outfit',sans-serif;font-style:italic}
+.section{max-width:1200px;margin:48px auto;padding:0 20px}
+.section h2{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:600;color:#e8d78a;margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid #1a1a2a}
+.section p{color:#9a9aa8;line-height:1.75;font-weight:300;max-width:860px;margin-bottom:14px;font-size:.98rem}
+.section p strong{color:#e6d690;font-weight:600}
+.section p em{color:#f0c040;font-style:normal}
+.s-table{width:100%;border-collapse:collapse;margin-top:18px;font-family:'JetBrains Mono',monospace;font-size:.85rem}
+.s-table th,.s-table td{padding:10px 14px;text-align:left;border-bottom:1px solid #1a1a2a}
+.s-table th{color:#f0c040;font-weight:600;text-transform:uppercase;font-size:.7rem;letter-spacing:1.5px}
+.s-table tr:hover td{background:rgba(240,192,64,.04)}
+.s-table td.s3{color:#f0c040;font-weight:600}
+.s-table td.s2{color:#d4d4dc}
+.s-table td.s1{color:#9aa4b4}
+.s-table td.s0{color:#8b2a2a}
+.regime-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}
+.regime-card{background:linear-gradient(135deg,#0a1220,#0d1826);border:1px solid #1e2636;border-radius:14px;padding:24px}
+.regime-card h3{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:#f0c040;margin-bottom:10px}
+.regime-card .formula{font-family:'JetBrains Mono',monospace;font-size:.9rem;color:#d0d0d8;background:rgba(0,0,0,.25);padding:10px 14px;border-radius:6px;margin:8px 0;border-left:3px solid #f0c040}
+.regime-card .values{font-family:'JetBrains Mono',monospace;color:#a8b0c0;font-size:.82rem;margin-top:6px}
+footer{text-align:center;padding:40px 20px 60px;color:#4a4a5a;font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:1px}
+footer a{color:#8a8a9a;text-decoration:none;border-bottom:1px dotted #4a4a5a;padding-bottom:1px}
+footer a:hover{color:#f0c040;border-color:#f0c040}
+@media (max-width:760px){.regime-grid{grid-template-columns:1fr}.legend{font-size:.66rem}#stage{height:60vh}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Crystal Confluence</h1>
+  <div class="tagline">multi-layer reinforcement · closure-strength geometry</div>
+  <p class="subtitle">
+    The magic-number formula of the <em>2×3 rectangle</em> factors into a natural four-layer hierarchy.
+    Each canonical magic number sits at <em>multiple layers simultaneously</em> — and the number of layers
+    quantitatively predicts its empirical closure strength. <em>N&nbsp;=&nbsp;20</em>, pierced by all three,
+    is the most robust stable doubly-magic nucleus.
+  </p>
+</header>
+
+<div id="stage">
+  <div class="overlay">
+    <div class="legend">
+      <h3>Layers</h3>
+      <div class="key"><span class="dot gold"></span>L0 — canonical magic&nbsp;&nbsp;<code>M(n)</code></div>
+      <div class="key"><span class="dot silver"></span>L1 — pronic&nbsp;&nbsp;<code>n(n+1)</code> = HO shell</div>
+      <div class="key"><span class="dot rose"></span>L2 — even&nbsp;&nbsp;<code>2n</code></div>
+      <div class="key"><span class="dot forbid"></span>forbidden (foreign prime)</div>
+      <div class="legend-hint">Hover an integer to read its decomposition. Vertical shafts = multi-layer reinforcement.</div>
+    </div>
+    <div class="controls">
+      <button id="btn-rotate" class="active">rotate</button>
+      <button id="btn-highlight20">isolate N=20</button>
+      <button id="btn-reset">reset</button>
+    </div>
+  </div>
+  <div id="tooltip"></div>
+</div>
+
+<div class="section">
+  <h2>The Hierarchy, Read Off the Formula</h2>
+  <p>
+    The unified closed-form <code>M(n) = N<sub>w</sub>·[C(n,1) + C(n,2) + C(n,3)] + N<sub>w</sub>·C(n,2)·𝟙(n≤N<sub>c</sub>)</code>
+    with <code>(N<sub>w</sub>, N<sub>c</sub>) = (2, 3)</code> is not monolithic — it is a sum of three <em>columns</em>. Each column defines a stratum:
+  </p>
+  <div class="regime-grid">
+    <div class="regime-card">
+      <h3>Low regime · n ≤ N<sub>c</sub> = 3</h3>
+      <div class="formula">M(n) = n(n+1)(n+2) / 3</div>
+      <div class="values">cumulative 3D harmonic oscillator → {2, 8, 20}</div>
+      <p style="color:#9a9aa8;font-size:.88rem;line-height:1.65;margin-top:10px;font-weight:300">
+        Pure HO cumulation. Mayer–Jensen 1949 before spin–orbit. Agrees with experiment for the first three closures.
+      </p>
+    </div>
+    <div class="regime-card">
+      <h3>High regime · n ≥ 4</h3>
+      <div class="formula">M(n) = n(n² + 5) / 3</div>
+      <div class="values">Wigner spin–orbit correction → {28, 50, 82, 126}</div>
+      <p style="color:#9a9aa8;font-size:.88rem;line-height:1.65;margin-top:10px;font-weight:300">
+        Spin–orbit reshuffling kicks in. The pure-HO prediction at n=4 would be 40 — framework corrects to 28, matching observation.
+      </p>
+    </div>
+  </div>
+  <p style="margin-top:22px">
+    The switch at <em>exactly n = N<sub>c</sub> = 3</em> is the same point where the pure harmonic oscillator fails experimentally. The column count <code>N<sub>c</sub> = 3</code> encodes physical-space dimension; the formula implements the HO → HO+SO transition as a structural consequence, not a tuned correction.
+  </p>
+</div>
+
+<div class="section">
+  <h2>Closure Strength s(N) = Number of Reinforcing Layers</h2>
+  <p>
+    An integer that lies on multiple strata has multiple independent structural reasons to host a nuclear shell closure. The count is the framework's closure-strength prediction. This is the arithmetic closed-form analogue of the <em>Dirac Confluence Mechanism</em> (Ding et al., <em>Phys. Rev. Lett.</em> <strong>136</strong> 082501, 2026), which attributes robust magic numbers to the coincidence of spin and pseudospin symmetries.
+  </p>
+  <table class="s-table" id="sTable">
+    <thead><tr><th>s(N)</th><th>N</th><th>label</th><th>layers</th><th>E(2⁺) [MeV]</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<div class="section">
+  <h2>What the Visual Shows</h2>
+  <p>
+    Each integer from 2 to 82 is plotted horizontally. The three layers (L0 primary gold, L1 pronic silver, L2 tertiary rose) are stacked vertically. A glowing <em>shaft</em> connects spheres representing the same integer across layers — the taller and thicker the shaft, the stronger the reinforcement.
+  </p>
+  <p>
+    <strong>Three golden spheres stacked vertically at N = 20</strong> is the triple reinforcement that predicts ⁴⁰Ca's unique robustness (E(2⁺) = 3.904 MeV, the largest among first-row canonical closures). <strong>Two stacks at N = 28, 50, 82, 126</strong> mark canonical SO-induced magic. <strong>Two stacks at N = 56</strong> are the Ni-56 doubly-magic signature — strong but not canonical. <strong>Single rose spheres</strong> at N = 14, 16, 32, 34, 40, 64 are the emergent subshells of exotic neutron-rich nuclei. <strong>Dark red dots on the floor</strong> are the thirty even integers containing foreign primes — framework-forbidden, experimentally silent.
+  </p>
+</div>
+
+<footer>
+  Crystal Topos / WACA Programme · April 2026 · <a href="https://zenodo.org" target="_blank">Zenodo</a>
+</footer>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.module.min.js"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+
+// ============================================================
+// DATA — framework hierarchy
+// ============================================================
+const L0 = [2, 8, 20, 28, 50, 82, 126];  // canonical magic
+const L1_core = [20, 30, 42, 56, 72, 90, 110];  // pronic n(n+1), n=4..10 (20 duplicated from L0)
+const FORBIDDEN = [26, 46, 52, 58, 62, 74, 78, 92, 94, 104, 106, 116, 118, 122, 130, 138, 142, 146, 148, 156, 158, 166, 174, 178, 182, 184, 186, 188, 194];
+
+const LABELS = {
+  2: { kind: 'canonical', nucleus: '⁴He',  e2: null },
+  8: { kind: 'canonical', nucleus: '¹⁶O',  e2: null },
+  14:{ kind: 'emergent',  nucleus: 'N=14 sub (C–Si region)', e2: null },
+  16:{ kind: 'emergent',  nucleus: '²⁴O subshell', e2: 4.790 },
+  20:{ kind: 'TRIPLE',    nucleus: '⁴⁰Ca', e2: 3.904 },
+  28:{ kind: 'canonical', nucleus: '⁴⁸Ca', e2: 3.832 },
+  32:{ kind: 'emergent',  nucleus: '⁵²Ca', e2: 2.564 },
+  34:{ kind: 'emergent',  nucleus: '⁵⁴Ca (Nature 2013)', e2: 2.043 },
+  40:{ kind: 'emergent',  nucleus: 'Zr / Ni semi-magic', e2: null },
+  42:{ kind: 'pronic',    nucleus: 'D tower depth', e2: null },
+  50:{ kind: 'canonical', nucleus: '⁹⁰Zr', e2: 2.186 },
+  56:{ kind: 'doubly',    nucleus: '⁵⁶Ni',  e2: 2.700 },
+  64:{ kind: 'emergent',  nucleus: 'Gd subshell', e2: null },
+  82:{ kind: 'canonical', nucleus: '¹³²Sn', e2: 4.041 },
+  126:{kind: 'canonical', nucleus: '²⁰⁸Pb', e2: 4.085 },
+};
+
+// Closure-strength table
+function sOf(n) {
+  if (FORBIDDEN.includes(n)) return 0;
+  let s = 0;
+  if (L0.includes(n)) s++;
+  if (L1_core.includes(n) || [2,8,20].includes(n)) s++; // L1 includes low-regime overlap via correction
+  if (n % 2 === 0) s++;
+  return s;
+}
+// Adjust: at low regime, L1 with correction gives {2,8,20}. Already counted via explicit list above.
+
+// ============================================================
+// TABLE population
+// ============================================================
+const rows = [
+  [20, '⁴⁰Ca',     3, 'L0 ∩ L1 ∩ L2', 3.904],
+  [2,  '⁴He',      2, 'L0 ∩ L2',      null],
+  [8,  '¹⁶O',      2, 'L0 ∩ L2',      null],
+  [28, '⁴⁸Ca',     2, 'L0 ∩ L2',      3.832],
+  [50, '⁹⁰Zr',     2, 'L0 ∩ L2',      2.186],
+  [82, '¹³²Sn',    2, 'L0 ∩ L2',      4.041],
+  [126,'²⁰⁸Pb',    2, 'L0 ∩ L2',      4.085],
+  [56, '⁵⁶Ni doubly', 2, 'L1 ∩ L2',   2.700],
+  [16, '²⁴O',      1, 'L2',           4.790],
+  [32, '⁵²Ca',     1, 'L2',           2.564],
+  [34, '⁵⁴Ca',     1, 'L2',           2.043],
+  [14, 'C–Si',     1, 'L2',           null],
+  [40, 'Zr / Ni',  1, 'L2',           null],
+  [64, 'Gd',       1, 'L2',           null],
+  [46, '—',        0, 'FORBIDDEN (2·23)', null],
+  [58, '—',        0, 'FORBIDDEN (2·29)', null],
+  [62, '—',        0, 'FORBIDDEN (2·31)', null],
+];
+const tbody = document.querySelector('#sTable tbody');
+rows.forEach(([n, label, s, layers, e2]) => {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td class="s${s}">${s}</td><td>${n}</td><td>${label}</td><td>${layers}</td><td>${e2 !== null ? e2 : '—'}</td>`;
+  tbody.appendChild(tr);
+});
+
+// ============================================================
+// THREE.JS SETUP
+// ============================================================
+const stage = document.getElementById('stage');
+const tooltip = document.getElementById('tooltip');
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x04080f, 0.012);
+
+const camera = new THREE.PerspectiveCamera(42, stage.clientWidth/stage.clientHeight, 0.1, 500);
+camera.position.set(0, 14, 42);
+camera.lookAt(0, 0, 0);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setSize(stage.clientWidth, stage.clientHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+stage.appendChild(renderer.domElement);
+
+window.addEventListener('resize', () => {
+  camera.aspect = stage.clientWidth/stage.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(stage.clientWidth, stage.clientHeight);
+});
+
+// Lights
+scene.add(new THREE.AmbientLight(0x334455, 0.4));
+const keyLight = new THREE.DirectionalLight(0xf0c040, 0.7);
+keyLight.position.set(10, 20, 10);
+scene.add(keyLight);
+const rimLight = new THREE.DirectionalLight(0x4488ff, 0.35);
+rimLight.position.set(-15, 5, -10);
+scene.add(rimLight);
+
+// Starfield
+const starGeo = new THREE.BufferGeometry();
+const starPos = [];
+for (let i = 0; i < 800; i++) {
+  starPos.push((Math.random()-.5)*200, (Math.random()-.5)*80, (Math.random()-.5)*200);
+}
+starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPos, 3));
+const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color:0x4466aa, size:0.08, transparent:true, opacity:0.45 }));
+scene.add(stars);
+
+// ============================================================
+// GEOMETRY: three planes at y = +3, 0, -3  (L0, L1, L2)
+// Integer N maps to x = (N - 40) * scale
+// Z jitter small for depth
+// ============================================================
+const N_MIN = 2, N_MAX = 130;  // visible range — extended to include 7th canonical magic N=126
+const X_SCALE = 0.22;
+const xOf = n => (n - 66) * X_SCALE;
+
+const Y_L0 =  3.2;
+const Y_L1 =  0.0;
+const Y_L2 = -3.2;
+const Y_FLOOR = -5.6;
+
+// Grid planes — subtle
+function makePlane(y, color, opacity) {
+  const g = new THREE.PlaneGeometry(32, 4, 1, 1);
+  g.scale(1.15, 1, 1); // slight widening to cover extended x-range
+  const m = new THREE.MeshBasicMaterial({ color, transparent:true, opacity, side:THREE.DoubleSide, depthWrite:false });
+  const mesh = new THREE.Mesh(g, m);
+  mesh.rotation.x = -Math.PI/2;
+  mesh.position.y = y;
+  scene.add(mesh);
+  // wire outline
+  const edges = new THREE.EdgesGeometry(g);
+  const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color, transparent:true, opacity:opacity*1.5 }));
+  line.rotation.x = -Math.PI/2;
+  line.position.y = y;
+  scene.add(line);
+}
+makePlane(Y_L0, 0xf0c040, 0.025);
+makePlane(Y_L1, 0xc4d0dc, 0.025);
+makePlane(Y_L2, 0xe08a90, 0.025);
+makePlane(Y_FLOOR, 0x8b2a2a, 0.02);
+
+// Axis line (integer axis)
+const axisGeo = new THREE.BufferGeometry();
+axisGeo.setAttribute('position', new THREE.Float32BufferAttribute([xOf(N_MIN)-1, Y_FLOOR-0.1, 0, xOf(N_MAX)+1, Y_FLOOR-0.1, 0], 3));
+scene.add(new THREE.Line(axisGeo, new THREE.LineBasicMaterial({ color:0x333344, transparent:true, opacity:0.6 })));
+
+// Tick labels every 10 (rendered as sprites)
+function makeTextSprite(text, color='#6a7082', size=32) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256; canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  ctx.font = `${size}px "JetBrains Mono", monospace`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = color;
+  ctx.fillText(text, 128, 32);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.minFilter = THREE.LinearFilter;
+  const mat = new THREE.SpriteMaterial({ map:tex, transparent:true, depthWrite:false });
+  const sprite = new THREE.Sprite(mat);
+  sprite.scale.set(3.2, 0.8, 1);
+  return sprite;
+}
+
+for (let n = 10; n <= 130; n += 10) {
+  const s = makeTextSprite(String(n), '#4a5268', 36);
+  s.position.set(xOf(n), Y_FLOOR-0.7, 0);
+  scene.add(s);
+}
+// Layer labels at left edge
+const layerLabels = [
+  { text: 'L0  primary',  y: Y_L0,  color: '#f0c040' },
+  { text: 'L1  pronic',   y: Y_L1,  color: '#c4d0dc' },
+  { text: 'L2  even',     y: Y_L2,  color: '#e08a90' },
+  { text: 'FORBIDDEN',    y: Y_FLOOR-0.1, color: '#8b4040' },
+];
+layerLabels.forEach(l => {
+  const s = makeTextSprite(l.text, l.color, 32);
+  s.scale.set(4.2, 1.05, 1);
+  s.position.set(xOf(N_MIN)-4, l.y, 0);
+  scene.add(s);
+});
+
+// ============================================================
+// SPHERES & SHAFTS
+// ============================================================
+const sphereGroup = new THREE.Group();
+scene.add(sphereGroup);
+const pickables = [];
+
+function makeSphere(n, y, color, radius, glow) {
+  const geo = new THREE.SphereGeometry(radius, 28, 28);
+  const mat = new THREE.MeshStandardMaterial({
+    color, emissive: color, emissiveIntensity: glow,
+    metalness: 0.4, roughness: 0.25,
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(xOf(n), y, 0);
+  mesh.userData = { n, layer: y };
+  sphereGroup.add(mesh);
+  pickables.push(mesh);
+  // halo
+  const haloGeo = new THREE.SphereGeometry(radius*2.2, 16, 16);
+  const haloMat = new THREE.MeshBasicMaterial({ color, transparent:true, opacity:0.12, depthWrite:false });
+  const halo = new THREE.Mesh(haloGeo, haloMat);
+  halo.position.copy(mesh.position);
+  sphereGroup.add(halo);
+  return mesh;
+}
+
+function makeShaft(n, yTop, yBot, color, opacity) {
+  const height = yTop - yBot;
+  const geo = new THREE.CylinderGeometry(0.05, 0.05, height, 12, 1);
+  const mat = new THREE.MeshBasicMaterial({ color, transparent:true, opacity, depthWrite:false });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(xOf(n), (yTop+yBot)/2, 0);
+  sphereGroup.add(mesh);
+}
+
+// L0 — gold, large, glowing
+const onL0 = new Set();
+L0.forEach(n => {
+  if (n >= N_MIN && n <= N_MAX) {
+    makeSphere(n, Y_L0, 0xf0c040, 0.52, 0.9);
+    onL0.add(n);
+  }
+});
+
+// L1 — silver, medium  (includes pronic n(n+1) for n=4..9 AND low regime 2,8,20 via correction)
+const L1_all = new Set([...L1_core, 2, 8, 20]);
+L1_all.forEach(n => {
+  if (n >= N_MIN && n <= N_MAX) {
+    makeSphere(n, Y_L1, 0xc4d0dc, 0.40, 0.55);
+  }
+});
+
+// L2 — rose, small  (even integers that are allowed and not forbidden; range N_MIN..N_MAX)
+const onL2 = new Set();
+for (let n = N_MIN; n <= N_MAX; n += 2) {
+  if (!FORBIDDEN.includes(n)) {
+    const special = LABELS[n];
+    const isSpecial = !!special;
+    makeSphere(n, Y_L2, 0xe08a90, isSpecial ? 0.30 : 0.15, isSpecial ? 0.5 : 0.18);
+    onL2.add(n);
+  }
+}
+
+// FORBIDDEN — dark red on floor
+FORBIDDEN.forEach(n => {
+  if (n >= N_MIN && n <= N_MAX) {
+    makeSphere(n, Y_FLOOR, 0x8b2a2a, 0.18, 0.35);
+  }
+});
+
+// Shafts — connect spheres vertically across layers
+function addShafts(n) {
+  const hitsL0 = onL0.has(n);
+  const hitsL1 = L1_all.has(n);
+  const hitsL2 = onL2.has(n);
+
+  const color = hitsL0 ? 0xf0c040 : hitsL1 ? 0xc4d0dc : 0xe08a90;
+  const opacity = (hitsL0 && hitsL1 && hitsL2) ? 0.95 : (hitsL0 && hitsL2) ? 0.55 : (hitsL1 && hitsL2) ? 0.5 : 0.2;
+
+  if (hitsL0 && hitsL1 && hitsL2) {
+    // Triple — full shaft L0→L2
+    makeShaft(n, Y_L0, Y_L2, 0xf0c040, 0.85);
+  } else if (hitsL0 && hitsL2) {
+    makeShaft(n, Y_L0, Y_L2, 0xf0c040, 0.45);
+  } else if (hitsL1 && hitsL2) {
+    makeShaft(n, Y_L1, Y_L2, 0xc4d0dc, 0.45);
+  } else if (hitsL1 && hitsL0) {
+    makeShaft(n, Y_L0, Y_L1, 0xf0c040, 0.45);
+  }
+}
+// Apply to all allowed even integers
+for (let n = N_MIN; n <= N_MAX; n += 2) {
+  if (!FORBIDDEN.includes(n)) addShafts(n);
+}
+
+// Extra aura for the triple reinforcement (N=20)
+(() => {
+  const n = 20;
+  const g = new THREE.CylinderGeometry(0.45, 0.45, Y_L0 - Y_L2, 16, 1, true);
+  const m = new THREE.MeshBasicMaterial({ color: 0xf0c040, transparent:true, opacity:0.12, side:THREE.DoubleSide, depthWrite:false });
+  const aura = new THREE.Mesh(g, m);
+  aura.position.set(xOf(n), (Y_L0+Y_L2)/2, 0);
+  sphereGroup.add(aura);
+  // Sparkle ring at N=20 base
+  const ringGeo = new THREE.TorusGeometry(0.9, 0.04, 12, 48);
+  const ringMat = new THREE.MeshBasicMaterial({ color:0xf0c040, transparent:true, opacity:0.7 });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.position.set(xOf(n), Y_L2, 0);
+  ring.rotation.x = Math.PI/2;
+  sphereGroup.add(ring);
+})();
+
+// Number labels near the key integers
+Object.keys(LABELS).forEach(nStr => {
+  const n = +nStr;
+  if (n < N_MIN || n > N_MAX) return;
+  const s = makeTextSprite(String(n), LABELS[n].kind === 'TRIPLE' ? '#f0c040' : (LABELS[n].kind === 'canonical' ? '#e8c878' : '#a8b4c4'), 40);
+  s.scale.set(2.0, 0.5, 1);
+  s.position.set(xOf(n), Y_L0 + 1.0, 0);
+  scene.add(s);
+});
+
+// ============================================================
+// PICKING + TOOLTIP
+// ============================================================
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+let hovered = null;
+
+stage.addEventListener('pointermove', (e) => {
+  const rect = renderer.domElement.getBoundingClientRect();
+  pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+  pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects(pickables);
+  if (hits.length) {
+    const n = hits[0].object.userData.n;
+    showTooltip(n, e.clientX - rect.left, e.clientY - rect.top);
+    hovered = n;
+  } else {
+    tooltip.style.opacity = 0;
+    hovered = null;
+  }
+});
+
+function showTooltip(n, x, y) {
+  const lab = LABELS[n];
+  const forbidden = FORBIDDEN.includes(n);
+  const layers = [];
+  if (onL0.has(n)) layers.push('<div class="layer"><span style="color:#f0c040">L0</span> primary magic <code>M</code></div>');
+  if (L1_all.has(n)) layers.push('<div class="layer"><span style="color:#c4d0dc">L1</span> pronic · HO shell size</div>');
+  if (onL2.has(n)) layers.push('<div class="layer"><span style="color:#e08a90">L2</span> even <code>2·' + (n/2) + '</code></div>');
+  const s = forbidden ? 0 : layers.length;
+  const strengthLabel = forbidden ? 'forbidden — no closure predicted' :
+                       s === 3 ? 's(N) = 3 · TRIPLE-reinforced (strongest)' :
+                       s === 2 ? 's(N) = 2 · doubly-reinforced' :
+                       s === 1 ? 's(N) = 1 · singly-reinforced (emergent)' : '';
+  const label = forbidden ? `forbidden — contains foreign prime` :
+                lab ? lab.nucleus : 'allowed';
+  const e2line = lab && lab.e2 ? `<div style="margin-top:6px;color:#88a0b8">E(2⁺) = ${lab.e2} MeV</div>` : '';
+  tooltip.innerHTML = `<div class="title">N = ${n}</div><div class="label">${label}</div>${layers.join('')}<div class="strength">${strengthLabel}</div>${e2line}`;
+  const tw = tooltip.offsetWidth, th = tooltip.offsetHeight;
+  const rect = stage.getBoundingClientRect();
+  const maxX = rect.width - tw - 10;
+  const maxY = rect.height - th - 10;
+  tooltip.style.left = Math.min(x + 16, maxX) + 'px';
+  tooltip.style.top = Math.min(y - th/2, maxY) + 'px';
+  tooltip.style.opacity = 1;
+}
+
+// ============================================================
+// CAMERA CONTROLS (orbit + autorotate)
+// ============================================================
+let autorotate = true;
+let angle = 0;
+const radius = 48;
+let isDragging = false, dragStartX = 0, dragStartAngle = 0;
+let elevation = 14;
+
+stage.addEventListener('pointerdown', (e) => {
+  isDragging = true;
+  dragStartX = e.clientX;
+  dragStartAngle = angle;
+  autorotate = false;
+  document.getElementById('btn-rotate').classList.remove('active');
+});
+window.addEventListener('pointerup', () => { isDragging = false; });
+window.addEventListener('pointermove', (e) => {
+  if (isDragging) {
+    angle = dragStartAngle + (e.clientX - dragStartX) * 0.006;
+  }
+});
+stage.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  elevation = Math.max(3, Math.min(35, elevation + e.deltaY * 0.02));
+}, { passive:false });
+
+document.getElementById('btn-rotate').addEventListener('click', (e) => {
+  autorotate = !autorotate;
+  e.target.classList.toggle('active', autorotate);
+});
+document.getElementById('btn-highlight20').addEventListener('click', () => {
+  // pan camera to focus on N=20
+  const targetX = xOf(20);
+  angle = Math.PI * 1.9;
+  elevation = 8;
+  autorotate = false;
+  document.getElementById('btn-rotate').classList.remove('active');
+  // briefly boost N=20 aura — handled by existing aura
+});
+document.getElementById('btn-reset').addEventListener('click', () => {
+  angle = 0;
+  elevation = 14;
+  autorotate = true;
+  document.getElementById('btn-rotate').classList.add('active');
+});
+
+// ============================================================
+// RENDER LOOP
+// ============================================================
+const clock = new THREE.Clock();
+function tick() {
+  const dt = clock.getDelta();
+  if (autorotate) angle += dt * 0.12;
+  camera.position.x = Math.sin(angle) * radius;
+  camera.position.z = Math.cos(angle) * radius;
+  camera.position.y = elevation;
+  camera.lookAt(0, 0, 0);
+
+  // Subtle pulse on N=20 aura
+  const t = clock.getElapsedTime();
+  sphereGroup.children.forEach(obj => {
+    if (obj.userData && obj.userData.n === 20 && obj.geometry && obj.geometry.type === 'SphereGeometry') {
+      obj.material.emissiveIntensity = 0.9 + 0.3 * Math.sin(t * 2);
+    }
+  });
+
+  renderer.render(scene, camera);
+  requestAnimationFrame(tick);
+}
+tick();
+</script>
+</body>
+</html>

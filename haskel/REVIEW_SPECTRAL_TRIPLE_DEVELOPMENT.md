@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Daland Montgomery — SPDX-License-Identifier: AGPL-3.0-or-later -->
+
 # Review: Discrete Spectral Triple (April 2026)
 
 **Status:** Standalone proof-of-concept complete. Compiles under GHC 9.4.7, runs, all 25 checks pass.
