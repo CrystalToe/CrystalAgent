@@ -4163,8 +4163,9 @@ theorem muon_denom_a : d3 * (2 * chi - 1) = 88 := by native_decide
 theorem muon_denom_b : nW * nW * nW * nW * (chi - 1) + d3 = 88 := by native_decide
 ```
 
-## §Lean: CrystalLattice.lean (     399 lines, 107 theorems)
+## §Lean: CrystalLattice.lean (     402 lines, 107 theorems)
 ```lean
+
 /-
   CrystalLattice_NoMathlib.lean
 

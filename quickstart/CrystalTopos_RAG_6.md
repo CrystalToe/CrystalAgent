@@ -137,7 +137,9 @@ C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
 - **CrystalStratum** —      359 lines, 0 prove functions
 - **CrystalStructural** —      238 lines, 58 prove functions
 - **CrystalThermo** —      369 lines, 20 prove functions
+- **CrystalThirdGate** —      184 lines, 0 prove functions
 - **CrystalTower** —      323 lines, 0 prove functions
+- **CrystalUnifiedDGP** —      219 lines, 0 prove functions
 - **CrystalUniversal** —      251 lines, 24 prove functions
 - **CrystalWACAScan** —     2281 lines, 238 prove functions
 - **CrystalWavelet** —      331 lines, 0 prove functions
@@ -238,8 +240,10 @@ C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
 - **CrystalStratum.lean** — 73 theorems
 - **CrystalStructural.lean** — 45 theorems
 - **CrystalThermo.lean** — 30 theorems
+- **CrystalThirdGate.lean** — 10 theorems
 - **CrystalTopos.lean** — 342 theorems
 - **CrystalTower.lean** — 21 theorems
+- **CrystalUnifiedDGP.lean** — 10 theorems
 - **CrystalUniversal.lean** — 35 theorems
 - **CrystalVEV.lean** — 16 theorems
 - **CrystalWACAScan.lean** — 16 theorems
@@ -340,8 +344,10 @@ C_F=(N_c²−1)/(2N_c)=4/3, T_F=1/2
 - **CrystalStratum.agda** — 66 proofs
 - **CrystalStructural.agda** — 49 proofs
 - **CrystalThermo.agda** — 30 proofs
+- **CrystalThirdGate.agda** — 43 proofs
 - **CrystalTopos.agda** — 272 proofs
 - **CrystalTower.agda** — 25 proofs
+- **CrystalUnifiedDGP.agda** — 34 proofs
 - **CrystalUniversal.agda** — 35 proofs
 - **CrystalVEV.agda** — 11 proofs
 - **CrystalWACAScan.agda** — 10 proofs
