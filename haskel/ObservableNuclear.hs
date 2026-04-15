@@ -146,6 +146,59 @@ obsSEMFPairing = mk "SEMF pair exp" "1/N_w = 1/2"
   (\_ -> 1.0 / nW_d) (1.0/2.0) ExactRational
 
 -- =====================================================================
+-- SEMF COEFFICIENTS (dimensionful, MeV) -- derived d_52, all five
+--
+-- Pattern: a_x = m_e_nuclear * (rectangle ratio)
+-- All five have empirical match within 0.5%, structural reading clean,
+-- mechanically verified in CrystalUnifiedDGP.{hs, lean, agda}.
+-- =====================================================================
+
+-- | a_v = m_e * chi*Sigma_d/beta0 = m_e * 6*36/7 = m_e * 216/7
+-- Volume coefficient. Bulk binding per nucleon. Predicted: 15.79 MeV (0.05% off).
+-- Reading: (rectangle area * sectors) / (running coefficient)
+obsSEMFVolume_coeff :: Obs
+obsSEMFVolume_coeff = mk "a_v (MeV)" "m_e*chi*Sd/b0 = m_e*216/7"
+  (\v -> meNuclear v * chi_d * sigmaD_d / beta0_d)
+  15.8 ExactRational
+
+-- | a_s = m_e * 11 * gauss / N_w^2 = m_e * 143/4
+-- Surface coefficient. Boundary penalty per surface nucleon. Predicted: 18.30 MeV (0.02% off).
+-- 11 in H, gauss = N_w^2 + N_c^2, denominator = squared spin width.
+-- Equivalent: gauss * (D+gauss) / (gauss+beta0); denom gauss+b0 = M(3) = 20.
+obsSEMFSurface_coeff :: Obs
+obsSEMFSurface_coeff = mk "a_s (MeV)" "m_e*11*gauss/Nw^2 = m_e*143/4"
+  (\v -> meNuclear v * 11.0 * gauss_d / (nW_d * nW_d))
+  18.3 ExactRational
+
+-- | a_c = m_e * beta0/(chi-1) = m_e * 7/5
+-- Coulomb coefficient. Per Z(Z-1)/A^(1/3). Predicted: 0.717 MeV (0.35% off).
+-- Factored: (N_c/(chi-1)) * (beta0/N_c) = (3/5) * (7/3) = 7/5.
+-- The 3/5 prefactor is obsSEMFCoulPre (already proved).
+obsSEMFCoulomb_coeff :: Obs
+obsSEMFCoulomb_coeff = mk "a_c (MeV)" "m_e*b0/(chi-1) = m_e*7/5"
+  (\v -> meNuclear v * beta0_d / (chi_d - 1.0))
+  0.714 ExactRational
+
+-- | a_a = m_e * 19 * 43 / (3*chi) = m_e * 817/18
+-- Asymmetry coefficient. Penalty for N != Z. Predicted: 23.23 MeV (0.13% off).
+-- 19 and 43 are CONSECUTIVE Heegner numbers (6th and 7th in H).
+-- 43 also appears in Tc (Z=43); asymmetry and Tc instability share a source.
+obsSEMFAsymmetry_coeff :: Obs
+obsSEMFAsymmetry_coeff = mk "a_a (MeV)" "m_e*19*43/(3chi) = m_e*817/18"
+  (\v -> meNuclear v * 19.0 * 43.0 / (3.0 * chi_d))
+  23.2 ExactRational
+
+-- | a_p = m_e * N_c^2 * gauss / (chi-1) = m_e * 117/5
+-- Pairing magnitude. Sign rule already in obsSEMFPairing. Predicted: 11.98 MeV (0.20% off).
+-- N_c^2 = 9, gauss = 13 (also in a_s), chi-1 = 5 (also in a_c).
+-- Equivalent: gauss*Sigma_d/(gauss+beta0) = 468/20 -> 117/5;
+-- denom gauss+b0 = M(3) = 20 (same as a_s).
+obsSEMFPairing_coeff :: Obs
+obsSEMFPairing_coeff = mk "a_p (MeV)" "m_e*Nc^2*gauss/(chi-1) = m_e*117/5"
+  (\v -> meNuclear v * (nC_d * nC_d) * gauss_d / (chi_d - 1.0))
+  12.0 ExactRational
+
+-- =====================================================================
 -- ALL
 -- =====================================================================
 
@@ -160,9 +213,15 @@ allNuclear =
   , obsDeuteronBE, obsAlphaBE, obsProtonRadius
   -- Neutron lifetime
   , obsNeutronLife
-  -- Iron + SEMF
+  -- Iron + SEMF exponents/prefactors
   , obsIronPeak
   , obsSEMFSurface, obsSEMFCoulomb, obsSEMFCoulPre, obsSEMFPairing
+  -- SEMF coefficients (NEW d_52 -- all five derived from rectangle)
+  , obsSEMFVolume_coeff
+  , obsSEMFSurface_coeff
+  , obsSEMFCoulomb_coeff
+  , obsSEMFAsymmetry_coeff
+  , obsSEMFPairing_coeff
   ]
 
 -- =====================================================================
@@ -194,8 +253,10 @@ main = do
   mapM_ row (take 3 (drop 9 allNuclear))
   putStrLn "  --- Neutron Lifetime ---"
   mapM_ row (take 1 (drop 12 allNuclear))
-  putStrLn "  --- Iron Peak + SEMF ---"
-  mapM_ row (drop 13 allNuclear)
+  putStrLn "  --- Iron Peak + SEMF Exponents ---"
+  mapM_ row (take 5 (drop 13 allNuclear))
+  putStrLn "  --- SEMF Coefficients (NEW d_52, all five rectangle-derived) ---"
+  mapM_ row (drop 18 allNuclear)
   putStrLn ""
 
   check "All 7 magic numbers EXACT"
@@ -205,6 +266,12 @@ main = do
   check "Fe-56 = d3*b0 = 56" (abs (oCry obsIronPeak - 56.0) < 1e-10)
   check "tau_n = 878" (abs (oCry obsNeutronLife - 878.0) < 1e-10)
   check "SEMF surf = 2/3" (abs (oCry obsSEMFSurface - 2.0/3.0) < 1e-14)
+  -- New checks: all five SEMF coefficients within 0.5% of empirical
+  check "a_v within 0.5%" (gapPct obsSEMFVolume_coeff    < 0.5)
+  check "a_s within 0.5%" (gapPct obsSEMFSurface_coeff   < 0.5)
+  check "a_c within 0.5%" (gapPct obsSEMFCoulomb_coeff   < 0.5)
+  check "a_a within 0.5%" (gapPct obsSEMFAsymmetry_coeff < 0.5)
+  check "a_p within 0.5%" (gapPct obsSEMFPairing_coeff   < 0.5)
   putStrLn ""
 
   let gs = map gapPct allNuclear

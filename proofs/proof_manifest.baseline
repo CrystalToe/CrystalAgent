@@ -2347,6 +2347,16 @@ LEAN CrystalThermo.lean packing_dof
 LEAN CrystalThermo.lean no_weak_coupling
 LEAN CrystalThermo.lean no_colour_coupling
 LEAN CrystalThermo.lean mixed_only
+LEAN CrystalThirdGate.lean stubbornFour_all_dual_fail
+LEAN CrystalThirdGate.lean heegner_size
+LEAN CrystalThirdGate.lean blessed_set_check
+LEAN CrystalThirdGate.lean foreign_set_check
+LEAN CrystalThirdGate.lean third_tier_vacuous
+LEAN CrystalThirdGate.lean magic_all_blessed
+LEAN CrystalThirdGate.lean noble_all_blessed
+LEAN CrystalThirdGate.lean oganesson_foreign
+LEAN CrystalThirdGate.lean pb_lifts_to_163
+LEAN CrystalThirdGate.lean max_heegner_is_163
 LEAN CrystalTopos.lean the_one_law
 LEAN CrystalTopos.lean chi_eq
 LEAN CrystalTopos.lean beta0_eq
@@ -2710,6 +2720,40 @@ LEAN CrystalTower.lean sector_sum
 LEAN CrystalTower.lean mixed_product
 LEAN CrystalTower.lean d4_is_24
 LEAN CrystalTower.lean d_times_steps
+LEAN CrystalUnifiedDGP.lean tc_has_odd_odd
+LEAN CrystalUnifiedDGP.lean pm_has_odd_odd
+LEAN CrystalUnifiedDGP.lean au_shell_distance
+LEAN CrystalUnifiedDGP.lean magic_matches_M
+LEAN CrystalUnifiedDGP.lean stubborn_all_dual_fail
+LEAN CrystalUnifiedDGP.lean even_even_positive
+LEAN CrystalUnifiedDGP.lean all_z_near_magic
+LEAN CrystalUnifiedDGP.lean magic_self_consistent
+LEAN CrystalUnifiedDGP.lean stubborn_near_magic
+LEAN CrystalUnifiedDGP.lean au_and_i_tied_at_8
+LEAN CrystalUnifiedDGP.lean av_atoms_correct
+LEAN CrystalUnifiedDGP.lean av_ratio_numerator
+LEAN CrystalUnifiedDGP.lean av_ratio_lowest_terms
+LEAN CrystalUnifiedDGP.lean av_ratio_alternate
+LEAN CrystalUnifiedDGP.lean as_atoms_correct
+LEAN CrystalUnifiedDGP.lean as_ratio_numerator
+LEAN CrystalUnifiedDGP.lean as_ratio_lowest_terms
+LEAN CrystalUnifiedDGP.lean as_ratio_alternate
+LEAN CrystalUnifiedDGP.lean as_denominator_is_magic
+LEAN CrystalUnifiedDGP.lean ac_atoms_correct
+LEAN CrystalUnifiedDGP.lean ac_ratio_lowest_terms
+LEAN CrystalUnifiedDGP.lean ac_factored_form
+LEAN CrystalUnifiedDGP.lean ac_prefactor_consistent
+LEAN CrystalUnifiedDGP.lean aa_atoms_correct
+LEAN CrystalUnifiedDGP.lean aa_ratio_numerator
+LEAN CrystalUnifiedDGP.lean aa_ratio_lowest_terms
+LEAN CrystalUnifiedDGP.lean aa_alternate_decomposition
+LEAN CrystalUnifiedDGP.lean aa_heegner_43_is_tc
+LEAN CrystalUnifiedDGP.lean ap_atoms_correct
+LEAN CrystalUnifiedDGP.lean ap_ratio_numerator
+LEAN CrystalUnifiedDGP.lean ap_ratio_lowest_terms
+LEAN CrystalUnifiedDGP.lean ap_alternate_decomposition
+LEAN CrystalUnifiedDGP.lean ap_denominator_is_magic
+LEAN CrystalUnifiedDGP.lean ap_shares_atoms_with_ac_and_as
 LEAN CrystalUniversal.lean nW_val
 LEAN CrystalUniversal.lean nC_val
 LEAN CrystalUniversal.lean chi_val
@@ -3091,7 +3135,7 @@ LEAN Universality.lean rushbrooke_check
 LEAN Universality.lean rushbrooke_is_2
 LEAN Universality.lean widom_2d
 LEAN Universality.lean fisher_2d
-LEAN_FILES 100
+LEAN_FILES 102
 # AGDA PROOFS
 AGDA CrystalAlphaProton.agda chi-eq
 AGDA CrystalAlphaProton.agda sigma-d-eq
@@ -5090,6 +5134,49 @@ AGDA CrystalThermo.agda packing-dof
 AGDA CrystalThermo.agda no-weak
 AGDA CrystalThermo.agda no-colour
 AGDA CrystalThermo.agda mixed-only
+AGDA CrystalThirdGate.agda claim1-I
+AGDA CrystalThirdGate.agda claim1-Tb
+AGDA CrystalThirdGate.agda claim1-Lu
+AGDA CrystalThirdGate.agda claim1-Au
+AGDA CrystalThirdGate.agda claim2-2
+AGDA CrystalThirdGate.agda claim2-3
+AGDA CrystalThirdGate.agda claim2-5
+AGDA CrystalThirdGate.agda claim2-7
+AGDA CrystalThirdGate.agda claim2-11
+AGDA CrystalThirdGate.agda claim2-17
+AGDA CrystalThirdGate.agda claim2-19
+AGDA CrystalThirdGate.agda claim2-41
+AGDA CrystalThirdGate.agda claim2-43
+AGDA CrystalThirdGate.agda claim2-67
+AGDA CrystalThirdGate.agda claim2-163
+AGDA CrystalThirdGate.agda claim3-13
+AGDA CrystalThirdGate.agda claim3-23
+AGDA CrystalThirdGate.agda claim3-29
+AGDA CrystalThirdGate.agda claim3-37
+AGDA CrystalThirdGate.agda claim3-53
+AGDA CrystalThirdGate.agda claim3-71
+AGDA CrystalThirdGate.agda claim3-79
+AGDA CrystalThirdGate.agda claim4-2
+AGDA CrystalThirdGate.agda claim4-3
+AGDA CrystalThirdGate.agda claim4-5
+AGDA CrystalThirdGate.agda claim4-7
+AGDA CrystalThirdGate.agda claim4-11
+AGDA CrystalThirdGate.agda claim5
+AGDA CrystalThirdGate.agda claim6-2
+AGDA CrystalThirdGate.agda claim6-8
+AGDA CrystalThirdGate.agda claim6-20
+AGDA CrystalThirdGate.agda claim6-28
+AGDA CrystalThirdGate.agda claim6-50
+AGDA CrystalThirdGate.agda claim6-82
+AGDA CrystalThirdGate.agda claim6-126
+AGDA CrystalThirdGate.agda claim7-He
+AGDA CrystalThirdGate.agda claim7-Ne
+AGDA CrystalThirdGate.agda claim7-Ar
+AGDA CrystalThirdGate.agda claim7-Kr
+AGDA CrystalThirdGate.agda claim7-Xe
+AGDA CrystalThirdGate.agda claim7-Rn
+AGDA CrystalThirdGate.agda claim7-Og
+AGDA CrystalThirdGate.agda claim8-Pm
 AGDA CrystalTopos.agda the-one-law
 AGDA CrystalTopos.agda chi-eq
 AGDA CrystalTopos.agda beta0-eq
@@ -5387,6 +5474,87 @@ AGDA CrystalTower.agda beta0-check
 AGDA CrystalTower.agda staircase-step
 AGDA CrystalTower.agda d-times-steps
 AGDA CrystalTower.agda chi-cubed-216
+AGDA CrystalUnifiedDGP.agda t1-Tc
+AGDA CrystalUnifiedDGP.agda t2-Pm
+AGDA CrystalUnifiedDGP.agda t3-Au-shell
+AGDA CrystalUnifiedDGP.agda t4-M-1
+AGDA CrystalUnifiedDGP.agda t4-M-2
+AGDA CrystalUnifiedDGP.agda t4-M-3
+AGDA CrystalUnifiedDGP.agda t4-M-4
+AGDA CrystalUnifiedDGP.agda t4-M-5
+AGDA CrystalUnifiedDGP.agda t4-M-6
+AGDA CrystalUnifiedDGP.agda t4-M-7
+AGDA CrystalUnifiedDGP.agda t5-I
+AGDA CrystalUnifiedDGP.agda t5-Tb
+AGDA CrystalUnifiedDGP.agda t5-Lu
+AGDA CrystalUnifiedDGP.agda t5-Au
+AGDA CrystalUnifiedDGP.agda t6-He
+AGDA CrystalUnifiedDGP.agda t6-C
+AGDA CrystalUnifiedDGP.agda t6-O
+AGDA CrystalUnifiedDGP.agda t6-Ca
+AGDA CrystalUnifiedDGP.agda t6-Sn
+AGDA CrystalUnifiedDGP.agda t6-Pb
+AGDA CrystalUnifiedDGP.agda t7-1
+AGDA CrystalUnifiedDGP.agda t7-11
+AGDA CrystalUnifiedDGP.agda t7-22
+AGDA CrystalUnifiedDGP.agda t7-43
+AGDA CrystalUnifiedDGP.agda t7-60
+AGDA CrystalUnifiedDGP.agda t7-75
+AGDA CrystalUnifiedDGP.agda t7-83
+AGDA CrystalUnifiedDGP.agda t8-2
+AGDA CrystalUnifiedDGP.agda (minℕ
+AGDA CrystalUnifiedDGP.agda (minℕ
+AGDA CrystalUnifiedDGP.agda (minℕ
+AGDA CrystalUnifiedDGP.agda (minℕ
+AGDA CrystalUnifiedDGP.agda t10-Au
+AGDA CrystalUnifiedDGP.agda t10-I
+AGDA CrystalUnifiedDGP.agda t11-chi
+AGDA CrystalUnifiedDGP.agda t11-sigmaD
+AGDA CrystalUnifiedDGP.agda t11-beta0
+AGDA CrystalUnifiedDGP.agda t11-towerD
+AGDA CrystalUnifiedDGP.agda t11-numerator
+AGDA CrystalUnifiedDGP.agda t11-lowest-terms
+AGDA CrystalUnifiedDGP.agda t11-alternate-numerator
+AGDA CrystalUnifiedDGP.agda t11-alternate-numerator-reduced
+AGDA CrystalUnifiedDGP.agda t11-alternate-denominator-reduced
+AGDA CrystalUnifiedDGP.agda t13-heegner11
+AGDA CrystalUnifiedDGP.agda t13-gauss
+AGDA CrystalUnifiedDGP.agda t13-nW-squared
+AGDA CrystalUnifiedDGP.agda t13-numerator
+AGDA CrystalUnifiedDGP.agda t13-lowest-terms
+AGDA CrystalUnifiedDGP.agda t13-alternate-numerator
+AGDA CrystalUnifiedDGP.agda t13-alternate-denominator
+AGDA CrystalUnifiedDGP.agda t13-alternate-numerator-reduced
+AGDA CrystalUnifiedDGP.agda t13-alternate-denominator-reduced
+AGDA CrystalUnifiedDGP.agda t13-denominator-is-magic
+AGDA CrystalUnifiedDGP.agda t15-beta0
+AGDA CrystalUnifiedDGP.agda t15-chiMinus1
+AGDA CrystalUnifiedDGP.agda t15-nC
+AGDA CrystalUnifiedDGP.agda t15-lowest-terms
+AGDA CrystalUnifiedDGP.agda t15-factored-numerator
+AGDA CrystalUnifiedDGP.agda t15-factored-denominator
+AGDA CrystalUnifiedDGP.agda t15-factored-numerator-reduced
+AGDA CrystalUnifiedDGP.agda t15-factored-denominator-reduced
+AGDA CrystalUnifiedDGP.agda t17-h19
+AGDA CrystalUnifiedDGP.agda t17-h43
+AGDA CrystalUnifiedDGP.agda t17-3chi
+AGDA CrystalUnifiedDGP.agda t17-numerator
+AGDA CrystalUnifiedDGP.agda t17-not-div-2
+AGDA CrystalUnifiedDGP.agda t17-not-div-3
+AGDA CrystalUnifiedDGP.agda t17-alternate-numerator
+AGDA CrystalUnifiedDGP.agda t17-alternate-denominator
+AGDA CrystalUnifiedDGP.agda t17-alternate-numerator-reduced
+AGDA CrystalUnifiedDGP.agda t17-alternate-denominator-reduced
+AGDA CrystalUnifiedDGP.agda t19-nC-squared
+AGDA CrystalUnifiedDGP.agda t19-gauss
+AGDA CrystalUnifiedDGP.agda t19-chiMinus1
+AGDA CrystalUnifiedDGP.agda t19-numerator
+AGDA CrystalUnifiedDGP.agda t19-lowest-terms
+AGDA CrystalUnifiedDGP.agda t19-alternate-numerator
+AGDA CrystalUnifiedDGP.agda t19-alternate-denominator
+AGDA CrystalUnifiedDGP.agda t19-alternate-numerator-reduced
+AGDA CrystalUnifiedDGP.agda t19-alternate-denominator-reduced
+AGDA CrystalUnifiedDGP.agda t19-denominator-is-magic
 AGDA CrystalUniversal.agda nW-val
 AGDA CrystalUniversal.agda nC-val
 AGDA CrystalUniversal.agda χ-val
@@ -5800,7 +5968,7 @@ AGDA CrystalFriedmann.agda denom-product
 AGDA CrystalFriedmann.agda decel-crossover
 AGDA CrystalFriedmann.agda ob-piece
 AGDA CrystalFriedmann.agda neff-base
-AGDA_FILES 102
+AGDA_FILES 104
 # HASKELL MODULES
 HASKELL CrystalAlphaProton.hs
 HASKELL CrystalAstro.hs
@@ -5859,7 +6027,9 @@ HASKELL CrystalSectors.hs
 HASKELL CrystalStratum.hs
 HASKELL CrystalStructural.hs
 HASKELL CrystalThermo.hs
+HASKELL CrystalThirdGate.hs
 HASKELL CrystalTower.hs
+HASKELL CrystalUnifiedDGP.hs
 HASKELL CrystalUniversal.hs
 HASKELL CrystalWACAScan.hs
 HASKELL CrystalWavelet.hs
@@ -6600,8 +6770,8 @@ PYTHON toe/python/examples/thermo/thermo_lattice.py
 PYTHON toe/python/examples/thermo/thermo_lj_potential.py
 PYTHON toe/python/examples/thermo/thermo_md_simulation.py
 # SUMMARY COUNTS
-TOTAL_LEAN_THEOREMS     3092
-TOTAL_AGDA_PROOFS     2707
+TOTAL_LEAN_THEOREMS     3136
+TOTAL_AGDA_PROOFS     2831
 TOTAL_RUST_TESTS      568
-TOTAL_HASKELL_MODULES       77
+TOTAL_HASKELL_MODULES       79
 TOTAL_PYTHON_MODULES      105

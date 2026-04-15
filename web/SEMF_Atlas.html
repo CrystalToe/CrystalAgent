@@ -1,0 +1,614 @@
+<!-- Copyright (c) 2026 Daland Montgomery -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SEMF Coefficient Atlas — Crystal Topos</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#05060a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#e8e8f0}
+canvas{display:block;cursor:grab}
+canvas:active{cursor:grabbing}
+
+#title{position:fixed;top:18px;left:24px;z-index:10;pointer-events:none}
+#title h1{font-size:18px;font-weight:300;letter-spacing:1.5px;color:#fff;text-shadow:0 0 20px rgba(180,200,255,0.4)}
+#title .sub{font-size:11px;color:#8a92a8;letter-spacing:2px;margin-top:4px;text-transform:uppercase}
+
+#info{position:fixed;top:24px;right:24px;z-index:10;background:rgba(12,15,28,0.85);border:1px solid rgba(120,140,200,0.25);border-radius:8px;padding:18px 20px;width:340px;backdrop-filter:blur(12px);font-size:12.5px;line-height:1.5;color:#c8cee0;box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+#info h2{font-size:13px;font-weight:600;letter-spacing:0.5px;color:#fff;margin-bottom:8px}
+#info .formula{font-family:Georgia,serif;font-style:italic;color:#ffd680;font-size:14px;margin:8px 0;padding:8px 10px;background:rgba(255,200,100,0.08);border-left:2px solid #ffaa44;border-radius:3px}
+#info .stat{display:flex;justify-content:space-between;padding:3px 0;font-size:11.5px}
+#info .stat span:first-child{color:#8a92a8}
+#info .stat span:last-child{color:#fff;font-family:Menlo,Courier,monospace;font-weight:500}
+#info .reading{margin-top:10px;font-size:11.5px;color:#a8b0c8;font-style:italic;line-height:1.55}
+#info .atoms{margin-top:10px;display:flex;flex-wrap:wrap;gap:5px}
+#info .atom-chip{font-family:Menlo,Courier,monospace;font-size:10.5px;padding:2.5px 7px;border-radius:3px;background:rgba(120,180,255,0.15);color:#9ec5ff;border:1px solid rgba(120,180,255,0.3)}
+#info .atom-chip.heegner{background:rgba(255,200,80,0.15);color:#ffd680;border-color:rgba(255,200,80,0.3)}
+#info .empty{color:#5a6080;font-style:italic;font-size:12px;text-align:center;padding:20px 0}
+
+#legend{position:fixed;bottom:24px;left:24px;z-index:10;background:rgba(12,15,28,0.7);border:1px solid rgba(120,140,200,0.2);border-radius:8px;padding:12px 16px;font-size:11px;line-height:1.7;color:#a8b0c8;backdrop-filter:blur(8px)}
+#legend .row{display:flex;align-items:center;gap:8px}
+#legend .swatch{width:14px;height:3px;border-radius:1px}
+#legend .dot{width:9px;height:9px;border-radius:50%}
+
+#controls{position:fixed;bottom:24px;right:24px;z-index:10;background:rgba(12,15,28,0.7);border:1px solid rgba(120,140,200,0.2);border-radius:8px;padding:10px 14px;font-size:11px;color:#8a92a8;backdrop-filter:blur(8px)}
+#controls span{color:#c8cee0;font-weight:500}
+
+#hint{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:5;color:rgba(200,210,230,0.5);font-size:13px;letter-spacing:1px;pointer-events:none;transition:opacity 1.5s;text-align:center}
+#hint.hidden{opacity:0}
+#hint .big{font-size:24px;color:#fff;margin-bottom:8px;letter-spacing:2px;font-weight:300}
+</style>
+</head>
+<body>
+
+<div id="title">
+<h1>SEMF COEFFICIENT ATLAS</h1>
+<div class="sub">The (2,3) Rectangle &amp; Its Five Nuclear Children</div>
+</div>
+
+<div id="hint">
+<div class="big">⟲ DRAG TO ROTATE</div>
+<div>Click any glowing sphere to inspect a coefficient</div>
+</div>
+
+<div id="info">
+<div class="empty">Hover or click a coefficient sphere<br>to see its derivation.</div>
+</div>
+
+<div id="legend">
+<div class="row"><span class="swatch" style="background:#5aa8ff"></span> Rectangle atom</div>
+<div class="row"><span class="swatch" style="background:#ffaa44"></span> Heegner-spectrum atom</div>
+<div class="row"><span class="swatch" style="background:#88ff99"></span> Shared atom (used by 2+ coefficients)</div>
+<div class="row" style="margin-top:6px"><span class="dot" style="background:rgba(180,200,255,0.6)"></span> Atom node</div>
+<div class="row"><span class="dot" style="background:#ff6b9d"></span> SEMF coefficient (size ∝ MeV)</div>
+</div>
+
+<div id="controls"><span>SCROLL</span> zoom · <span>DRAG</span> rotate · <span>R</span> reset · <span>SPACE</span> auto-spin</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// =====================================================
+// SEMF Coefficient Atlas — interactive 3D visualization
+// =====================================================
+
+const W = window.innerWidth, H = window.innerHeight;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x05060a);
+scene.fog = new THREE.FogExp2(0x05060a, 0.012);
+
+const camera = new THREE.PerspectiveCamera(55, W/H, 0.1, 2000);
+camera.position.set(35, 22, 45);
+const camTarget = new THREE.Vector3(0, 0, 0);
+camera.lookAt(camTarget);
+
+const renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
+renderer.setSize(W, H);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+document.body.appendChild(renderer.domElement);
+
+// =====================================================
+// LIGHTING — moody, with rim lights
+// =====================================================
+scene.add(new THREE.AmbientLight(0x404060, 0.4));
+const key = new THREE.PointLight(0xaaccff, 1.5, 200);
+key.position.set(30, 40, 30); scene.add(key);
+const rim1 = new THREE.PointLight(0xff6688, 0.8, 150);
+rim1.position.set(-30, 10, -20); scene.add(rim1);
+const rim2 = new THREE.PointLight(0x66ffaa, 0.5, 150);
+rim2.position.set(20, -30, -10); scene.add(rim2);
+
+// =====================================================
+// STARFIELD BACKDROP
+// =====================================================
+{
+  const stars = new THREE.BufferGeometry();
+  const positions = new Float32Array(2000 * 3);
+  for (let i = 0; i < 2000; i++) {
+    const r = 200 + Math.random() * 600;
+    const t = Math.random() * Math.PI * 2;
+    const p = Math.acos(2 * Math.random() - 1);
+    positions[i*3]   = r * Math.sin(p) * Math.cos(t);
+    positions[i*3+1] = r * Math.sin(p) * Math.sin(t);
+    positions[i*3+2] = r * Math.cos(p);
+  }
+  stars.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const starMat = new THREE.PointsMaterial({color:0x8899bb, size:0.7, transparent:true, opacity:0.6});
+  scene.add(new THREE.Points(stars, starMat));
+}
+
+// =====================================================
+// THE (2,3) RECTANGLE — central wireframe lattice
+// =====================================================
+const rectGroup = new THREE.Group();
+scene.add(rectGroup);
+
+// Build a 2x3x1 grid of glowing nodes (the rectangle's cells)
+const cellSpacing = 2.4;
+const rectCells = [];
+for (let y = 0; y < 2; y++) {       // N_w = 2 (width / spin)
+  for (let x = 0; x < 3; x++) {     // N_c = 3 (depth / color)
+    const px = (x - 1) * cellSpacing;
+    const py = (y - 0.5) * cellSpacing;
+    const pz = 0;
+    // Node sphere
+    const node = new THREE.Mesh(
+      new THREE.SphereGeometry(0.32, 24, 24),
+      new THREE.MeshPhongMaterial({color:0xffffff, emissive:0x668bff, emissiveIntensity:0.7, shininess:100})
+    );
+    node.position.set(px, py, pz);
+    rectGroup.add(node);
+    rectCells.push({pos: node.position.clone(), x, y});
+  }
+}
+
+// Wireframe edges connecting cells
+{
+  const edgeMat = new THREE.LineBasicMaterial({color:0x5577cc, transparent:true, opacity:0.5});
+  // Horizontal edges
+  for (let y = 0; y < 2; y++) {
+    for (let x = 0; x < 2; x++) {
+      const a = rectCells[y*3 + x].pos, b = rectCells[y*3 + x + 1].pos;
+      const g = new THREE.BufferGeometry().setFromPoints([a, b]);
+      rectGroup.add(new THREE.Line(g, edgeMat));
+    }
+  }
+  // Vertical edges
+  for (let x = 0; x < 3; x++) {
+    const a = rectCells[x].pos, b = rectCells[3 + x].pos;
+    const g = new THREE.BufferGeometry().setFromPoints([a, b]);
+    rectGroup.add(new THREE.Line(g, edgeMat));
+  }
+  // Diagonals (subtle, give it depth)
+  const diagMat = new THREE.LineBasicMaterial({color:0x4466aa, transparent:true, opacity:0.18});
+  for (let i = 0; i < rectCells.length; i++) {
+    for (let j = i+1; j < rectCells.length; j++) {
+      const g = new THREE.BufferGeometry().setFromPoints([rectCells[i].pos, rectCells[j].pos]);
+      rectGroup.add(new THREE.Line(g, diagMat));
+    }
+  }
+}
+
+// Rectangle label (using a sprite with canvas texture)
+function makeTextSprite(text, color, fontSize=64, weight='400') {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512; canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  ctx.font = `${weight} ${fontSize}px -apple-system, sans-serif`;
+  ctx.fillStyle = color;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 20;
+  ctx.fillText(text, 256, 64);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.minFilter = THREE.LinearFilter;
+  const mat = new THREE.SpriteMaterial({map: tex, transparent: true, depthWrite: false});
+  const sprite = new THREE.Sprite(mat);
+  sprite.scale.set(8, 2, 1);
+  return sprite;
+}
+
+const rectLabel = makeTextSprite('(2 × 3) RECTANGLE', '#aaccff', 36, '300');
+rectLabel.position.set(0, -3.8, 0);
+rectLabel.scale.set(10, 2.5, 1);
+rectGroup.add(rectLabel);
+
+// =====================================================
+// THE ATOM POOL — orbiting nodes that feed coefficients
+// =====================================================
+// Each atom has: name, value, type (rect/heegner), position around the rectangle
+const atomDefs = [
+  // Rectangle atoms — closer in, blue
+  {name:'χ',       label:'χ=6',        type:'rect',    angle:0.0, dist:11, height:5},
+  {name:'β₀',      label:'β₀=7',       type:'rect',    angle:0.45, dist:11, height:5},
+  {name:'Σd',      label:'Σd=36',      type:'rect',    angle:0.9, dist:11, height:5},
+  {name:'gauss',   label:'gauss=13',   type:'rect',    angle:1.35, dist:11, height:5},
+  {name:'N_w²',    label:'N_w²=4',     type:'rect',    angle:1.8, dist:11, height:5},
+  {name:'N_c²',    label:'N_c²=9',     type:'rect',    angle:2.25, dist:11, height:5},
+  {name:'N_c',     label:'N_c=3',      type:'rect',    angle:2.7, dist:11, height:5},
+  {name:'χ−1',     label:'χ−1=5',      type:'rect',    angle:3.15, dist:11, height:5},
+  {name:'3χ',      label:'3χ=18',      type:'rect',    angle:3.6, dist:11, height:5},
+  // Heegner atoms — farther out, gold
+  {name:'11',      label:'11∈H',       type:'heegner', angle:4.4, dist:14, height:-5.5},
+  {name:'19',      label:'19∈H',       type:'heegner', angle:5.0, dist:14, height:-5.5},
+  {name:'43',      label:'43∈H',       type:'heegner', angle:5.6, dist:14, height:-5.5},
+];
+
+const atomNodes = {};   // name → mesh
+const atomLabels = {};  // name → sprite
+
+atomDefs.forEach(a => {
+  const x = Math.cos(a.angle) * a.dist;
+  const z = Math.sin(a.angle) * a.dist;
+  const y = a.height;
+  const isHeegner = a.type === 'heegner';
+  const baseColor = isHeegner ? 0xffaa44 : 0x5aa8ff;
+
+  const geom = new THREE.SphereGeometry(0.42, 20, 20);
+  const mat = new THREE.MeshPhongMaterial({
+    color: 0xffffff,
+    emissive: baseColor,
+    emissiveIntensity: 0.6,
+    shininess: 80,
+    transparent: true,
+    opacity: 0.9
+  });
+  const mesh = new THREE.Mesh(geom, mat);
+  mesh.position.set(x, y, z);
+  mesh.userData = {atom: a, baseEmissive: baseColor, baseIntensity: 0.6};
+  scene.add(mesh);
+  atomNodes[a.name] = mesh;
+
+  // Label
+  const labelColor = isHeegner ? '#ffd680' : '#a8c8ff';
+  const sprite = makeTextSprite(a.label, labelColor, 56, '500');
+  sprite.position.set(x, y - 1.2, z);
+  sprite.scale.set(4.5, 1.1, 1);
+  scene.add(sprite);
+  atomLabels[a.name] = sprite;
+
+  // Subtle halo
+  const haloGeom = new THREE.SphereGeometry(0.7, 16, 16);
+  const haloMat = new THREE.MeshBasicMaterial({color:baseColor, transparent:true, opacity:0.12, side:THREE.BackSide});
+  const halo = new THREE.Mesh(haloGeom, haloMat);
+  halo.position.copy(mesh.position);
+  scene.add(halo);
+});
+
+// =====================================================
+// THE FIVE COEFFICIENTS — orbiting spheres
+// =====================================================
+const coefData = [
+  {
+    key:'a_v', name:'a_v (volume)',  empMeV:15.8,  predMeV:15.79, off:0.05,
+    formula:'m_e · χ · Σd / β₀ = m_e · 216/7',
+    atoms:['χ','Σd','β₀'],
+    reading:'Bulk binding per nucleon. The numerator χ·Σd is the total state space a nucleon can occupy (rectangle area × sector total); the denominator β₀ is the rate the strong coupling runs.',
+    color:0xff6b9d,
+    angle:Math.PI * 0.0
+  },
+  {
+    key:'a_s', name:'a_s (surface)', empMeV:18.3,  predMeV:18.30, off:0.02,
+    formula:'m_e · 11 · gauss / N_w² = m_e · 143/4',
+    atoms:['11','gauss','N_w²'],
+    reading:'Surface-nucleon binding loss. The numerator 11·gauss is the deepest non-magic Heegner number weighted by the Gauss invariant; N_w² sets the pairing-symmetry scale. Equivalent: gauss·(D+gauss)/(gauss+β₀), where the denominator equals M(3) = 20 — the third magic number.',
+    color:0x9d6bff,
+    angle:Math.PI * 0.4
+  },
+  {
+    key:'a_c', name:'a_c (Coulomb)', empMeV:0.714, predMeV:0.717, off:0.35,
+    formula:'m_e · β₀ / (χ−1) = m_e · 7/5',
+    atoms:['β₀','χ−1','N_c'],
+    reading:'Coulomb energy per Z(Z−1)/A^(1/3). Factors as (3/5) · (7/3) = (proved geometric prefactor) × (β₀/N_c, the QCD running per color charge). The natural scale of color screening.',
+    color:0x6bffaa,
+    angle:Math.PI * 0.8
+  },
+  {
+    key:'a_a', name:'a_a (asymmetry)', empMeV:23.2, predMeV:23.23, off:0.13,
+    formula:'m_e · 19 · 43 / (3χ) = m_e · 817/18',
+    atoms:['19','43','3χ','N_c'],
+    reading:'Asymmetry penalty for N≠Z. The only coefficient needing TWO Heegner numbers — reflecting that asymmetry is intrinsically pairwise. 19 and 43 are CONSECUTIVE in H (6th and 7th). 43 also appears in Tc (Z=43), the unstable blessed element — same arithmetic source.',
+    color:0xffd166,
+    angle:Math.PI * 1.2
+  },
+  {
+    key:'a_p', name:'a_p (pairing)', empMeV:12.0, predMeV:11.98, off:0.20,
+    formula:'m_e · N_c² · gauss / (χ−1) = m_e · 117/5',
+    atoms:['N_c²','gauss','χ−1'],
+    reading:'Pairing-binding magnitude per √A. Shares gauss with a_s and χ−1 with a_c. Equivalent: gauss·Σd/(gauss+β₀), with the same M(3)=20 denominator as a_s. Pairing and surface penalties share the M(3) closure.',
+    color:0x66ddff,
+    angle:Math.PI * 1.6
+  }
+];
+
+const coefMeshes = {};
+const coefOrbitRadius = 22;
+
+coefData.forEach(c => {
+  // Sphere size scales with empirical MeV (sqrt for visual balance)
+  const size = 0.65 + Math.sqrt(c.empMeV) * 0.32;
+
+  const x = Math.cos(c.angle) * coefOrbitRadius;
+  const z = Math.sin(c.angle) * coefOrbitRadius;
+  const y = Math.sin(c.angle * 1.7) * 2;
+
+  // Outer glow sphere
+  const glowGeom = new THREE.SphereGeometry(size * 1.6, 24, 24);
+  const glowMat = new THREE.MeshBasicMaterial({color:c.color, transparent:true, opacity:0.12, side:THREE.BackSide});
+  const glow = new THREE.Mesh(glowGeom, glowMat);
+  glow.position.set(x, y, z);
+  scene.add(glow);
+
+  // Main sphere
+  const geom = new THREE.SphereGeometry(size, 32, 32);
+  const mat = new THREE.MeshPhongMaterial({
+    color: 0xffffff,
+    emissive: c.color,
+    emissiveIntensity: 0.85,
+    shininess: 120,
+    specular: 0xffffff
+  });
+  const mesh = new THREE.Mesh(geom, mat);
+  mesh.position.set(x, y, z);
+  mesh.userData = {coef: c, baseEmissive: c.color, baseIntensity: 0.85, glow: glow, baseY: y, baseAngle: c.angle, size: size};
+  scene.add(mesh);
+  coefMeshes[c.key] = mesh;
+
+  // Label
+  const sprite = makeTextSprite(c.key, '#ffffff', 72, '600');
+  sprite.position.set(x, y + size + 1.4, z);
+  sprite.scale.set(4, 1, 1);
+  scene.add(sprite);
+});
+
+// =====================================================
+// CONNECTION LINES (drawn dynamically based on selection)
+// =====================================================
+const connectionGroup = new THREE.Group();
+scene.add(connectionGroup);
+
+// Compute which atoms are shared (used by 2+ coefficients) for legend coloring
+const usageCount = {};
+coefData.forEach(c => c.atoms.forEach(a => {
+  usageCount[a] = (usageCount[a] || 0) + 1;
+}));
+
+function clearConnections() {
+  while (connectionGroup.children.length > 0) {
+    const c = connectionGroup.children[0];
+    c.geometry.dispose();
+    c.material.dispose();
+    connectionGroup.remove(c);
+  }
+}
+
+function drawConnections(coef) {
+  clearConnections();
+  if (!coef) return;
+  coef.atoms.forEach(atomName => {
+    const atomMesh = atomNodes[atomName];
+    if (!atomMesh) return;
+    const isShared = usageCount[atomName] >= 2;
+    const isHeegner = ['11','19','43'].includes(atomName);
+    const lineColor = isShared ? 0x88ff99 : (isHeegner ? 0xffaa44 : 0x5aa8ff);
+
+    // Curved line via quadratic bezier
+    const start = coefMeshes[coef.key].position;
+    const end = atomMesh.position;
+    const mid = new THREE.Vector3().lerpVectors(start, end, 0.5);
+    mid.y += 3;
+    const curve = new THREE.QuadraticBezierCurve3(start, mid, end);
+    const points = curve.getPoints(40);
+    const geom = new THREE.BufferGeometry().setFromPoints(points);
+    const mat = new THREE.LineBasicMaterial({color: lineColor, transparent: true, opacity: 0.85, linewidth: 2});
+    connectionGroup.add(new THREE.Line(geom, mat));
+
+    // Pulse the connected atom
+    atomMesh.userData.pulsing = true;
+  });
+}
+
+function clearAtomPulse() {
+  Object.values(atomNodes).forEach(m => { m.userData.pulsing = false; });
+}
+
+// =====================================================
+// INTERACTION — raycasting for hover + click
+// =====================================================
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+let selectedCoef = null;
+let hoverCoef = null;
+
+function pickCoef(event) {
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const meshes = Object.values(coefMeshes);
+  const hits = raycaster.intersectObjects(meshes);
+  return hits.length > 0 ? hits[0].object.userData.coef : null;
+}
+
+renderer.domElement.addEventListener('mousemove', (e) => {
+  if (dragging) return;
+  const c = pickCoef(e);
+  if (c !== hoverCoef) {
+    hoverCoef = c;
+    if (!selectedCoef) {
+      clearAtomPulse();
+      drawConnections(c);
+      updateInfoPanel(c);
+    }
+    document.body.style.cursor = c ? 'pointer' : 'grab';
+  }
+});
+
+renderer.domElement.addEventListener('click', (e) => {
+  if (dragMoved) return;
+  const c = pickCoef(e);
+  if (c) {
+    selectedCoef = c;
+    clearAtomPulse();
+    drawConnections(c);
+    updateInfoPanel(c);
+    hideHint();
+  } else if (selectedCoef) {
+    selectedCoef = null;
+    clearAtomPulse();
+    clearConnections();
+    updateInfoPanel(null);
+  }
+});
+
+function updateInfoPanel(c) {
+  const el = document.getElementById('info');
+  if (!c) {
+    el.innerHTML = '<div class="empty">Hover or click a coefficient sphere<br>to see its derivation.</div>';
+    return;
+  }
+  const atomChips = c.atoms.map(a => {
+    const isHeegner = ['11','19','43'].includes(a);
+    return `<span class="atom-chip${isHeegner ? ' heegner' : ''}">${a}</span>`;
+  }).join('');
+  el.innerHTML = `
+    <h2>${c.name}</h2>
+    <div class="formula">${c.formula}</div>
+    <div class="stat"><span>Predicted</span><span>${c.predMeV.toFixed(3)} MeV</span></div>
+    <div class="stat"><span>Empirical</span><span>${c.empMeV.toFixed(3)} MeV</span></div>
+    <div class="stat"><span>Deviation</span><span style="color:${c.off < 0.1 ? '#88ff99' : c.off < 0.3 ? '#ffd680' : '#ffaa66'}">${c.off.toFixed(2)}%</span></div>
+    <div class="atoms">${atomChips}</div>
+    <div class="reading">${c.reading}</div>
+  `;
+}
+
+// =====================================================
+// CAMERA CONTROLS — drag to rotate, scroll to zoom
+// =====================================================
+let dragging = false, dragMoved = false;
+let lastX = 0, lastY = 0;
+let theta = Math.atan2(camera.position.x, camera.position.z);  // azimuth
+let phi = Math.acos(camera.position.y / camera.position.length());  // polar
+let radius = camera.position.length();
+let autoSpin = true;
+
+function updateCamera() {
+  camera.position.x = radius * Math.sin(phi) * Math.sin(theta);
+  camera.position.y = radius * Math.cos(phi);
+  camera.position.z = radius * Math.sin(phi) * Math.cos(theta);
+  camera.lookAt(camTarget);
+}
+updateCamera();
+
+renderer.domElement.addEventListener('mousedown', (e) => {
+  dragging = true;
+  dragMoved = false;
+  lastX = e.clientX; lastY = e.clientY;
+  autoSpin = false;
+});
+window.addEventListener('mouseup', () => { dragging = false; });
+window.addEventListener('mousemove', (e) => {
+  if (!dragging) return;
+  const dx = e.clientX - lastX, dy = e.clientY - lastY;
+  if (Math.abs(dx) + Math.abs(dy) > 3) dragMoved = true;
+  lastX = e.clientX; lastY = e.clientY;
+  theta -= dx * 0.006;
+  phi = Math.max(0.15, Math.min(Math.PI - 0.15, phi - dy * 0.006));
+  updateCamera();
+});
+renderer.domElement.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  radius = Math.max(20, Math.min(120, radius + e.deltaY * 0.05));
+  updateCamera();
+}, {passive: false});
+
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'r' || e.key === 'R') {
+    radius = 58; theta = 0.7; phi = 1.1;
+    updateCamera();
+  } else if (e.key === ' ') {
+    autoSpin = !autoSpin;
+    e.preventDefault();
+  }
+});
+
+// Touch support
+renderer.domElement.addEventListener('touchstart', (e) => {
+  if (e.touches.length === 1) {
+    dragging = true; dragMoved = false;
+    lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
+    autoSpin = false;
+  }
+});
+renderer.domElement.addEventListener('touchmove', (e) => {
+  if (dragging && e.touches.length === 1) {
+    const dx = e.touches[0].clientX - lastX, dy = e.touches[0].clientY - lastY;
+    if (Math.abs(dx) + Math.abs(dy) > 3) dragMoved = true;
+    lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
+    theta -= dx * 0.008;
+    phi = Math.max(0.15, Math.min(Math.PI - 0.15, phi - dy * 0.008));
+    updateCamera();
+    e.preventDefault();
+  }
+}, {passive: false});
+renderer.domElement.addEventListener('touchend', () => { dragging = false; });
+
+// =====================================================
+// HINT FADE
+// =====================================================
+let hintShown = true;
+function hideHint() {
+  if (!hintShown) return;
+  document.getElementById('hint').classList.add('hidden');
+  hintShown = false;
+}
+setTimeout(hideHint, 6000);
+
+// =====================================================
+// ANIMATION LOOP
+// =====================================================
+let t = 0;
+function animate() {
+  requestAnimationFrame(animate);
+  t += 0.01;
+
+  // Auto-spin until user interacts
+  if (autoSpin) {
+    theta += 0.0025;
+    updateCamera();
+  }
+
+  // Rectangle gentle pulse
+  rectGroup.children.forEach(child => {
+    if (child.material && child.material.emissive) {
+      child.material.emissiveIntensity = 0.55 + Math.sin(t * 2) * 0.15;
+    }
+  });
+
+  // Coefficient sphere bob
+  Object.values(coefMeshes).forEach((mesh, i) => {
+    const ud = mesh.userData;
+    mesh.position.y = ud.baseY + Math.sin(t * 1.3 + i * 1.2) * 0.4;
+    mesh.rotation.y += 0.006;
+    if (ud.glow) ud.glow.position.y = mesh.position.y;
+
+    // Hover/select brighten
+    const isActive = (selectedCoef && selectedCoef.key === ud.coef.key) ||
+                     (!selectedCoef && hoverCoef && hoverCoef.key === ud.coef.key);
+    const target = isActive ? 1.3 : 0.85;
+    mesh.material.emissiveIntensity += (target - mesh.material.emissiveIntensity) * 0.15;
+  });
+
+  // Atom pulsing when connected
+  Object.values(atomNodes).forEach(mesh => {
+    const ud = mesh.userData;
+    if (ud.pulsing) {
+      ud.baseIntensity = 0.6 + Math.sin(t * 5) * 0.5;
+      mesh.material.emissiveIntensity = ud.baseIntensity + 0.4;
+      mesh.scale.setScalar(1.0 + Math.sin(t * 5) * 0.15);
+    } else {
+      mesh.material.emissiveIntensity += (0.6 - mesh.material.emissiveIntensity) * 0.1;
+      mesh.scale.x += (1.0 - mesh.scale.x) * 0.1;
+      mesh.scale.y = mesh.scale.x; mesh.scale.z = mesh.scale.x;
+    }
+  });
+
+  // Connection lines breathe
+  connectionGroup.children.forEach((line, i) => {
+    line.material.opacity = 0.6 + Math.sin(t * 3 + i * 0.5) * 0.3;
+  });
+
+  renderer.render(scene, camera);
+}
+animate();
+
+// =====================================================
+// RESIZE
+// =====================================================
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>

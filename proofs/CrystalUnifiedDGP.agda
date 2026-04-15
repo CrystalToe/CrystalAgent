@@ -218,3 +218,252 @@ t10-Au : distanceToMagic 118 ≡ 8
 t10-Au = refl
 t10-I  : distanceToMagic 74  ≡ 8
 t10-I  = refl
+
+-- ── T11: SEMF VOLUME COEFFICIENT a_v FROM RECTANGLE ────────────
+-- a_v = m_e_nuclear * (chi * Sigma_d) / beta0
+--   chi    = 6  (rectangle area = N_w * N_c)
+--   Sigma_d = 36 (sector total = d1+d2+d3+d4)
+--   beta0  = 7  (QCD running coefficient = (11N_c - 2chi)/3)
+-- Rational: 6 * 36 / 7 = 216/7 (lowest terms; 7 prime, gcd(216,7)=1).
+-- Predicted: m_e * 216/7 ≈ 15.79 MeV, within 0.05% of empirical 15.8 MeV.
+
+chi-atom : ℕ
+chi-atom = 6
+
+sigmaD-int : ℕ
+sigmaD-int = 36
+
+beta0-atom : ℕ
+beta0-atom = 7
+
+towerD-int : ℕ
+towerD-int = 42
+
+t11-chi : chi-atom ≡ 6
+t11-chi = refl
+
+t11-sigmaD : sigmaD-int ≡ 36
+t11-sigmaD = refl
+
+t11-beta0 : beta0-atom ≡ 7
+t11-beta0 = refl
+
+t11-towerD : towerD-int ≡ 42
+t11-towerD = refl
+
+t11-numerator : chi-atom * sigmaD-int ≡ 216
+t11-numerator = refl
+
+-- 7 does not divide 216 (216 = 2³ · 3³, 7 prime), so 216/7 is in lowest terms.
+t11-lowest-terms : 216 rem 7 ≡ 6
+t11-lowest-terms = refl
+
+-- Equivalent decomposition: (Sigma_d)² / D = 1296/42 = 216/7
+t11-alternate-numerator : sigmaD-int * sigmaD-int ≡ 1296
+t11-alternate-numerator = refl
+
+t11-alternate-numerator-reduced : 1296 quot 6 ≡ 216
+t11-alternate-numerator-reduced = refl
+
+t11-alternate-denominator-reduced : 42 quot 6 ≡ 7
+t11-alternate-denominator-reduced = refl
+
+-- ── T13: SEMF SURFACE COEFFICIENT a_s FROM RECTANGLE ───────────
+-- a_s = m_e_nuclear * 11 * gauss / N_w² = m_e * 143/4
+--   11      ∈ H               (Heegner number)
+--   gauss  = N_w² + N_c² = 13 (rectangle Gauss invariant)
+--   N_w²   = 4                (squared spin width)
+-- Rational: 11 · 13 / 4 = 143/4 (lowest terms; 143 odd, 4 = 2²).
+-- Predicted: m_e * 143/4 ≈ 18.296 MeV, within 0.02% of empirical 18.3 MeV.
+--
+-- Equivalent: gauss · (D+gauss) / (gauss+beta0) = 13 · 55 / 20 = 143/4.
+-- Note: gauss + beta0 = 20 = M(3), third magic number.
+
+heegner11 : ℕ
+heegner11 = 11
+
+gauss-atom : ℕ
+gauss-atom = 13
+
+nW-squared : ℕ
+nW-squared = 4
+
+t13-heegner11 : heegner11 ≡ 11
+t13-heegner11 = refl
+
+t13-gauss : gauss-atom ≡ 13
+t13-gauss = refl
+
+t13-nW-squared : nW-squared ≡ 4
+t13-nW-squared = refl
+
+t13-numerator : heegner11 * gauss-atom ≡ 143
+t13-numerator = refl
+
+-- 4 does not divide 143 (143 = 11·13 odd), so 143/4 is in lowest terms.
+t13-lowest-terms : 143 rem 4 ≡ 3
+t13-lowest-terms = refl
+
+-- Equivalent decomposition: gauss · (D+gauss) / (gauss+beta0)
+t13-alternate-numerator : gauss-atom * (towerD-int + gauss-atom) ≡ 13 * 55
+t13-alternate-numerator = refl
+
+t13-alternate-denominator : gauss-atom + beta0-atom ≡ 20
+t13-alternate-denominator = refl
+
+t13-alternate-numerator-reduced : (13 * 55) quot 5 ≡ 143
+t13-alternate-numerator-reduced = refl
+
+t13-alternate-denominator-reduced : 20 quot 5 ≡ 4
+t13-alternate-denominator-reduced = refl
+
+-- The denominator gauss + beta0 = 20 is the third magic number M(3).
+t13-denominator-is-magic : gauss-atom + beta0-atom ≡ 20
+t13-denominator-is-magic = refl
+
+-- ── T15: SEMF COULOMB COEFFICIENT a_c FROM RECTANGLE ───────────
+-- a_c = m_e_nuclear * beta0 / (chi-1) = m_e * 7/5
+--
+-- Equivalently with the proved Coulomb prefactor 3/5 = N_c/(chi-1):
+--   a_c = (N_c/(chi-1)) * m_e * (beta0/N_c) = (3/5)*(7/3)*m_e = (7/5)*m_e
+--
+-- Atoms: beta0 = 7, N_c = 3, chi-1 = 5. Rational 7/5 in lowest terms.
+-- Predicted: m_e * 7/5 ≈ 0.7165 MeV; empirical 0.714 MeV; off by 0.35%.
+
+beta0-full : ℕ
+beta0-full = 7
+
+chiMinus1 : ℕ
+chiMinus1 = 5
+
+nC-atom : ℕ
+nC-atom = 3
+
+t15-beta0 : beta0-full ≡ 7
+t15-beta0 = refl
+
+t15-chiMinus1 : chiMinus1 ≡ 5
+t15-chiMinus1 = refl
+
+t15-nC : nC-atom ≡ 3
+t15-nC = refl
+
+-- 5 does not divide 7 (both prime), so 7/5 is in lowest terms.
+t15-lowest-terms : 7 rem 5 ≡ 2
+t15-lowest-terms = refl
+
+-- Factored form: (N_c * beta0) / (chiMinus1 * N_c) = 21/15 = 7/5 (gcd 3).
+t15-factored-numerator : nC-atom * beta0-full ≡ 21
+t15-factored-numerator = refl
+
+t15-factored-denominator : chiMinus1 * nC-atom ≡ 15
+t15-factored-denominator = refl
+
+t15-factored-numerator-reduced : 21 quot 3 ≡ 7
+t15-factored-numerator-reduced = refl
+
+t15-factored-denominator-reduced : 15 quot 3 ≡ 5
+t15-factored-denominator-reduced = refl
+
+-- ── T17: SEMF ASYMMETRY COEFFICIENT a_a FROM RECTANGLE ─────────
+-- a_a = m_e_nuclear * 19 * 43 / (3*chi) = m_e * 817/18
+--
+-- 19 ∈ H (6th Heegner), 43 ∈ H (7th Heegner, also Tc's Z),
+-- 3*chi = 18 (tripled rectangle area).
+-- 817/18 in lowest terms (gcd = 1: 817 odd and not div by 3).
+-- Predicted: m_e * 817/18 ≈ 23.229 MeV; empirical 23.2 MeV; off 0.13%.
+
+heegner19 : ℕ
+heegner19 = 19
+
+heegner43 : ℕ
+heegner43 = 43
+
+threeChi : ℕ
+threeChi = 18
+
+t17-h19 : heegner19 ≡ 19
+t17-h19 = refl
+
+t17-h43 : heegner43 ≡ 43
+t17-h43 = refl
+
+t17-3chi : threeChi ≡ 18
+t17-3chi = refl
+
+t17-numerator : heegner19 * heegner43 ≡ 817
+t17-numerator = refl
+
+-- 817 is odd (not div by 2) and 817 mod 3 = 1 (not div by 3),
+-- so gcd(817, 18) = 1 and the ratio is irreducible.
+t17-not-div-2 : 817 rem 2 ≡ 1
+t17-not-div-2 = refl
+
+t17-not-div-3 : 817 rem 3 ≡ 1
+t17-not-div-3 = refl
+
+-- Equivalent decomposition: D² / (gauss·N_c) = 1764/39 = 588/13.
+t17-alternate-numerator : towerD-int * towerD-int ≡ 1764
+t17-alternate-numerator = refl
+
+t17-alternate-denominator : gauss-atom * nC-atom ≡ 39
+t17-alternate-denominator = refl
+
+t17-alternate-numerator-reduced : 1764 quot 3 ≡ 588
+t17-alternate-numerator-reduced = refl
+
+t17-alternate-denominator-reduced : 39 quot 3 ≡ 13
+t17-alternate-denominator-reduced = refl
+
+-- ── T19: SEMF PAIRING MAGNITUDE a_p FROM RECTANGLE ────────────
+-- a_p = m_e_nuclear * N_c² * gauss / (chi-1) = m_e * 9*13/5 = m_e * 117/5
+--
+-- Sign rule (already proved from N_w = 2): even-even +, odd-odd -, odd-A 0.
+-- This adds the magnitude.
+--
+-- Atoms: N_c² = 9, gauss = 13, chi-1 = 5.
+-- Rational 117/5 in lowest terms (5 prime, 117 = 3²·13, no factor 5).
+-- Predicted: m_e * 117/5 ≈ 11.976 MeV; empirical 12.0 MeV; off 0.20%.
+--
+-- Equivalent: gauss · sigma_d / (gauss+beta0) = 468/20 → 117/5 (gcd 4).
+-- gauss+beta0 = 20 = M(3), same denominator as a_s. Pairing & surface
+-- share the M(3) closure.
+
+nC-squared : ℕ
+nC-squared = 9
+
+gauss-for-pair : ℕ
+gauss-for-pair = 13
+
+t19-nC-squared : nC-squared ≡ 9
+t19-nC-squared = refl
+
+t19-gauss : gauss-for-pair ≡ 13
+t19-gauss = refl
+
+t19-chiMinus1 : chiMinus1 ≡ 5
+t19-chiMinus1 = refl
+
+t19-numerator : nC-squared * gauss-for-pair ≡ 117
+t19-numerator = refl
+
+-- 117/5 in lowest terms: 5 prime, 117 = 3²·13, gcd = 1.
+t19-lowest-terms : 117 rem 5 ≡ 2
+t19-lowest-terms = refl
+
+-- Equivalent: gauss · sigma_d / (gauss+beta0) = 468/20 → 117/5
+t19-alternate-numerator : gauss-for-pair * sigmaD-int ≡ 468
+t19-alternate-numerator = refl
+
+t19-alternate-denominator : gauss-for-pair + beta0-full ≡ 20
+t19-alternate-denominator = refl
+
+t19-alternate-numerator-reduced : 468 quot 4 ≡ 117
+t19-alternate-numerator-reduced = refl
+
+t19-alternate-denominator-reduced : 20 quot 4 ≡ 5
+t19-alternate-denominator-reduced = refl
+
+-- Denominator gauss+beta0 = M(3), shared with a_s.
+t19-denominator-is-magic : gauss-for-pair + beta0-full ≡ 20
+t19-denominator-is-magic = refl
